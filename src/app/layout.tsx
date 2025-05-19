@@ -14,7 +14,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className="dark"> {/* Apply dark theme globally */}
+    <html lang="en" className="dark">
       <body className={`${orbitron.variable} ${poppins.variable} font-poppins antialiased`}>
         {children}
         <Toaster /> {/* Add Toaster for notifications */}
