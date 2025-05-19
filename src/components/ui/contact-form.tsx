@@ -1,3 +1,4 @@
+
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -16,6 +17,8 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/hooks/use-toast";
 import { Send } from "lucide-react";
+import { db } from '@/lib/firebase'; // Import Firebase db instance
+import { collection, addDoc, serverTimestamp } from 'firebase/firestore'; // Import Firestore functions
 
 const formSchema = z.object({
   name: z.string().min(2, { message: "Name must be at least 2 characters." }),
@@ -38,15 +41,27 @@ export default function ContactForm() {
     },
   });
 
-  function onSubmit(values: ContactFormValues) {
-    // In a real app, you'd send this data to a backend.
-    console.log(values);
-    toast({
-      title: "Application Submitted!",
-      description: "Thank you for your interest. We'll be in touch soon.",
-      variant: "default", 
-    });
-    form.reset();
+  async function onSubmit(values: ContactFormValues) {
+    try {
+      const docRef = await addDoc(collection(db, "contactSubmissions"), {
+        ...values,
+        submittedAt: serverTimestamp(),
+      });
+      console.log("Document written with ID: ", docRef.id);
+      toast({
+        title: "Application Submitted!",
+        description: "Thank you for your interest. We'll be in touch soon.",
+        variant: "default", 
+      });
+      form.reset();
+    } catch (e) {
+      console.error("Error adding document: ", e);
+      toast({
+        title: "Submission Failed",
+        description: "There was an error submitting your application. Please try again.",
+        variant: "destructive",
+      });
+    }
   }
 
   return (
