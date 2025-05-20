@@ -2,7 +2,7 @@
 import Link from 'next/link';
 import { InnoNexusLogo } from '@/components/icons/innnexus-logo';
 import { Button } from '@/components/ui/button';
-import { Menu } from 'lucide-react'; // For mobile menu icon
+import { Menu, LogIn } from 'lucide-react'; // For mobile menu icon
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet'; // For mobile drawer
 
 const navLinks = [
@@ -27,44 +27,60 @@ export default function Navbar() {
               key={link.href}
               href={link.href}
               className="transition-colors hover:text-primary"
-              prefetch={false} // Disable prefetching
+              prefetch={false}
             >
               {link.label}
             </Link>
           ))}
         </nav>
 
-        <div className="md:hidden">
-          <Sheet>
-            <SheetTrigger asChild>
-              <Button variant="ghost" size="icon">
-                <Menu className="h-6 w-6" />
-                <span className="sr-only">Toggle Menu</span>
-              </Button>
-            </SheetTrigger>
-            <SheetContent side="right" className="w-[240px] sm:w-[300px] p-6">
-              <SheetHeader className="mb-6 text-left"> {/* Added mb-6 for spacing, text-left for title alignment */}
-                <SheetTitle>
-                  <Link href="/" prefetch={false}>
-                    <InnoNexusLogo className="h-8 w-auto" />
-                  </Link>
-                </SheetTitle>
-                {/* You could add a SheetDescription here if needed */}
-              </SheetHeader>
-              <div className="flex flex-col space-y-4">
-                {navLinks.map((link) => (
+        <div className="flex items-center gap-2">
+          <Button asChild variant="ghost" className="hidden md:inline-flex">
+            <Link href="/login">
+              <LogIn className="mr-2 h-4 w-4" />
+              Login
+            </Link>
+          </Button>
+
+          <div className="md:hidden">
+            <Sheet>
+              <SheetTrigger asChild>
+                <Button variant="ghost" size="icon">
+                  <Menu className="h-6 w-6" />
+                  <span className="sr-only">Toggle Menu</span>
+                </Button>
+              </SheetTrigger>
+              <SheetContent side="right" className="w-[240px] sm:w-[300px] p-6">
+                <SheetHeader className="mb-6 text-left">
+                  <SheetTitle>
+                    <Link href="/" prefetch={false} aria-label="InnoNexus Home">
+                      <InnoNexusLogo className="h-8 w-auto" />
+                    </Link>
+                  </SheetTitle>
+                </SheetHeader>
+                <div className="flex flex-col space-y-4">
+                  {navLinks.map((link) => (
+                    <Link
+                      key={link.href}
+                      href={link.href}
+                      className="text-lg transition-colors hover:text-primary"
+                      prefetch={false}
+                    >
+                      {link.label}
+                    </Link>
+                  ))}
                   <Link
-                    key={link.href}
-                    href={link.href}
-                    className="text-lg transition-colors hover:text-primary"
-                    prefetch={false} // Disable prefetching for mobile links too
-                  >
-                    {link.label}
-                  </Link>
-                ))}
-              </div>
-            </SheetContent>
-          </Sheet>
+                      href="/login"
+                      className="text-lg transition-colors hover:text-primary flex items-center"
+                      prefetch={false}
+                    >
+                      <LogIn className="mr-2 h-5 w-5" />
+                      Login
+                    </Link>
+                </div>
+              </SheetContent>
+            </Sheet>
+          </div>
         </div>
       </div>
     </header>
