@@ -16,7 +16,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
-import { useRouter } from "next/navigation"; // Corrected import
+import { useRouter } from "next/navigation";
 import { LogIn } from "lucide-react";
 
 // IMPORTANT: These are hardcoded for demonstration purposes ONLY.
@@ -48,14 +48,29 @@ export default function AdminLoginForm() {
         title: "Admin Login Successful",
         description: "Redirecting to admin dashboard...",
       });
+      console.log("[AdminLoginForm] Credentials correct. Attempting to redirect to /admin/dashboard");
+      
       // In a real app, you would set some kind of session/token here
-      router.push("/admin/dashboard");
+      setTimeout(() => {
+        try {
+          router.push("/admin/dashboard");
+          console.log("[AdminLoginForm] router.push('/admin/dashboard') was called.");
+        } catch (e) {
+          console.error("[AdminLoginForm] Error during router.push:", e);
+          toast({
+            title: "Redirection Error",
+            description: "Could not navigate to the dashboard. Check console for details.",
+            variant: "destructive",
+          });
+        }
+      }, 0); // Defer to the next tick of the event loop
     } else {
       toast({
         title: "Login Failed",
         description: "Invalid admin email or password.",
         variant: "destructive",
       });
+      console.log("[AdminLoginForm] Invalid credentials entered.");
     }
   }
 
