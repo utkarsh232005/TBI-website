@@ -58,7 +58,6 @@ export default function ContactForm() {
     try {
       const campusStatusFromStorage = typeof window !== "undefined" ? localStorage.getItem('applicantCampusStatus') : null;
       
-      // Explicitly construct the object to be sent to Firestore
       const dataForFirestore: FirestoreSubmissionData = {
         name: values.name,
         email: values.email,
@@ -66,7 +65,6 @@ export default function ContactForm() {
         submittedAt: serverTimestamp(),
       };
 
-      // Add optional fields if they have values
       if (values.companyName) {
         dataForFirestore.companyName = values.companyName;
       }
@@ -75,25 +73,28 @@ export default function ContactForm() {
         dataForFirestore.campusStatus = campusStatusFromStorage;
       }
 
-      // You can add a console.log here to verify the data before sending:
       // console.log("Data being sent to Firestore:", dataForFirestore);
 
       const docRef = await addDoc(collection(db, "contactSubmissions"), dataForFirestore);
-      // console.log("Document written with ID: ", docRef.id); // Optional: for debugging
+      // console.log("Document written with ID: ", docRef.id); 
       toast({
         title: "Application Submitted!",
         description: "Thank you for your interest. We'll be in touch soon.",
         variant: "default", 
       });
-      form.reset(); // Reset form fields
+      form.reset(); 
       if (campusStatusFromStorage && typeof window !== "undefined") {
-        localStorage.removeItem('applicantCampusStatus'); // Clean up localStorage
+        localStorage.removeItem('applicantCampusStatus'); 
       }
     } catch (e) {
-      console.error("Error adding document: ", e);
+      console.error("Error adding document to Firestore: ", e); // More detailed error logging
+      let errorMessage = "There was an error submitting your application. Please try again.";
+      if (e instanceof Error) {
+        errorMessage += ` Details: ${e.message}`;
+      }
       toast({
         title: "Submission Failed",
-        description: "There was an error submitting your application. Please try again.",
+        description: errorMessage,
         variant: "destructive",
       });
     }
