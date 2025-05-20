@@ -25,19 +25,19 @@ const formSchema = z.object({
   email: z.string().email({ message: "Please enter a valid email address." }),
   companyName: z.string().optional(),
   idea: z.string().min(10, { message: "Please describe your idea in at least 10 characters." }),
-  campusStatus: z.string().optional(), // Remains in schema for type consistency if needed elsewhere
+  campusStatus: z.string().optional(),
 });
 
 export type ContactFormValues = z.infer<typeof formSchema>;
 
-// Interface for the actual data structure sent to Firestore
 interface FirestoreSubmissionData {
   name: string;
   email: string;
   companyName?: string;
   idea: string;
-  submittedAt: any; // For serverTimestamp
+  submittedAt: any; 
   campusStatus?: string;
+  status: "pending" | "accepted" | "rejected"; // Added status
 }
 
 
@@ -63,6 +63,7 @@ export default function ContactForm() {
         email: values.email,
         idea: values.idea,
         submittedAt: serverTimestamp(),
+        status: "pending", // Default status
       };
 
       if (values.companyName) {
@@ -73,10 +74,7 @@ export default function ContactForm() {
         dataForFirestore.campusStatus = campusStatusFromStorage;
       }
 
-      // console.log("Data being sent to Firestore:", dataForFirestore);
-
       const docRef = await addDoc(collection(db, "contactSubmissions"), dataForFirestore);
-      // console.log("Document written with ID: ", docRef.id); 
       toast({
         title: "Application Submitted!",
         description: "Thank you for your interest. We'll be in touch soon.",
@@ -87,7 +85,7 @@ export default function ContactForm() {
         localStorage.removeItem('applicantCampusStatus'); 
       }
     } catch (e) {
-      console.error("Error adding document to Firestore: ", e); // More detailed error logging
+      console.error("Error adding document to Firestore: ", e);
       let errorMessage = "There was an error submitting your application. Please try again.";
       if (e instanceof Error) {
         errorMessage += ` Details: ${e.message}`;

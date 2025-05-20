@@ -1,6 +1,6 @@
 
 // src/app/admin/dashboard/page.tsx
-"use client"; // This page will fetch data client-side for simplicity with Firebase SDK
+"use client"; 
 
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
@@ -8,10 +8,12 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
-import { LayoutDashboard, LogOut, Users, FileText, AlertCircle, Loader2 } from "lucide-react";
+import { LayoutDashboard, LogOut, Users, FileText, AlertCircle, Loader2, ThumbsUp, ThumbsDown, KeyRound, UserCircle } from "lucide-react";
 import { db } from '@/lib/firebase';
 import { collection, getDocs, orderBy, query, Timestamp } from 'firebase/firestore';
-import { format } from 'date-fns'; // For formatting dates
+import { format } from 'date-fns';
+import { useToast } from "@/hooks/use-toast";
+import { processApplicationAction } from '@/app/actions/admin-actions';
 
 interface Submission {
   id: string;
@@ -20,55 +22,119 @@ interface Submission {
   companyName?: string;
   idea: string;
   campusStatus?: "campus" | "off-campus";
-  submittedAt: Date | string; // Store as Date object after fetching
+  submittedAt: Date | string;
+  status: "pending" | "accepted" | "rejected";
+  temporaryUserId?: string;
+  temporaryPassword?: string;
+  processedByAdminAt?: Date | string;
 }
 
 export default function AdminDashboardPage() {
   const [submissions, setSubmissions] = useState<Submission[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const { toast } = useToast();
+  const [processingSubmissionId, setProcessingSubmissionId] = useState<string | null>(null);
+
+  const fetchSubmissions = async () => {
+    setIsLoading(true);
+    setError(null);
+    try {
+      const submissionsCollection = collection(db, "contactSubmissions");
+      const q = query(submissionsCollection, orderBy("submittedAt", "desc"));
+      const querySnapshot = await getDocs(q);
+      const fetchedSubmissions: Submission[] = [];
+      querySnapshot.forEach((doc) => {
+        const data = doc.data();
+        fetchedSubmissions.push({
+          id: doc.id,
+          name: data.name,
+          email: data.email,
+          companyName: data.companyName,
+          idea: data.idea,
+          campusStatus: data.campusStatus,
+          submittedAt: data.submittedAt instanceof Timestamp ? data.submittedAt.toDate() : new Date(data.submittedAt),
+          status: data.status || "pending", // Default to pending if status is not set
+          temporaryUserId: data.temporaryUserId,
+          temporaryPassword: data.temporaryPassword,
+          processedByAdminAt: data.processedByAdminAt instanceof Timestamp ? data.processedByAdminAt.toDate() : (data.processedByAdminAt ? new Date(data.processedByAdminAt) : undefined),
+        });
+      });
+      setSubmissions(fetchedSubmissions);
+    } catch (err: any) {
+      console.error("Error fetching submissions: ", err);
+      setError("Failed to load submissions. Please check console or Firestore permissions.");
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   useEffect(() => {
-    const fetchSubmissions = async () => {
-      setIsLoading(true);
-      setError(null);
-      try {
-        const submissionsCollection = collection(db, "contactSubmissions");
-        const q = query(submissionsCollection, orderBy("submittedAt", "desc"));
-        const querySnapshot = await getDocs(q);
-        const fetchedSubmissions: Submission[] = [];
-        querySnapshot.forEach((doc) => {
-          const data = doc.data();
-          fetchedSubmissions.push({
-            id: doc.id,
-            name: data.name,
-            email: data.email,
-            companyName: data.companyName,
-            idea: data.idea,
-            campusStatus: data.campusStatus,
-            submittedAt: data.submittedAt instanceof Timestamp ? data.submittedAt.toDate() : new Date(data.submittedAt) // Convert Firestore Timestamp to JS Date
-          });
-        });
-        setSubmissions(fetchedSubmissions);
-      } catch (err: any) {
-        console.error("Error fetching submissions: ", err);
-        setError("Failed to load submissions. Please check console for details or ensure you have correct Firestore permissions.");
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
     fetchSubmissions();
   }, []);
 
-  const formatDate = (date: Date | string) => {
+  const formatDate = (date: Date | string | undefined) => {
     if (!date) return 'N/A';
     try {
-      return format(new Date(date), "PPpp"); // e.g., Jul 27, 2024, 12:30:00 PM
+      return format(new Date(date), "PPpp"); 
     } catch {
       return 'Invalid Date';
     }
   };
+
+  const handleProcessApplication = async (submissionId: string, action: 'accept' | 'reject', applicantName: string, applicantEmail: string) => {
+    setProcessingSubmissionId(submissionId);
+    try {
+      const result = await processApplicationAction(submissionId, action, applicantName, applicantEmail);
+      if (result.status === 'success') {
+        toast({
+          title: `Application ${action === 'accept' ? 'Accepted' : 'Rejected'}`,
+          description: result.message,
+        });
+        // Update local state to reflect changes
+        setSubmissions(prevSubmissions =>
+          prevSubmissions.map(sub =>
+            sub.id === submissionId
+              ? { ...sub, 
+                  status: action, 
+                  temporaryUserId: action === 'accept' ? result.temporaryUserId : undefined,
+                  temporaryPassword: action === 'accept' ? result.temporaryPassword : undefined,
+                  processedByAdminAt: new Date() // Approximate, actual value is set by serverTimestamp
+                }
+              : sub
+          )
+        );
+      } else {
+        toast({
+          title: "Processing Failed",
+          description: result.message,
+          variant: "destructive",
+        });
+      }
+    } catch (err: any) {
+      console.error(`Error ${action}ing application: `, err);
+      toast({
+        title: "Error",
+        description: `Failed to ${action} application. ${err.message || ''}`,
+        variant: "destructive",
+      });
+    } finally {
+      setProcessingSubmissionId(null);
+    }
+  };
+
+  const getStatusBadgeVariant = (status: Submission['status']) => {
+    switch (status) {
+      case 'accepted':
+        return 'default'; // Often green or primary
+      case 'rejected':
+        return 'destructive';
+      case 'pending':
+      default:
+        return 'secondary'; // Often yellow or gray
+    }
+  };
+
 
   return (
     <div className="flex flex-col min-h-screen bg-background">
@@ -94,7 +160,9 @@ export default function AdminDashboardPage() {
               Application Submissions
             </CardTitle>
             <CardDescription>
-              View and manage all applications submitted through the contact form.
+              View and manage applications. Temporary credentials for accepted users are shown below (for portal access once implemented).
+              <br />
+              <span className="text-xs text-muted-foreground">Note: Email notifications are currently simulated and logged to the server console.</span>
             </CardDescription>
           </CardHeader>
           <CardContent>
@@ -108,7 +176,7 @@ export default function AdminDashboardPage() {
                 <AlertCircle className="mr-2 h-8 w-8" />
                 <p className="font-semibold">Error loading data</p>
                 <p className="text-sm">{error}</p>
-                <Button onClick={() => window.location.reload()} variant="outline" className="mt-4">Try Again</Button>
+                <Button onClick={fetchSubmissions} variant="outline" className="mt-4">Try Again</Button>
               </div>
             ) : submissions.length === 0 ? (
               <div className="text-center py-10">
@@ -122,10 +190,10 @@ export default function AdminDashboardPage() {
                     <TableRow>
                       <TableHead>Name</TableHead>
                       <TableHead>Email</TableHead>
-                      <TableHead>Company</TableHead>
-                      <TableHead className="min-w-[200px]">Idea</TableHead>
-                      <TableHead>Campus Status</TableHead>
+                      <TableHead>Idea</TableHead>
+                      <TableHead>Status</TableHead>
                       <TableHead>Submitted At</TableHead>
+                      <TableHead>Actions</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
@@ -133,22 +201,53 @@ export default function AdminDashboardPage() {
                       <TableRow key={submission.id}>
                         <TableCell className="font-medium">{submission.name}</TableCell>
                         <TableCell>{submission.email}</TableCell>
-                        <TableCell>{submission.companyName || 'N/A'}</TableCell>
                         <TableCell>
                           <div className="max-w-xs truncate" title={submission.idea}>
                             {submission.idea}
                           </div>
+                           {submission.status === 'accepted' && submission.temporaryUserId && (
+                            <div className="mt-1 text-xs text-muted-foreground">
+                                <div className="flex items-center gap-1"><UserCircle size={12}/> User ID: {submission.temporaryUserId}</div>
+                                <div className="flex items-center gap-1"><KeyRound size={12}/> Pass: {submission.temporaryPassword}</div>
+                            </div>
+                          )}
                         </TableCell>
                         <TableCell>
-                          {submission.campusStatus ? (
-                            <Badge variant={submission.campusStatus === 'campus' ? 'default' : 'secondary'}>
-                              {submission.campusStatus.charAt(0).toUpperCase() + submission.campusStatus.slice(1)}
-                            </Badge>
-                          ) : (
-                            'N/A'
+                          <Badge variant={getStatusBadgeVariant(submission.status)} className="capitalize">
+                            {submission.status}
+                          </Badge>
+                          {submission.processedByAdminAt && (
+                             <div className="text-xs text-muted-foreground mt-1">({formatDate(submission.processedByAdminAt)})</div>
                           )}
                         </TableCell>
                         <TableCell>{formatDate(submission.submittedAt)}</TableCell>
+                        <TableCell className="space-x-2">
+                          {submission.status === 'pending' ? (
+                            <>
+                              <Button
+                                variant="default"
+                                size="sm"
+                                onClick={() => handleProcessApplication(submission.id, 'accept', submission.name, submission.email)}
+                                disabled={processingSubmissionId === submission.id}
+                                className="bg-green-600 hover:bg-green-700 text-white"
+                              >
+                                {processingSubmissionId === submission.id ? <Loader2 className="h-4 w-4 animate-spin" /> : <ThumbsUp className="h-4 w-4" />}
+                                <span className="ml-1 hidden sm:inline">Accept</span>
+                              </Button>
+                              <Button
+                                variant="destructive"
+                                size="sm"
+                                onClick={() => handleProcessApplication(submission.id, 'reject', submission.name, submission.email)}
+                                disabled={processingSubmissionId === submission.id}
+                              >
+                                {processingSubmissionId === submission.id ? <Loader2 className="h-4 w-4 animate-spin" /> : <ThumbsDown className="h-4 w-4" />}
+                                 <span className="ml-1 hidden sm:inline">Reject</span>
+                              </Button>
+                            </>
+                          ) : (
+                            <span className="text-xs text-muted-foreground">Processed</span>
+                          )}
+                        </TableCell>
                       </TableRow>
                     ))}
                   </TableBody>
@@ -158,7 +257,6 @@ export default function AdminDashboardPage() {
           </CardContent>
         </Card>
         
-        {/* Placeholder for more admin features */}
         <Card className="shadow-lg">
           <CardHeader>
             <CardTitle className="flex items-center text-2xl">
@@ -166,7 +264,7 @@ export default function AdminDashboardPage() {
               User Management (Placeholder)
             </CardTitle>
             <CardDescription>
-              This section will allow managing users once full Firebase Authentication is implemented.
+              This section will allow managing users once full Firebase Authentication is implemented for accepted applicants.
             </CardDescription>
           </CardHeader>
           <CardContent>
