@@ -1,9 +1,12 @@
+
 "use client";
 
 import { useEffect, useRef, useState } from 'react';
-import Link from 'next/link';
+// Link component is no longer directly used for "Apply for Incubation" button
+// import Link from 'next/link'; 
 import { Button } from '@/components/ui/button';
 import { ArrowRight, ChevronDown } from 'lucide-react';
+import { CampusStatusDialog } from '@/components/ui/campus-status-dialog'; // Import the new dialog
 
 const NUM_PARTICLES = 30;
 
@@ -11,6 +14,7 @@ export default function HeroSection() {
   const [particles, setParticles] = useState<JSX.Element[]>([]);
   const sectionRef = useRef<HTMLDivElement>(null);
   const [isInView, setIsInView] = useState(false);
+  const [showCampusDialog, setShowCampusDialog] = useState(false); // State for dialog visibility
 
   useEffect(() => {
     const observer = new IntersectionObserver(
@@ -29,7 +33,12 @@ export default function HeroSection() {
 
     return () => {
       if (sectionRef.current) {
-        observer.unobserve(sectionRef.current);
+        // Check if sectionRef.current is still valid before unobserving
+        try {
+          observer.unobserve(sectionRef.current);
+        } catch (e) {
+          // console.warn("Error unobserving hero section:", e);
+        }
       }
     };
   }, []);
@@ -50,9 +59,9 @@ export default function HeroSection() {
           style={{
             width: `${size}px`,
             height: `${size}px`,
-            left: `${Math.random() * 100}%`, // Initial horizontal position spread
+            left: `${Math.random() * 100}%`, 
             animationDuration: `${animationDuration}s`,
-            animationDelay: `-${animationDelay}s`, // Negative delay starts part-way through
+            animationDelay: `-${animationDelay}s`, 
             // @ts-ignore CSS custom properties
             '--x-start': `${xStart}vw`,
             '--x-end': `${xEnd}vw`,
@@ -63,6 +72,19 @@ export default function HeroSection() {
     });
     setParticles(newParticles);
   }, []);
+
+  const handleApplyForIncubationClick = () => {
+    setShowCampusDialog(true);
+  };
+
+  const handleCampusStatusSelect = (status: "campus" | "off-campus") => {
+    localStorage.setItem('applicantCampusStatus', status);
+    setShowCampusDialog(false); // Dialog will also close itself via onOpenChange
+    const contactSection = document.getElementById('contact');
+    if (contactSection) {
+      contactSection.scrollIntoView({ behavior: 'smooth' });
+    }
+  };
 
   return (
     <section 
@@ -83,17 +105,20 @@ export default function HeroSection() {
           Join our ecosystem of visionaries, creators, and successful startups.
         </p>
         <div className="mt-10 flex flex-col items-center justify-center gap-4 sm:flex-row">
-          <Button asChild size="lg" className="font-poppins font-semibold group">
-            <Link href="#contact">
-              Apply for Incubation
-              <ArrowRight className="ml-2 h-5 w-5 transition-transform group-hover:translate-x-1" />
-            </Link>
+          <Button 
+            size="lg" 
+            className="font-poppins font-semibold group"
+            onClick={handleApplyForIncubationClick} // Updated onClick handler
+          >
+            Apply for Incubation
+            <ArrowRight className="ml-2 h-5 w-5 transition-transform group-hover:translate-x-1" />
           </Button>
           <Button asChild variant="outline" size="lg" className="font-poppins font-semibold group border-primary text-primary hover:bg-primary/10 hover:text-primary">
-            <Link href="#startups">
+            {/* Using an anchor tag for internal page navigation is fine */}
+            <a href="#startups">
               See Success Stories
               <ChevronDown className="ml-2 h-5 w-5 transition-transform group-hover:translate-y-1" />
-            </Link>
+            </a>
           </Button>
         </div>
       </div>
@@ -103,6 +128,12 @@ export default function HeroSection() {
       >
         <ChevronDown size={32} />
       </div>
+      {/* Render the dialog */}
+      <CampusStatusDialog
+        open={showCampusDialog}
+        onOpenChange={setShowCampusDialog}
+        onSelect={handleCampusStatusSelect}
+      />
     </section>
   );
 }

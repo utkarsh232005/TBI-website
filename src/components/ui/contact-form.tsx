@@ -17,17 +17,25 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/hooks/use-toast";
 import { Send } from "lucide-react";
-import { db } from '@/lib/firebase'; // Import Firebase db instance
-import { collection, addDoc, serverTimestamp } from 'firebase/firestore'; // Import Firestore functions
+import { db } from '@/lib/firebase';
+import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
 
 const formSchema = z.object({
   name: z.string().min(2, { message: "Name must be at least 2 characters." }),
   email: z.string().email({ message: "Please enter a valid email address." }),
   companyName: z.string().optional(),
   idea: z.string().min(10, { message: "Please describe your idea in at least 10 characters." }),
+  campusStatus: z.string().optional(), // Added campusStatus
 });
 
 export type ContactFormValues = z.infer<typeof formSchema>;
+
+// Define a more specific type for submission data if needed
+interface SubmissionData extends ContactFormValues {
+  submittedAt: any; // For serverTimestamp
+  campusStatus?: string;
+}
+
 
 export default function ContactForm() {
   const { toast } = useToast();
@@ -38,15 +46,24 @@ export default function ContactForm() {
       email: "",
       companyName: "",
       idea: "",
+      campusStatus: undefined, // Initialize campusStatus
     },
   });
 
   async function onSubmit(values: ContactFormValues) {
     try {
-      const docRef = await addDoc(collection(db, "contactSubmissions"), {
+      const campusStatus = typeof window !== "undefined" ? localStorage.getItem('applicantCampusStatus') : null;
+      
+      const submissionData: SubmissionData = {
         ...values,
         submittedAt: serverTimestamp(),
-      });
+      };
+
+      if (campusStatus) {
+        submissionData.campusStatus = campusStatus;
+      }
+
+      const docRef = await addDoc(collection(db, "contactSubmissions"), submissionData);
       console.log("Document written with ID: ", docRef.id);
       toast({
         title: "Application Submitted!",
@@ -54,6 +71,9 @@ export default function ContactForm() {
         variant: "default", 
       });
       form.reset();
+      if (campusStatus && typeof window !== "undefined") {
+        localStorage.removeItem('applicantCampusStatus'); // Clean up localStorage
+      }
     } catch (e) {
       console.error("Error adding document: ", e);
       toast({
@@ -133,6 +153,7 @@ export default function ContactForm() {
             </FormItem>
           )}
         />
+        {/* Note: campusStatus is not a visible form field, it's captured from the dialog */}
         <Button type="submit" size="lg" className="w-full font-poppins font-semibold group bg-primary hover:bg-primary/90">
           Let's Build the Future Together
           <Send className="ml-2 h-5 w-5 transition-transform group-hover:translate-x-1" />
