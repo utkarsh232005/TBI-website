@@ -25,13 +25,17 @@ const formSchema = z.object({
   email: z.string().email({ message: "Please enter a valid email address." }),
   companyName: z.string().optional(),
   idea: z.string().min(10, { message: "Please describe your idea in at least 10 characters." }),
-  campusStatus: z.string().optional(), // Added campusStatus
+  campusStatus: z.string().optional(), // Remains in schema for type consistency if needed elsewhere
 });
 
 export type ContactFormValues = z.infer<typeof formSchema>;
 
-// Define a more specific type for submission data if needed
-interface SubmissionData extends ContactFormValues {
+// Interface for the actual data structure sent to Firestore
+interface FirestoreSubmissionData {
+  name: string;
+  email: string;
+  companyName?: string;
+  idea: string;
   submittedAt: any; // For serverTimestamp
   campusStatus?: string;
 }
@@ -46,32 +50,43 @@ export default function ContactForm() {
       email: "",
       companyName: "",
       idea: "",
-      campusStatus: undefined, // Initialize campusStatus
+      campusStatus: undefined, 
     },
   });
 
   async function onSubmit(values: ContactFormValues) {
     try {
-      const campusStatus = typeof window !== "undefined" ? localStorage.getItem('applicantCampusStatus') : null;
+      const campusStatusFromStorage = typeof window !== "undefined" ? localStorage.getItem('applicantCampusStatus') : null;
       
-      const submissionData: SubmissionData = {
-        ...values,
+      // Explicitly construct the object to be sent to Firestore
+      const dataForFirestore: FirestoreSubmissionData = {
+        name: values.name,
+        email: values.email,
+        idea: values.idea,
         submittedAt: serverTimestamp(),
       };
 
-      if (campusStatus) {
-        submissionData.campusStatus = campusStatus;
+      // Add optional fields if they have values
+      if (values.companyName) {
+        dataForFirestore.companyName = values.companyName;
       }
 
-      const docRef = await addDoc(collection(db, "contactSubmissions"), submissionData);
-      console.log("Document written with ID: ", docRef.id);
+      if (campusStatusFromStorage) {
+        dataForFirestore.campusStatus = campusStatusFromStorage;
+      }
+
+      // You can add a console.log here to verify the data before sending:
+      // console.log("Data being sent to Firestore:", dataForFirestore);
+
+      const docRef = await addDoc(collection(db, "contactSubmissions"), dataForFirestore);
+      // console.log("Document written with ID: ", docRef.id); // Optional: for debugging
       toast({
         title: "Application Submitted!",
         description: "Thank you for your interest. We'll be in touch soon.",
         variant: "default", 
       });
-      form.reset();
-      if (campusStatus && typeof window !== "undefined") {
+      form.reset(); // Reset form fields
+      if (campusStatusFromStorage && typeof window !== "undefined") {
         localStorage.removeItem('applicantCampusStatus'); // Clean up localStorage
       }
     } catch (e) {
@@ -153,7 +168,6 @@ export default function ContactForm() {
             </FormItem>
           )}
         />
-        {/* Note: campusStatus is not a visible form field, it's captured from the dialog */}
         <Button type="submit" size="lg" className="w-full font-poppins font-semibold group bg-primary hover:bg-primary/90">
           Let's Build the Future Together
           <Send className="ml-2 h-5 w-5 transition-transform group-hover:translate-x-1" />
