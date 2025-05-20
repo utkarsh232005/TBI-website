@@ -1,3 +1,4 @@
+
 import Link from 'next/link';
 import { InnoNexusLogo } from '@/components/icons/innnexus-logo';
 import { Button } from '@/components/ui/button';
@@ -16,7 +17,7 @@ export default function Navbar() {
   return (
     <header className="sticky top-0 z-50 w-full border-b border-border/40 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
       <div className="container flex h-16 max-w-screen-2xl items-center justify-between px-4 sm:px-6 lg:px-8">
-        <Link href="/" className="flex items-center gap-2" aria-label="InnoNexus Home">
+        <Link href="/" className="flex items-center gap-2" aria-label="InnoNexus Home" prefetch={false}>
           <InnoNexusLogo className="h-8 w-auto" />
         </Link>
         
@@ -26,6 +27,7 @@ export default function Navbar() {
               key={link.href}
               href={link.href}
               className="transition-colors hover:text-primary"
+              prefetch={false} // Disable prefetching
             >
               {link.label}
             </Link>
@@ -42,7 +44,7 @@ export default function Navbar() {
             </SheetTrigger>
             <SheetContent side="right" className="w-[240px] sm:w-[300px] p-6">
               <div className="flex flex-col space-y-4">
-                <Link href="/" className="mb-4">
+                <Link href="/" className="mb-4" prefetch={false}>
                   <InnoNexusLogo className="h-8 w-auto" />
                 </Link>
                 {navLinks.map((link) => (
@@ -50,6 +52,7 @@ export default function Navbar() {
                     key={link.href}
                     href={link.href}
                     className="text-lg transition-colors hover:text-primary"
+                    prefetch={false} // Disable prefetching for mobile links too
                   >
                     {link.label}
                   </Link>
