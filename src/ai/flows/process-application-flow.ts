@@ -19,7 +19,7 @@ const generateRandomString = (length: number = 8) => {
   return Math.random().toString(36).substring(2, 2 + length);
 };
 
-export const ProcessApplicationInputSchema = z.object({
+const ProcessApplicationInputSchema = z.object({
   submissionId: z.string().describe('The ID of the contact submission document in Firestore.'),
   action: z.enum(['accept', 'reject']).describe('The action to take: "accept" or "reject".'),
   applicantName: z.string().describe("The name of the applicant."),
@@ -27,7 +27,7 @@ export const ProcessApplicationInputSchema = z.object({
 });
 export type ProcessApplicationInput = z.infer<typeof ProcessApplicationInputSchema>;
 
-export const ProcessApplicationOutputSchema = z.object({
+const ProcessApplicationOutputSchema = z.object({
   status: z.enum(['success', 'error']).describe('The outcome of the operation.'),
   message: z.string().describe('A message describing the outcome.'),
   email: z.object({
