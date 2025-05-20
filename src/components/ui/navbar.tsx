@@ -3,7 +3,7 @@ import Link from 'next/link';
 import { InnoNexusLogo } from '@/components/icons/innnexus-logo';
 import { Button } from '@/components/ui/button';
 import { Menu } from 'lucide-react'; // For mobile menu icon
-import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet'; // For mobile drawer
+import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet'; // For mobile drawer
 
 const navLinks = [
   { href: '#about', label: 'About Us' },
@@ -43,10 +43,15 @@ export default function Navbar() {
               </Button>
             </SheetTrigger>
             <SheetContent side="right" className="w-[240px] sm:w-[300px] p-6">
+              <SheetHeader className="mb-6 text-left"> {/* Added mb-6 for spacing, text-left for title alignment */}
+                <SheetTitle>
+                  <Link href="/" prefetch={false}>
+                    <InnoNexusLogo className="h-8 w-auto" />
+                  </Link>
+                </SheetTitle>
+                {/* You could add a SheetDescription here if needed */}
+              </SheetHeader>
               <div className="flex flex-col space-y-4">
-                <Link href="/" className="mb-4" prefetch={false}>
-                  <InnoNexusLogo className="h-8 w-auto" />
-                </Link>
                 {navLinks.map((link) => (
                   <Link
                     key={link.href}
