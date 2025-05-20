@@ -18,15 +18,19 @@ export async function processApplicationAction(
     const input: ProcessApplicationInput = { submissionId, action, applicantName, applicantEmail };
     const result = await processApplication(input);
     
+    // Log the full result from the flow to the server console
+    console.log("[AdminActions] Result from processApplication flow:", JSON.stringify(result, null, 2));
+
     if (result.status === 'success') {
       revalidatePath('/admin/dashboard'); // Revalidate to show updated status
     }
     return result;
   } catch (error: any) {
-    console.error("Error in processApplicationAction: ", error);
+    console.error("[AdminActions] Error in processApplicationAction: ", error);
     return {
       status: 'error',
       message: `Server action failed: ${error.message || 'Unknown error'}`,
     };
   }
 }
+
