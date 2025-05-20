@@ -13,6 +13,7 @@ import {ai} from '@/ai/genkit';
 import {z} from 'genkit';
 import { db } from '@/lib/firebase';
 import { doc, updateDoc, serverTimestamp, getDoc } from 'firebase/firestore';
+import { Resend } from 'resend';
 
 // Helper function to generate a simple random string
 const generateRandomString = (length: number = 8) => {
@@ -34,24 +35,47 @@ const ProcessApplicationOutputSchema = z.object({
     to: z.string(),
     subject: z.string(),
     body: z.string(),
-  }).optional().describe('Details of the email that would be sent. Optional if email sending fails or is not applicable.'),
+    sent: z.boolean(),
+    sendError: z.string().optional(),
+  }).optional().describe('Details of the email operation. Optional if email sending is not applicable.'),
   temporaryUserId: z.string().optional().describe('Generated temporary user ID if accepted.'),
   temporaryPassword: z.string().optional().describe('Generated temporary password if accepted.'),
 });
 export type ProcessApplicationOutput = z.infer<typeof ProcessApplicationOutputSchema>;
 
 
-async function sendEmailNotification(to: string, subject: string, body: string) {
-  // In a real application, you would integrate with an email service provider
-  // (e.g., SendGrid, Mailgun, AWS SES, or Firebase Trigger Email Extension).
-  console.log("------ SIMULATING EMAIL SENDING ------");
-  console.log("To:", to);
-  console.log("Subject:", subject);
-  console.log("Body:\n", body);
-  console.log("--------------------------------------");
-  // For this prototype, we just log. In a real app, this function would return a promise
-  // indicating success or failure of the email sending operation.
-  return { success: true, message: "Email logged to console (simulated)." };
+async function sendEmailNotification(to: string, subject: string, body: string): Promise<{ success: boolean; message: string; error?: string }> {
+  if (!process.env.RESEND_API_KEY) {
+    console.warn("RESEND_API_KEY not found. Email sending is disabled. Logging to console instead.");
+    console.log("------ SIMULATING EMAIL SENDING (RESEND_API_KEY missing) ------");
+    console.log("To:", to);
+    console.log("Subject:", subject);
+    console.log("Body:\n", body);
+    console.log("-----------------------------------------------------------");
+    return { success: false, message: "Email sending disabled: RESEND_API_KEY not found. Logged to console.", error: "RESEND_API_KEY_MISSING" };
+  }
+
+  const resend = new Resend(process.env.RESEND_API_KEY);
+
+  try {
+    const { data, error } = await resend.emails.send({
+      from: 'InnoNexus <onboarding@resend.dev>', // Replace with your verified domain sender e.g. 'Your Name <notifications@yourdomain.com>'
+      to: [to],
+      subject: subject,
+      text: body, // For HTML emails, use 'html: "<strong>your html content</strong>"'
+    });
+
+    if (error) {
+      console.error("Resend API Error:", error);
+      return { success: false, message: `Failed to send email via Resend: ${error.message}`, error: JSON.stringify(error) };
+    }
+
+    console.log("Email sent successfully via Resend. ID:", data?.id);
+    return { success: true, message: `Email sent successfully to ${to} via Resend.` };
+  } catch (e: any) {
+    console.error("Error in sendEmailNotification with Resend:", e);
+    return { success: false, message: `Exception during email sending: ${e.message}`, error: e.toString() };
+  }
 }
 
 
@@ -74,7 +98,6 @@ const processApplicationFlow = ai.defineFlow(
       if (submissionData.status !== 'pending') {
          return { status: 'error', message: `Submission ${submissionId} has already been processed (status: ${submissionData.status}).` };
       }
-
 
       let emailSubject = '';
       let emailBody = '';
@@ -103,16 +126,17 @@ const processApplicationFlow = ai.defineFlow(
 
       await updateDoc(submissionRef, updateData);
       
-      // Simulate sending email
-      await sendEmailNotification(applicantEmail, emailSubject, emailBody);
+      const emailResult = await sendEmailNotification(applicantEmail, emailSubject, emailBody);
 
       return {
         status: 'success',
-        message: `Application ${action === 'accept' ? 'accepted' : 'rejected'} successfully.`,
+        message: `Application ${action === 'accept' ? 'accepted' : 'rejected'} successfully. ${emailResult.message}`,
         email: {
           to: applicantEmail,
           subject: emailSubject,
           body: emailBody,
+          sent: emailResult.success,
+          sendError: emailResult.error,
         },
         temporaryUserId: temporaryUserId,
         temporaryPassword: temporaryPassword,
@@ -129,7 +153,5 @@ const processApplicationFlow = ai.defineFlow(
 );
 
 export async function processApplication(input: ProcessApplicationInput): Promise<ProcessApplicationOutput> {
-  // This flow does not use an LLM prompt directly, it's procedural.
-  // If we wanted an LLM to draft the email, we would define and call a prompt here.
   return processApplicationFlow(input);
 }
