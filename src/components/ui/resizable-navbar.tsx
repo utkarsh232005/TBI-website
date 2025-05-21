@@ -7,7 +7,7 @@ import {
   AnimatePresence,
   useScroll,
   useMotionValueEvent,
-} from "framer-motion"; // Changed from "motion/react" to "framer-motion" for typical usage
+} from "framer-motion"; 
 
 import React, { useRef, useState } from "react";
 import { InnoNexusLogo as AppLogo } from '@/components/icons/innnexus-logo';
@@ -71,7 +71,7 @@ export const Navbar = ({ children, className }: NavbarProps) => {
   return (
     <motion.div
       ref={ref}
-      className={cn("sticky inset-x-0 top-0 z-50 w-full", className)} // Changed top-20 to top-0
+      className={cn("sticky inset-x-0 top-0 z-50 w-full", className)} 
     >
       {React.Children.map(children, (child) =>
         React.isValidElement(child)
@@ -90,9 +90,6 @@ export const NavBody = ({ children, className, visible }: NavBodyProps) => {
     <motion.div
       animate={{
         backdropFilter: visible ? "blur(10px)" : "none",
-        // boxShadow: visible // Kept boxShadow but ensure it respects dark theme
-        //   ? "0 0 24px rgba(34, 42, 53, 0.06), 0 1px 1px rgba(0, 0, 0, 0.05), 0 0 0 1px rgba(34, 42, 53, 0.04), 0 0 4px rgba(34, 42, 53, 0.08), 0 16px 68px rgba(47, 48, 55, 0.05), 0 1px 0 rgba(255, 255, 255, 0.1) inset"
-        //   : "none",
         width: visible ? "40%" : "100%",
         y: visible ? 20 : 0,
       }}
@@ -105,8 +102,8 @@ export const NavBody = ({ children, className, visible }: NavBodyProps) => {
         minWidth: "800px",
       }}
       className={cn(
-        "relative z-[60] mx-auto hidden w-full max-w-screen-2xl flex-row items-center justify-between self-start rounded-full bg-transparent px-4 py-2 lg:flex dark:bg-transparent",
-        visible && "bg-background/80 dark:bg-background/80 border border-border shadow-lg", // Adjusted for theme
+        "relative z-[60] mx-auto hidden w-full max-w-screen-2xl flex-row items-center justify-between self-start rounded-full bg-transparent px-4 py-2 lg:flex",
+        visible && "bg-background/80 border border-border shadow-lg", 
         className,
       )}
     >
@@ -122,22 +119,22 @@ export const NavItems = ({ items, className, onItemClick }: NavItemsProps) => {
     <motion.div
       onMouseLeave={() => setHovered(null)}
       className={cn(
-        "absolute inset-0 hidden flex-1 flex-row items-center justify-center space-x-2 text-sm font-medium text-muted-foreground transition duration-200 hover:text-foreground lg:flex lg:space-x-2", // Adjusted colors
+        "absolute inset-0 hidden flex-1 flex-row items-center justify-center space-x-2 text-sm font-normal text-muted-foreground transition duration-200 lg:flex lg:space-x-2", 
         className,
       )}
     >
       {items.map((item, idx) => (
-        <Link
+        <Link // Changed from <a> to <Link>
           href={item.link}
           key={`link-${idx}`}
           onMouseEnter={() => setHovered(idx)}
           onClick={onItemClick}
-          className="relative px-4 py-2 text-muted-foreground hover:text-primary dark:text-neutral-300" // Adjusted colors
+          className="relative px-4 py-2 text-muted-foreground hover:text-foreground" 
         >
           {hovered === idx && (
             <motion.div
               layoutId="hovered"
-              className="absolute inset-0 h-full w-full rounded-full bg-accent dark:bg-neutral-800" // Adjusted for theme
+              className="absolute inset-0 h-full w-full rounded-full bg-muted/50" // Use a muted background for hover to match gray-400 style
             />
           )}
           <span className="relative z-20">{item.name}</span>
@@ -152,13 +149,10 @@ export const MobileNav = ({ children, className, visible }: MobileNavProps) => {
     <motion.div
       animate={{
         backdropFilter: visible ? "blur(10px)" : "none",
-        // boxShadow: visible // Kept boxShadow
-        //   ? "0 0 24px rgba(34, 42, 53, 0.06), 0 1px 1px rgba(0, 0, 0, 0.05), 0 0 0 1px rgba(34, 42, 53, 0.04), 0 0 4px rgba(34, 42, 53, 0.08), 0 16px 68px rgba(47, 48, 55, 0.05), 0 1px 0 rgba(255, 255, 255, 0.1) inset"
-        //   : "none",
         width: visible ? "90%" : "100%",
         paddingRight: visible ? "12px" : "0px",
         paddingLeft: visible ? "12px" : "0px",
-        borderRadius: visible ? "1.5rem" : "0rem", // Changed from 4px to 2rem and then 0rem
+        borderRadius: visible ? "1.5rem" : "0rem", 
         y: visible ? 20 : 0,
       }}
       transition={{
@@ -167,9 +161,8 @@ export const MobileNav = ({ children, className, visible }: MobileNavProps) => {
         damping: 50,
       }}
       className={cn(
-        "relative z-50 mx-auto flex w-full max-w-[calc(100vw-2rem)] flex-col items-center justify-between bg-transparent px-0 py-2 lg:hidden", // max-w original
-        // "container flex h-16 items-center justify-between px-4 sm:px-6 lg:px-8 lg:hidden", // Trying to match old navbar container
-        visible && "bg-background/80 dark:bg-background/80 border border-border shadow-lg", // Adjusted for theme
+        "relative z-50 mx-auto flex w-full max-w-[calc(100vw-2rem)] flex-col items-center justify-between bg-transparent px-0 py-2 lg:hidden", 
+        visible && "bg-background/80 border border-border shadow-lg", 
         className,
       )}
     >
@@ -185,7 +178,7 @@ export const MobileNavHeader = ({
   return (
     <div
       className={cn(
-        "flex w-full flex-row items-center justify-between px-4", // Added px-4 for padding
+        "flex w-full flex-row items-center justify-between px-4", 
         className,
       )}
     >
@@ -198,7 +191,7 @@ export const MobileNavMenu = ({
   children,
   className,
   isOpen,
-}: MobileNavMenuProps) => { // Removed onClose as it's handled by link clicks
+}: MobileNavMenuProps) => { 
   return (
     <AnimatePresence>
       {isOpen && (
@@ -207,7 +200,7 @@ export const MobileNavMenu = ({
           animate={{ opacity: 1, y: 0 }}
           exit={{ opacity: 0, y: -20 }}
           className={cn(
-            "absolute inset-x-0 top-16 z-50 flex w-full flex-col items-start justify-start gap-4 rounded-lg bg-card px-4 py-8 shadow-xl dark:bg-card", // Adjusted for theme and shadow
+            "absolute inset-x-0 top-16 z-50 flex w-full flex-col items-start justify-start gap-4 rounded-lg bg-card px-4 py-8 shadow-xl", 
             className,
           )}
         >
@@ -226,59 +219,56 @@ export const MobileNavToggle = ({
   onClick: () => void;
 }) => {
   return isOpen ? (
-    <IconX className="text-foreground dark:text-foreground" onClick={onClick} />
+    <IconX className="text-foreground" onClick={onClick} />
   ) : (
-    <IconMenu2 className="text-foreground dark:text-foreground" onClick={onClick} />
+    <IconMenu2 className="text-foreground" onClick={onClick} />
   );
 };
 
 export const NavbarLogo = () => {
   return (
-    <Link
+    <Link // Changed from <a> to <Link>
       href="/"
       aria-label="InnoNexus Home"
       className="relative z-20 mr-4 flex items-center space-x-2 px-2 py-1 text-sm font-normal"
     >
-      <AppLogo className="h-8 w-auto" />
+      <AppLogo className="h-8 w-auto text-primary" /> {/* Ensure logo uses primary color */}
     </Link>
   );
 };
 
 export const NavbarButton = ({
   href,
-  as: Tag = "button", // Default to button if not linking
+  as: Tag = "button", 
   children,
   className,
   variant = "primary",
-  onClick, // Added onClick to handle it for button type
+  onClick, 
   ...props
 }: {
   href?: string;
   as?: React.ElementType;
   children: React.ReactNode;
   className?: string;
-  variant?: "primary" | "secondary" | "dark" | "gradient" | "outline" | "ghost"; // Added more variants
+  variant?: "primary" | "secondary" | "outline" | "ghost"; 
   onClick?: React.MouseEventHandler<HTMLButtonElement | HTMLAnchorElement>;
 } & (
   | React.ComponentPropsWithoutRef<"a">
   | React.ComponentPropsWithoutRef<"button">
 )) => {
-  // Using ShadCN buttonVariants for consistency
-  const baseStyles = "px-4 py-2 rounded-md text-sm font-semibold relative cursor-pointer hover:-translate-y-0.5 transition duration-200 inline-block text-center";
+  
+  const baseStyles = "px-6 py-2 rounded-full text-base font-semibold relative cursor-pointer hover:-translate-y-0.5 transition duration-200 inline-block text-center";
 
-  // Simplified variants, ideally map to globals.css theme
+  // Variants using theme variables from globals.css
   const variantStyles = {
-    primary: "bg-primary text-primary-foreground shadow-md",
+    primary: "bg-primary text-primary-foreground shadow-md hover:bg-primary/90",
     secondary: "bg-secondary text-secondary-foreground hover:bg-secondary/80",
-    outline: "border border-input bg-background hover:bg-accent hover:text-accent-foreground",
-    ghost: "hover:bg-accent hover:text-accent-foreground",
-    dark: "bg-neutral-900 text-white shadow-md", // Example dark variant
-    gradient: "bg-gradient-to-b from-blue-500 to-blue-700 text-white shadow-md", // Example gradient
+    // Updated outline to match example's secondary button style (e.g., "Talk to Sales")
+    outline: "border border-muted bg-transparent text-muted-foreground hover:text-foreground hover:border-foreground",
+    ghost: "hover:bg-accent hover:text-accent-foreground text-foreground", // Ensure ghost buttons are visible on black bg
   };
   
-  // Ensure props like 'type' are passed if Tag is 'button'
   const buttonProps = Tag === "button" ? { type: "button", ...props } : props;
-
 
   if (Tag === "a" && href) {
     return (

@@ -4,6 +4,8 @@
 
 @layer base {
   :root {
+    /* These are light theme defaults, primarily for reference if a light theme toggle is ever added. */
+    /* The site currently operates in dark mode by default via <html class="dark"> */
     --background: 0 0% 100%;
     --foreground: 222.2 84% 4.9%;
 
@@ -32,7 +34,7 @@
     --input: 214.3 31.8% 91.4%;
     --ring: 222.2 84% 4.9%;
 
-    --radius: 0.5rem;
+    --radius: 0.5rem; /* Default radius, buttons will override to rounded-full */
 
     --chart-1: 12 76% 61%;
     --chart-2: 173 58% 39%;
@@ -42,39 +44,40 @@
   }
 
   .dark {
-    --background: 0 0% 7%; /* Dark Charcoal */
-    --foreground: 0 0% 98%; /* Almost White */
+    --background: 0 0% 0%; /* Black background from example */
+    --foreground: 0 0% 98%; /* Near white text */
 
-    --card: 0 0% 10%; /* Slightly Lighter Charcoal for cards */
+    --card: 0 0% 5%; /* Dark gray for cards, slightly off-black */
     --card-foreground: 0 0% 98%;
 
-    --popover: 0 0% 5%; /* Darker for popovers */
+    --popover: 0 0% 3%; /* Even darker for popovers */
     --popover-foreground: 0 0% 98%;
 
-    --primary: 181 100% 74%; /* Electric Blue */
-    --primary-foreground: 181 100% 10%; /* Dark Blue for text on primary */
+    --primary: 190 95% 43%; /* Cyan from example gradient */
+    --primary-foreground: 0 0% 100%; /* White text on primary */
 
-    --secondary: 0 0% 12%; /* A bit lighter charcoal for secondary buttons/elements */
-    --secondary-foreground: 0 0% 90%;
+    --secondary: 0 0% 15%; /* Medium dark gray for secondary elements */
+    --secondary-foreground: 0 0% 90%; /* Light gray text on secondary */
 
-    --muted: 0 0% 15%; /* For borders, dividers */
-    --muted-foreground: 0 0% 65%; /* For subtext */
+    --muted: 0 0% 10%; /* Dark gray for muted backgrounds (e.g., TabsList) */
+    --muted-foreground: 215 8% 65%; /* text-gray-400 from example */
 
-    --accent: 120 61% 50%; /* Lime Green */
-    --accent-foreground: 0 0% 7%; /* Dark Charcoal for text on lime green */
+    --accent: 263 93% 66%; /* Purple from example gradient */
+    --accent-foreground: 0 0% 100%; /* White text on accent */
 
-    --destructive: 348 83% 47%; /* Crimson Red */
+    --destructive: 348 83% 47%; /* Crimson Red (can be kept or adjusted) */
     --destructive-foreground: 0 0% 98%;
 
-    --border: 0 0% 20%;
-    --input: 0 0% 20%;
-    --ring: 181 100% 60%; /* Focus ring - Electric Blue shade */
+    --border: 215 14% 34%; /* border-gray-600 from example */
+    --input: 215 14% 34%; /* border-gray-600 for input borders */
+    --ring: 190 80% 55%; /* Lighter cyan for focus rings */
     
-    --chart-1: 181 100% 74%; /* Electric Blue */
-    --chart-2: 120 61% 50%; /* Lime Green */
-    --chart-3: 280 80% 70%; /* Violet */
-    --chart-4: 0 80% 70%; /* Crimson Red like */
-    --chart-5: 210 80% 70%; /* Another Blue */
+    /* Chart colors updated to match new theme */
+    --chart-1: 190 95% 43%; /* Cyan */
+    --chart-2: 263 93% 66%; /* Purple */
+    --chart-3: 220 80% 70%; /* A blue */
+    --chart-4: 300 70% 60%; /* A magenta */
+    --chart-5: 0 0% 60%;   /* A gray */
   }
 }
 
@@ -104,7 +107,7 @@
 
 .particle {
   position: absolute;
-  background-color: hsl(var(--primary) / 0.5); /* Electric Blue with some transparency */
+  background-color: hsl(var(--primary) / 0.5); /* Uses new primary (cyan) with some transparency */
   border-radius: 50%;
   animation: float 25s infinite ease-in-out;
   opacity: 0;
