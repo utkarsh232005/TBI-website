@@ -2,18 +2,18 @@
 "use client";
 
 import { useRef, useEffect, useState } from 'react';
-import Image from 'next/image';
+// Removed Image import as it's no longer directly used for the header
 import { BentoGrid, BentoGridItem } from '@/components/ui/bento-grid';
-import { Rocket } from 'lucide-react'; // Using Lucide for a generic icon
+import { Rocket } from 'lucide-react'; 
 
-// Data remains the same as before
+// Data remains the same as before for content
 const startupsData = [
   {
     id: '1',
     name: 'QuantumLeap AI',
-    logoUrl: 'https://placehold.co/300x150/1A1A1A/7DF9FF.png?text=QAI',
+    logoUrl: 'https://placehold.co/300x150/1A1A1A/7DF9FF.png?text=QAI', // Kept for potential future use, but not for header
     description: 'Revolutionizing data analytics with quantum-inspired machine learning algorithms.',
-    badgeText: 'Series A Funded', // This badge won't be directly used in BentoGridItem, but data is kept
+    badgeText: 'Series A Funded',
     websiteUrl: '#',
     dataAiHint: "technology logo"
   },
@@ -64,17 +64,10 @@ const startupsData = [
   },
 ];
 
-const BentoCompatibleSkeleton = ({ startup }: { startup: typeof startupsData[0] }) => (
-  <div className="flex flex-1 w-full h-full min-h-[6rem] rounded-xl items-center justify-center relative overflow-hidden bg-card-foreground/5">
-    <Image
-      src={startup.logoUrl}
-      alt={`${startup.name} logo`}
-      fill
-      style={{ objectFit: 'contain' }}
-      className="p-4"
-      data-ai-hint={startup.dataAiHint || "startup logo"}
-    />
-  </div>
+// New Skeleton component to match the plain dark rectangle header in the image
+const Skeleton = () => (
+  <div className="flex flex-1 w-full h-full min-h-[6rem] rounded-xl bg-card-foreground/5"></div>
+  // bg-card-foreground/5 gives a very subtle dark gray, slightly lighter than card background
 );
 
 
@@ -108,17 +101,11 @@ export default function FeaturedStartupsSection() {
     id: startup.id,
     title: startup.name,
     description: startup.description,
-    header: <BentoCompatibleSkeleton startup={startup} />,
-    icon: <Rocket className="h-4 w-4 text-primary" />, // Generic icon
-    className: startupsData.indexOf(startup) === 2 || startupsData.indexOf(startup) === 5 ? "md:col-span-2" : "", // Adjusting for 0-based index for items 3 and 6
+    header: <Skeleton />, // Use the new plain Skeleton for the header
+    icon: <Rocket className="h-4 w-4 text-muted-foreground" />, // Generic icon, styled to be subtle
+    className: startupsData.indexOf(startup) === 2 || startupsData.indexOf(startup) === 5 ? "md:col-span-2" : "",
   }));
   
-  // Handle cases with fewer than 6 startups for md:col-span-2 logic
-  // For simplicity, we'll apply col-span-2 to 3rd and 6th item if they exist.
-  // A more dynamic col-span logic might be needed for varying numbers of items.
-  // For this implementation, we'll assume startupsData.length is suitable or the col-span logic will gracefully handle fewer items.
-  // If startupsData.length is 3, the 3rd item (index 2) gets col-span-2.
-  // If startupsData.length is 6, 3rd (index 2) and 6th (index 5) get col-span-2.
 
   return (
     <section id="startups" ref={sectionRef} className="py-16 md:py-24 bg-background text-foreground">
@@ -137,14 +124,14 @@ export default function FeaturedStartupsSection() {
              <div
               key={item.id}
               className={`transition-all duration-500 ease-out ${isInView ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}
-              style={{ transitionDelay: `${i * 100 + 200}ms` }} // Stagger animation for items
+              style={{ transitionDelay: `${i * 100 + 200}ms` }}
             >
               <BentoGridItem
                 title={item.title}
                 description={item.description}
                 header={item.header}
                 icon={item.icon}
-                className={item.className} // Apply md:col-span-2 based on item's pre-calculated className
+                className={item.className}
               />
             </div>
           ))}
