@@ -86,11 +86,19 @@ export default {
   				to: {
   					height: '0'
   				}
-  			}
+  			},
+        scroll: {
+          to: {
+            transform: 'translateX(calc(-50% - 0.5rem))', // Keyframe for infinite scroll
+            // This assumes a gap of 1rem (gap-4). -50% scrolls one full set of duplicated items.
+            // -0.5rem accounts for half the gap between the end of original and start of cloned.
+          },
+        },
   		},
   		animation: {
   			'accordion-down': 'accordion-down 0.2s ease-out',
-  			'accordion-up': 'accordion-up 0.2s ease-out'
+  			'accordion-up': 'accordion-up 0.2s ease-out',
+        'scroll': 'scroll var(--animation-duration, 40s) var(--animation-direction, forwards) linear infinite', // Animation utility
   		}
   	}
   },

@@ -1,9 +1,11 @@
 "use client";
 
 import { useRef, useEffect, useState } from 'react';
-import TestimonialCarousel, { type Testimonial } from '@/components/ui/testimonial-carousel';
+// import TestimonialCarousel, { type Testimonial } from '@/components/ui/testimonial-carousel'; // Old carousel
+import { InfiniteMovingCards } from '@/components/ui/infinite-moving-cards'; // New component
 
-const testimonialsData: Testimonial[] = [
+// Testimonial data structure is compatible
+const testimonialsData = [
   {
     id: '1',
     quote: 'InnoNexus provided us with unparalleled mentorship and resources. Their network was instrumental in our early success and Series A funding.',
@@ -56,15 +58,20 @@ export default function TestimonialsSection() {
     }
     return () => {
       if (sectionRef.current) {
+        // eslint-disable-next-line react-hooks/exhaustive-deps
         observer.unobserve(sectionRef.current);
       }
     };
   }, []);
 
+  const animationClass = (delay: string = '0ms') => 
+    `transition-all duration-700 ease-out ${isInView ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}` + ` style="transition-delay: ${delay}"`;
+
+
   return (
     <section id="testimonials" ref={sectionRef} className="py-16 md:py-24 bg-background text-foreground">
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-        <div className={`text-center mb-12 md:mb-16 transition-all duration-700 ease-out ${isInView ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}>
+        <div className={`text-center mb-12 md:mb-16 ${animationClass()}`}>
           <h2 className="font-orbitron text-3xl font-bold tracking-tight sm:text-4xl md:text-5xl text-primary">
             Words From Our Innovators
           </h2>
@@ -73,7 +80,15 @@ export default function TestimonialsSection() {
           </p>
         </div>
         
-        <TestimonialCarousel testimonials={testimonialsData} />
+        <div 
+          className={`relative flex flex-col items-center justify-center overflow-hidden ${animationClass('150ms')}`}
+        >
+          <InfiniteMovingCards
+            items={testimonialsData}
+            direction="right"
+            speed="slow"
+          />
+        </div>
       </div>
     </section>
   );
