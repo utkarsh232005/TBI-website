@@ -150,6 +150,7 @@ export default function AdminDashboardPage() {
 
   const handleProcessApplication = async (submissionId: string, action: 'accept' | 'reject', applicantName: string, applicantEmail: string) => {
     setProcessingSubmissionId(submissionId);
+    actionBeingProcessed = action; // Set for button spinner
     try {
       const result = await processApplicationAction(submissionId, action, applicantName, applicantEmail);
       if (result.status === 'success') {
@@ -157,8 +158,7 @@ export default function AdminDashboardPage() {
           title: `Application ${action === 'accept' ? 'Accepted' : 'Rejected'}`,
           description: result.message,
         });
-        // Re-fetch or update local state more accurately
-        fetchSubmissions(); // Re-fetch to get all updates and re-process chart data
+        fetchSubmissions(); 
       } else {
         toast({
           title: "Processing Failed",
@@ -175,6 +175,7 @@ export default function AdminDashboardPage() {
       });
     } finally {
       setProcessingSubmissionId(null);
+      actionBeingProcessed = null; // Reset for button spinner
     }
   };
 
@@ -290,7 +291,7 @@ export default function AdminDashboardPage() {
           </CardDescription>
         </CardHeader>
         <CardContent>
-          {isLoading && submissions.length === 0 ? ( // Show main loader only if no data at all yet
+          {isLoading && submissions.length === 0 ? ( 
             <div className="flex items-center justify-center py-10">
               <Loader2 className="mr-2 h-8 w-8 animate-spin text-primary" />
               <span className="text-muted-foreground">Loading submissions...</span>
@@ -399,12 +400,21 @@ export default function AdminDashboardPage() {
 let actionBeingProcessed: 'accept' | 'reject' | null = null;
 
 // Update handleProcessApplication to set actionBeingProcessed
-const originalHandleProcessApplication = AdminDashboardPage.prototype.handleProcessApplication;
-AdminDashboardPage.prototype.handleProcessApplication = async function(submissionId: string, action: 'accept' | 'reject', applicantName: string, applicantEmail: string) {
-  actionBeingProcessed = action;
-  // @ts-ignore
-  await originalHandleProcessApplication.call(this, submissionId, action, applicantName, applicantEmail);
-  actionBeingProcessed = null;
-};
+// This is a bit of a workaround for functional components.
+// Ideally, this state (actionBeingProcessed) would be part of the component's state
+// if we were to refactor how it's used with the handleProcessApplication function.
+// For now, we are modifying the function attached to the default export.
+const originalHandleProcessApplication = (AdminDashboardPage as any).prototype?.handleProcessApplication;
 
-```CDATATE OF THE FILE HERE. Ensure all code is properly escaped within the CDATA section.
+if (originalHandleProcessApplication) {
+  (AdminDashboardPage as any).prototype.handleProcessApplication = async function(this: any, submissionId: string, action: 'accept' | 'reject', applicantName: string, applicantEmail: string) {
+    actionBeingProcessed = action;
+    await originalHandleProcessApplication.call(this, submissionId, action, applicantName, applicantEmail);
+    actionBeingProcessed = null;
+  };
+} else {
+  // Fallback if prototype or original function is not found, to prevent crashes.
+  // This might happen if the component structure changes significantly.
+  // We still want the AdminDashboardPage to render.
+  console.warn("Could not find originalHandleProcessApplication on AdminDashboardPage prototype. Button spinner logic might be affected.");
+}
