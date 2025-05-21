@@ -3,12 +3,12 @@
 "use client"; 
 
 import { useEffect, useState } from 'react';
-import Link from 'next/link';
+// import Link from 'next/link'; // No longer needed here
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
-import { LayoutDashboard, LogOut, Users, FileText, AlertCircle, Loader2, ThumbsUp, ThumbsDown, KeyRound, UserCircle } from "lucide-react";
+import { AlertCircle, Loader2, ThumbsUp, ThumbsDown, KeyRound, UserCircle, FileTextIcon } from "lucide-react";
 import { db } from '@/lib/firebase';
 import { collection, getDocs, orderBy, query, Timestamp } from 'firebase/firestore';
 import { format } from 'date-fns';
@@ -126,157 +126,122 @@ export default function AdminDashboardPage() {
   const getStatusBadgeVariant = (status: Submission['status']) => {
     switch (status) {
       case 'accepted':
-        return 'default'; // Often green or primary
+        return 'default'; 
       case 'rejected':
         return 'destructive';
       case 'pending':
       default:
-        return 'secondary'; // Often yellow or gray
+        return 'secondary'; 
     }
   };
 
-
   return (
-    <div className="flex flex-col min-h-screen bg-background">
-      <header className="sticky top-0 z-40 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-        <div className="container flex h-16 max-w-screen-2xl items-center justify-between px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center gap-2">
-            <LayoutDashboard className="h-8 w-8 text-primary" />
-            <h1 className="font-orbitron text-2xl font-bold text-primary">Admin Dashboard</h1>
-          </div>
-          <Button asChild variant="outline">
-            <Link href="/">
-              <LogOut className="mr-2 h-4 w-4" /> Back to Homepage
-            </Link>
-          </Button>
-        </div>
-      </header>
-
-      <main className="flex-grow container mx-auto px-4 py-8 sm:px-6 lg:px-8">
-        <Card className="mb-8 shadow-lg">
-          <CardHeader>
-            <CardTitle className="flex items-center text-2xl">
-              <FileText className="mr-3 h-7 w-7 text-primary" />
-              Application Submissions
-            </CardTitle>
-            <CardDescription>
-              View and manage applications. Temporary credentials for accepted users are shown below (for portal access once implemented).
-              <br />
-              <span className="text-xs text-muted-foreground">Note: Email notifications are currently simulated and logged to the server console.</span>
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            {isLoading ? (
-              <div className="flex items-center justify-center py-10">
-                <Loader2 className="mr-2 h-8 w-8 animate-spin text-primary" />
-                <span className="text-muted-foreground">Loading submissions...</span>
-              </div>
-            ) : error ? (
-              <div className="flex flex-col items-center justify-center py-10 text-destructive">
-                <AlertCircle className="mr-2 h-8 w-8" />
-                <p className="font-semibold">Error loading data</p>
-                <p className="text-sm">{error}</p>
-                <Button onClick={fetchSubmissions} variant="outline" className="mt-4">Try Again</Button>
-              </div>
-            ) : submissions.length === 0 ? (
-              <div className="text-center py-10">
-                <FileText className="mx-auto h-12 w-12 text-muted-foreground mb-4" />
-                <p className="text-muted-foreground">No submissions yet.</p>
-              </div>
-            ) : (
-              <div className="overflow-x-auto">
-                <Table>
-                  <TableHeader>
-                    <TableRow>
-                      <TableHead>Name</TableHead>
-                      <TableHead>Email</TableHead>
-                      <TableHead>Idea</TableHead>
-                      <TableHead>Status</TableHead>
-                      <TableHead>Submitted At</TableHead>
-                      <TableHead>Actions</TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {submissions.map((submission) => (
-                      <TableRow key={submission.id}>
-                        <TableCell className="font-medium">{submission.name}</TableCell>
-                        <TableCell>{submission.email}</TableCell>
-                        <TableCell>
-                          <div className="max-w-xs truncate" title={submission.idea}>
-                            {submission.idea}
+    <div className="space-y-8">
+      <Card className="shadow-lg">
+        <CardHeader>
+          <CardTitle className="flex items-center text-2xl">
+            <FileTextIcon className="mr-3 h-7 w-7 text-primary" />
+            Application Submissions
+          </CardTitle>
+          <CardDescription>
+            View and manage applications. Temporary credentials for accepted users are shown below.
+            <br />
+            <span className="text-xs text-muted-foreground">
+              Email notifications are sent via Resend (API key required).
+            </span>
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          {isLoading ? (
+            <div className="flex items-center justify-center py-10">
+              <Loader2 className="mr-2 h-8 w-8 animate-spin text-primary" />
+              <span className="text-muted-foreground">Loading submissions...</span>
+            </div>
+          ) : error ? (
+            <div className="flex flex-col items-center justify-center py-10 text-destructive">
+              <AlertCircle className="mr-2 h-8 w-8" />
+              <p className="font-semibold">Error loading data</p>
+              <p className="text-sm">{error}</p>
+              <Button onClick={fetchSubmissions} variant="outline" className="mt-4">Try Again</Button>
+            </div>
+          ) : submissions.length === 0 ? (
+            <div className="text-center py-10">
+              <FileTextIcon className="mx-auto h-12 w-12 text-muted-foreground mb-4" />
+              <p className="text-muted-foreground">No submissions yet.</p>
+            </div>
+          ) : (
+            <div className="overflow-x-auto">
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>Name</TableHead>
+                    <TableHead>Email</TableHead>
+                    <TableHead>Idea</TableHead>
+                    <TableHead>Status</TableHead>
+                    <TableHead>Submitted At</TableHead>
+                    <TableHead className="text-right">Actions</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {submissions.map((submission) => (
+                    <TableRow key={submission.id}>
+                      <TableCell className="font-medium">{submission.name}</TableCell>
+                      <TableCell>{submission.email}</TableCell>
+                      <TableCell>
+                        <div className="max-w-xs truncate" title={submission.idea}>
+                          {submission.idea}
+                        </div>
+                        {submission.status === 'accepted' && submission.temporaryUserId && (
+                          <div className="mt-1 text-xs text-muted-foreground">
+                              <div className="flex items-center gap-1"><UserCircle size={12}/> User ID: {submission.temporaryUserId}</div>
+                              <div className="flex items-center gap-1"><KeyRound size={12}/> Pass: {submission.temporaryPassword}</div>
                           </div>
-                           {submission.status === 'accepted' && submission.temporaryUserId && (
-                            <div className="mt-1 text-xs text-muted-foreground">
-                                <div className="flex items-center gap-1"><UserCircle size={12}/> User ID: {submission.temporaryUserId}</div>
-                                <div className="flex items-center gap-1"><KeyRound size={12}/> Pass: {submission.temporaryPassword}</div>
-                            </div>
-                          )}
-                        </TableCell>
-                        <TableCell>
-                          <Badge variant={getStatusBadgeVariant(submission.status)} className="capitalize">
-                            {submission.status}
-                          </Badge>
-                          {submission.processedByAdminAt && (
-                             <div className="text-xs text-muted-foreground mt-1">({formatDate(submission.processedByAdminAt)})</div>
-                          )}
-                        </TableCell>
-                        <TableCell>{formatDate(submission.submittedAt)}</TableCell>
-                        <TableCell className="space-x-2">
-                          {submission.status === 'pending' ? (
-                            <>
-                              <Button
-                                variant="default"
-                                size="sm"
-                                onClick={() => handleProcessApplication(submission.id, 'accept', submission.name, submission.email)}
-                                disabled={processingSubmissionId === submission.id}
-                                className="bg-green-600 hover:bg-green-700 text-white"
-                              >
-                                {processingSubmissionId === submission.id ? <Loader2 className="h-4 w-4 animate-spin" /> : <ThumbsUp className="h-4 w-4" />}
-                                <span className="ml-1 hidden sm:inline">Accept</span>
-                              </Button>
-                              <Button
-                                variant="destructive"
-                                size="sm"
-                                onClick={() => handleProcessApplication(submission.id, 'reject', submission.name, submission.email)}
-                                disabled={processingSubmissionId === submission.id}
-                              >
-                                {processingSubmissionId === submission.id ? <Loader2 className="h-4 w-4 animate-spin" /> : <ThumbsDown className="h-4 w-4" />}
-                                 <span className="ml-1 hidden sm:inline">Reject</span>
-                              </Button>
-                            </>
-                          ) : (
-                            <span className="text-xs text-muted-foreground">Processed</span>
-                          )}
-                        </TableCell>
-                      </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
-              </div>
-            )}
-          </CardContent>
-        </Card>
-        
-        <Card className="shadow-lg">
-          <CardHeader>
-            <CardTitle className="flex items-center text-2xl">
-              <Users className="mr-3 h-7 w-7 text-primary" />
-              User Management (Placeholder)
-            </CardTitle>
-            <CardDescription>
-              This section will allow managing users once full Firebase Authentication is implemented for accepted applicants.
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <p className="text-muted-foreground">User management features will be available here.</p>
-             <Button variant="outline" className="mt-4" disabled>Manage Users</Button>
-          </CardContent>
-        </Card>
-
-      </main>
-       <footer className="border-t py-4 text-center text-sm text-muted-foreground">
-        InnoNexus Admin Panel &copy; {new Date().getFullYear()}
-      </footer>
+                        )}
+                      </TableCell>
+                      <TableCell>
+                        <Badge variant={getStatusBadgeVariant(submission.status)} className="capitalize">
+                          {submission.status}
+                        </Badge>
+                        {submission.processedByAdminAt && (
+                           <div className="text-xs text-muted-foreground mt-1">({formatDate(submission.processedByAdminAt)})</div>
+                        )}
+                      </TableCell>
+                      <TableCell>{formatDate(submission.submittedAt)}</TableCell>
+                      <TableCell className="text-right space-x-2">
+                        {submission.status === 'pending' ? (
+                          <>
+                            <Button
+                              variant="default"
+                              size="sm"
+                              onClick={() => handleProcessApplication(submission.id, 'accept', submission.name, submission.email)}
+                              disabled={processingSubmissionId === submission.id}
+                              className="bg-green-600 hover:bg-green-700 text-white"
+                            >
+                              {processingSubmissionId === submission.id ? <Loader2 className="h-4 w-4 animate-spin" /> : <ThumbsUp className="h-4 w-4" />}
+                              <span className="ml-1 hidden sm:inline">Accept</span>
+                            </Button>
+                            <Button
+                              variant="destructive"
+                              size="sm"
+                              onClick={() => handleProcessApplication(submission.id, 'reject', submission.name, submission.email)}
+                              disabled={processingSubmissionId === submission.id}
+                            >
+                              {processingSubmissionId === submission.id ? <Loader2 className="h-4 w-4 animate-spin" /> : <ThumbsDown className="h-4 w-4" />}
+                               <span className="ml-1 hidden sm:inline">Reject</span>
+                            </Button>
+                          </>
+                        ) : (
+                          <span className="text-xs text-muted-foreground">Processed</span>
+                        )}
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </div>
+          )}
+        </CardContent>
+      </Card>
     </div>
   );
 }
