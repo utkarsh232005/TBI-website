@@ -124,7 +124,7 @@ export const NavItems = ({ items, className, onItemClick }: NavItemsProps) => {
       )}
     >
       {items.map((item, idx) => (
-        <Link // Changed from <a> to <Link>
+        <Link 
           href={item.link}
           key={`link-${idx}`}
           onMouseEnter={() => setHovered(idx)}
@@ -134,7 +134,7 @@ export const NavItems = ({ items, className, onItemClick }: NavItemsProps) => {
           {hovered === idx && (
             <motion.div
               layoutId="hovered"
-              className="absolute inset-0 h-full w-full rounded-full bg-muted/50" // Use a muted background for hover to match gray-400 style
+              className="absolute inset-0 h-full w-full rounded-full bg-muted/50" 
             />
           )}
           <span className="relative z-20">{item.name}</span>
@@ -227,12 +227,12 @@ export const MobileNavToggle = ({
 
 export const NavbarLogo = () => {
   return (
-    <Link // Changed from <a> to <Link>
+    <Link 
       href="/"
-      aria-label="InnoNexus Home"
+      aria-label="RCEOM-TBI Home" // Updated aria-label for consistency
       className="relative z-20 mr-4 flex items-center space-x-2 px-2 py-1 text-sm font-normal"
     >
-      <AppLogo className="h-8 w-auto text-primary" /> {/* Ensure logo uses primary color */}
+      <AppLogo className="h-8 w-auto text-primary" text="TBI" /> {/* Pass "TBI" as text prop */}
     </Link>
   );
 };
@@ -257,15 +257,14 @@ export const NavbarButton = ({
   | React.ComponentPropsWithoutRef<"button">
 )) => {
   
-  const baseStyles = "px-6 py-2 rounded-full text-base font-semibold relative cursor-pointer hover:-translate-y-0.5 transition duration-200 inline-block text-center";
+  const baseStyles = "px-6 py-2 rounded-full text-base font-normal relative cursor-pointer hover:-translate-y-0.5 transition duration-200 inline-block text-center";
 
-  // Variants using theme variables from globals.css
+
   const variantStyles = {
     primary: "bg-primary text-primary-foreground shadow-md hover:bg-primary/90",
     secondary: "bg-secondary text-secondary-foreground hover:bg-secondary/80",
-    // Updated outline to match example's secondary button style (e.g., "Talk to Sales")
     outline: "border border-muted bg-transparent text-muted-foreground hover:text-foreground hover:border-foreground",
-    ghost: "hover:bg-accent hover:text-accent-foreground text-foreground", // Ensure ghost buttons are visible on black bg
+    ghost: "hover:bg-accent hover:text-accent-foreground text-foreground", 
   };
   
   const buttonProps = Tag === "button" ? { type: "button", ...props } : props;
