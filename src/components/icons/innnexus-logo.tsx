@@ -4,7 +4,7 @@ export function InnoNexusLogo(props: SVGProps<SVGSVGElement>) {
   return (
     <svg
       xmlns="http://www.w3.org/2000/svg"
-      viewBox="0 0 200 50"
+      viewBox="0 0 250 50" // Increased width from 200 to 250
       aria-label="RCEOM-TBI Logo"
       {...props}
     >
