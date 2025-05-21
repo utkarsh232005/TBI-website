@@ -1,8 +1,13 @@
+
 "use client";
 
-import { useRef, useEffect, useState } from 'react';
+// This section is largely being replaced by the ApplicationFormDialog for the form part.
+// The contact details and map could be moved to a dedicated "Contact Us" page if needed.
+// For now, its direct usage on the main page is removed.
+// The ContactForm component it used to render is now directly used by ApplicationFormDialog.
+
 import Image from 'next/image';
-import ContactForm from '@/components/ui/contact-form';
+// import ContactForm from '@/components/ui/contact-form'; // ContactForm is now used by ApplicationFormDialog
 import { Mail, Phone, MapPin } from 'lucide-react';
 
 const contactDetails = [
@@ -12,57 +17,32 @@ const contactDetails = [
 ];
 
 export default function ContactSection() {
-  const sectionRef = useRef<HTMLDivElement>(null);
-  const [isInView, setIsInView] = useState(false);
+  // const sectionRef = useRef<HTMLDivElement>(null); // No longer needed for animation triggers here
+  // const [isInView, setIsInView] = useState(false); // No longer needed for animation triggers here
 
-  useEffect(() => {
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        if (entry.isIntersecting) {
-          setIsInView(true);
-          observer.unobserve(entry.target);
-        }
-      },
-      { threshold: 0.1 }
-    );
+  // useEffect logic for IntersectionObserver removed as this section is no longer animated in the same way.
 
-    if (sectionRef.current) {
-      observer.observe(sectionRef.current);
-    }
-    return () => {
-      if (sectionRef.current) {
-        observer.unobserve(sectionRef.current);
-      }
-    };
-  }, []);
+  // const animationClass = (baseClass: string, delay: string) => 
+  //   `${baseClass} transition-all duration-700 ease-out ${isInView ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`
+  //   + ` style="transition-delay: ${delay}"`;
 
-  const animationClass = (baseClass: string, delay: string) => 
-    `${baseClass} transition-all duration-700 ease-out ${isInView ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`
-    + ` style="transition-delay: ${delay}"`; // Inline style for delay
-
+  // The form itself is now in a dialog. This component might be repurposed or removed.
+  // If you want a static contact info section, you can keep and simplify this.
+  // For now, returning a minimal placeholder or null if it's not meant to be displayed.
   return (
-    <section id="contact" ref={sectionRef} className="py-16 md:py-24 bg-card text-foreground">
+    <section id="contact-info" className="py-16 md:py-24 bg-card text-foreground">
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-        <div className={`text-center mb-12 md:mb-16 ${animationClass('', '0ms')}`}>
+        <div className="text-center mb-12 md:mb-16">
           <h2 className="font-orbitron text-3xl font-bold tracking-tight sm:text-4xl md:text-5xl text-primary">
-            Join InnoNexus
+            Contact Us
           </h2>
           <p className="mt-4 max-w-2xl mx-auto text-lg text-muted-foreground sm:text-xl">
-            Ready to turn your vision into reality? Apply for our incubation program or get in touch.
+            Have questions? We'd love to hear from you.
           </p>
         </div>
-
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-16">
-          <div className={`${animationClass('space-y-8', '200ms')}`}>
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-16 items-center">
             <div>
-              <h3 className="font-orbitron text-2xl font-semibold mb-6 text-foreground">Application Form</h3>
-              <ContactForm />
-            </div>
-          </div>
-
-          <div className={`${animationClass('space-y-8', '400ms')}`}>
-            <div>
-              <h3 className="font-orbitron text-2xl font-semibold mb-6 text-foreground">Contact Information</h3>
+              <h3 className="font-orbitron text-2xl font-semibold mb-6 text-foreground">Our Information</h3>
               <ul className="space-y-4">
                 {contactDetails.map((item, index) => (
                   <li key={index} className="flex items-start">
@@ -79,9 +59,7 @@ export default function ContactSection() {
                 ))}
               </ul>
             </div>
-            
             <div>
-              <h3 className="font-orbitron text-2xl font-semibold mt-10 mb-6 text-foreground">Our Location</h3>
               <div className="aspect-video w-full rounded-lg overflow-hidden shadow-lg border border-border">
                 <Image
                   src="https://placehold.co/600x400/121212/7DF9FF.png?text=InnoNexus+HQ"
@@ -93,9 +71,9 @@ export default function ContactSection() {
                 />
               </div>
             </div>
-          </div>
         </div>
       </div>
     </section>
   );
 }
+

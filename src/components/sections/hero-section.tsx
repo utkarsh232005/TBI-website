@@ -10,7 +10,11 @@ import Image from 'next/image';
 // DUMMY_GOOGLE_FORM_LINK: This is a placeholder. Replace with your actual Google Form link for off-campus applicants.
 const DUMMY_GOOGLE_FORM_LINK = 'https://docs.google.com/forms/d/e/YOUR_FORM_ID_HERE/viewform?usp=sf_link';
 
-export default function HeroSection() {
+interface HeroSectionProps {
+  onApplyClick?: () => void; // Add this prop
+}
+
+export default function HeroSection({ onApplyClick }: HeroSectionProps) { // Destructure the prop
   const sectionRef = useRef<HTMLDivElement>(null);
   const [isInView, setIsInView] = useState(false);
   const [showCampusDialog, setShowCampusDialog] = useState(false);
@@ -46,17 +50,20 @@ export default function HeroSection() {
   };
 
   const handleCampusStatusSelect = (status: "campus" | "off-campus") => {
-    localStorage.setItem('applicantCampusStatus', status); // Store status regardless
+    localStorage.setItem('applicantCampusStatus', status);
     setShowCampusDialog(false);
 
     if (status === "off-campus") {
-      // Redirect to Google Form for off-campus applicants
       window.location.href = DUMMY_GOOGLE_FORM_LINK;
     } else { // status === "campus"
-      // Scroll to contact section for campus applicants
-      const contactSection = document.getElementById('contact');
-      if (contactSection) {
-        contactSection.scrollIntoView({ behavior: 'smooth' });
+      if (onApplyClick) {
+        onApplyClick(); // Open the application form dialog
+      } else {
+        // Fallback or error if onApplyClick is not provided
+        console.warn("onApplyClick not provided to HeroSection for campus applicants.");
+        // As a fallback, attempt to scroll if the old #contact existed.
+        // const contactSection = document.getElementById('contact');
+        // if (contactSection) contactSection.scrollIntoView({ behavior: 'smooth' });
       }
     }
   };
