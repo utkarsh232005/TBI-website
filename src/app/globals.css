@@ -11,9 +11,9 @@
 
     /* ... other light theme vars ... */
 
-    --radius: 9999px; /* Default radius for buttons (rounded-full) */
-    --radius-md: calc(var(--radius) - 2px); /* Example, can be adjusted */
-    --radius-lg: calc(var(--radius) - 4px); /* Example, can be adjusted */
+    --radius: 0.75rem; /* Updated radius for more rounded cards by default */
+    --radius-md: calc(var(--radius) - 2px); 
+    --radius-lg: calc(var(--radius) - 4px);
 
 
     --chart-1: 12 76% 61%;
@@ -57,6 +57,8 @@
     --input: 0 0% 25%; 
     --ring: 180 80% 65%; /* Lighter cyan for focus rings */
     
+    --radius: 0.75rem; /* Updated radius for .dark theme as well */
+
     --chart-1: 180 95% 50%; /* Cyan */
     --chart-2: 270 90% 65%; /* Purple */
     --chart-3: 220 80% 70%; /* A blue */

@@ -1,7 +1,9 @@
+
 import Image from 'next/image';
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { ExternalLink } from 'lucide-react';
+import { cn } from "@/lib/utils"; // Added missing import
 
 interface Startup {
   id: string;
@@ -20,7 +22,10 @@ interface StartupCardProps {
 
 export default function StartupCard({ startup, className }: StartupCardProps) {
   return (
-    <Card className={`group relative overflow-hidden bg-card shadow-lg transition-all duration-300 hover:shadow-2xl hover:shadow-primary/30 hover:border-primary/50 ${className}`}>
+    <Card className={cn(
+      "group relative overflow-hidden bg-card shadow-lg transition-all duration-300 hover:shadow-2xl hover:shadow-primary/30 hover:border-primary/50 rounded-3xl",
+      className
+    )}>
       <CardHeader className="p-4">
         <div className="relative h-20 w-full mb-4">
           <Image
@@ -32,7 +37,7 @@ export default function StartupCard({ startup, className }: StartupCardProps) {
             data-ai-hint={startup.dataAiHint || "startup logo"}
           />
         </div>
-        <CardTitle className="font-orbitron text-xl text-foreground group-hover:text-primary transition-colors">
+        <CardTitle className="font-orbitron text-xl text-foreground group-hover:text-primary transition-colors text-center">
           {startup.name}
         </CardTitle>
       </CardHeader>

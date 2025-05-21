@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useRef, useEffect, useState } from 'react';
@@ -68,11 +69,11 @@ export default function AboutSection() {
           {missionVision.map((item, index) => (
             <div key={item.title} className={`${animationClass(`delay-${(index + 1) * 100}ms`)}`}>
               <Card className="h-full bg-card shadow-xl hover:shadow-primary/20 transition-shadow duration-300">
-                <CardHeader className="flex flex-row items-center space-x-4 pb-2">
+                <CardHeader className="flex flex-row items-center space-x-4 pb-4 pt-6 px-6">
                   <item.Icon className="h-10 w-10 text-primary" />
                   <CardTitle className="font-orbitron text-2xl text-card-foreground">{item.title}</CardTitle>
                 </CardHeader>
-                <CardContent>
+                <CardContent className="px-6 pb-6">
                   <p className="text-muted-foreground">{item.description}</p>
                 </CardContent>
               </Card>
@@ -83,7 +84,7 @@ export default function AboutSection() {
         <div className="grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-3">
           {stats.map((stat, index) => (
             <div key={stat.id} className={`${animationClass(`delay-${(index + 3) * 100}ms`)}`}>
-              <Card className="text-center bg-card shadow-xl hover:shadow-accent/20 transition-shadow duration-300 p-6">
+              <Card className="text-center bg-card shadow-xl hover:shadow-accent/20 transition-shadow duration-300 p-6 rounded-3xl">
                 <CardContent className="flex flex-col items-center justify-center">
                   <stat.Icon className="h-12 w-12 mb-4 text-accent" />
                   <AnimatedCounter
