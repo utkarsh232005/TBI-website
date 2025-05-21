@@ -11,7 +11,7 @@ import {
   MobileNavToggle,
   MobileNavMenu,
 } from "@/components/ui/resizable-navbar";
-import { useState }_ from "react";
+import { useState } from "react";
 import Link from "next/link"; // Import Link for navigation
 
 export default function MainNavbar() {
