@@ -1,9 +1,13 @@
 
+// This file is no longer used as the primary navbar.
+// It is replaced by resizable-navbar.tsx and main-navbar.tsx.
+// You can choose to delete this file if it's no longer needed elsewhere.
+
 import Link from 'next/link';
 import { InnoNexusLogo } from '@/components/icons/innnexus-logo';
 import { Button } from '@/components/ui/button';
-import { Menu, LogIn } from 'lucide-react'; // For mobile menu icon
-import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet'; // For mobile drawer
+import { Menu, LogIn } from 'lucide-react';
+import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
 
 const navLinks = [
   { href: '#about', label: 'About Us' },
@@ -13,7 +17,7 @@ const navLinks = [
   { href: '#contact', label: 'Apply' },
 ];
 
-export default function Navbar() {
+export default function OldNavbar() { // Renamed to OldNavbar to avoid conflicts if needed temporarily
   return (
     <header className="sticky top-0 z-50 w-full border-b border-border/40 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
       <div className="container flex h-16 max-w-screen-2xl items-center justify-between px-4 sm:px-6 lg:px-8">
@@ -52,7 +56,7 @@ export default function Navbar() {
               </SheetTrigger>
               <SheetContent side="right" className="w-[240px] sm:w-[300px] p-6">
                 <SheetHeader className="mb-6 text-left">
-                  <SheetTitle>
+                   <SheetTitle>
                     <Link href="/" prefetch={false} aria-label="InnoNexus Home">
                       <InnoNexusLogo className="h-8 w-auto" />
                     </Link>

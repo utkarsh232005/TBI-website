@@ -1,4 +1,5 @@
-import Navbar from '@/components/ui/navbar';
+
+import MainNavbar from '@/components/ui/main-navbar'; // Updated import
 import Footer from '@/components/ui/footer';
 import HeroSection from '@/components/sections/hero-section';
 import AboutSection from '@/components/sections/about-section';
@@ -10,7 +11,7 @@ import ContactSection from '@/components/sections/contact-section';
 export default function HomePage() {
   return (
     <div className="flex flex-col min-h-screen bg-background font-poppins">
-      <Navbar />
+      <MainNavbar /> {/* Use the new MainNavbar */}
       <main className="flex-grow">
         <HeroSection />
         <AboutSection />
