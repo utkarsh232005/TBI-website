@@ -25,7 +25,7 @@ export default function UserLoginForm() {
       <CardHeader>
         <CardTitle className="font-orbitron text-2xl">User Login</CardTitle>
         <CardDescription>
-          Sign in to your InnoNexus account or apply if you're new.
+          Sign in to your RCEOM-TBI account or apply if you're new.
         </CardDescription>
       </CardHeader>
       <CardContent>

@@ -4,7 +4,7 @@
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import AdminLoginForm from "@/components/auth/admin-login-form";
 import UserLoginForm from "@/components/auth/user-login-form";
-import { InnoNexusLogo } from "@/components/icons/innnexus-logo";
+import { InnoNexusLogo } from "@/components/icons/innnexus-logo"; // Visually this will show RCEOM-TBI
 import Link from "next/link";
 
 export default function LoginPage() {
@@ -18,7 +18,7 @@ export default function LoginPage() {
           Welcome Back
         </h1>
         <p className="text-muted-foreground">
-          Sign in to access your InnoNexus account.
+          Sign in to access your RCEOM-TBI account.
         </p>
       </div>
       <Tabs defaultValue="user" className="w-full max-w-md">

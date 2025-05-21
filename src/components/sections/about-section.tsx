@@ -8,7 +8,7 @@ import { UsersRound, TrendingUp, Rocket, Lightbulb, Goal } from 'lucide-react';
 
 const stats = [
   { id: 1, value: 50, label: 'Startups Mentored', Icon: Rocket, suffix: '+' },
-  { id: 2, value: 10, label: 'Funding Raised (Millions)', Icon: TrendingUp, prefix: '$', suffix: 'M+' },
+  { id: 2, value: 10, label: 'Funding Raised (Millions)', Icon: TrendingUp, prefix: '₹', suffix: 'M+' },
   { id: 3, value: 100, label: 'Mentors & Experts', Icon: UsersRound, suffix: '+' },
 ];
 
@@ -58,7 +58,7 @@ export default function AboutSection() {
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
         <div className={`text-center mb-12 md:mb-16 ${animationClass('delay-0')}`}>
           <h2 className="font-orbitron text-3xl font-bold tracking-tight sm:text-4xl md:text-5xl text-primary">
-            About InnoNexus
+            About RCEOM-TBI
           </h2>
           <p className="mt-4 max-w-2xl mx-auto text-lg text-muted-foreground sm:text-xl">
             We are dedicated to nurturing the brightest minds and innovative ideas, transforming them into successful ventures that shape the future.

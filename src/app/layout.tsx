@@ -4,7 +4,7 @@ import './globals.css';
 import { Toaster } from "@/components/ui/toaster"; // Import Toaster
 
 export const metadata: Metadata = {
-  title: 'InnoNexus - Empowering Innovators',
+  title: 'RCEOM-TBI - Empowering Innovators',
   description: 'Join our ecosystem of visionaries, creators, and successful startups.',
 };
 

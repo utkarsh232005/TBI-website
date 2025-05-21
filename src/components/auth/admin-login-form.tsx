@@ -21,7 +21,7 @@ import { LogIn } from "lucide-react";
 
 // IMPORTANT: These are hardcoded for demonstration purposes ONLY.
 // In a production environment, this is highly insecure.
-const ADMIN_EMAIL = "admin@innnexus.com";
+const ADMIN_EMAIL = "admin@rceomtbi.com"; // Updated Admin Email
 const ADMIN_PASSWORD = "secureadminpassword"; // Please change this if you deploy this anywhere
 
 const formSchema = z.object({
@@ -79,7 +79,7 @@ export default function AdminLoginForm() {
       <CardHeader>
         <CardTitle className="font-orbitron text-2xl">Admin Portal</CardTitle>
         <CardDescription>
-          Enter your administrator credentials to access the admin panel.
+          Enter your administrator credentials to access the RCEOM-TBI admin panel.
         </CardDescription>
       </CardHeader>
       <CardContent>

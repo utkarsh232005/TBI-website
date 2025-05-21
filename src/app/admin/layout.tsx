@@ -17,7 +17,7 @@ import {
 } from "@/components/ui/sidebar";
 import { Button } from "@/components/ui/button";
 import { LayoutDashboard, FileText, Users, LogOut, Settings } from "lucide-react";
-import { InnoNexusLogo } from "@/components/icons/innnexus-logo";
+import { InnoNexusLogo } from "@/components/icons/innnexus-logo"; // Visually this will show RCEOM-TBI
 import { usePathname } from "next/navigation";
 
 export default function AdminLayout({
@@ -38,7 +38,7 @@ export default function AdminLayout({
       <div className="flex min-h-screen">
         <Sidebar className="border-r border-border bg-card">
           <SidebarHeader className="p-4">
-            <Link href="/" className="flex items-center gap-2" aria-label="InnoNexus Home">
+            <Link href="/" className="flex items-center gap-2" aria-label="RCEOM-TBI Home">
               <InnoNexusLogo className="h-8 w-auto" />
             </Link>
           </SidebarHeader>

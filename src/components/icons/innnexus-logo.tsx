@@ -5,7 +5,7 @@ export function InnoNexusLogo(props: SVGProps<SVGSVGElement>) {
     <svg
       xmlns="http://www.w3.org/2000/svg"
       viewBox="0 0 200 50"
-      aria-label="InnoNexus Logo"
+      aria-label="RCEOM-TBI Logo"
       {...props}
     >
       <text
@@ -16,7 +16,7 @@ export function InnoNexusLogo(props: SVGProps<SVGSVGElement>) {
         fontWeight="bold"
         fill="hsl(var(--primary))"
       >
-        InnoNexus
+        RCEOM-TBI
       </text>
     </svg>
   );

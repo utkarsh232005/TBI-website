@@ -26,7 +26,7 @@ const programData = [
     id: 'funding',
     title: 'Funding Opportunities',
     Icon: DollarSign,
-    content: 'InnoNexus provides seed funding for promising startups and facilitates connections with angel investors and venture capital firms. We help you prepare your pitch deck and financial projections to secure the capital needed for growth.',
+    content: 'RCEOM-TBI provides seed funding for promising startups and facilitates connections with angel investors and venture capital firms. We help you prepare your pitch deck and financial projections to secure the capital needed for growth.',
   },
   {
     id: 'networking',
@@ -72,7 +72,7 @@ export default function ProgramDetailsSection() {
             Our Program
           </h2>
           <p className="mt-4 max-w-2xl mx-auto text-lg text-muted-foreground sm:text-xl">
-            Discover how InnoNexus can fuel your startup's growth and success.
+            Discover how RCEOM-TBI can fuel your startup's growth and success.
           </p>
         </div>
 

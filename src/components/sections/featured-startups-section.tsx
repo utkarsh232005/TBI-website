@@ -115,7 +115,7 @@ export default function FeaturedStartupsSection() {
             Featured Startups
           </h2>
           <p className="mt-4 max-w-2xl mx-auto text-lg text-muted-foreground sm:text-xl">
-            Meet some of the innovative companies thriving in the InnoNexus ecosystem.
+            Meet some of the innovative companies thriving in the RCEOM-TBI ecosystem.
           </p>
         </div>
         

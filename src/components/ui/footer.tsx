@@ -3,7 +3,7 @@ export default function Footer() {
     <footer className="border-t border-border/40 bg-background">
       <div className="container mx-auto flex flex-col items-center justify-center py-8 px-4 text-center sm:px-6 lg:px-8">
         <p className="text-sm text-muted-foreground">
-          &copy; {new Date().getFullYear()} InnoNexus. All rights reserved.
+          &copy; {new Date().getFullYear()} RCEOM-TBI. All rights reserved.
         </p>
         <p className="mt-1 text-xs text-muted-foreground">
           Empowering the Next Generation of Innovators.

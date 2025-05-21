@@ -8,7 +8,7 @@ import { InfiniteMovingCards } from '@/components/ui/infinite-moving-cards'; // 
 const testimonialsData = [
   {
     id: '1',
-    quote: 'InnoNexus provided us with unparalleled mentorship and resources. Their network was instrumental in our early success and Series A funding.',
+    quote: 'RCEOM-TBI provided us with unparalleled mentorship and resources. Their network was instrumental in our early success and Series A funding.',
     name: 'Dr. Aris Thorne',
     title: 'CEO, QuantumLeap AI',
     avatarUrl: 'https://placehold.co/100x100/7DF9FF/121212.png?text=AT',
@@ -18,7 +18,7 @@ const testimonialsData = [
   },
   {
     id: '2',
-    quote: 'The incubation program at InnoNexus was a game-changer. We went from a concept to a market-ready product in record time, thanks to their support.',
+    quote: 'The incubation program at RCEOM-TBI was a game-changer. We went from a concept to a market-ready product in record time, thanks to their support.',
     name: 'Lena Hanson',
     title: 'Founder, EcoSynth Solutions',
     avatarUrl: 'https://placehold.co/100x100/32CD32/121212.png?text=LH',
@@ -28,7 +28,7 @@ const testimonialsData = [
   },
   {
     id: '3',
-    quote: 'The hands-on guidance and strategic advice we received were invaluable. InnoNexus truly understands the challenges startups face.',
+    quote: 'The hands-on guidance and strategic advice we received were invaluable. RCEOM-TBI truly understands the challenges startups face.',
     name: 'Raj Patel',
     title: 'CTO, NovaMed Devices',
     avatarUrl: 'https://placehold.co/100x100/FF2D55/121212.png?text=RP',
@@ -76,7 +76,7 @@ export default function TestimonialsSection() {
             Words From Our Innovators
           </h2>
           <p className="mt-4 max-w-2xl mx-auto text-lg text-muted-foreground sm:text-xl">
-            Hear what founders say about their journey with InnoNexus.
+            Hear what founders say about their journey with RCEOM-TBI.
           </p>
         </div>
         

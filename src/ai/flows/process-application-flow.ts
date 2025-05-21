@@ -59,7 +59,7 @@ async function sendEmailNotification(to: string, subject: string, body: string):
 
   try {
     const { data, error } = await resend.emails.send({
-      from: 'InnoNexus <onboarding@resend.dev>', // Replace with your verified domain sender e.g. 'Your Name <notifications@yourdomain.com>'
+      from: 'RCEOM-TBI <onboarding@resend.dev>', // Replace with your verified domain sender e.g. 'Your Name <notifications@yourdomain.com>'
       to: [to],
       subject: subject,
       text: body, // For HTML emails, use 'html: "<strong>your html content</strong>"'
@@ -115,13 +115,13 @@ const processApplicationFlow = ai.defineFlow(
         updateData.temporaryUserId = temporaryUserId;
         updateData.temporaryPassword = temporaryPassword;
 
-        emailSubject = 'Congratulations! Your InnoNexus Application has been Accepted!';
-        emailBody = `Dear ${applicantName},\n\nWe are thrilled to inform you that your application to InnoNexus has been accepted!\n\nWe were very impressed with your idea and believe in its potential. Here are your temporary login credentials to access our portal (feature coming soon):\nUser ID: ${temporaryUserId}\nPassword: ${temporaryPassword}\n\nPlease keep these safe. We will be in touch shortly with the next steps.\n\nWelcome to InnoNexus!\n\nBest regards,\nThe InnoNexus Team`;
+        emailSubject = 'Congratulations! Your RCEOM-TBI Application has been Accepted!';
+        emailBody = `Dear ${applicantName},\n\nWe are thrilled to inform you that your application to RCEOM-TBI has been accepted!\n\nWe were very impressed with your idea and believe in its potential. Here are your temporary login credentials to access our portal (feature coming soon):\nUser ID: ${temporaryUserId}\nPassword: ${temporaryPassword}\n\nPlease keep these safe. We will be in touch shortly with the next steps.\n\nWelcome to RCEOM-TBI!\n\nBest regards,\nThe RCEOM-TBI Team`;
 
       } else { // action === 'reject'
         updateData.status = 'rejected';
-        emailSubject = 'Update on Your InnoNexus Application';
-        emailBody = `Dear ${applicantName},\n\nThank you for your interest in InnoNexus and for taking the time to apply.\n\nAfter careful consideration, we regret to inform you that we will not be moving forward with your application at this time. The selection process is highly competitive, and we receive many qualified applications.\n\nWe wish you the best of luck in your future endeavors.\n\nSincerely,\nThe InnoNexus Team`;
+        emailSubject = 'Update on Your RCEOM-TBI Application';
+        emailBody = `Dear ${applicantName},\n\nThank you for your interest in RCEOM-TBI and for taking the time to apply.\n\nAfter careful consideration, we regret to inform you that we will not be moving forward with your application at this time. The selection process is highly competitive, and we receive many qualified applications.\n\nWe wish you the best of luck in your future endeavors.\n\nSincerely,\nThe RCEOM-TBI Team`;
       }
 
       await updateDoc(submissionRef, updateData);
