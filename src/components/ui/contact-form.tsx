@@ -20,12 +20,16 @@ import { Send } from "lucide-react";
 import { db } from '@/lib/firebase';
 import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
 
+// DUMMY_GOOGLE_FORM_LINK: This is a placeholder. Replace with your actual Google Form link for off-campus applicants.
+// Ensure this link is the same as the one in hero-section.tsx
+const DUMMY_GOOGLE_FORM_LINK_FOR_OFF_CAMPUS = 'https://docs.google.com/forms/d/e/YOUR_FORM_ID_HERE/viewform?usp=sf_link';
+
 const formSchema = z.object({
   name: z.string().min(2, { message: "Name must be at least 2 characters." }),
   email: z.string().email({ message: "Please enter a valid email address." }),
   companyName: z.string().optional(),
   idea: z.string().min(10, { message: "Please describe your idea in at least 10 characters." }),
-  campusStatus: z.string().optional(),
+  // campusStatus is handled by localStorage and added programmatically
 });
 
 export type ContactFormValues = z.infer<typeof formSchema>;
@@ -36,8 +40,8 @@ interface FirestoreSubmissionData {
   companyName?: string;
   idea: string;
   submittedAt: any; 
-  campusStatus?: string;
-  status: "pending" | "accepted" | "rejected"; // Added status
+  campusStatus?: "campus" | "off-campus"; // Explicitly type this
+  status: "pending" | "accepted" | "rejected";
 }
 
 
@@ -50,44 +54,67 @@ export default function ContactForm() {
       email: "",
       companyName: "",
       idea: "",
-      campusStatus: undefined, 
     },
   });
 
   async function onSubmit(values: ContactFormValues) {
+    const campusStatusFromStorage = typeof window !== "undefined" ? localStorage.getItem('applicantCampusStatus') as "campus" | "off-campus" | null : null;
+
+    if (campusStatusFromStorage === "off-campus") {
+      toast({
+        title: "Off-Campus Applications",
+        description: "Off-campus applications should be submitted via the Google Form. Redirecting you now...",
+        variant: "default",
+        duration: 5000, // Give user time to read before redirect
+      });
+      // Redirect to the Google Form if an off-campus user tries to submit here
+      setTimeout(() => {
+        window.location.href = DUMMY_GOOGLE_FORM_LINK_FOR_OFF_CAMPUS;
+      }, 3000); // Delay redirect slightly
+      return; // Prevent submission to Firestore
+    }
+
+    // Proceed with Firestore submission only for campus users or if status is not 'off-campus'
     try {
-      const campusStatusFromStorage = typeof window !== "undefined" ? localStorage.getItem('applicantCampusStatus') : null;
-      
       const dataForFirestore: FirestoreSubmissionData = {
         name: values.name,
         email: values.email,
         idea: values.idea,
         submittedAt: serverTimestamp(),
-        status: "pending", // Default status
+        status: "pending",
       };
 
       if (values.companyName) {
         dataForFirestore.companyName = values.companyName;
       }
 
-      if (campusStatusFromStorage) {
+      // Only set campusStatus if it's "campus" and came from localStorage for this form.
+      // If campusStatusFromStorage is null, it means they came directly to the contact form.
+      if (campusStatusFromStorage === "campus") {
         dataForFirestore.campusStatus = campusStatusFromStorage;
+      } else if (!campusStatusFromStorage) {
+        // If no status from localStorage (e.g. direct navigation to #contact),
+        // you might want to default it or leave it undefined.
+        // For now, we'll leave it undefined if not explicitly "campus".
       }
-
+      
+      // console.log("Data being sent to Firestore:", dataForFirestore); // For debugging
       const docRef = await addDoc(collection(db, "contactSubmissions"), dataForFirestore);
+      
       toast({
         title: "Application Submitted!",
         description: "Thank you for your interest. We'll be in touch soon.",
         variant: "default", 
       });
       form.reset(); 
-      if (campusStatusFromStorage && typeof window !== "undefined") {
+      // Clear the localStorage only if it was a 'campus' submission through this form
+      if (campusStatusFromStorage === "campus" && typeof window !== "undefined") {
         localStorage.removeItem('applicantCampusStatus'); 
       }
-    } catch (e) {
+    } catch (e: any) {
       console.error("Error adding document to Firestore: ", e);
       let errorMessage = "There was an error submitting your application. Please try again.";
-      if (e instanceof Error) {
+      if (e instanceof Error && e.message) {
         errorMessage += ` Details: ${e.message}`;
       }
       toast({

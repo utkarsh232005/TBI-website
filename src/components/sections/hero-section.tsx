@@ -3,9 +3,12 @@
 
 import { useEffect, useRef, useState } from 'react';
 import { Button } from '@/components/ui/button';
-import { ArrowRight, ChevronDown } from 'lucide-react'; // ChevronDown might not be needed anymore
+import { ArrowRight } from 'lucide-react';
 import { CampusStatusDialog } from '@/components/ui/campus-status-dialog';
 import Image from 'next/image';
+
+// DUMMY_GOOGLE_FORM_LINK: This is a placeholder. Replace with your actual Google Form link for off-campus applicants.
+const DUMMY_GOOGLE_FORM_LINK = 'https://docs.google.com/forms/d/e/YOUR_FORM_ID_HERE/viewform?usp=sf_link';
 
 export default function HeroSection() {
   const sectionRef = useRef<HTMLDivElement>(null);
@@ -43,18 +46,25 @@ export default function HeroSection() {
   };
 
   const handleCampusStatusSelect = (status: "campus" | "off-campus") => {
-    localStorage.setItem('applicantCampusStatus', status);
+    localStorage.setItem('applicantCampusStatus', status); // Store status regardless
     setShowCampusDialog(false);
-    const contactSection = document.getElementById('contact');
-    if (contactSection) {
-      contactSection.scrollIntoView({ behavior: 'smooth' });
+
+    if (status === "off-campus") {
+      // Redirect to Google Form for off-campus applicants
+      window.location.href = DUMMY_GOOGLE_FORM_LINK;
+    } else { // status === "campus"
+      // Scroll to contact section for campus applicants
+      const contactSection = document.getElementById('contact');
+      if (contactSection) {
+        contactSection.scrollIntoView({ behavior: 'smooth' });
+      }
     }
   };
 
   return (
     <section 
       ref={sectionRef}
-      className="relative flex min-h-screen items-center justify-center overflow-hidden bg-black text-white pt-12 sm:pt-16" // bg-black from example
+      className="relative flex min-h-screen items-center justify-center overflow-hidden bg-black text-white pt-12 sm:pt-16"
     >
       {/* Noise Texture Overlay */}
       <div className="absolute inset-0 z-0">
@@ -64,7 +74,7 @@ export default function HeroSection() {
           layout="fill"
           objectFit="cover"
           className="opacity-50"
-          unoptimized // For simple overlay, optimization might not be critical & avoids config
+          unoptimized
           data-ai-hint="noise texture"
         />
       </div>
@@ -83,20 +93,18 @@ export default function HeroSection() {
         </h1>
         
         <div className="mt-12 flex flex-col items-center justify-center gap-5 sm:flex-row">
-          {/* "Apply for Incubation" styled like "Start 14 Days Free Trial" */}
           <div className="relative inline-flex items-center justify-center w-full sm:w-auto group">
             <div className="absolute transition-all duration-200 rounded-full -inset-px bg-gradient-to-r from-cyan-500 to-purple-500 group-hover:shadow-lg group-hover:shadow-cyan-500/50"></div>
             <Button
               size="lg"
               onClick={handleApplyForIncubationClick}
-              className="relative inline-flex items-center justify-center w-full px-8 py-3 text-base font-normal text-white bg-black border border-transparent rounded-full sm:w-auto group" // Added group here for consistency if inner elements need it
+              className="relative inline-flex items-center justify-center w-full px-8 py-3 text-base font-normal text-white bg-black border border-transparent rounded-full sm:w-auto group"
             >
               Apply for Incubation
               <ArrowRight className="ml-2 h-5 w-5 transition-transform group-hover:translate-x-1" />
             </Button>
           </div>
 
-          {/* "See Success Stories" styled like "Talk to Sales" */}
           <Button
             asChild
             variant="outline"
@@ -105,7 +113,6 @@ export default function HeroSection() {
           >
             <a href="#startups">
               See Success Stories
-              {/* Icon can be added here if desired, e.g. <ChevronDown className="ml-2 h-5 w-5 transition-transform group-hover:translate-y-1" /> */}
             </a>
           </Button>
         </div>
