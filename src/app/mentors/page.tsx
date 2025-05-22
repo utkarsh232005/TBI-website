@@ -1,7 +1,7 @@
 
 // src/app/mentors/page.tsx
 import MentorCard, { type Mentor } from '@/components/ui/mentor-card';
-import { MainNavbar } from '@/components/ui/main-navbar'; // Assuming MainNavbar is the correct export
+import MainNavbar from '@/components/ui/main-navbar'; // Corrected import
 import Footer from '@/components/ui/footer';
 
 const mentorsData: Mentor[] = [
