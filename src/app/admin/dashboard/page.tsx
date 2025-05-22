@@ -217,7 +217,8 @@ export default function AdminDashboardPage() {
         <KpiCard title="Rejected" value={kpiData.rejected} Icon={XCircle} description="Applications not moved forward." colorClass="text-red-500" />
       </div>
 
-      {/* Charts Section */}
+      {/* Charts Section - TEMPORARILY COMMENTED OUT FOR DIAGNOSIS */}
+      {/*
       <div className="grid gap-6 md:grid-cols-2">
         <Card className="shadow-lg">
           <CardHeader>
@@ -277,6 +278,7 @@ export default function AdminDashboardPage() {
           </CardContent>
         </Card>
       </div>
+      */}
 
       {/* Submissions Table */}
       <Card className="shadow-lg">
@@ -398,4 +400,5 @@ export default function AdminDashboardPage() {
     </div>
   );
 }
-// Removed problematic prototype manipulation and global actionBeingProcessed variable
+
+    
