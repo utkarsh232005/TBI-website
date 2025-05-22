@@ -1,4 +1,4 @@
-
+// src/app/admin/layout.tsx
 "use client";
 
 import * as React from "react";
@@ -30,7 +30,7 @@ export default function AdminLayout({
   const navItems = [
     { href: "/admin/dashboard", label: "Submissions", icon: FileText },
     { href: "#", label: "User Management", icon: Users, disabled: true }, // Placeholder
-    { href: "#", label: "Settings", icon: Settings, disabled: true }, // Placeholder
+    { href: "/admin/settings", label: "Settings", icon: Settings, disabled: false }, // Enabled settings link
   ];
 
   return (

@@ -1,4 +1,4 @@
-
+// src/components/auth/admin-login-form.tsx
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -17,23 +17,30 @@ import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
 import { useRouter } from "next/navigation";
-import { LogIn } from "lucide-react";
+import { LogIn, Loader2 } from "lucide-react";
+import { useState } from "react";
+import { verifyAdminCredentials, type AdminLoginFormValues } from "@/app/actions/auth-actions";
 
-// IMPORTANT: These are hardcoded for demonstration purposes ONLY.
-// In a production environment, this is highly insecure.
-const ADMIN_EMAIL = "admin@rceomtbi.com"; // Updated Admin Email
-const ADMIN_PASSWORD = "secureadminpassword"; // Please change this if you deploy this anywhere
+
+// Admin credentials are now verified via server action using Firestore.
+// Ensure you have created the document 'admin_config/main_credentials' in Firestore
+// with 'email' and 'password' fields.
+// Initial values for testing:
+// email: "admin@rceomtbi.com"
+// password: "secureadminpassword" (WARNING: This will be stored as plaintext in Firestore)
 
 const formSchema = z.object({
   email: z.string().email({ message: "Please enter a valid email." }),
   password: z.string().min(1, { message: "Password is required." }),
 });
 
-export type AdminLoginFormValues = z.infer<typeof formSchema>;
+// Type AdminLoginFormValues is now imported from auth-actions.ts
 
 export default function AdminLoginForm() {
   const { toast } = useToast();
   const router = useRouter();
+  const [isLoading, setIsLoading] = useState(false);
+
   const form = useForm<AdminLoginFormValues>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -42,35 +49,36 @@ export default function AdminLoginForm() {
     },
   });
 
-  function onSubmit(values: AdminLoginFormValues) {
-    if (values.email === ADMIN_EMAIL && values.password === ADMIN_PASSWORD) {
-      toast({
-        title: "Admin Login Successful",
-        description: "Redirecting to admin dashboard...",
-      });
-      console.log("[AdminLoginForm] Credentials correct. Attempting to redirect to /admin/dashboard");
-      
-      // In a real app, you would set some kind of session/token here
-      setTimeout(() => {
-        try {
-          router.push("/admin/dashboard");
-          console.log("[AdminLoginForm] router.push('/admin/dashboard') was called.");
-        } catch (e) {
-          console.error("[AdminLoginForm] Error during router.push:", e);
-          toast({
-            title: "Redirection Error",
-            description: "Could not navigate to the dashboard. Check console for details.",
-            variant: "destructive",
-          });
+  async function onSubmit(values: AdminLoginFormValues) {
+    setIsLoading(true);
+    try {
+      const result = await verifyAdminCredentials(values);
+
+      if (result.success) {
+        toast({
+          title: "Admin Login Successful",
+          description: "Redirecting to admin dashboard...",
+        });
+        if (result.redirectTo) {
+          // Using setTimeout to allow toast to render before navigation
+          setTimeout(() => router.push(result.redirectTo!), 0);
         }
-      }, 0); // Defer to the next tick of the event loop
-    } else {
+      } else {
+        toast({
+          title: "Login Failed",
+          description: result.message,
+          variant: "destructive",
+        });
+      }
+    } catch (error: any) {
+      console.error("[AdminLoginForm] Error during login submission: ", error);
       toast({
-        title: "Login Failed",
-        description: "Invalid admin email or password.",
+        title: "Login Error",
+        description: error.message || "An unexpected error occurred.",
         variant: "destructive",
       });
-      console.log("[AdminLoginForm] Invalid credentials entered.");
+    } finally {
+      setIsLoading(false);
     }
   }
 
@@ -97,6 +105,7 @@ export default function AdminLoginForm() {
                       placeholder="admin@example.com"
                       {...field}
                       className="bg-card border-border focus:border-primary focus:ring-primary"
+                      disabled={isLoading}
                     />
                   </FormControl>
                   <FormMessage />
@@ -115,18 +124,26 @@ export default function AdminLoginForm() {
                       placeholder="••••••••"
                       {...field}
                       className="bg-card border-border focus:border-primary focus:ring-primary"
+                      disabled={isLoading}
                     />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
               )}
             />
-            <Button type="submit" size="lg" className="w-full font-poppins font-semibold group">
+            <Button type="submit" size="lg" className="w-full font-poppins font-semibold group" disabled={isLoading}>
+              {isLoading ? (
+                <Loader2 className="mr-2 h-5 w-5 animate-spin" />
+              ) : (
+                <LogIn className="mr-2 h-5 w-5 transition-transform group-hover:translate-x-1" />
+              )}
               Login as Admin
-              <LogIn className="ml-2 h-5 w-5 transition-transform group-hover:translate-x-1" />
             </Button>
           </form>
         </Form>
+         <p className="mt-4 text-xs text-center text-muted-foreground">
+          Security Warning: Admin passwords should be stored hashed. This demo stores them in plaintext in Firestore for simplicity. Do not use this approach in production.
+        </p>
       </CardContent>
     </Card>
   );
