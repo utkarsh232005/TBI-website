@@ -41,6 +41,11 @@ interface ChartDataItem {
   fill: string;
 }
 
+interface ProcessingActionState {
+  id: string;
+  type: 'accept' | 'reject';
+}
+
 const statusChartConfig = {
   pending: { label: "Pending", color: "hsl(var(--chart-3))", icon: Clock },
   accepted: { label: "Accepted", color: "hsl(var(--chart-1))", icon: CheckCircle },
@@ -59,7 +64,7 @@ export default function AdminDashboardPage() {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const { toast } = useToast();
-  const [processingSubmissionId, setProcessingSubmissionId] = useState<string | null>(null);
+  const [processingActionState, setProcessingActionState] = useState<ProcessingActionState | null>(null);
 
   const [statusChartData, setStatusChartData] = useState<ChartDataItem[]>([]);
   const [campusChartData, setCampusChartData] = useState<ChartDataItem[]>([]);
@@ -149,8 +154,7 @@ export default function AdminDashboardPage() {
   };
 
   const handleProcessApplication = async (submissionId: string, action: 'accept' | 'reject', applicantName: string, applicantEmail: string) => {
-    setProcessingSubmissionId(submissionId);
-    actionBeingProcessed = action; // Set for button spinner
+    setProcessingActionState({ id: submissionId, type: action });
     try {
       const result = await processApplicationAction(submissionId, action, applicantName, applicantEmail);
       if (result.status === 'success') {
@@ -174,8 +178,7 @@ export default function AdminDashboardPage() {
         variant: "destructive",
       });
     } finally {
-      setProcessingSubmissionId(null);
-      actionBeingProcessed = null; // Reset for button spinner
+      setProcessingActionState(null);
     }
   };
 
@@ -364,19 +367,19 @@ export default function AdminDashboardPage() {
                               variant="default"
                               size="sm"
                               onClick={() => handleProcessApplication(submission.id, 'accept', submission.name, submission.email)}
-                              disabled={processingSubmissionId === submission.id}
+                              disabled={processingActionState?.id === submission.id}
                               className="bg-green-600 hover:bg-green-700 text-white"
                             >
-                              {processingSubmissionId === submission.id && actionBeingProcessed === 'accept' ? <Loader2 className="h-4 w-4 animate-spin" /> : <ThumbsUp className="h-4 w-4" />}
+                              {processingActionState?.id === submission.id && processingActionState?.type === 'accept' ? <Loader2 className="h-4 w-4 animate-spin" /> : <ThumbsUp className="h-4 w-4" />}
                               <span className="ml-1 hidden sm:inline">Accept</span>
                             </Button>
                             <Button
                               variant="destructive"
                               size="sm"
                               onClick={() => handleProcessApplication(submission.id, 'reject', submission.name, submission.email)}
-                              disabled={processingSubmissionId === submission.id}
+                              disabled={processingActionState?.id === submission.id}
                             >
-                              {processingSubmissionId === submission.id && actionBeingProcessed === 'reject' ? <Loader2 className="h-4 w-4 animate-spin" /> : <ThumbsDown className="h-4 w-4" />}
+                              {processingActionState?.id === submission.id && processingActionState?.type === 'reject' ? <Loader2 className="h-4 w-4 animate-spin" /> : <ThumbsDown className="h-4 w-4" />}
                                <span className="ml-1 hidden sm:inline">Reject</span>
                             </Button>
                           </>
@@ -395,26 +398,4 @@ export default function AdminDashboardPage() {
     </div>
   );
 }
-
-// Helper state for button spinner
-let actionBeingProcessed: 'accept' | 'reject' | null = null;
-
-// Update handleProcessApplication to set actionBeingProcessed
-// This is a bit of a workaround for functional components.
-// Ideally, this state (actionBeingProcessed) would be part of the component's state
-// if we were to refactor how it's used with the handleProcessApplication function.
-// For now, we are modifying the function attached to the default export.
-const originalHandleProcessApplication = (AdminDashboardPage as any).prototype?.handleProcessApplication;
-
-if (originalHandleProcessApplication) {
-  (AdminDashboardPage as any).prototype.handleProcessApplication = async function(this: any, submissionId: string, action: 'accept' | 'reject', applicantName: string, applicantEmail: string) {
-    actionBeingProcessed = action;
-    await originalHandleProcessApplication.call(this, submissionId, action, applicantName, applicantEmail);
-    actionBeingProcessed = null;
-  };
-} else {
-  // Fallback if prototype or original function is not found, to prevent crashes.
-  // This might happen if the component structure changes significantly.
-  // We still want the AdminDashboardPage to render.
-  console.warn("Could not find originalHandleProcessApplication on AdminDashboardPage prototype. Button spinner logic might be affected.");
-}
+// Removed problematic prototype manipulation and global actionBeingProcessed variable
