@@ -1,3 +1,4 @@
+
 // src/app/actions/auth-actions.ts
 'use server';
 
@@ -36,11 +37,35 @@ export async function verifyAdminCredentials(
       return {
         success: false,
         message:
-          'Admin configuration error. Please contact support. (Hint: Create admin_config/main_credentials document in Firestore)',
+          'Admin configuration error. Please contact support. (Hint: Create admin_config/main_credentials document in Firestore with email and password fields)',
       };
     }
 
     const storedCredentials = credsDocSnap.data();
+
+    // Add more robust checks for storedCredentials
+    if (!storedCredentials || typeof storedCredentials !== 'object') {
+      console.error(
+        `Admin credentials document at ${ADMIN_CREDENTIALS_PATH} is empty or not an object.`
+      );
+      return {
+        success: false,
+        message:
+          'Admin configuration error. Credentials document is malformed. Ensure it has email and password fields.',
+      };
+    }
+    
+    if (typeof storedCredentials.email !== 'string' || typeof storedCredentials.password !== 'string') {
+      console.error(
+        `Admin credentials document at ${ADMIN_CREDENTIALS_PATH} is missing 'email' or 'password' string fields.`
+      );
+      return {
+        success: false,
+        message:
+          'Admin configuration error. Credentials document is missing required email/password string fields.',
+      };
+    }
+
 
     // WARNING: Plaintext password comparison. Highly insecure for production.
     // Passwords should be hashed and compared securely.
