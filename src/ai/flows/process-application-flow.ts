@@ -46,7 +46,11 @@ export type ProcessApplicationOutput = z.infer<typeof ProcessApplicationOutputSc
 
 async function sendEmailNotification(to: string, subject: string, body: string): Promise<{ success: boolean; message: string; error?: string }> {
   if (!process.env.RESEND_API_KEY) {
-    console.warn("RESEND_API_KEY not found. Email sending is disabled. Logging to console instead.");
+    console.error("**********************************************************************************");
+    console.error("ERROR: RESEND_API_KEY not found in environment variables.");
+    console.error("Email sending is DISABLED. The email below is a simulation logged to the console.");
+    console.error("To enable real email sending, set RESEND_API_KEY in your .env.local file and restart the server.");
+    console.error("**********************************************************************************");
     console.log("------ SIMULATING EMAIL SENDING (RESEND_API_KEY missing) ------");
     console.log("To:", to);
     console.log("Subject:", subject);
@@ -58,8 +62,11 @@ async function sendEmailNotification(to: string, subject: string, body: string):
   const resend = new Resend(process.env.RESEND_API_KEY);
 
   try {
+    // IMPORTANT: For best deliverability, replace 'onboarding@resend.dev' 
+    // with an email address from a domain you have verified with Resend.
+    // e.g., 'Your Name <notifications@yourverifieddomain.com>'
     const { data, error } = await resend.emails.send({
-      from: 'RCEOM-TBI <onboarding@resend.dev>', // Replace with your verified domain sender e.g. 'Your Name <notifications@yourdomain.com>'
+      from: 'RCEOM-TBI <onboarding@resend.dev>', 
       to: [to],
       subject: subject,
       text: body, // For HTML emails, use 'html: "<strong>your html content</strong>"'
