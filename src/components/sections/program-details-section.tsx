@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useRef, useEffect, useState } from 'react';
@@ -7,7 +8,9 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from '@/components/ui/accordion';
-import { CheckCircle2, Users, DollarSign, CalendarDays, Network } from 'lucide-react';
+import { Button } from '@/components/ui/button'; // Import Button
+import Link from 'next/link'; // Import Link
+import { CheckCircle2, Users, DollarSign, CalendarDays, Network, ArrowRight } from 'lucide-react';
 
 const programData = [
   {
@@ -20,7 +23,8 @@ const programData = [
     id: 'mentorship',
     title: 'Mentorship Programs',
     Icon: Users,
-    content: 'Gain access to a network of experienced mentors, industry experts, and successful entrepreneurs. Our tailored mentorship programs cover areas like product development, market strategy, fundraising, and operational excellence to guide you at every step.',
+    contentP1: 'Gain access to a network of experienced mentors, industry experts, and successful entrepreneurs. Our tailored mentorship programs cover areas like product development, market strategy, fundraising, and operational excellence to guide you at every step.',
+    // contentP2 and button will be added dynamically below
   },
   {
     id: 'funding',
@@ -56,6 +60,7 @@ export default function ProgramDetailsSection() {
     }
     return () => {
       if (sectionRef.current) {
+        // eslint-disable-next-line react-hooks/exhaustive-deps
         observer.unobserve(sectionRef.current);
       }
     };
@@ -91,7 +96,19 @@ export default function ProgramDetailsSection() {
                     </div>
                   </AccordionTrigger>
                   <AccordionContent className="p-6 pt-0 text-muted-foreground">
-                    {item.content}
+                    {item.id === 'mentorship' ? (
+                      <>
+                        <p className="mb-4">{item.contentP1}</p>
+                        <Button asChild variant="default" size="lg" className="group">
+                          <Link href="/mentors">
+                            See Our Mentors
+                            <ArrowRight className="ml-2 h-5 w-5 transition-transform group-hover:translate-x-1" />
+                          </Link>
+                        </Button>
+                      </>
+                    ) : (
+                      item.content
+                    )}
                   </AccordionContent>
                 </AccordionItem>
               </div>
