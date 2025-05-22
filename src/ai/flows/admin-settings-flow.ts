@@ -9,7 +9,7 @@
  */
 
 import { ai } from '@/ai/genkit'; // Assuming genkit is initialized in @/ai/genkit
-import { z } from 'genkit/zod';
+import { z } from 'genkit'; // Updated Zod import
 import { db } from '@/lib/firebase';
 import { doc, updateDoc, serverTimestamp, setDoc } from 'firebase/firestore';
 
