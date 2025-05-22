@@ -81,14 +81,17 @@ export async function verifyAdminCredentials(
     } else {
       return { success: false, message: 'Invalid admin email or password.' };
     }
-  } catch (error) {
-    console.error('[AuthActions] Error verifying admin credentials:', error);
+  } catch (error: any) { // Modified catch block
+    console.error('[AuthActions] Error verifying admin credentials:', error); // Log the full error object
     if (error instanceof z.ZodError) {
       return { success: false, message: 'Invalid input data.' };
     }
+    // Construct a more detailed message if possible, otherwise fallback to generic
+    const errorMessage = error instanceof Error ? error.message : 'An unexpected error occurred.';
     return {
       success: false,
-      message: 'An unexpected error occurred during login.',
+      message: `An unexpected error occurred during login: ${errorMessage}`,
     };
   }
 }
+
