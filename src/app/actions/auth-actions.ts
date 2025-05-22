@@ -43,7 +43,6 @@ export async function verifyAdminCredentials(
 
     const storedCredentials = credsDocSnap.data();
 
-    // Add more robust checks for storedCredentials
     if (!storedCredentials || typeof storedCredentials !== 'object') {
       console.error(
         `Admin credentials document at ${ADMIN_CREDENTIALS_PATH} is empty or not an object.`
@@ -81,12 +80,18 @@ export async function verifyAdminCredentials(
     } else {
       return { success: false, message: 'Invalid admin email or password.' };
     }
-  } catch (error: any) { // Modified catch block
-    console.error('[AuthActions] Error verifying admin credentials:', error); // Log the full error object
+  } catch (error: any) {
+    console.error('[AuthActions] Error verifying admin credentials:', error);
     if (error instanceof z.ZodError) {
       return { success: false, message: 'Invalid input data.' };
     }
-    // Construct a more detailed message if possible, otherwise fallback to generic
+    // Check if it's a Firestore permission error
+    if (error.code === 'permission-denied' || (error.message && (error.message.toLowerCase().includes('permission denied') || error.message.toLowerCase().includes('insufficient permissions')))) {
+      return {
+        success: false,
+        message: 'Login Failed: Firestore permission denied. Please check your Firestore security rules to allow reading the admin credentials document.',
+      };
+    }
     const errorMessage = error instanceof Error ? error.message : 'An unexpected error occurred.';
     return {
       success: false,
@@ -94,4 +99,3 @@ export async function verifyAdminCredentials(
     };
   }
 }
-
