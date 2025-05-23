@@ -29,8 +29,8 @@ export default function AdminLayout({
 
   const navItems = [
     { href: "/admin/dashboard", label: "Submissions", icon: FileText },
-    { href: "/admin/events", label: "Events", icon: CalendarDays, disabled: false }, // Added Events link
-    { href: "#", label: "Mentors", icon: Users, disabled: true }, // Placeholder for Mentors
+    { href: "/admin/events", label: "Events", icon: CalendarDays, disabled: false },
+    { href: "/admin/mentors", label: "Mentors", icon: Users, disabled: false }, // Enabled and pointed to /admin/mentors
     { href: "/admin/settings", label: "Settings", icon: Settings, disabled: false },
   ];
 
