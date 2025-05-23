@@ -16,7 +16,7 @@ import {
   SidebarTrigger,
 } from "@/components/ui/sidebar";
 import { Button } from "@/components/ui/button";
-import { LayoutDashboard, FileText, Users, LogOut, Settings } from "lucide-react";
+import { LayoutDashboard, FileText, Users, LogOut, Settings, CalendarDays } from "lucide-react"; // Added CalendarDays
 import { InnoNexusLogo } from "@/components/icons/innnexus-logo"; // Visually this will show RCEOM-TBI
 import { usePathname } from "next/navigation";
 
@@ -29,8 +29,9 @@ export default function AdminLayout({
 
   const navItems = [
     { href: "/admin/dashboard", label: "Submissions", icon: FileText },
-    { href: "#", label: "User Management", icon: Users, disabled: true }, // Placeholder
-    { href: "/admin/settings", label: "Settings", icon: Settings, disabled: false }, // Enabled settings link
+    { href: "/admin/events", label: "Events", icon: CalendarDays, disabled: false }, // Added Events link
+    { href: "#", label: "Mentors", icon: Users, disabled: true }, // Placeholder for Mentors
+    { href: "/admin/settings", label: "Settings", icon: Settings, disabled: false },
   ];
 
   return (
