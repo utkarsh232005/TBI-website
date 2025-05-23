@@ -8,13 +8,12 @@ import {
   MobileNavHeader,
   MobileNavToggle,
   MobileNavMenu,
-  NavbarButton, // Added back for mobile login
+  NavbarButton,
 } from "@/components/ui/resizable-navbar";
-import { useState }
- from "react";
+import { useState } from "react";
 import Link from "next/link";
 import { motion } from "framer-motion";
-import { cn } from "@/lib/utils";
+// import { cn } from "@/lib/utils"; // cn is not used in this file
 
 interface MainNavbarProps {
   onApplyClick?: () => void;
@@ -25,14 +24,15 @@ export default function MainNavbar({ onApplyClick }: MainNavbarProps) {
     { name: 'About Us', link: '/#about' },
     { name: 'Startups', link: '/#startups' },
     { name: 'Program', link: '/#program' },
-    { name: 'Events', link: '/events' }, // Changed Testimonials to Events
+    { name: 'Events', link: '/events' },
     { name: 'Mentors', link: '/mentors' },
   ];
 
   const actionNavItems = [
-    { name: 'Apply', action: onApplyClick, isButton: true },
     { name: 'Login', link: '/login', isButton: false },
+    { name: 'Apply', action: onApplyClick, isButton: true },
   ];
+
 
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [hoveredItem, setHoveredItem] = useState<string | null>(null);
@@ -58,7 +58,9 @@ export default function MainNavbar({ onApplyClick }: MainNavbarProps) {
       {/* Desktop Navigation */}
       <NavBody>
         <NavbarLogo />
-        <div className="flex-1 flex justify-center items-center space-x-1 text-sm font-normal text-muted-foreground transition duration-200 lg:space-x-2">
+
+        {/* Main Navigation Links - Centered */}
+        <div className="flex-1 flex justify-center items-center space-x-1 text-sm font-normal transition duration-200 lg:space-x-2">
           {mainNavLinks.map((item) => (
             <Link
               href={item.link}
@@ -71,7 +73,7 @@ export default function MainNavbar({ onApplyClick }: MainNavbarProps) {
               {hoveredItem === item.name && (
                 <motion.div
                   layoutId={`hovered-nav-${item.name}`}
-                  className="absolute inset-0 h-full w-full rounded-full" // Transparent pill for animation drive
+                  className="absolute inset-0 h-full w-full rounded-full bg-muted/30" // Restored pill background
                   transition={{ type: "spring", stiffness: 300, damping: 30 }}
                 />
               )}
@@ -79,9 +81,11 @@ export default function MainNavbar({ onApplyClick }: MainNavbarProps) {
             </Link>
           ))}
         </div>
+        
+        {/* Action Buttons (Login, Apply) - Right Aligned */}
         <div className="flex items-center gap-2">
           {actionNavItems.map((item) => (
-            item.link ? (
+            item.link ? ( // This handles Login
               <Link
                 href={item.link}
                 key={`action-${item.name}`}
@@ -93,13 +97,13 @@ export default function MainNavbar({ onApplyClick }: MainNavbarProps) {
                 {hoveredItem === item.name && (
                   <motion.div
                     layoutId={`hovered-action-${item.name}`}
-                    className="absolute inset-0 h-full w-full rounded-full"
+                    className="absolute inset-0 h-full w-full rounded-full bg-muted/30" // Restored pill background
                     transition={{ type: "spring", stiffness: 300, damping: 30 }}
                   />
                 )}
                 <span className="relative z-20">{item.name}</span>
               </Link>
-            ) : item.isButton && item.action ? (
+            ) : item.isButton && item.action ? ( // This handles Apply
                  <button
                     key={`action-${item.name}`}
                     onClick={item.action}
@@ -110,7 +114,7 @@ export default function MainNavbar({ onApplyClick }: MainNavbarProps) {
                     {hoveredItem === item.name && (
                       <motion.div
                         layoutId={`hovered-action-${item.name}`} 
-                        className="absolute inset-0 h-full w-full rounded-full"
+                        className="absolute inset-0 h-full w-full rounded-full bg-muted/30" // Restored pill background
                         transition={{ type: "spring", stiffness: 300, damping: 30 }}
                       />
                     )}
