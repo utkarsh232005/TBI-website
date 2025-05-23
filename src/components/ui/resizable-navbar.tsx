@@ -7,10 +7,11 @@ import {
   AnimatePresence,
   useScroll,
   useMotionValueEvent,
-} from "framer-motion"; 
+  type Variants, // Added type Variants import
+} from "framer-motion"; // Standardized to framer-motion
 
 import React, { useRef, useState } from "react";
-import { InnoNexusLogo as AppLogo } from '@/components/icons/innnexus-logo';
+// Removed: import { InnoNexusLogo as AppLogo } from '@/components/icons/innnexus-logo';
 import Link from 'next/link';
 
 
@@ -71,7 +72,7 @@ export const Navbar = ({ children, className }: NavbarProps) => {
   return (
     <motion.div
       ref={ref}
-      className={cn("sticky inset-x-0 top-0 z-50 w-full", className)} 
+      className={cn("sticky inset-x-0 top-0 z-50 w-full", className)}
     >
       {React.Children.map(children, (child) =>
         React.isValidElement(child)
@@ -103,7 +104,7 @@ export const NavBody = ({ children, className, visible }: NavBodyProps) => {
       }}
       className={cn(
         "relative z-[60] mx-auto hidden w-full max-w-screen-2xl flex-row items-center justify-between self-start rounded-full bg-transparent px-4 py-2 lg:flex",
-        visible && "bg-background/80 border border-border shadow-lg", 
+        visible && "bg-background/80 border border-border shadow-lg",
         className,
       )}
     >
@@ -119,22 +120,22 @@ export const NavItems = ({ items, className, onItemClick }: NavItemsProps) => {
     <motion.div
       onMouseLeave={() => setHovered(null)}
       className={cn(
-        "absolute inset-0 hidden flex-1 flex-row items-center justify-center space-x-2 text-sm font-normal text-muted-foreground transition duration-200 lg:flex lg:space-x-2", 
+        "absolute inset-0 hidden flex-1 flex-row items-center justify-center space-x-2 text-sm font-normal text-muted-foreground transition duration-200 lg:flex lg:space-x-2",
         className,
       )}
     >
       {items.map((item, idx) => (
-        <Link 
+        <Link
           href={item.link}
           key={`link-${idx}`}
           onMouseEnter={() => setHovered(idx)}
           onClick={onItemClick}
-          className="relative px-4 py-2 text-muted-foreground hover:text-foreground" 
+          className="relative px-4 py-2 text-muted-foreground hover:text-primary" // Adjusted hover color
         >
           {hovered === idx && (
             <motion.div
               layoutId="hovered"
-              className="absolute inset-0 h-full w-full rounded-full bg-muted/50" 
+              className="absolute inset-0 h-full w-full rounded-full" // Transparent pill
             />
           )}
           <span className="relative z-20">{item.name}</span>
@@ -152,7 +153,7 @@ export const MobileNav = ({ children, className, visible }: MobileNavProps) => {
         width: visible ? "90%" : "100%",
         paddingRight: visible ? "12px" : "0px",
         paddingLeft: visible ? "12px" : "0px",
-        borderRadius: visible ? "1.5rem" : "0rem", 
+        borderRadius: visible ? "1.5rem" : "0rem",
         y: visible ? 20 : 0,
       }}
       transition={{
@@ -161,8 +162,8 @@ export const MobileNav = ({ children, className, visible }: MobileNavProps) => {
         damping: 50,
       }}
       className={cn(
-        "relative z-50 mx-auto flex w-full max-w-[calc(100vw-2rem)] flex-col items-center justify-between bg-transparent px-0 py-2 lg:hidden", 
-        visible && "bg-background/80 border border-border shadow-lg", 
+        "relative z-50 mx-auto flex w-full max-w-[calc(100vw-2rem)] flex-col items-center justify-between bg-transparent px-0 py-2 lg:hidden",
+        visible && "bg-background/80 border border-border shadow-lg",
         className,
       )}
     >
@@ -178,7 +179,7 @@ export const MobileNavHeader = ({
   return (
     <div
       className={cn(
-        "flex w-full flex-row items-center justify-between px-4", 
+        "flex w-full flex-row items-center justify-between px-4",
         className,
       )}
     >
@@ -187,11 +188,56 @@ export const MobileNavHeader = ({
   );
 };
 
+const Path = (props: {d?: string; variants: Variants; transition?: { duration: number }; initial?: string | boolean | undefined; animate?: string | undefined;}) => (
+  <motion.path
+    fill="transparent"
+    strokeWidth="3"
+    stroke="currentColor" // Inherits color from parent
+    strokeLinecap="round"
+    {...props}
+  />
+);
+
+const AnimatedMenuToggleSVG = ({ isOpen }: { isOpen: boolean }) => (
+  <motion.svg
+    width="23"
+    height="23"
+    viewBox="0 0 23 23"
+    initial={false} // Prevent animation on initial load
+    animate={isOpen ? "open" : "closed"}
+    className="text-foreground" // Ensure SVG inherits text color
+  >
+    <Path
+      variants={{
+        closed: { d: "M 2 2.5 L 20 2.5" },
+        open: { d: "M 3 16.5 L 17 2.5" },
+      }}
+      transition={{ duration: 0.3 }}
+    />
+    <Path
+      d="M 2 9.423 L 20 9.423"
+      variants={{
+        closed: { opacity: 1 },
+        open: { opacity: 0 },
+      }}
+      transition={{ duration: 0.1 }}
+    />
+    <Path
+      variants={{
+        closed: { d: "M 2 16.346 L 20 16.346" },
+        open: { d: "M 3 2.5 L 17 16.346" },
+      }}
+      transition={{ duration: 0.3 }}
+    />
+  </motion.svg>
+);
+
+
 export const MobileNavMenu = ({
   children,
   className,
   isOpen,
-}: MobileNavMenuProps) => { 
+}: MobileNavMenuProps) => {
   return (
     <AnimatePresence>
       {isOpen && (
@@ -200,7 +246,7 @@ export const MobileNavMenu = ({
           animate={{ opacity: 1, y: 0 }}
           exit={{ opacity: 0, y: -20 }}
           className={cn(
-            "absolute inset-x-0 top-16 z-50 flex w-full flex-col items-start justify-start gap-4 rounded-lg bg-card px-4 py-8 shadow-xl", 
+            "absolute inset-x-0 top-16 z-50 flex w-full flex-col items-start justify-start gap-4 rounded-lg bg-card px-4 py-8 shadow-xl",
             className,
           )}
         >
@@ -218,45 +264,52 @@ export const MobileNavToggle = ({
   isOpen: boolean;
   onClick: () => void;
 }) => {
-  return isOpen ? (
-    <IconX className="text-foreground" onClick={onClick} />
-  ) : (
-    <IconMenu2 className="text-foreground" onClick={onClick} />
+  return (
+    <button
+      onClick={onClick}
+      className="p-1 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 focus:ring-offset-background text-foreground"
+      aria-label={isOpen ? "Close menu" : "Open menu"}
+      aria-expanded={isOpen}
+    >
+      <AnimatedMenuToggleSVG isOpen={isOpen} />
+    </button>
   );
 };
 
 export const NavbarLogo = () => {
   return (
-    <Link 
+    <Link
       href="/"
-      aria-label="RCEOM-TBI Home" // Updated aria-label for consistency
-      className="relative z-20 mr-4 flex items-center space-x-2 px-2 py-1 text-sm font-normal"
+      aria-label="RCEOM-TBI Home"
+      className="relative z-20 flex items-center px-2 py-1" // Adjusted padding/margin
     >
-      <AppLogo className="h-8 w-auto text-primary" text="TBI" /> {/* Pass "TBI" as text prop */}
+      <span className="font-orbitron text-2xl font-bold text-primary">
+        TBI
+      </span>
     </Link>
   );
 };
 
 export const NavbarButton = ({
   href,
-  as: Tag = "button", 
+  as: Tag = "button",
   children,
   className,
   variant = "primary",
-  onClick, 
+  onClick,
   ...props
 }: {
   href?: string;
   as?: React.ElementType;
   children: React.ReactNode;
   className?: string;
-  variant?: "primary" | "secondary" | "outline" | "ghost"; 
+  variant?: "primary" | "secondary" | "outline" | "ghost";
   onClick?: React.MouseEventHandler<HTMLButtonElement | HTMLAnchorElement>;
 } & (
   | React.ComponentPropsWithoutRef<"a">
   | React.ComponentPropsWithoutRef<"button">
 )) => {
-  
+
   const baseStyles = "px-6 py-2 rounded-full text-base font-normal relative cursor-pointer hover:-translate-y-0.5 transition duration-200 inline-block text-center";
 
 
@@ -264,9 +317,9 @@ export const NavbarButton = ({
     primary: "bg-primary text-primary-foreground shadow-md hover:bg-primary/90",
     secondary: "bg-secondary text-secondary-foreground hover:bg-secondary/80",
     outline: "border border-muted bg-transparent text-muted-foreground hover:text-foreground hover:border-foreground",
-    ghost: "hover:bg-accent hover:text-accent-foreground text-foreground", 
+    ghost: "hover:bg-accent hover:text-accent-foreground text-foreground",
   };
-  
+
   const buttonProps = Tag === "button" ? { type: "button", ...props } : props;
 
   if (Tag === "a" && href) {
@@ -282,7 +335,7 @@ export const NavbarButton = ({
       </Link>
     );
   }
-  
+
   return (
      <Tag
       className={cn(baseStyles, variantStyles[variant as keyof typeof variantStyles], className)}
