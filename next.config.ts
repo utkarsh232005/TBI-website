@@ -22,6 +22,12 @@ const nextConfig: NextConfig = {
         hostname: 'landingfoliocom.imgix.net',
         port: '',
         pathname: '/**',
+      },
+      {
+        protocol: 'https',
+        hostname: 'www.freepik.com',
+        port: '',
+        pathname: '/**',
       }
     ],
   },
