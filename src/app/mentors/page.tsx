@@ -1,73 +1,14 @@
+// src/app/mentors/page.tsx
+"use client";
 
-"use client"; // This page uses client-side components and potentially hooks (implicitly by Framer Motion)
-
-import MentorCard, { type Mentor } from '@/components/ui/mentor-card';
+import { useEffect, useState } from 'react';
+import MentorCard, { type Mentor as PublicMentor } from '@/components/ui/mentor-card'; // PublicMentor type from card
 import MainNavbar from '@/components/ui/main-navbar';
 import Footer from '@/components/ui/footer';
 import { motion } from 'framer-motion';
-
-const mentorsData: Mentor[] = [
-  {
-    id: '1',
-    name: 'Prabodh Halde',
-    designation: 'Head Regulatory Affairs, Marico',
-    description: "Dr. Prabodh Halde, an esteemed professional, leads Marico's regulatory affairs division, leveraging over 30 years of expertise in food processing technology to spearhead innovation and excellence in the field.",
-    areaOfMentorship: 'Technology',
-    email: 'prabodh1972@gmail.com',
-    avatarUrl: 'https://placehold.co/100x100/7DF9FF/121212.png?text=PH',
-    backgroundImageUrl: 'https://placehold.co/400x600/121212/1E1E1E.png',
-    dataAiHintAvatar: 'professional male food technologist',
-    dataAiHintBackground: 'modern office technology'
-  },
-  {
-    id: '2',
-    name: 'Goutam Dutta',
-    designation: 'Senior Advisory Solution Architect, IBM',
-    description: "Mr. Goutam Dutta, an esteemed Senior Advisory Solution Architect at IBM, leverages an impressive 24 years of industry experience to provide cutting-edge solutions, embodying a legacy of excellence in technology innovation and strategic advisory.",
-    areaOfMentorship: 'Product Development',
-    email: 'duttagoutam@hotmail.com',
-    avatarUrl: 'https://placehold.co/100x100/7DF9FF/121212.png?text=GD',
-    backgroundImageUrl: 'https://placehold.co/400x600/1A1A1A/2D2D2D.png',
-    dataAiHintAvatar: 'corporate male architect',
-    dataAiHintBackground: 'abstract tech design'
-  },
-  {
-    id: '3',
-    name: 'Vaibhav Girmil',
-    designation: 'Senior Manager, Punjab National Bank',
-    description: "Mr. Vaibhav Girmil is an accomplished Senior Manager at PNB, with 12 years of expertise in treasury operations and foreign exchange management. He's adept at navigating complex financial landscapes with finesse and precision.",
-    areaOfMentorship: 'Finance',
-    email: 'vaibhav.girmil07@gmail.com',
-    avatarUrl: 'https://placehold.co/100x100/7DF9FF/121212.png?text=VG',
-    backgroundImageUrl: 'https://placehold.co/400x600/1E1E1E/3A3A3A.png',
-    dataAiHintAvatar: 'bank manager finance expert',
-    dataAiHintBackground: 'financial charts graphs'
-  },
-  {
-    id: '4',
-    name: 'Deepak Jha',
-    designation: 'Product Manager, Lightbeam AI',
-    description: "A seasoned Product Manager at LightBeam AI, boasting a decade of diverse experience in AI, Security, Privacy, Marketing, Healthcare, Social Media, and Fashion industries.",
-    areaOfMentorship: 'Early Stage Ideation', 
-    email: 'djdx21@gmail.com',
-    avatarUrl: 'https://placehold.co/100x100/7DF9FF/121212.png?text=DJ',
-    backgroundImageUrl: 'https://placehold.co/400x600/121212/1E1E1E.png',
-    dataAiHintAvatar: 'product manager AI tech',
-    dataAiHintBackground: 'AI neural network'
-  },
-  {
-    id: '5',
-    name: 'Sarika Narayan',
-    designation: 'Independent Business Consultant',
-    description: "Ms. Sarika Narayan, an independent business consultant, leverages over two decades of experience in driving business planning and strategy, net margin realization, and product development and marketing. Specializing in empowering low-income artisan enterprises, she pioneers sustainable growth and market expansion strategies.",
-    areaOfMentorship: 'Business Strategy',
-    email: 'sarikanarayan@yahoo.com',
-    avatarUrl: 'https://placehold.co/100x100/7DF9FF/121212.png?text=SN',
-    backgroundImageUrl: 'https://placehold.co/400x600/1A1A1A/2D2D2D.png',
-    dataAiHintAvatar: 'female business consultant',
-    dataAiHintBackground: 'strategy planning whiteboard'
-  },
-];
+import { db } from '@/lib/firebase';
+import { collection, getDocs, orderBy, query, Timestamp } from 'firebase/firestore';
+import { Loader2, AlertCircle, Users } from 'lucide-react';
 
 const pageTitleVariants = {
   hidden: { opacity: 0, y: -20 },
@@ -84,7 +25,63 @@ const cardItemVariants = {
   visible: { opacity: 1, y: 0, transition: { duration: 0.5, ease: "easeOut" } },
 };
 
+// This is the structure of mentor data stored in Firestore
+export interface FirestoreMentor {
+  id: string;
+  name: string;
+  designation: string;
+  expertise: string; // "Area of Mentorship" from form
+  description: string;
+  profilePictureUrl?: string; // "avatarUrl" from form
+  linkedinUrl?: string;
+  email: string;
+  createdAt?: Timestamp; // For ordering
+  // Other fields like backgroundImageUrl are not directly from Firestore for now
+}
+
 export default function MentorsPage() {
+  const [mentors, setMentors] = useState<PublicMentor[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    const fetchMentors = async () => {
+      setIsLoading(true);
+      setError(null);
+      try {
+        const mentorsCollection = collection(db, "mentors");
+        const q = query(mentorsCollection, orderBy("createdAt", "desc"));
+        const querySnapshot = await getDocs(q);
+        const fetchedMentors: PublicMentor[] = [];
+        querySnapshot.forEach((doc) => {
+          const data = doc.data() as Omit<FirestoreMentor, 'id'>; // Cast to known Firestore structure
+          fetchedMentors.push({
+            id: doc.id,
+            name: data.name,
+            designation: data.designation,
+            description: data.description,
+            areaOfMentorship: data.expertise, // Map expertise to areaOfMentorship
+            email: data.email,
+            avatarUrl: data.profilePictureUrl || `https://placehold.co/100x100/7DF9FF/121212.png?text=${encodeURIComponent(data.name.substring(0,2))}`,
+            // Using a default placeholder for background, as this is not in Firestore
+            backgroundImageUrl: `https://placehold.co/400x600/121212/1E1E1E.png?text=${encodeURIComponent(data.name.substring(0,1))}`,
+            dataAiHintAvatar: `professional ${data.name.split(' ')[0].toLowerCase()}`,
+            dataAiHintBackground: 'abstract tech design',
+            linkedinUrl: data.linkedinUrl,
+          });
+        });
+        setMentors(fetchedMentors);
+      } catch (err: any) {
+        console.error("Error fetching mentors for public page: ", err);
+        setError("Failed to load mentors. Please try again later. " + err.message);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchMentors();
+  }, []);
+
   return (
     <div className="flex flex-col min-h-screen bg-background font-poppins">
       <MainNavbar />
@@ -93,7 +90,7 @@ export default function MentorsPage() {
           <motion.div 
             className="text-center mb-12 md:mb-16"
             initial="hidden"
-            animate="visible" // Animate on load as it's at the top
+            animate="visible"
             variants={pageTitleVariants}
           >
             <h1 className="font-orbitron text-3xl font-bold tracking-tight sm:text-4xl md:text-5xl text-primary">
@@ -108,7 +105,24 @@ export default function MentorsPage() {
             </motion.p>
           </motion.div>
 
-          {mentorsData && mentorsData.length > 0 ? (
+          {isLoading ? (
+            <div className="flex justify-center items-center py-20">
+              <Loader2 className="h-12 w-12 animate-spin text-primary" />
+            </div>
+          ) : error ? (
+            <div className="text-center py-20 text-destructive">
+              <AlertCircle className="mx-auto h-12 w-12 mb-4" />
+              <p className="text-xl font-semibold">Could not load mentors</p>
+              <p className="text-muted-foreground">{error}</p>
+            </div>
+          ) : mentors.length === 0 ? (
+            <div className="text-center py-20">
+              <Users className="mx-auto h-12 w-12 text-muted-foreground mb-4" />
+              <p className="text-muted-foreground text-lg">
+                No mentors to display at the moment. Check back soon or add them via the admin panel.
+              </p>
+            </div>
+          ) : (
             <motion.div 
               className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 xl:gap-10"
               initial="hidden"
@@ -116,16 +130,12 @@ export default function MentorsPage() {
               viewport={{ once: true, amount: 0.1 }}
               variants={gridVariants}
             >
-              {mentorsData.map((mentor) => (
+              {mentors.map((mentor) => (
                 <motion.div key={mentor.id} variants={cardItemVariants}>
                   <MentorCard mentor={mentor} />
                 </motion.div>
               ))}
             </motion.div>
-          ) : (
-            <p className="text-center text-muted-foreground text-lg">
-              No mentors to display at the moment. Please check back later.
-            </p>
           )}
         </div>
       </main>
