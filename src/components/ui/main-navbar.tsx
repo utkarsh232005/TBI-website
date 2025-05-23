@@ -3,33 +3,39 @@
 import {
   Navbar,
   NavBody,
-  // NavItems, // Replaced with custom rendering
   MobileNav,
   NavbarLogo,
-  NavbarButton,
   MobileNavHeader,
   MobileNavToggle,
   MobileNavMenu,
+  NavbarButton, // Added back for mobile login
 } from "@/components/ui/resizable-navbar";
-import { useState } from "react";
-import Link from "next/link"; // Import Link for navigation
-import { motion } from "framer-motion"; // Moved import to top
-import { cn } from "@/lib/utils"; // Moved import to top
+import { useState }
+ from "react";
+import Link from "next/link";
+import { motion } from "framer-motion";
+import { cn } from "@/lib/utils";
 
 interface MainNavbarProps {
   onApplyClick?: () => void;
 }
 
 export default function MainNavbar({ onApplyClick }: MainNavbarProps) {
-  const navItems = [
-    { name: 'About Us', link: '#about' },
-    { name: 'Startups', link: '#startups' },
-    { name: 'Program', link: '#program' },
-    { name: 'Testimonials', link: '#testimonials' },
+  const mainNavLinks = [
+    { name: 'About Us', link: '/#about' },
+    { name: 'Startups', link: '/#startups' },
+    { name: 'Program', link: '/#program' },
+    { name: 'Events', link: '/events' }, // Changed Testimonials to Events
+    { name: 'Mentors', link: '/mentors' },
+  ];
+
+  const actionNavItems = [
+    { name: 'Apply', action: onApplyClick, isButton: true },
+    { name: 'Login', link: '/login', isButton: false },
   ];
 
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  const [hovered, setHovered] = useState<number | null>(null);
+  const [hoveredItem, setHoveredItem] = useState<string | null>(null);
 
   const closeMobileMenu = () => setIsMobileMenuOpen(false);
 
@@ -47,64 +53,71 @@ export default function MainNavbar({ onApplyClick }: MainNavbarProps) {
     }
   };
   
-  const dynamicNavItems = [
-    ...navItems,
-    { name: 'Apply', action: handleApplyNavItemClick, isButton: true } 
-  ];
-
-
   return (
     <Navbar>
       {/* Desktop Navigation */}
       <NavBody>
         <NavbarLogo />
-        {/* Custom rendering for NavItems to handle mixed links and buttons */}
-        <motion.div
-          onMouseLeave={() => setHovered(null)}
-          className={cn(
-            "absolute inset-0 hidden flex-1 flex-row items-center justify-center space-x-2 text-sm font-normal text-muted-foreground transition duration-200 lg:flex lg:space-x-2",
-          )}
-        >
-          {dynamicNavItems.map((item, idx) => (
+        <div className="flex-1 flex justify-center items-center space-x-1 text-sm font-normal text-muted-foreground transition duration-200 lg:space-x-2">
+          {mainNavLinks.map((item) => (
+            <Link
+              href={item.link}
+              key={`nav-${item.name}`}
+              onMouseEnter={() => setHoveredItem(item.name)}
+              onMouseLeave={() => setHoveredItem(null)}
+              onClick={closeMobileMenu}
+              className="relative px-3 py-2 text-muted-foreground hover:text-primary transition-colors duration-200"
+            >
+              {hoveredItem === item.name && (
+                <motion.div
+                  layoutId={`hovered-nav-${item.name}`}
+                  className="absolute inset-0 h-full w-full rounded-full" // Transparent pill for animation drive
+                  transition={{ type: "spring", stiffness: 300, damping: 30 }}
+                />
+              )}
+              <span className="relative z-20">{item.name}</span>
+            </Link>
+          ))}
+        </div>
+        <div className="flex items-center gap-2">
+          {actionNavItems.map((item) => (
             item.link ? (
               <Link
                 href={item.link}
-                key={`link-${idx}`}
-                onMouseEnter={() => setHovered(idx)}
+                key={`action-${item.name}`}
+                onMouseEnter={() => setHoveredItem(item.name)}
+                onMouseLeave={() => setHoveredItem(null)}
                 onClick={closeMobileMenu}
-                className="relative px-4 py-2 text-muted-foreground hover:text-foreground"
+                className="relative px-3 py-2 text-muted-foreground hover:text-primary transition-colors duration-200"
               >
-                {hovered === idx && (
+                {hoveredItem === item.name && (
                   <motion.div
-                    layoutId="hovered"
-                    className="absolute inset-0 h-full w-full rounded-full bg-muted/50"
+                    layoutId={`hovered-action-${item.name}`}
+                    className="absolute inset-0 h-full w-full rounded-full"
+                    transition={{ type: "spring", stiffness: 300, damping: 30 }}
                   />
                 )}
                 <span className="relative z-20">{item.name}</span>
               </Link>
             ) : item.isButton && item.action ? (
                  <button
-                    key={`action-${idx}`}
+                    key={`action-${item.name}`}
                     onClick={item.action}
-                    onMouseEnter={() => setHovered(idx)}
-                    className="relative px-4 py-2 text-muted-foreground hover:text-foreground"
+                    onMouseEnter={() => setHoveredItem(item.name)}
+                    onMouseLeave={() => setHoveredItem(null)}
+                    className="relative px-3 py-2 text-muted-foreground hover:text-primary transition-colors duration-200"
                   >
-                    {hovered === idx && (
+                    {hoveredItem === item.name && (
                       <motion.div
-                        layoutId={`hovered-action-${idx}`} // Ensure unique layoutId
-                        className="absolute inset-0 h-full w-full rounded-full bg-muted/50"
+                        layoutId={`hovered-action-${item.name}`} 
+                        className="absolute inset-0 h-full w-full rounded-full"
+                        transition={{ type: "spring", stiffness: 300, damping: 30 }}
                       />
                     )}
                     <span className="relative z-20">{item.name}</span>
                   </button>
             ) : null
           ))}
-        </motion.div>
-        {/* <NavItems items={navItems} onItemClick={closeMobileMenu} /> Replaced with custom rendering */}
-        <div className="flex items-center gap-2">
-          <NavbarButton as="a" href="/login" variant="ghost" className="text-foreground hover:bg-accent hover:text-accent-foreground">
-            Login
-          </NavbarButton>
         </div>
       </NavBody>
 
@@ -122,25 +135,25 @@ export default function MainNavbar({ onApplyClick }: MainNavbarProps) {
           isOpen={isMobileMenuOpen}
           onClose={closeMobileMenu}
         >
-          {navItems.map((item, idx) => ( 
+          {mainNavLinks.map((item, idx) => ( 
             <Link
               key={`mobile-link-${idx}`}
               href={item.link}
               onClick={closeMobileMenu}
-              className="relative block py-2 text-lg text-foreground hover:text-primary"
+              className="block py-2 text-lg text-foreground hover:text-primary"
             >
               {item.name}
             </Link>
           ))}
           <button
             onClick={handleApplyNavItemClick}
-            className="relative block py-2 text-lg text-foreground hover:text-primary"
+            className="block py-2 text-lg text-foreground hover:text-primary"
           >
             Apply
           </button>
           <div className="flex w-full flex-col gap-4 pt-4 border-t border-border mt-4">
             <NavbarButton
-              as="a"
+              as="a" 
               href="/login"
               onClick={closeMobileMenu}
               variant="outline"
@@ -154,5 +167,3 @@ export default function MainNavbar({ onApplyClick }: MainNavbarProps) {
     </Navbar>
   );
 }
-
-// Removed imports from bottom as they are now at the top
