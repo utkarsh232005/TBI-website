@@ -1,10 +1,10 @@
 
 "use client";
 
-import { useRef, useEffect, useState } from 'react';
 import AnimatedCounter from '@/components/ui/animated-counter';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { UsersRound, TrendingUp, Rocket, Lightbulb, Goal } from 'lucide-react';
+import { motion } from 'framer-motion';
 
 const stats = [
   { id: 1, value: 50, label: 'Startups Mentored', Icon: Rocket, suffix: '+' },
@@ -25,49 +25,42 @@ const missionVision = [
   }
 ];
 
+const sectionVariants = {
+  hidden: { opacity: 0 },
+  visible: { opacity: 1, transition: { staggerChildren: 0.2, delayChildren: 0.1 } },
+};
+
+const itemVariants = {
+  hidden: { opacity: 0, y: 20 },
+  visible: { opacity: 1, y: 0, transition: { duration: 0.6, ease: "easeOut" } },
+};
+
 export default function AboutSection() {
-  const sectionRef = useRef<HTMLDivElement>(null);
-  const [isInView, setIsInView] = useState(false);
-
-  useEffect(() => {
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        if (entry.isIntersecting) {
-          setIsInView(true);
-          observer.unobserve(entry.target);
-        }
-      },
-      { threshold: 0.1 }
-    );
-
-    if (sectionRef.current) {
-      observer.observe(sectionRef.current);
-    }
-    return () => {
-      if (sectionRef.current) {
-        observer.unobserve(sectionRef.current);
-      }
-    };
-  }, []);
-
-  const animationClass = (delay: string) => 
-    `transition-all duration-700 ease-out ${isInView ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`;
-
   return (
-    <section id="about" ref={sectionRef} className="py-16 md:py-24 bg-background text-foreground">
+    <motion.section 
+      id="about" 
+      className="py-16 md:py-24 bg-background text-foreground"
+      initial="hidden"
+      whileInView="visible"
+      viewport={{ once: true, amount: 0.1 }}
+      variants={sectionVariants}
+    >
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-        <div className={`text-center mb-12 md:mb-16 ${animationClass('delay-0')}`}>
+        <motion.div className="text-center mb-12 md:mb-16" variants={itemVariants}>
           <h2 className="font-orbitron text-3xl font-bold tracking-tight sm:text-4xl md:text-5xl text-primary">
             About RCEOM-TBI
           </h2>
           <p className="mt-4 max-w-2xl mx-auto text-lg text-muted-foreground sm:text-xl">
             We are dedicated to nurturing the brightest minds and innovative ideas, transforming them into successful ventures that shape the future.
           </p>
-        </div>
+        </motion.div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-12 md:mb-16">
-          {missionVision.map((item, index) => (
-            <div key={item.title} className={`${animationClass(`delay-${(index + 1) * 100}ms`)}`}>
+        <motion.div 
+          className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-12 md:mb-16"
+          variants={staggerContainer(0.2)} // Use staggerContainer if sectionVariants doesn't already handle it for this specific grid
+        >
+          {missionVision.map((item) => (
+            <motion.div key={item.title} variants={itemVariants} className="h-full">
               <Card className="h-full bg-card shadow-xl hover:shadow-primary/20 transition-shadow duration-300">
                 <CardHeader className="flex flex-row items-center space-x-4 pb-4 pt-6 px-6">
                   <item.Icon className="h-10 w-10 text-primary" />
@@ -77,13 +70,16 @@ export default function AboutSection() {
                   <p className="text-muted-foreground">{item.description}</p>
                 </CardContent>
               </Card>
-            </div>
+            </motion.div>
           ))}
-        </div>
+        </motion.div>
         
-        <div className="grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-3">
-          {stats.map((stat, index) => (
-            <div key={stat.id} className={`${animationClass(`delay-${(index + 3) * 100}ms`)}`}>
+        <motion.div 
+          className="grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-3"
+           variants={staggerContainer(0.2, 0.4)} // Delay this grid slightly
+        >
+          {stats.map((stat) => (
+            <motion.div key={stat.id} variants={itemVariants}>
               <Card className="text-center bg-card shadow-xl hover:shadow-accent/20 transition-shadow duration-300 p-6 rounded-3xl">
                 <CardContent className="flex flex-col items-center justify-center">
                   <stat.Icon className="h-12 w-12 mb-4 text-accent" />
@@ -96,10 +92,22 @@ export default function AboutSection() {
                   <p className="mt-2 text-lg text-muted-foreground">{stat.label}</p>
                 </CardContent>
               </Card>
-            </div>
+            </motion.div>
           ))}
-        </div>
+        </motion.div>
       </div>
-    </section>
+    </motion.section>
   );
 }
+
+// Helper for staggering if not using sectionVariants directly for grids
+const staggerContainer = (staggerChildren = 0.1, delayChildren = 0) => ({
+  hidden: { opacity: 0 }, // Add opacity to parent for smoother collective appear
+  visible: {
+    opacity: 1,
+    transition: {
+      staggerChildren,
+      delayChildren,
+    },
+  },
+});

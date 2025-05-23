@@ -1,11 +1,10 @@
 
 "use client";
 
-import { useRef, useEffect, useState } from 'react';
 import { BentoGrid, BentoGridItem } from '@/components/ui/bento-grid';
 import { Rocket } from 'lucide-react'; 
+import { motion } from 'framer-motion';
 
-// Data remains the same as before for content
 const startupsData = [
   {
     id: '1',
@@ -63,80 +62,80 @@ const startupsData = [
   },
 ];
 
-// Skeleton component to match the plain dark rectangle header in the image
 const Skeleton = () => (
-  <div className="flex flex-1 w-full h-full min-h-[6rem] rounded-xl bg-card-foreground/5"></div>
+  <div className="flex flex-1 w-full h-full min-h-[6rem] rounded-xl bg-gradient-to-br from-card to-secondary"></div>
 );
 
+const sectionTitleVariants = {
+  hidden: { opacity: 0, y: 20 },
+  visible: { opacity: 1, y: 0, transition: { duration: 0.6, ease: "easeOut" } },
+};
+
+const bentoGridVariants = {
+  hidden: { opacity: 0 },
+  visible: { opacity: 1, transition: { staggerChildren: 0.15, delayChildren: 0.2 } },
+};
+
+const bentoItemVariants = {
+  hidden: { opacity: 0, y: 20 },
+  visible: { opacity: 1, y: 0, transition: { duration: 0.5, ease: "easeOut" } },
+};
 
 export default function FeaturedStartupsSection() {
-  const sectionRef = useRef<HTMLDivElement>(null);
-  const [isInView, setIsInView] = useState(false);
-
-  useEffect(() => {
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        if (entry.isIntersecting) {
-          setIsInView(true);
-          observer.unobserve(entry.target);
-        }
-      },
-      { threshold: 0.05 } 
-    );
-
-    if (sectionRef.current) {
-      observer.observe(sectionRef.current);
-    }
-    return () => {
-      if (sectionRef.current) {
-        observer.unobserve(sectionRef.current);
-      }
-    };
-  }, []);
-
-  // Prepare items for BentoGrid
-  const bentoItems = startupsData.map((startup, i) => ({ // Added index i
+  const bentoItems = startupsData.map((startup, i) => ({
     id: startup.id,
     title: startup.name,
     description: startup.description,
-    header: <Skeleton />, // Use the plain Skeleton for the header
+    header: <Skeleton />, 
     icon: <Rocket className="h-4 w-4 text-muted-foreground" />, 
-    // Apply spanning logic from demo: 4th item (index 3) spans 2 columns.
-    // Since startupsData has 6 items (indices 0-5), i === 6 will not be met.
     className: i === 3 ? "md:col-span-2" : "", 
   }));
   
 
   return (
-    <section id="startups" ref={sectionRef} className="py-16 md:py-24 bg-background text-foreground">
+    <motion.section 
+      id="startups" 
+      className="py-16 md:py-24 bg-background text-foreground"
+      initial="hidden"
+      whileInView="visible"
+      viewport={{ once: true, amount: 0.1 }}
+    >
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-        <div className={`text-center mb-12 md:mb-16 transition-all duration-700 ease-out ${isInView ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}>
+        <motion.div 
+          className="text-center mb-12 md:mb-16"
+          variants={sectionTitleVariants}
+        >
           <h2 className="font-orbitron text-3xl font-bold tracking-tight sm:text-4xl md:text-5xl text-primary">
             Featured Startups
           </h2>
           <p className="mt-4 max-w-2xl mx-auto text-lg text-muted-foreground sm:text-xl">
             Meet some of the innovative companies thriving in the RCEOM-TBI ecosystem.
           </p>
-        </div>
+        </motion.div>
         
-        <BentoGrid className={`max-w-4xl mx-auto transition-all duration-500 ease-out ${isInView ? 'opacity-100' : 'opacity-0'}`} style={{ transitionDelay: `150ms` }}>
-          {bentoItems.map((item, i) => ( // Added index i for transitionDelay keying
-             <div
-              key={item.id} // Use item.id for React key
-              className={`transition-all duration-500 ease-out ${isInView ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}
-              style={{ transitionDelay: `${i * 100 + 200}ms` }}
-            >
-              <BentoGridItem
-                title={item.title}
-                description={item.description}
-                header={item.header}
-                icon={item.icon}
-                className={item.className} // Pass the calculated className for spanning
-              />
-            </div>
-          ))}
-        </BentoGrid>
+        <motion.div
+          variants={bentoGridVariants}
+          className="max-w-4xl mx-auto" // This div will be the BentoGrid itself
+        >
+          <BentoGrid>
+            {bentoItems.map((item) => (
+              <motion.div
+                key={item.id}
+                variants={bentoItemVariants}
+                // The className for col-span is passed to BentoGridItem, which applies it to its root
+              >
+                <BentoGridItem
+                  title={item.title}
+                  description={item.description}
+                  header={item.header}
+                  icon={item.icon}
+                  className={item.className} 
+                />
+              </motion.div>
+            ))}
+          </BentoGrid>
+        </motion.div>
       </div>
-    </section>
+    </motion.section>
   );
 }

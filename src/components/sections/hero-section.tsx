@@ -6,44 +6,34 @@ import { Button } from '@/components/ui/button';
 import { ArrowRight } from 'lucide-react';
 import { CampusStatusDialog } from '@/components/ui/campus-status-dialog';
 import Image from 'next/image';
+import { motion } from 'framer-motion';
 
 // DUMMY_GOOGLE_FORM_LINK: This is a placeholder. Replace with your actual Google Form link for off-campus applicants.
 const DUMMY_GOOGLE_FORM_LINK = 'https://docs.google.com/forms/d/e/YOUR_FORM_ID_HERE/viewform?usp=sf_link';
 
 interface HeroSectionProps {
-  onApplyClick?: () => void; // Add this prop
+  onApplyClick?: () => void;
 }
 
-export default function HeroSection({ onApplyClick }: HeroSectionProps) { // Destructure the prop
-  const sectionRef = useRef<HTMLDivElement>(null);
-  const [isInView, setIsInView] = useState(false);
+const fadeInUp = {
+  initial: { opacity: 0, y: 30 },
+  animate: { opacity: 1, y: 0, transition: { duration: 0.6, ease: "easeOut" } },
+};
+
+const staggerContainer = {
+  initial: {},
+  animate: {
+    transition: {
+      staggerChildren: 0.2,
+      delayChildren: 0.2,
+    },
+  },
+};
+
+
+export default function HeroSection({ onApplyClick }: HeroSectionProps) {
+  // sectionRef and isInView are no longer needed for Framer Motion's whileInView or initial animate
   const [showCampusDialog, setShowCampusDialog] = useState(false);
-
-  useEffect(() => {
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        if (entry.isIntersecting) {
-          setIsInView(true);
-          observer.unobserve(entry.target);
-        }
-      },
-      { threshold: 0.1 }
-    );
-
-    if (sectionRef.current) {
-      observer.observe(sectionRef.current);
-    }
-
-    return () => {
-      if (sectionRef.current && observer) {
-        try {
-          observer.unobserve(sectionRef.current);
-        } catch (e) {
-          // console.warn("Error unobserving hero section:", e);
-        }
-      }
-    };
-  }, []);
   
   const handleApplyForIncubationClick = () => {
     setShowCampusDialog(true);
@@ -55,22 +45,17 @@ export default function HeroSection({ onApplyClick }: HeroSectionProps) { // Des
 
     if (status === "off-campus") {
       window.location.href = DUMMY_GOOGLE_FORM_LINK;
-    } else { // status === "campus"
+    } else { 
       if (onApplyClick) {
-        onApplyClick(); // Open the application form dialog
+        onApplyClick(); 
       } else {
-        // Fallback or error if onApplyClick is not provided
         console.warn("onApplyClick not provided to HeroSection for campus applicants.");
-        // As a fallback, attempt to scroll if the old #contact existed.
-        // const contactSection = document.getElementById('contact');
-        // if (contactSection) contactSection.scrollIntoView({ behavior: 'smooth' });
       }
     }
   };
 
   return (
     <section 
-      ref={sectionRef}
       className="relative flex min-h-screen items-center justify-center overflow-hidden bg-black text-white pt-12 sm:pt-16"
     >
       {/* Noise Texture Overlay */}
@@ -89,17 +74,31 @@ export default function HeroSection({ onApplyClick }: HeroSectionProps) { // Des
       {/* Bottom Gradient Effect */}
       <div className="absolute bottom-0 left-0 right-0 h-1/3 bg-bottom-gradient-hero z-0" />
       
-      <div className={`relative z-10 mx-auto max-w-4xl p-4 text-center transition-all duration-1000 ease-out ${isInView ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}>
-        <p className="text-sm font-normal tracking-widest uppercase mb-8">
+      <motion.div 
+        className="relative z-10 mx-auto max-w-4xl p-4 text-center"
+        variants={staggerContainer}
+        initial="initial"
+        animate="animate"
+      >
+        <motion.p 
+          className="text-sm font-normal tracking-widest uppercase mb-8"
+          variants={fadeInUp}
+        >
           <span className="text-transparent bg-clip-text bg-gradient-to-r from-cyan-500 to-purple-500">
             YOUR STARTUP NEEDS A KICK
           </span>
-        </p>
-        <h1 className="font-orbitron text-4xl font-normal text-white sm:text-5xl lg:text-6xl xl:text-7xl">
+        </motion.p>
+        <motion.h1 
+          className="font-orbitron text-4xl font-normal text-white sm:text-5xl lg:text-6xl xl:text-7xl"
+          variants={fadeInUp}
+        >
           Connect &amp; grow with your targeted customers
-        </h1>
+        </motion.h1>
         
-        <div className="mt-12 flex flex-col items-center justify-center gap-5 sm:flex-row">
+        <motion.div 
+          className="mt-12 flex flex-col items-center justify-center gap-5 sm:flex-row"
+          variants={fadeInUp}
+        >
           <div className="relative inline-flex items-center justify-center w-full sm:w-auto group">
             <div className="absolute transition-all duration-200 rounded-full -inset-px bg-gradient-to-r from-cyan-500 to-purple-500 group-hover:shadow-lg group-hover:shadow-cyan-500/50"></div>
             <Button
@@ -122,8 +121,8 @@ export default function HeroSection({ onApplyClick }: HeroSectionProps) { // Des
               See Success Stories
             </a>
           </Button>
-        </div>
-      </div>
+        </motion.div>
+      </motion.div>
       
       <CampusStatusDialog
         open={showCampusDialog}

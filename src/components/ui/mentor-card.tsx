@@ -4,7 +4,8 @@
 import { cn } from "@/lib/utils";
 import Image from 'next/image';
 import Link from 'next/link';
-import { Mail, UserCircle, Briefcase, Brain } from 'lucide-react'; // Added icons
+import { Mail, UserCircle, Briefcase, Brain } from 'lucide-react';
+import { motion } from 'framer-motion';
 
 export interface Mentor {
   id: string;
@@ -25,10 +26,14 @@ interface MentorCardProps {
 
 export default function MentorCard({ mentor }: MentorCardProps) {
   return (
-    <div className="w-full group/card max-w-sm mx-auto">
+    <motion.div 
+      className="w-full group/card max-w-sm mx-auto"
+      whileHover={{ scale: 1.03, y: -5 }}
+      transition={{ type: "spring", stiffness: 400, damping: 15 }}
+    >
       <div
         className={cn(
-          "cursor-pointer overflow-hidden relative card h-[450px] rounded-2xl shadow-xl flex flex-col justify-between p-5 border border-border hover:border-primary/50 transition-all duration-300",
+          "cursor-pointer overflow-hidden relative card h-[450px] rounded-2xl shadow-xl flex flex-col justify-between p-5 border border-border hover:border-primary/50 transition-all duration-300", // Removed hover:border-primary/50 to let Framer Motion handle visual feedback primarily
         )}
         style={{ 
           backgroundImage: `url(${mentor.backgroundImageUrl})`,
@@ -85,6 +90,6 @@ export default function MentorCard({ mentor }: MentorCardProps) {
           </div>
         </div>
       </div>
-    </div>
+    </motion.div>
   );
 }

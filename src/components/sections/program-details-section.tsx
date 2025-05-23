@@ -1,16 +1,16 @@
 
 "use client";
 
-import { useRef, useEffect, useState } from 'react';
 import {
   Accordion,
   AccordionContent,
   AccordionItem,
   AccordionTrigger,
 } from '@/components/ui/accordion';
-import { Button } from '@/components/ui/button'; // Import Button
-import Link from 'next/link'; // Import Link
+import { Button } from '@/components/ui/button'; 
+import Link from 'next/link'; 
 import { CheckCircle2, Users, DollarSign, CalendarDays, Network, ArrowRight } from 'lucide-react';
+import { motion } from 'framer-motion';
 
 const programData = [
   {
@@ -24,7 +24,6 @@ const programData = [
     title: 'Mentorship Programs',
     Icon: Users,
     contentP1: 'Gain access to a network of experienced mentors, industry experts, and successful entrepreneurs. Our tailored mentorship programs cover areas like product development, market strategy, fundraising, and operational excellence to guide you at every step.',
-    // contentP2 and button will be added dynamically below
   },
   {
     id: 'funding',
@@ -40,53 +39,42 @@ const programData = [
   },
 ];
 
+const sectionVariants = {
+  hidden: { opacity: 0 },
+  visible: { opacity: 1, transition: { staggerChildren: 0.1, delayChildren: 0.1 } },
+};
+
+const itemVariants = {
+  hidden: { opacity: 0, y: 20 },
+  visible: { opacity: 1, y: 0, transition: { duration: 0.6, ease: "easeOut" } },
+};
+
 export default function ProgramDetailsSection() {
-  const sectionRef = useRef<HTMLDivElement>(null);
-  const [isInView, setIsInView] = useState(false);
-
-  useEffect(() => {
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        if (entry.isIntersecting) {
-          setIsInView(true);
-          observer.unobserve(entry.target);
-        }
-      },
-      { threshold: 0.1 }
-    );
-
-    if (sectionRef.current) {
-      observer.observe(sectionRef.current);
-    }
-    return () => {
-      if (sectionRef.current) {
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-        observer.unobserve(sectionRef.current);
-      }
-    };
-  }, []);
-  
-  const animationClass = (delay: string) => 
-    `transition-all duration-700 ease-out ${isInView ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`;
-
   return (
-    <section id="program" ref={sectionRef} className="py-16 md:py-24 bg-card text-foreground">
+    <motion.section 
+      id="program" 
+      className="py-16 md:py-24 bg-card text-foreground"
+      initial="hidden"
+      whileInView="visible"
+      viewport={{ once: true, amount: 0.1 }}
+      variants={sectionVariants}
+    >
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-        <div className={`text-center mb-12 md:mb-16 ${animationClass('delay-0')}`}>
+        <motion.div className="text-center mb-12 md:mb-16" variants={itemVariants}>
           <h2 className="font-orbitron text-3xl font-bold tracking-tight sm:text-4xl md:text-5xl text-primary">
             Our Program
           </h2>
           <p className="mt-4 max-w-2xl mx-auto text-lg text-muted-foreground sm:text-xl">
             Discover how RCEOM-TBI can fuel your startup's growth and success.
           </p>
-        </div>
+        </motion.div>
 
         <div className="max-w-3xl mx-auto">
           <Accordion type="single" collapsible className="w-full space-y-4">
-            {programData.map((item, index) => (
-              <div
+            {programData.map((item) => (
+              <motion.div
                 key={item.id}
-                className={`${animationClass(`delay-${(index + 1) * 150}ms`)}`}
+                variants={itemVariants}
               >
                 <AccordionItem value={item.id} className="border border-border rounded-lg shadow-md hover:shadow-primary/20 transition-shadow bg-background">
                   <AccordionTrigger className="p-6 text-lg font-poppins font-medium hover:no-underline text-left">
@@ -111,11 +99,11 @@ export default function ProgramDetailsSection() {
                     )}
                   </AccordionContent>
                 </AccordionItem>
-              </div>
+              </motion.div>
             ))}
           </Accordion>
         </div>
       </div>
-    </section>
+    </motion.section>
   );
 }

@@ -1,8 +1,10 @@
 
-// src/app/mentors/page.tsx
+"use client"; // This page uses client-side components and potentially hooks (implicitly by Framer Motion)
+
 import MentorCard, { type Mentor } from '@/components/ui/mentor-card';
-import MainNavbar from '@/components/ui/main-navbar'; // Corrected import
+import MainNavbar from '@/components/ui/main-navbar';
 import Footer from '@/components/ui/footer';
+import { motion } from 'framer-motion';
 
 const mentorsData: Mentor[] = [
   {
@@ -46,7 +48,7 @@ const mentorsData: Mentor[] = [
     name: 'Deepak Jha',
     designation: 'Product Manager, Lightbeam AI',
     description: "A seasoned Product Manager at LightBeam AI, boasting a decade of diverse experience in AI, Security, Privacy, Marketing, Healthcare, Social Media, and Fashion industries.",
-    areaOfMentorship: 'Early Stage Ideation', // Standardized from "Consultancy Domain"
+    areaOfMentorship: 'Early Stage Ideation', 
     email: 'djdx21@gmail.com',
     avatarUrl: 'https://placehold.co/100x100/7DF9FF/121212.png?text=DJ',
     backgroundImageUrl: 'https://placehold.co/400x600/121212/1E1E1E.png',
@@ -67,27 +69,59 @@ const mentorsData: Mentor[] = [
   },
 ];
 
+const pageTitleVariants = {
+  hidden: { opacity: 0, y: -20 },
+  visible: { opacity: 1, y: 0, transition: { duration: 0.6, ease: "easeOut" } },
+};
+
+const gridVariants = {
+  hidden: { opacity: 0 },
+  visible: { opacity: 1, transition: { staggerChildren: 0.1, delayChildren: 0.2 } },
+};
+
+const cardItemVariants = {
+  hidden: { opacity: 0, y: 20 },
+  visible: { opacity: 1, y: 0, transition: { duration: 0.5, ease: "easeOut" } },
+};
+
 export default function MentorsPage() {
   return (
     <div className="flex flex-col min-h-screen bg-background font-poppins">
       <MainNavbar />
       <main className="flex-grow py-16 md:py-24">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-12 md:mb-16">
+          <motion.div 
+            className="text-center mb-12 md:mb-16"
+            initial="hidden"
+            animate="visible" // Animate on load as it's at the top
+            variants={pageTitleVariants}
+          >
             <h1 className="font-orbitron text-3xl font-bold tracking-tight sm:text-4xl md:text-5xl text-primary">
               Meet Our Mentors
             </h1>
-            <p className="mt-4 max-w-2xl mx-auto text-lg text-muted-foreground sm:text-xl">
+            <motion.p 
+              className="mt-4 max-w-2xl mx-auto text-lg text-muted-foreground sm:text-xl"
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0, transition: { duration: 0.5, delay: 0.2, ease: "easeOut"} }}
+            >
               Guiding visionaries to success with expert mentorship and industry insights.
-            </p>
-          </div>
+            </motion.p>
+          </motion.div>
 
           {mentorsData && mentorsData.length > 0 ? (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 xl:gap-10">
+            <motion.div 
+              className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 xl:gap-10"
+              initial="hidden"
+              whileInView="visible"
+              viewport={{ once: true, amount: 0.1 }}
+              variants={gridVariants}
+            >
               {mentorsData.map((mentor) => (
-                <MentorCard key={mentor.id} mentor={mentor} />
+                <motion.div key={mentor.id} variants={cardItemVariants}>
+                  <MentorCard mentor={mentor} />
+                </motion.div>
               ))}
-            </div>
+            </motion.div>
           ) : (
             <p className="text-center text-muted-foreground text-lg">
               No mentors to display at the moment. Please check back later.
