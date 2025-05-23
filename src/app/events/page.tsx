@@ -9,6 +9,7 @@ import { motion } from 'framer-motion';
 import { db } from '@/lib/firebase';
 import { collection, getDocs, orderBy, query, Timestamp } from 'firebase/firestore';
 import { Loader2, AlertCircle, CalendarDays } from 'lucide-react';
+import { format } from 'date-fns'; // Added this import
 
 const pageTitleVariants = {
   hidden: { opacity: 0, y: -20 },
@@ -87,20 +88,22 @@ export default function EventsPage() {
     <div className="flex flex-col min-h-screen bg-background font-poppins">
       <MainNavbar />
       <main className="flex-grow py-16 md:py-24">
-        <div className="container mx-auto px-4 sm:px-6 lg:px-8">
+        <motion.div
+          className="container mx-auto px-4 sm:px-6 lg:px-8"
+          initial="hidden"
+          animate="visible"
+          variants={sectionVariants} // Using sectionVariants for overall container
+        >
           <motion.div
             className="text-center mb-12 md:mb-16"
-            initial="hidden"
-            animate="visible"
-            variants={pageTitleVariants}
+            variants={pageTitleVariants} // Variants for title block
           >
             <h1 className="font-orbitron text-3xl font-bold tracking-tight sm:text-4xl md:text-5xl text-primary">
               Upcoming Events
             </h1>
             <motion.p
               className="mt-4 max-w-2xl mx-auto text-lg text-muted-foreground sm:text-xl"
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0, transition: { duration: 0.5, delay: 0.2, ease: "easeOut"} }}
+              variants={fadeInUp} // Using a more specific variant
             >
               Stay updated with our latest workshops, competitions, and networking opportunities.
             </motion.p>
@@ -126,10 +129,7 @@ export default function EventsPage() {
           ) : (
             <motion.div
               className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 xl:gap-10"
-              initial="hidden"
-              whileInView="visible"
-              viewport={{ once: true, amount: 0.1 }}
-              variants={gridVariants}
+              variants={gridVariants} // Variants for the grid container
             >
               {events.map((eventData) => {
                 // Adapt FirestoreEvent to EventCard's Event type
@@ -153,9 +153,21 @@ export default function EventsPage() {
               })}
             </motion.div>
           )}
-        </div>
+        </motion.div>
       </main>
       <Footer />
     </div>
   );
 }
+
+// Re-defining Framer Motion variants here as they were used in the original code.
+// These can be moved to a shared file if used in multiple places.
+const sectionVariants = {
+  hidden: { opacity: 0 },
+  visible: { opacity: 1, transition: { staggerChildren: 0.1, delayChildren: 0.1 } },
+};
+
+const fadeInUp = {
+  hidden: { opacity: 0, y: 20 },
+  visible: { opacity: 1, y: 0, transition: { duration: 0.6, ease: "easeOut" } },
+};
