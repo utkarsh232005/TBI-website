@@ -2,7 +2,6 @@
 "use client";
 
 import { useRef, useEffect, useState } from 'react';
-// Removed Image import as it's no longer directly used for the header
 import { BentoGrid, BentoGridItem } from '@/components/ui/bento-grid';
 import { Rocket } from 'lucide-react'; 
 
@@ -11,7 +10,7 @@ const startupsData = [
   {
     id: '1',
     name: 'QuantumLeap AI',
-    logoUrl: 'https://placehold.co/300x150/1A1A1A/7DF9FF.png?text=QAI', // Kept for potential future use, but not for header
+    logoUrl: 'https://placehold.co/300x150/1A1A1A/7DF9FF.png?text=QAI',
     description: 'Revolutionizing data analytics with quantum-inspired machine learning algorithms.',
     badgeText: 'Series A Funded',
     websiteUrl: '#',
@@ -64,10 +63,9 @@ const startupsData = [
   },
 ];
 
-// New Skeleton component to match the plain dark rectangle header in the image
+// Skeleton component to match the plain dark rectangle header in the image
 const Skeleton = () => (
   <div className="flex flex-1 w-full h-full min-h-[6rem] rounded-xl bg-card-foreground/5"></div>
-  // bg-card-foreground/5 gives a very subtle dark gray, slightly lighter than card background
 );
 
 
@@ -97,13 +95,15 @@ export default function FeaturedStartupsSection() {
   }, []);
 
   // Prepare items for BentoGrid
-  const bentoItems = startupsData.map(startup => ({
+  const bentoItems = startupsData.map((startup, i) => ({ // Added index i
     id: startup.id,
     title: startup.name,
     description: startup.description,
-    header: <Skeleton />, // Use the new plain Skeleton for the header
-    icon: <Rocket className="h-4 w-4 text-muted-foreground" />, // Generic icon, styled to be subtle
-    className: startupsData.indexOf(startup) === 2 || startupsData.indexOf(startup) === 5 ? "md:col-span-2" : "",
+    header: <Skeleton />, // Use the plain Skeleton for the header
+    icon: <Rocket className="h-4 w-4 text-muted-foreground" />, 
+    // Apply spanning logic from demo: 4th item (index 3) spans 2 columns.
+    // Since startupsData has 6 items (indices 0-5), i === 6 will not be met.
+    className: i === 3 ? "md:col-span-2" : "", 
   }));
   
 
@@ -120,9 +120,9 @@ export default function FeaturedStartupsSection() {
         </div>
         
         <BentoGrid className={`max-w-4xl mx-auto transition-all duration-500 ease-out ${isInView ? 'opacity-100' : 'opacity-0'}`} style={{ transitionDelay: `150ms` }}>
-          {bentoItems.map((item, i) => (
+          {bentoItems.map((item, i) => ( // Added index i for transitionDelay keying
              <div
-              key={item.id}
+              key={item.id} // Use item.id for React key
               className={`transition-all duration-500 ease-out ${isInView ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}
               style={{ transitionDelay: `${i * 100 + 200}ms` }}
             >
@@ -131,7 +131,7 @@ export default function FeaturedStartupsSection() {
                 description={item.description}
                 header={item.header}
                 icon={item.icon}
-                className={item.className}
+                className={item.className} // Pass the calculated className for spanning
               />
             </div>
           ))}
