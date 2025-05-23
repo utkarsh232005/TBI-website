@@ -25,14 +25,14 @@ import { Textarea } from "@/components/ui/textarea";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Users, PlusCircle, Loader2, AlertCircle, Edit, Trash2, Briefcase, Brain, LinkIcon, Mail } from "lucide-react";
+import { Users, PlusCircle, Loader2, AlertCircle, Edit, Trash2 } from "lucide-react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { useToast } from "@/hooks/use-toast";
 import { db } from '@/lib/firebase';
 import { collection, getDocs, Timestamp, orderBy, query } from 'firebase/firestore';
-import { createMentorAction } from '@/app/actions/mentor-actions'; // We will create this
+import { createMentorAction } from '@/app/actions/mentor-actions';
 import { format } from 'date-fns';
 
 // Schema for the mentor creation/edit form
@@ -105,8 +105,14 @@ export default function AdminMentorsPage() {
       });
       setMentors(fetchedMentors);
     } catch (err: any) {
-      console.error("Error fetching mentors: ", err);
-      setError("Failed to load mentors. " + err.message);
+      console.error("Error fetching mentors for admin page: ", err);
+      let detailedError = "Failed to load mentors.";
+      if (err.code === 'permission-denied' || (err.message && (err.message.toLowerCase().includes('permission-denied') || err.message.toLowerCase().includes('insufficient permissions')))) {
+        detailedError = "Failed to load mentors: Missing or insufficient Firestore permissions. Please check your Firestore security rules for the 'mentors' collection to allow reads.";
+      } else if (err.message) {
+        detailedError += ` ${err.message}`;
+      }
+      setError(detailedError);
     } finally {
       setIsLoading(false);
     }
@@ -286,7 +292,7 @@ export default function AdminMentorsPage() {
             <div className="text-destructive flex flex-col items-center py-10">
               <AlertCircle className="h-8 w-8 mb-2" />
               <p className="font-semibold">Error loading mentors</p>
-              <p>{error}</p>
+              <p className="text-sm">{error}</p>
               <Button onClick={fetchMentors} variant="outline" className="mt-4">Try Again</Button>
             </div>
           ) : mentors.length === 0 ? (

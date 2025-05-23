@@ -73,7 +73,13 @@ export default function MentorsPage() {
         setMentors(fetchedMentors);
       } catch (err: any) {
         console.error("Error fetching mentors for public page: ", err);
-        setError("Failed to load mentors. Please try again later. " + err.message);
+        let detailedError = "Failed to load mentors. Please try again later.";
+        if (err.code === 'permission-denied' || (err.message && (err.message.toLowerCase().includes('permission-denied') || err.message.toLowerCase().includes('insufficient permissions')))) {
+            detailedError = "Failed to load mentors: Missing or insufficient Firestore permissions. Please check your Firestore security rules for the 'mentors' collection to allow reads.";
+        } else if (err.message) {
+            detailedError += ` ${err.message}`;
+        }
+        setError(detailedError);
       } finally {
         setIsLoading(false);
       }
