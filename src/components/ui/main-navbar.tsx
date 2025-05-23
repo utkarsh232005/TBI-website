@@ -13,7 +13,6 @@ import {
 import { useState } from "react";
 import Link from "next/link";
 import { motion } from "framer-motion";
-// import { cn } from "@/lib/utils"; // cn is not used in this file
 
 interface MainNavbarProps {
   onApplyClick?: () => void;
@@ -28,9 +27,9 @@ export default function MainNavbar({ onApplyClick }: MainNavbarProps) {
     { name: 'Mentors', link: '/mentors' },
   ];
 
+  // "Apply" is removed from actionNavItems
   const actionNavItems = [
     { name: 'Login', link: '/login', isButton: false },
-    { name: 'Apply', action: onApplyClick, isButton: true },
   ];
 
 
@@ -39,20 +38,10 @@ export default function MainNavbar({ onApplyClick }: MainNavbarProps) {
 
   const closeMobileMenu = () => setIsMobileMenuOpen(false);
 
-  const handleApplyNavItemClick = () => {
-    closeMobileMenu();
-    if (onApplyClick) {
-      onApplyClick();
-    } else {
-      const campusStatusFromStorage = typeof window !== "undefined" ? localStorage.getItem('applicantCampusStatus') as "campus" | "off-campus" | null : null;
-      if (campusStatusFromStorage === "off-campus") {
-        window.location.href = 'https://docs.google.com/forms/d/e/YOUR_FORM_ID_HERE/viewform?usp=sf_link'; // DUMMY LINK
-      } else {
-        console.warn("onApplyClick not provided to MainNavbar for Apply button.");
-      }
-    }
-  };
-  
+  // The handleApplyNavItemClick function is no longer needed here as "Apply" is removed.
+  // If onApplyClick was used for other purposes, that logic would need reassessment.
+  // For now, assuming it was solely for the "Apply" button.
+
   return (
     <Navbar>
       {/* Desktop Navigation */}
@@ -73,7 +62,7 @@ export default function MainNavbar({ onApplyClick }: MainNavbarProps) {
               {hoveredItem === item.name && (
                 <motion.div
                   layoutId={`hovered-nav-${item.name}`}
-                  className="absolute inset-0 h-full w-full rounded-full bg-muted/30" // Restored pill background
+                  className="absolute inset-0 h-full w-full rounded-full bg-muted/30"
                   transition={{ type: "spring", stiffness: 300, damping: 30 }}
                 />
               )}
@@ -82,7 +71,7 @@ export default function MainNavbar({ onApplyClick }: MainNavbarProps) {
           ))}
         </div>
         
-        {/* Action Buttons (Login, Apply) - Right Aligned */}
+        {/* Action Buttons (Login) - Right Aligned */}
         <div className="flex items-center gap-2">
           {actionNavItems.map((item) => (
             item.link ? ( // This handles Login
@@ -97,13 +86,13 @@ export default function MainNavbar({ onApplyClick }: MainNavbarProps) {
                 {hoveredItem === item.name && (
                   <motion.div
                     layoutId={`hovered-action-${item.name}`}
-                    className="absolute inset-0 h-full w-full rounded-full bg-muted/30" // Restored pill background
+                    className="absolute inset-0 h-full w-full rounded-full bg-muted/30"
                     transition={{ type: "spring", stiffness: 300, damping: 30 }}
                   />
                 )}
                 <span className="relative z-20">{item.name}</span>
               </Link>
-            ) : item.isButton && item.action ? ( // This handles Apply
+            ) : item.isButton && item.action ? ( // This part was for "Apply", now effectively unused due to actionNavItems change
                  <button
                     key={`action-${item.name}`}
                     onClick={item.action}
@@ -113,8 +102,8 @@ export default function MainNavbar({ onApplyClick }: MainNavbarProps) {
                   >
                     {hoveredItem === item.name && (
                       <motion.div
-                        layoutId={`hovered-action-${item.name}`} 
-                        className="absolute inset-0 h-full w-full rounded-full bg-muted/30" // Restored pill background
+                        layoutId={`hovered-action-button-${item.name}`} 
+                        className="absolute inset-0 h-full w-full rounded-full bg-muted/30"
                         transition={{ type: "spring", stiffness: 300, damping: 30 }}
                       />
                     )}
@@ -149,12 +138,7 @@ export default function MainNavbar({ onApplyClick }: MainNavbarProps) {
               {item.name}
             </Link>
           ))}
-          <button
-            onClick={handleApplyNavItemClick}
-            className="block py-2 text-lg text-foreground hover:text-primary"
-          >
-            Apply
-          </button>
+          {/* "Apply" button removed from mobile menu */}
           <div className="flex w-full flex-col gap-4 pt-4 border-t border-border mt-4">
             <NavbarButton
               as="a" 
