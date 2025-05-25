@@ -153,193 +153,238 @@ export default function AdminMentorsPage() {
   }
 
   return (
-    <div className="space-y-6">
-      <Card className="shadow-lg">
-        <CardHeader className="flex flex-row items-center justify-between">
-          <div>
-            <CardTitle className="flex items-center text-2xl font-orbitron">
-              <Users className="mr-3 h-7 w-7 text-primary" />
-              Mentors Management
-            </CardTitle>
-            <CardDescription>
-              Add, view, edit, and delete mentor profiles.
-            </CardDescription>
+    <div className="w-full py-6 px-4 sm:px-6">
+      <Card className="bg-[#121212] border border-[#2A2A2A] shadow-[0_4px_20px_rgba(0,0,0,0.3)] rounded-2xl overflow-hidden">
+        <CardHeader className="bg-[#1A1A1A] border-b border-[#2A2A2A] p-6">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+            <div>
+              <CardTitle className="text-[#E0E0E0] text-2xl font-bold tracking-tight">MENTOR MANAGEMENT</CardTitle>
+              <CardDescription className="text-[#9CA3AF] mt-1">Create and manage mentors for TBI</CardDescription>
+            </div>
+            <Dialog open={isCreateDialogOpen} onOpenChange={setIsCreateDialogOpen}>
+              <DialogTrigger asChild>
+                <Button className="bg-[#4F46E5] hover:bg-[#4338CA] text-white rounded-xl px-6 py-2.5 shadow-[0_4px_15px_rgba(79,70,229,0.4)] transform transition-all duration-200 hover:scale-105 hover:shadow-[0_6px_20px_rgba(79,70,229,0.6)] font-medium">
+                  <PlusCircle className="mr-2 h-4 w-4" />
+                  Add New Mentor
+                </Button>
+              </DialogTrigger>
+              <DialogContent className="sm:max-w-[600px] bg-[#1A1A1A] border border-[#2A2A2A] text-[#E0E0E0] shadow-[0_8px_30px_rgba(0,0,0,0.4)] rounded-2xl">
+                <DialogHeader>
+                  <DialogTitle className="text-[#E0E0E0] text-xl font-semibold">Add New Mentor</DialogTitle>
+                  <DialogDescription className="text-[#9CA3AF]">
+                    Fill out the form below to add a new mentor to the TBI network.
+                  </DialogDescription>
+                </DialogHeader>
+                <Form {...form}>
+                  <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4 py-4 max-h-[70vh] overflow-y-auto pr-2">
+                    <FormField
+                      control={form.control}
+                      name="name"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel className="text-[#E0E0E0]">Full Name</FormLabel>
+                          <FormControl>
+                            <Input placeholder="Dr. Jane Smith" {...field} disabled={isSubmitting}
+                              className="bg-[#252525] border-[#3A3A3A] text-[#E0E0E0] focus:border-[#4F46E5] rounded-lg placeholder:text-[#6B7280]" />
+                          </FormControl>
+                          <FormMessage className="text-rose-400" />
+                        </FormItem>
+                      )}
+                    />
+                    <FormField
+                      control={form.control}
+                      name="designation"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel className="text-[#E0E0E0]">Designation</FormLabel>
+                          <FormControl>
+                            <Input placeholder="Chief Technology Officer" {...field} disabled={isSubmitting}
+                              className="bg-[#252525] border-[#3A3A3A] text-[#E0E0E0] focus:border-[#4F46E5] rounded-lg placeholder:text-[#6B7280]" />
+                          </FormControl>
+                          <FormMessage className="text-rose-400" />
+                        </FormItem>
+                      )}
+                    />
+                    <FormField
+                      control={form.control}
+                      name="expertise"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel className="text-[#E0E0E0]">Area of Expertise</FormLabel>
+                          <FormControl>
+                            <Input placeholder="DevOps engineering" {...field} disabled={isSubmitting}
+                              className="bg-[#252525] border-[#3A3A3A] text-[#E0E0E0] focus:border-[#4F46E5] rounded-lg placeholder:text-[#6B7280]" />
+                          </FormControl>
+                          <FormMessage className="text-rose-400" />
+                        </FormItem>
+                      )}
+                    />
+                    <FormField
+                      control={form.control}
+                      name="description"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel className="text-[#E0E0E0]">Short Description</FormLabel>
+                          <FormControl>
+                            <Textarea placeholder="Brief introduction of the mentor..." {...field} disabled={isSubmitting}
+                              className="min-h-[120px] bg-[#252525] border-[#3A3A3A] text-[#E0E0E0] focus:border-[#4F46E5] rounded-lg placeholder:text-[#6B7280]" />
+                          </FormControl>
+                          <FormMessage className="text-rose-400" />
+                        </FormItem>
+                      )}
+                    />
+                    <FormField
+                      control={form.control}
+                      name="profilePictureUrl"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel className="text-[#E0E0E0]">Profile Picture URL (Optional)</FormLabel>
+                          <FormControl>
+                            <Input type="url" placeholder="https://example.com/profile-pic.jpg" {...field} disabled={isSubmitting}
+                              className="bg-[#252525] border-[#3A3A3A] text-[#E0E0E0] focus:border-[#4F46E5] rounded-lg placeholder:text-[#6B7280]" />
+                          </FormControl>
+                          <FormMessage className="text-rose-400" />
+                          <p className="text-xs text-[#9CA3AF]">For now, please provide a URL. Direct upload coming soon.</p>
+                        </FormItem>
+                      )}
+                    />
+                    <FormField
+                      control={form.control}
+                      name="linkedinUrl"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel className="text-[#E0E0E0]">LinkedIn URL (Optional)</FormLabel>
+                          <FormControl>
+                            <Input type="url" placeholder="https://linkedin.com/in/username" {...field} disabled={isSubmitting}
+                              className="bg-[#252525] border-[#3A3A3A] text-[#E0E0E0] focus:border-[#4F46E5] rounded-lg placeholder:text-[#6B7280]" />
+                          </FormControl>
+                          <FormMessage className="text-rose-400" />
+                        </FormItem>
+                      )}
+                    />
+                    <FormField
+                      control={form.control}
+                      name="email"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel className="text-[#E0E0E0]">Email Address</FormLabel>
+                          <FormControl>
+                            <Input type="email" placeholder="mentor@example.com" {...field} disabled={isSubmitting}
+                              className="bg-[#252525] border-[#3A3A3A] text-[#E0E0E0] focus:border-[#4F46E5] rounded-lg placeholder:text-[#6B7280]" />
+                          </FormControl>
+                          <FormMessage className="text-rose-400" />
+                        </FormItem>
+                      )}
+                    />
+                    <DialogFooter>
+                      <Button type="button" variant="outline" onClick={() => setIsCreateDialogOpen(false)} disabled={isSubmitting}
+                        className="border-[#3A3A3A] text-[#E0E0E0] hover:bg-[#252525] rounded-lg">
+                        Cancel
+                      </Button>
+                      <Button type="submit" disabled={isSubmitting}
+                        className="bg-[#4F46E5] hover:bg-[#4338CA] text-white rounded-lg shadow-[0_4px_10px_rgba(79,70,229,0.3)] transform transition-transform hover:scale-105">
+                        {isSubmitting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                        Add Mentor
+                      </Button>
+                    </DialogFooter>
+                  </form>
+                </Form>
+              </DialogContent>
+            </Dialog>
           </div>
-          <Dialog open={isCreateDialogOpen} onOpenChange={setIsCreateDialogOpen}>
-            <DialogTrigger asChild>
-              <Button>
-                <PlusCircle className="mr-2 h-4 w-4" /> Add New Mentor
-              </Button>
-            </DialogTrigger>
-            <DialogContent className="sm:max-w-[525px] bg-card">
-              <DialogHeader>
-                <DialogTitle>Add New Mentor</DialogTitle>
-                <DialogDescription>Fill in the details for the new mentor.</DialogDescription>
-              </DialogHeader>
-              <Form {...form}>
-                <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4 py-4 max-h-[70vh] overflow-y-auto pr-2">
-                  <FormField
-                    control={form.control}
-                    name="name"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Full Name</FormLabel>
-                        <FormControl>
-                          <Input placeholder="e.g., Dr. Jane Doe" {...field} disabled={isSubmitting} />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                  <FormField
-                    control={form.control}
-                    name="designation"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Designation</FormLabel>
-                        <FormControl>
-                          <Input placeholder="e.g., Lead Innovator, Acme Corp" {...field} disabled={isSubmitting} />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                  <FormField
-                    control={form.control}
-                    name="expertise"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Area of Expertise/Mentorship</FormLabel>
-                        <FormControl>
-                          <Input placeholder="e.g., AI & Machine Learning" {...field} disabled={isSubmitting} />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                  <FormField
-                    control={form.control}
-                    name="description"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Description / Bio</FormLabel>
-                        <FormControl>
-                          <Textarea placeholder="Brief description of the mentor's background and experience..." {...field} rows={4} disabled={isSubmitting} />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                  <FormField
-                    control={form.control}
-                    name="email"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Email Address</FormLabel>
-                        <FormControl>
-                          <Input type="email" placeholder="mentor@example.com" {...field} disabled={isSubmitting} />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                  <FormField
-                    control={form.control}
-                    name="profilePictureUrl"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Profile Picture URL (Optional)</FormLabel>
-                        <FormControl>
-                          <Input type="url" placeholder="https://placehold.co/100x100.png" {...field} disabled={isSubmitting} />
-                        </FormControl>
-                        <FormMessage />
-                        <p className="text-xs text-muted-foreground">Direct upload coming soon. For now, provide a URL.</p>
-                      </FormItem>
-                    )}
-                  />
-                  <FormField
-                    control={form.control}
-                    name="linkedinUrl"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>LinkedIn Profile URL (Optional)</FormLabel>
-                        <FormControl>
-                          <Input type="url" placeholder="https://linkedin.com/in/mentorname" {...field} disabled={isSubmitting} />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                  <DialogFooter>
-                    <Button type="button" variant="outline" onClick={() => setIsCreateDialogOpen(false)} disabled={isSubmitting}>Cancel</Button>
-                    <Button type="submit" disabled={isSubmitting}>
-                      {isSubmitting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                      Add Mentor
-                    </Button>
-                  </DialogFooter>
-                </form>
-              </Form>
-            </DialogContent>
-          </Dialog>
         </CardHeader>
-        <CardContent>
+        <CardContent className="p-6">
           {isLoading ? (
             <div className="flex justify-center items-center py-10">
-              <Loader2 className="h-8 w-8 animate-spin text-primary" />
-              <span className="ml-2 text-muted-foreground">Loading mentors...</span>
+              <Loader2 className="h-8 w-8 animate-spin text-[#4F46E5]" />
+              <span className="ml-2 text-[#9CA3AF]">Loading mentors...</span>
             </div>
           ) : error ? (
-            <div className="text-destructive flex flex-col items-center py-10">
-              <AlertCircle className="h-8 w-8 mb-2" />
-              <p className="font-semibold">Error loading mentors</p>
-              <p className="text-sm">{error}</p>
-              <Button onClick={fetchMentors} variant="outline" className="mt-4">Try Again</Button>
+            <div className="flex justify-center items-center py-10">
+              <AlertCircle className="h-8 w-8 text-rose-500" />
+              <span className="ml-2 text-[#9CA3AF]">{error}</span>
             </div>
           ) : mentors.length === 0 ? (
-             <div className="text-center py-10">
-                <Users className="mx-auto h-12 w-12 text-muted-foreground mb-4" />
-                <p className="text-muted-foreground">No mentors found. Get started by adding one!</p>
+            <div className="text-center py-16 bg-[#151515] rounded-2xl border border-[#2A2A2A] shadow-inner">
+              <Users className="mx-auto h-16 w-16 text-[#4F46E5] opacity-70 mb-4" />
+              <p className="text-[#9CA3AF] text-lg">No mentors found. Get started by adding one!</p>
+              <Button onClick={() => setIsCreateDialogOpen(true)} className="mt-6 bg-[#4F46E5] hover:bg-[#4338CA] text-white rounded-xl px-6 py-2.5 shadow-[0_4px_15px_rgba(79,70,229,0.4)] transform transition-all duration-200 hover:scale-105 hover:shadow-[0_6px_20px_rgba(79,70,229,0.6)] font-medium">
+                <PlusCircle className="mr-2 h-4 w-4" />
+                Add First Mentor
+              </Button>
             </div>
           ) : (
-            <div className="overflow-x-auto">
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead>Avatar</TableHead>
-                    <TableHead>Name</TableHead>
-                    <TableHead>Designation</TableHead>
-                    <TableHead>Expertise</TableHead>
-                    <TableHead>Email</TableHead>
-                    <TableHead>Added On</TableHead>
-                    <TableHead className="text-right">Actions</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {mentors.map((mentor) => (
-                    <TableRow key={mentor.id}>
-                      <TableCell>
-                        <Avatar className="h-10 w-10">
-                          <AvatarImage src={mentor.profilePictureUrl || `https://placehold.co/100x100/121212/7DF9FF.png?text=${mentor.name.substring(0,2)}`} alt={mentor.name} />
-                          <AvatarFallback>{mentor.name.substring(0,2).toUpperCase()}</AvatarFallback>
-                        </Avatar>
-                      </TableCell>
-                      <TableCell className="font-medium">{mentor.name}</TableCell>
-                      <TableCell>{mentor.designation}</TableCell>
-                      <TableCell>{mentor.expertise}</TableCell>
-                      <TableCell>{mentor.email}</TableCell>
-                       <TableCell>{mentor.createdAt ? format(mentor.createdAt.toDate(), "PP") : 'N/A'}</TableCell>
-                      <TableCell className="text-right space-x-2">
-                        <Button variant="ghost" size="icon" disabled> {/* Placeholder for Edit */}
-                          <Edit className="h-4 w-4" />
-                        </Button>
-                        <Button variant="ghost" size="icon" className="text-destructive hover:text-destructive" disabled> {/* Placeholder for Delete */}
-                          <Trash2 className="h-4 w-4" />
-                        </Button>
-                      </TableCell>
+            <div className="overflow-hidden rounded-2xl border border-[#2A2A2A] shadow-[0_8px_30px_rgba(0,0,0,0.25)]">
+              <div className="overflow-x-auto">
+                <Table className="w-full">
+                  <TableHeader className="bg-[#1A1A1A]">
+                    <TableRow>
+                      <TableHead className="text-[#E0E0E0] font-semibold uppercase text-xs tracking-wider py-5 px-6 border-b border-[#2A2A2A]">Avatar</TableHead>
+                      <TableHead className="text-[#E0E0E0] font-semibold uppercase text-xs tracking-wider py-5 px-6 border-b border-[#2A2A2A]">Name</TableHead>
+                      <TableHead className="text-[#E0E0E0] font-semibold uppercase text-xs tracking-wider py-5 px-6 border-b border-[#2A2A2A]">Designation</TableHead>
+                      <TableHead className="text-[#E0E0E0] font-semibold uppercase text-xs tracking-wider py-5 px-6 border-b border-[#2A2A2A]">Expertise</TableHead>
+                      <TableHead className="text-[#E0E0E0] font-semibold uppercase text-xs tracking-wider py-5 px-6 border-b border-[#2A2A2A]">Email</TableHead>
+                      <TableHead className="text-[#E0E0E0] font-semibold uppercase text-xs tracking-wider py-5 px-6 border-b border-[#2A2A2A]">Added On</TableHead>
+                      <TableHead className="text-[#E0E0E0] font-semibold uppercase text-xs tracking-wider py-5 px-6 border-b border-[#2A2A2A] text-right">Actions</TableHead>
                     </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
+                  </TableHeader>
+                  <TableBody>
+                    {mentors.map((mentor, index) => (
+                      <TableRow 
+                        key={mentor.id} 
+                        className={`${index % 2 === 0 ? 'bg-[#121212]' : 'bg-[#1E1E1E]'} hover:bg-[#252525] transition-all duration-200`}
+                      >
+                        <TableCell className="py-5 px-6 border-b border-[#2A2A2A]">
+                          <Avatar className="h-12 w-12 ring-2 ring-[#4F46E5]/30 shadow-lg">
+                            <AvatarImage src={mentor.profilePictureUrl || `https://placehold.co/100x100/1E1E1E/4F46E5.png?text=${mentor.name.substring(0,2)}`} alt={mentor.name} />
+                            <AvatarFallback className="bg-[#4F46E5]/10 text-[#4F46E5] font-medium">{mentor.name.substring(0,2).toUpperCase()}</AvatarFallback>
+                          </Avatar>
+                        </TableCell>
+                        <TableCell className="py-5 px-6 border-b border-[#2A2A2A] text-[#E0E0E0]">
+                          <div className="flex flex-col">
+                            <span className="font-medium">{mentor.name}</span>
+                            <span className="text-xs text-[#9CA3AF] mt-1">{mentor.linkedinUrl && '✓ LinkedIn Profile'}</span>
+                          </div>
+                        </TableCell>
+                        <TableCell className="py-5 px-6 border-b border-[#2A2A2A] text-[#E0E0E0]">
+                          <span className="text-sm">{mentor.designation}</span>
+                        </TableCell>
+                        <TableCell className="py-5 px-6 border-b border-[#2A2A2A] text-[#E0E0E0]">
+                          <span className="px-3 py-1.5 bg-[#1A1A1A] rounded-full text-sm inline-block shadow-inner">
+                            {mentor.expertise}
+                          </span>
+                        </TableCell>
+                        <TableCell className="py-5 px-6 border-b border-[#2A2A2A] text-[#E0E0E0]">
+                          <span className="text-sm">{mentor.email}</span>
+                        </TableCell>
+                        <TableCell className="py-5 px-6 border-b border-[#2A2A2A] text-[#E0E0E0]">
+                          <span className="text-sm">{mentor.createdAt ? format(mentor.createdAt.toDate(), "PP") : 'N/A'}</span>
+                        </TableCell>
+                        <TableCell className="py-5 px-6 border-b border-[#2A2A2A] text-right">
+                          <div className="flex items-center justify-end space-x-3">
+                            <Button 
+                              variant="ghost" 
+                              size="icon" 
+                              className="rounded-full h-9 w-9 text-[#E0E0E0] hover:text-[#4F46E5] hover:bg-[#4F46E5]/10 transition-all duration-200 shadow-sm hover:shadow-[0_4px_12px_rgba(79,70,229,0.3)] hover:scale-110" 
+                              disabled
+                            >
+                              <Edit className="h-4 w-4" />
+                            </Button>
+                            <Button 
+                              variant="ghost" 
+                              size="icon" 
+                              className="rounded-full h-9 w-9 text-rose-500 hover:text-rose-400 hover:bg-rose-500/10 transition-all duration-200 shadow-sm hover:shadow-[0_4px_12px_rgba(239,68,68,0.3)] hover:scale-110" 
+                              disabled
+                            >
+                              <Trash2 className="h-4 w-4" />
+                            </Button>
+                          </div>
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              </div>
             </div>
           )}
         </CardContent>

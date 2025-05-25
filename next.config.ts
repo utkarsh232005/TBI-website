@@ -9,7 +9,10 @@ const nextConfig: NextConfig = {
   eslint: {
     ignoreDuringBuilds: true,
   },
+  // Disable font optimization to prevent 403 errors
+  optimizeFonts: false,
   images: {
+    domains: ['placehold.co', 'landingfoliocom.imgix.net', 'www.freepik.com'],
     remotePatterns: [
       {
         protocol: 'https',
@@ -31,6 +34,12 @@ const nextConfig: NextConfig = {
       }
     ],
   },
+  // Fix for server action errors
+  experimental: {
+    serverActions: {
+      allowedOrigins: ['localhost:9002', '127.0.0.1:55436']
+    }
+  }
 };
 
 export default nextConfig;

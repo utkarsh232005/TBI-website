@@ -1,13 +1,17 @@
-import { Orbitron, Poppins } from 'next/font/google';
+// Using only system fonts to avoid any Google Font 403 errors
 
-export const orbitron = Orbitron({
-  subsets: ['latin'],
+// Define CSS variables for our fonts
+export const orbitron = {
   variable: '--font-orbitron',
-  weight: ['400', '700'], // Specify weights you'll use
-});
+  className: 'font-orbitron'
+};
 
-export const poppins = Poppins({
-  subsets: ['latin'],
+export const poppins = {
   variable: '--font-poppins',
-  weight: ['300', '400', '500', '600', '700'], // Specify weights
-});
+  className: 'font-poppins'
+};
+
+export const inter = {
+  variable: '--font-inter',
+  className: 'font-inter'
+};

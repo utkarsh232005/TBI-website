@@ -96,11 +96,36 @@
     @apply border-border;
   }
   body {
-    @apply bg-background text-foreground;
+    @apply bg-background text-foreground relative;
     font-feature-settings: "rlig" 1, "calt" 1;
+    min-height: 100vh;
+    background: #121212;
+    color: #E0E0E0;
   }
   html {
     scroll-behavior: smooth;
+  }
+  
+  /* Font definitions using system fonts */
+  .font-orbitron {
+    font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Arial, sans-serif;
+    font-weight: 700;
+  }
+  
+  .font-poppins {
+    font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Arial, sans-serif;
+  }
+  
+  /* Fix for images with fill */
+  img {
+    max-width: 100%;
+    height: auto;
+  }
+  
+  /* Fix for image containers to ensure proper height */
+  [data-fill-image-container] {
+    position: relative !important;
+    min-height: 200px;
   }
 }
 

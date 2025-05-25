@@ -1,4 +1,3 @@
-
 // src/app/admin/dashboard/page.tsx
 "use client"; 
 
@@ -47,15 +46,15 @@ interface ProcessingActionState {
 }
 
 const statusChartConfig = {
-  pending: { label: "Pending", color: "hsl(var(--chart-3))", icon: Clock },
-  accepted: { label: "Accepted", color: "hsl(var(--chart-1))", icon: CheckCircle },
-  rejected: { label: "Rejected", color: "hsl(var(--chart-5))", icon: XCircle },
+  pending: { label: "Pending", color: "#F59E0B", icon: Clock },
+  accepted: { label: "Accepted", color: "#10B981", icon: CheckCircle },
+  rejected: { label: "Rejected", color: "#EF4444", icon: XCircle },
 } satisfies ChartConfig;
 
 const campusChartConfig = {
-  campus: { label: "Campus", color: "hsl(var(--chart-2))", icon: Landmark },
-  offCampus: { label: "Off-Campus", color: "hsl(var(--chart-4))", icon: Building },
-  notSpecified: { label: "Not Specified", color: "hsl(var(--muted))", icon: FileTextIcon },
+  campus: { label: "Campus", color: "#3B82F6", icon: Landmark },
+  offCampus: { label: "Off-Campus", color: "#8B5CF6", icon: Building },
+  notSpecified: { label: "Not Specified", color: "#6B7280", icon: FileTextIcon },
 } satisfies ChartConfig;
 
 
@@ -195,26 +194,81 @@ export default function AdminDashboardPage() {
   };
 
   const KpiCard = ({ title, value, Icon, description, colorClass = "text-primary" }: { title: string, value: number | string, Icon: React.ElementType, description?: string, colorClass?: string }) => (
-    <Card className="shadow-lg hover:shadow-primary/20 transition-shadow duration-300">
-      <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-        <CardTitle className="text-sm font-medium text-muted-foreground">{title}</CardTitle>
+    <Card className="shadow-lg hover:shadow-primary/20 transition-all duration-300 bg-[#1A1A1A] border-[#2A2A2A] hover:translate-y-[-2px]">
+      <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 bg-[#1A1A1A]">
+        <CardTitle className="text-sm font-medium text-[#9CA3AF]">{title}</CardTitle>
         <Icon className={`h-5 w-5 ${colorClass}`} />
       </CardHeader>
       <CardContent>
         <div className={`text-2xl font-bold ${colorClass}`}>{value}</div>
-        {description && <p className="text-xs text-muted-foreground pt-1">{description}</p>}
+        {description && <p className="text-xs text-[#9CA3AF] pt-1">{description}</p>}
       </CardContent>
     </Card>
   );
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-8 relative">
       {/* KPI Cards */}
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-        <KpiCard title="Total Submissions" value={kpiData.total} Icon={FileTextIcon} description="All applications received." colorClass="text-primary" />
-        <KpiCard title="Pending Review" value={kpiData.pending} Icon={Clock} description="Applications awaiting action."  colorClass="text-yellow-500"/>
-        <KpiCard title="Accepted" value={kpiData.accepted} Icon={CheckCircle} description="Successfully accepted applications." colorClass="text-green-500" />
-        <KpiCard title="Rejected" value={kpiData.rejected} Icon={XCircle} description="Applications not moved forward." colorClass="text-red-500" />
+      <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4 relative">
+        <Card className="bg-gradient-to-br from-[#1A1A1A] to-[#2A2A2A] border-[#2A2A2A] shadow-xl hover:shadow-2xl transition-all duration-300 hover:scale-[1.02]">
+          <CardContent className="p-6">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-[#9CA3AF] text-sm font-medium mb-1">Total Submissions</p>
+                <h3 className="text-3xl font-bold text-[#E0E0E0]">{kpiData.total}</h3>
+              </div>
+              <div className="h-12 w-12 rounded-full bg-[#4F46E5]/10 flex items-center justify-center">
+                <FileTextIcon className="h-6 w-6 text-[#4F46E5]" />
+              </div>
+            </div>
+            <p className="text-[#9CA3AF] text-sm mt-4">All applications received</p>
+          </CardContent>
+        </Card>
+
+        <Card className="bg-gradient-to-br from-[#1A1A1A] to-[#2A2A2A] border-[#2A2A2A] shadow-xl hover:shadow-2xl transition-all duration-300 hover:scale-[1.02]">
+          <CardContent className="p-6">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-[#9CA3AF] text-sm font-medium mb-1">Pending Review</p>
+                <h3 className="text-3xl font-bold text-[#E0E0E0]">{kpiData.pending}</h3>
+              </div>
+              <div className="h-12 w-12 rounded-full bg-amber-500/10 flex items-center justify-center">
+                <Clock className="h-6 w-6 text-amber-500" />
+              </div>
+            </div>
+            <p className="text-[#9CA3AF] text-sm mt-4">Applications awaiting action</p>
+          </CardContent>
+        </Card>
+
+        <Card className="bg-gradient-to-br from-[#1A1A1A] to-[#2A2A2A] border-[#2A2A2A] shadow-xl hover:shadow-2xl transition-all duration-300 hover:scale-[1.02]">
+          <CardContent className="p-6">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-[#9CA3AF] text-sm font-medium mb-1">Accepted</p>
+                <h3 className="text-3xl font-bold text-[#E0E0E0]">{kpiData.accepted}</h3>
+              </div>
+              <div className="h-12 w-12 rounded-full bg-teal-500/10 flex items-center justify-center">
+                <CheckCircle className="h-6 w-6 text-teal-500" />
+              </div>
+            </div>
+            <p className="text-[#9CA3AF] text-sm mt-4">Successfully accepted applications</p>
+          </CardContent>
+        </Card>
+
+        <Card className="bg-gradient-to-br from-[#1A1A1A] to-[#2A2A2A] border-[#2A2A2A] shadow-xl hover:shadow-2xl transition-all duration-300 hover:scale-[1.02]">
+          <CardContent className="p-6">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-[#9CA3AF] text-sm font-medium mb-1">Rejected</p>
+                <h3 className="text-3xl font-bold text-[#E0E0E0]">{kpiData.rejected}</h3>
+              </div>
+              <div className="h-12 w-12 rounded-full bg-rose-500/10 flex items-center justify-center">
+                <XCircle className="h-6 w-6 text-rose-500" />
+              </div>
+            </div>
+            <p className="text-[#9CA3AF] text-sm mt-4">Applications not moved forward</p>
+          </CardContent>
+        </Card>
       </div>
 
       {/* Charts Section - TEMPORARILY COMMENTED OUT FOR DIAGNOSIS */}
@@ -281,113 +335,118 @@ export default function AdminDashboardPage() {
       */}
 
       {/* Submissions Table */}
-      <Card className="shadow-lg">
-        <CardHeader>
-          <CardTitle className="flex items-center text-2xl">
-            <FileTextIcon className="mr-3 h-7 w-7 text-primary" />
-            Application Submissions
-          </CardTitle>
-          <CardDescription>
-            View and manage applications. Temporary credentials for accepted users are shown below.
-            <br />
-            <span className="text-xs text-muted-foreground">
-              Email notifications are sent via Resend (API key required if configured).
-            </span>
-          </CardDescription>
+      <Card className="shadow-xl bg-[#121212] border-[#2A2A2A] overflow-hidden">
+        <CardHeader className="bg-[#1A1A1A] border-b border-[#2A2A2A] p-6">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+            <div>
+              <CardTitle className="text-2xl font-bold tracking-tight text-[#E0E0E0] flex items-center">
+                <FileTextIcon className="mr-2 h-6 w-6 text-[#4F46E5]" />
+                Recent Submissions
+              </CardTitle>
+              <CardDescription className="text-[#9CA3AF] mt-1">Latest applications submitted to the platform</CardDescription>
+            </div>
+            <div className="flex flex-wrap items-center gap-2">
+              <Badge variant="outline" className="bg-amber-500/10 text-amber-500 border-amber-500/20 px-4 py-1.5 rounded-full shadow-inner">
+                <Clock className="mr-1.5 h-3.5 w-3.5" /> Pending: {kpiData.pending}
+              </Badge>
+              <Badge variant="outline" className="bg-teal-500/10 text-teal-500 border-teal-500/20 px-4 py-1.5 rounded-full shadow-inner">
+                <CheckCircle className="mr-1.5 h-3.5 w-3.5" /> Accepted: {kpiData.accepted}
+              </Badge>
+              <Badge variant="outline" className="bg-rose-500/10 text-rose-500 border-rose-500/20 px-4 py-1.5 rounded-full shadow-inner">
+                <XCircle className="mr-1.5 h-3.5 w-3.5" /> Rejected: {kpiData.rejected}
+              </Badge>
+            </div>
+          </div>
         </CardHeader>
-        <CardContent>
-          {isLoading && submissions.length === 0 ? ( 
-            <div className="flex items-center justify-center py-10">
-              <Loader2 className="mr-2 h-8 w-8 animate-spin text-primary" />
-              <span className="text-muted-foreground">Loading submissions...</span>
+        <CardContent className="p-0">
+          {isLoading ? (
+            <div className="flex justify-center items-center py-10">
+              <Loader2 className="h-8 w-8 animate-spin text-[#4F46E5]" />
+              <span className="ml-2 text-[#9CA3AF]">Loading submissions...</span>
             </div>
           ) : error ? (
-            <div className="flex flex-col items-center justify-center py-10 text-destructive">
-              <AlertCircle className="mr-2 h-8 w-8" />
-              <p className="font-semibold">Error loading data</p>
-              <p className="text-sm">{error}</p>
-              <Button onClick={fetchSubmissions} variant="outline" className="mt-4">Try Again</Button>
-            </div>
-          ) : submissions.length === 0 ? (
-            <div className="text-center py-10">
-              <FileTextIcon className="mx-auto h-12 w-12 text-muted-foreground mb-4" />
-              <p className="text-muted-foreground">No submissions yet.</p>
+            <div className="flex justify-center items-center py-10">
+              <AlertCircle className="h-8 w-8 text-rose-500" />
+              <span className="ml-2 text-[#9CA3AF]">{error}</span>
             </div>
           ) : (
             <div className="overflow-x-auto">
               <Table>
                 <TableHeader>
-                  <TableRow>
-                    <TableHead>Name</TableHead>
-                    <TableHead>Email</TableHead>
-                    <TableHead>Idea</TableHead>
-                    <TableHead>Campus Status</TableHead>
-                    <TableHead>Status</TableHead>
-                    <TableHead>Submitted At</TableHead>
-                    <TableHead className="text-right">Actions</TableHead>
+                  <TableRow className="bg-[#1A1A1A] hover:bg-[#1A1A1A]">
+                    <TableHead className="text-[#9CA3AF] font-medium">Name</TableHead>
+                    <TableHead className="text-[#9CA3AF] font-medium">Email</TableHead>
+                    <TableHead className="text-[#9CA3AF] font-medium">Company</TableHead>
+                    <TableHead className="text-[#9CA3AF] font-medium">Status</TableHead>
+                    <TableHead className="text-[#9CA3AF] font-medium">Submitted</TableHead>
+                    <TableHead className="text-[#9CA3AF] font-medium text-right">Actions</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {submissions.map((submission) => (
-                    <TableRow key={submission.id}>
-                      <TableCell className="font-medium">{submission.name}</TableCell>
-                      <TableCell>{submission.email}</TableCell>
+                  {submissions.map((submission, index) => (
+                    <TableRow 
+                      key={submission.id} 
+                      className={`border-b border-[#2A2A2A] hover:bg-[#2A2A2A]/20 transition-all duration-200 ${
+                        index % 2 === 0 ? 'bg-[#121212]' : 'bg-[#1E1E1E]'
+                      }`}
+                    >
+                      <TableCell className="font-medium text-[#E0E0E0]">{submission.name}</TableCell>
+                      <TableCell className="text-[#9CA3AF]">{submission.email}</TableCell>
+                      <TableCell className="text-[#9CA3AF]">{submission.companyName || 'N/A'}</TableCell>
                       <TableCell>
-                        <div className="max-w-xs truncate" title={submission.idea}>
-                          {submission.idea}
-                        </div>
-                        {submission.status === 'accepted' && submission.temporaryUserId && (
-                          <div className="mt-1 text-xs text-muted-foreground">
-                              <div className="flex items-center gap-1"><UserCircle size={12}/> User ID: {submission.temporaryUserId}</div>
-                              <div className="flex items-center gap-1"><KeyRound size={12}/> Pass: {submission.temporaryPassword}</div>
-                          </div>
-                        )}
-                      </TableCell>
-                      <TableCell>
-                        {submission.campusStatus ? (
-                           <Badge 
-                            variant={submission.campusStatus === 'campus' ? 'default' : 'secondary'} 
-                            className={submission.campusStatus === 'campus' ? 'bg-blue-500/20 text-blue-700 border-blue-500' : 'bg-purple-500/20 text-purple-700 border-purple-500'}
-                           >
-                            {submission.campusStatus === 'campus' ? 'Campus' : 'Off-Campus'}
-                           </Badge>
-                        ) : <span className="text-xs text-muted-foreground">N/A</span>}
-                      </TableCell>
-                      <TableCell>
-                        <Badge variant={getStatusBadgeVariant(submission.status)} className="capitalize">
-                          {submission.status}
+                        <Badge 
+                          variant="outline" 
+                          className={`px-3 py-1.5 rounded-full font-medium transition-all duration-200 ${
+                            submission.status === 'pending' 
+                              ? 'bg-amber-500/10 text-amber-500 border-amber-500/20' 
+                              : submission.status === 'accepted'
+                              ? 'bg-teal-500/10 text-teal-500 border-teal-500/20'
+                              : 'bg-rose-500/10 text-rose-500 border-rose-500/20'
+                          }`}
+                        >
+                          {submission.status === 'pending' && <Clock className="mr-1.5 h-3.5 w-3.5" />}
+                          {submission.status === 'accepted' && <CheckCircle className="mr-1.5 h-3.5 w-3.5" />}
+                          {submission.status === 'rejected' && <XCircle className="mr-1.5 h-3.5 w-3.5" />}
+                          {submission.status.charAt(0).toUpperCase() + submission.status.slice(1)}
                         </Badge>
                         {submission.processedByAdminAt && (
-                           <div className="text-xs text-muted-foreground mt-1">({formatDate(submission.processedByAdminAt)})</div>
+                          <div className="text-xs text-[#9CA3AF] mt-1">({formatDate(submission.processedByAdminAt)})</div>
                         )}
                       </TableCell>
-                      <TableCell>{formatDate(submission.submittedAt)}</TableCell>
+                      <TableCell className="text-[#9CA3AF]">{formatDate(submission.submittedAt)}</TableCell>
                       <TableCell className="text-right space-x-2">
                         {submission.status === 'pending' ? (
                           <>
                             <Button
-                              variant="default"
+                              variant="outline"
                               size="sm"
                               onClick={() => handleProcessApplication(submission.id, 'accept', submission.name, submission.email)}
                               disabled={processingActionState?.id === submission.id}
-                              className="bg-green-600 hover:bg-green-700 text-white"
+                              className="bg-teal-500/10 text-teal-500 border-teal-500/20 hover:bg-teal-500/20 hover:text-teal-400 transition-all duration-200"
                             >
-                              {processingActionState?.id === submission.id && processingActionState?.type === 'accept' ? <Loader2 className="h-4 w-4 animate-spin" /> : <ThumbsUp className="h-4 w-4" />}
+                              {processingActionState?.id === submission.id && processingActionState?.type === 'accept' ? (
+                                <Loader2 className="h-4 w-4 animate-spin" />
+                              ) : (
+                                <ThumbsUp className="h-4 w-4" />
+                              )}
                               <span className="ml-1 hidden sm:inline">Accept</span>
                             </Button>
                             <Button
-                              variant="destructive"
+                              variant="outline"
                               size="sm"
                               onClick={() => handleProcessApplication(submission.id, 'reject', submission.name, submission.email)}
                               disabled={processingActionState?.id === submission.id}
+                              className="bg-rose-500/10 text-rose-500 border-rose-500/20 hover:bg-rose-500/20 hover:text-rose-400 transition-all duration-200"
                             >
-                              {processingActionState?.id === submission.id && processingActionState?.type === 'reject' ? <Loader2 className="h-4 w-4 animate-spin" /> : <ThumbsDown className="h-4 w-4" />}
-                               <span className="ml-1 hidden sm:inline">Reject</span>
+                              {processingActionState?.id === submission.id && processingActionState?.type === 'reject' ? (
+                                <Loader2 className="h-4 w-4 animate-spin" />
+                              ) : (
+                                <ThumbsDown className="h-4 w-4" />
+                              )}
+                              <span className="ml-1 hidden sm:inline">Reject</span>
                             </Button>
                           </>
-                        ) : (
-                          <span className="text-xs text-muted-foreground">Processed</span>
-                        )}
+                        ) : null}
                       </TableCell>
                     </TableRow>
                   ))}
