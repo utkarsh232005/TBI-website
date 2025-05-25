@@ -15,7 +15,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" suppressHydrationWarning> {/* Remove className="dark", add suppressHydrationWarning */}
+    <html lang="en" suppressHydrationWarning>
       <body className={`${orbitron.variable} ${poppins.variable} font-poppins antialiased`}>
         <ThemeProvider
           attribute="class"
