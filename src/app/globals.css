@@ -1,109 +1,93 @@
-
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
 @layer base {
   :root {
-    /* Light theme variables */
-    --background: 0 0% 100%; /* White */
-    --foreground: 0 0% 3.9%; /* Near black */
-
-    --card: 0 0% 100%; /* White */
+    /* Light theme variables - keeping for reference but focusing on dark theme */
+    --background: 0 0% 100%;
+    --foreground: 0 0% 3.9%;
+    --card: 0 0% 100%;
     --card-foreground: 0 0% 3.9%;
-
-    --popover: 0 0% 100%; /* White */
+    --popover: 0 0% 100%;
     --popover-foreground: 0 0% 3.9%;
-
-    --primary: 180 95% 40%; /* Darker Cyan for better contrast on light bg */
-    --primary-foreground: 0 0% 98%; /* White text on primary */
-
-    --secondary: 0 0% 96.1%; /* Light gray */
-    --secondary-foreground: 0 0% 9%; /* Dark gray text on secondary */
-    
-    --muted: 0 0% 96.1%; /* Light gray for muted elements */
-    --muted-foreground: 0 0% 45.1%; /* Medium gray text */
-
-    --accent: 270 90% 55%; /* Darker Purple for better contrast on light bg */
-    --accent-foreground: 0 0% 98%; /* White text on accent */
-
-    --destructive: 0 84.2% 60.2%; /* Standard red */
+    --primary: 180 95% 40%;
+    --primary-foreground: 0 0% 98%;
+    --secondary: 0 0% 96.1%;
+    --secondary-foreground: 0 0% 9%;
+    --muted: 0 0% 96.1%;
+    --muted-foreground: 0 0% 45.1%;
+    --accent: 270 90% 55%;
+    --accent-foreground: 0 0% 98%;
+    --destructive: 0 84.2% 60.2%;
     --destructive-foreground: 0 0% 98%;
-
-    --border: 0 0% 89.8%; /* Light gray border */
-    --input: 0 0% 89.8%; 
-    --ring: 180 95% 50%; /* Cyan for focus rings */
-    
-    --radius: 0.75rem; /* Updated radius for more rounded cards by default */
-    --radius-md: calc(var(--radius) - 2px); 
+    --border: 0 0% 89.8%;
+    --input: 0 0% 89.8%;
+    --ring: 180 95% 50%;
+    --radius: 0.75rem;
+    --radius-md: calc(var(--radius) - 2px);
     --radius-lg: calc(var(--radius) - 4px);
-
-    /* Light theme chart colors */
-    --chart-1: 180 95% 45%; 
-    --chart-2: 270 90% 60%; 
-    --chart-3: 220 80% 65%; 
-    --chart-4: 30 70% 55%;  
-    --chart-5: 0 0% 50%;   
-
-    /* Sidebar specific vars for light theme */
-    --sidebar-background: 0 0% 98%; /* Very light gray for sidebar */
-    --sidebar-foreground: 0 0% 9%; 
+    --chart-1: 180 95% 45%;
+    --chart-2: 270 90% 60%;
+    --chart-3: 220 80% 65%;
+    --chart-4: 30 70% 55%;
+    --chart-5: 0 0% 50%;
+    --sidebar-background: 0 0% 98%;
+    --sidebar-foreground: 0 0% 9%;
     --sidebar-primary: 180 95% 40%;
     --sidebar-primary-foreground: 0 0% 98%;
-    --sidebar-accent: 0 0% 94%; 
+    --sidebar-accent: 0 0% 94%;
     --sidebar-accent-foreground: 0 0% 9%;
     --sidebar-border: 0 0% 90%;
     --sidebar-ring: 180 95% 50%;
   }
 
   .dark {
-    /* DuskUI Theme Inspired - Black background, Gray text, Cyan/Purple accents */
-    --background: 0 0% 0%; /* Black background */
-    --foreground: 0 0% 98%; /* Near white text (like #FAFAFA or #F9FAFB) */
-
-    --card: 0 0% 5%; /* Dark gray for cards, slightly off-black */
-    --card-foreground: 0 0% 98%;
-
-    --popover: 0 0% 3%; /* Even darker for popovers */
-    --popover-foreground: 0 0% 98%;
-
-    --primary: 180 95% 50%; /* Cyan (approx HSL for #00FFFF or similar) */
-    --primary-foreground: 0 0% 10%; /* Dark text for cyan buttons if needed, or white if bg is dark cyan */
-
-    --secondary: 0 0% 15%; /* Medium dark gray for secondary elements */
-    --secondary-foreground: 0 0% 90%; /* Light gray text on secondary */
-
-    --muted: 240 4% 15%; /* Darker gray for muted elements if card is very dark */
-    --muted-foreground: 0 0% 65%; /* For text-gray-400 like color on dark bg */
-
-    --accent: 270 90% 65%; /* Purple (approx HSL for #8A2BE2 or similar) */
-    --accent-foreground: 0 0% 100%; /* White text on accent */
-
-    --destructive: 0 70% 55%; /* A vivid red */
-    --destructive-foreground: 0 0% 98%;
-
-    --border: 0 0% 25%; /* A bit lighter than gray-600 for visibility on black */
-    --input: 0 0% 25%; 
-    --ring: 180 80% 65%; /* Lighter cyan for focus rings */
+    /* Enhanced Dark Theme */
+    --background: 0 0% 7%; /* #111111 */
+    --foreground: 0 0% 98%; /* Near white text */
     
-    --radius: 0.75rem; /* Updated radius for .dark theme as well */
-
-    /* Dark theme chart colors */
-    --chart-1: 180 95% 50%; /* Cyan */
-    --chart-2: 270 90% 65%; /* Purple */
-    --chart-3: 220 80% 70%; /* A blue */
-    --chart-4: 300 70% 60%; /* A magenta */
-    --chart-5: 0 0% 60%;   /* A gray */
-
-    /* Sidebar specific vars, ensure they blend with the black theme */
-    --sidebar-background: 0 0% 3%; /* Slightly off-black for sidebar */
-    --sidebar-foreground: 0 0% 85%; /* Lighter gray for sidebar text */
-    --sidebar-primary: 180 95% 50%; /* Cyan */
+    --card: 0 0% 10%; /* #1A1A1A */
+    --card-foreground: 0 0% 98%;
+    
+    --popover: 0 0% 8%; /* Slightly darker than background */
+    --popover-foreground: 0 0% 98%;
+    
+    --primary: 195 100% 50%; /* Electric blue */
+    --primary-foreground: 0 0% 100%;
+    
+    --secondary: 0 0% 15%; /* Dark gray for secondary elements */
+    --secondary-foreground: 0 0% 98%;
+    
+    --muted: 0 0% 20%; /* Muted background */
+    --muted-foreground: 0 0% 70%; /* Muted text */
+    
+    --accent: 270 100% 65%; /* Vibrant violet */
+    --accent-foreground: 0 0% 100%;
+    
+    --destructive: 0 100% 65%; /* Bright red */
+    --destructive-foreground: 0 0% 100%;
+    
+    --border: 0 0% 20%; /* Dark borders */
+    --input: 0 0% 20%;
+    --ring: 195 100% 50%;
+    
+    /* Chart colors - neon variants */
+    --chart-1: 195 100% 50%; /* Electric blue */
+    --chart-2: 270 100% 65%; /* Neon purple */
+    --chart-3: 160 100% 50%; /* Neon teal */
+    --chart-4: 330 100% 65%; /* Neon pink */
+    --chart-5: 0 0% 60%; /* Light gray */
+    
+    /* Sidebar specific colors */
+    --sidebar-background: 0 0% 8%;
+    --sidebar-foreground: 0 0% 90%;
+    --sidebar-primary: 195 100% 50%;
     --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 0 0% 10%; /* Darker accent for sidebar items */
+    --sidebar-accent: 0 0% 12%;
     --sidebar-accent-foreground: 0 0% 90%;
-    --sidebar-border: 0 0% 12%;
-    --sidebar-ring: 180 80% 65%;
+    --sidebar-border: 0 0% 15%;
+    --sidebar-ring: 195 100% 50%;
   }
 }
 
@@ -120,17 +104,58 @@
   }
 }
 
+/* Enhanced hover effects */
+.hover-glow {
+  transition: all 0.2s ease-in-out;
+}
+
+.hover-glow:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 0 20px hsla(var(--primary), 0.2);
+}
+
+/* Card hover effects */
+.card-hover {
+  transition: all 0.3s ease-in-out;
+}
+
+.card-hover:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 30px hsla(var(--primary), 0.15);
+  border-color: hsla(var(--primary), 0.5);
+}
+
+/* Table styles */
+.table-row-hover {
+  transition: background-color 0.2s ease-in-out;
+}
+
+.table-row-hover:hover {
+  background-color: hsla(var(--muted), 0.5);
+}
+
+/* Button hover animations */
+.button-glow {
+  transition: all 0.2s ease-in-out;
+}
+
+.button-glow:hover {
+  box-shadow: 0 0 15px hsla(var(--primary), 0.3);
+  transform: translateY(-2px);
+}
+
 /* Gradient for Hero Section bottom */
 .bg-bottom-gradient-hero {
-  background-image: radial-gradient(ellipse at bottom, hsla(var(--primary-hsl, 180, 95%, 50%), 0.15) 0%, transparent 60%);
+  background-image: radial-gradient(ellipse at bottom, hsla(var(--primary), 0.15) 0%, transparent 60%);
 }
-/* Define primary-hsl if not available directly, or use Tailwind's primary directly */
-/* For example, assuming primary is hsl(180, 95%, 50%) */
+
+/* Define primary-hsl if not available directly */
 html:not(.dark) {
-  --primary-hsl: 180, 95%, 40%; /* Darker Cyan for light mode */
-  --accent-hsl: 270, 90%, 55%; /* Darker Purple for light mode */
+  --primary-hsl: 180, 95%, 40%;
+  --accent-hsl: 270, 90%, 55%;
 }
+
 html.dark {
-  --primary-hsl: 180, 95%, 50%; /* Cyan for dark mode */
-  --accent-hsl: 270, 90%, 65%; /* Purple for dark mode */
+  --primary-hsl: 195, 100%, 50%;
+  --accent-hsl: 270, 100%, 65%;
 }
