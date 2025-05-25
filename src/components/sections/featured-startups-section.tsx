@@ -66,6 +66,7 @@ const Skeleton = () => (
   <div className="flex flex-1 w-full h-full min-h-[6rem] rounded-xl bg-gradient-to-br from-card to-secondary"></div>
 );
 
+
 const sectionTitleVariants = {
   hidden: { opacity: 0, y: 20 },
   visible: { opacity: 1, y: 0, transition: { duration: 0.6, ease: "easeOut" } },
@@ -115,14 +116,13 @@ export default function FeaturedStartupsSection() {
         
         <motion.div
           variants={bentoGridVariants}
-          className="max-w-4xl mx-auto" // This div will be the BentoGrid itself
+          className="max-w-4xl mx-auto" 
         >
           <BentoGrid>
             {bentoItems.map((item) => (
               <motion.div
                 key={item.id}
                 variants={bentoItemVariants}
-                // The className for col-span is passed to BentoGridItem, which applies it to its root
               >
                 <BentoGridItem
                   title={item.title}

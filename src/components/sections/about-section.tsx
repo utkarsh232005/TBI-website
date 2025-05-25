@@ -57,7 +57,7 @@ export default function AboutSection() {
 
         <motion.div 
           className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-12 md:mb-16"
-          variants={staggerContainer(0.2)} // Use staggerContainer if sectionVariants doesn't already handle it for this specific grid
+          variants={staggerContainer(0.2)}
         >
           {missionVision.map((item) => (
             <motion.div key={item.title} variants={itemVariants} className="h-full">
@@ -76,7 +76,7 @@ export default function AboutSection() {
         
         <motion.div 
           className="grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-3"
-           variants={staggerContainer(0.2, 0.4)} // Delay this grid slightly
+           variants={staggerContainer(0.2, 0.4)} 
         >
           {stats.map((stat) => (
             <motion.div key={stat.id} variants={itemVariants}>
@@ -100,9 +100,8 @@ export default function AboutSection() {
   );
 }
 
-// Helper for staggering if not using sectionVariants directly for grids
 const staggerContainer = (staggerChildren = 0.1, delayChildren = 0) => ({
-  hidden: { opacity: 0 }, // Add opacity to parent for smoother collective appear
+  hidden: { opacity: 0 }, 
   visible: {
     opacity: 1,
     transition: {

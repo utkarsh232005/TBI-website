@@ -77,7 +77,7 @@ export default function ProgramDetailsSection() {
                 variants={itemVariants}
               >
                 <AccordionItem value={item.id} className="border border-border rounded-lg shadow-md hover:shadow-primary/20 transition-shadow bg-background">
-                  <AccordionTrigger className="p-6 text-lg font-poppins font-medium hover:no-underline text-left">
+                  <AccordionTrigger className="p-6 text-lg font-poppins font-medium hover:no-underline text-left text-card-foreground">
                     <div className="flex items-center">
                       <item.Icon className="h-6 w-6 mr-3 text-primary" />
                       {item.title}

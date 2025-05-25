@@ -48,19 +48,13 @@ export const BentoGridItem = ({
       )}
       whileHover={{ 
         scale: 1.02, 
-        // Slightly change background on hover for better feedback if desired
-        // backgroundColor: "hsla(var(--card-foreground-hsl), 0.03)", // Example: very subtle
         transition: { type: "spring", stiffness: 300, damping: 15 }
       }}
-      // The variants for the inner content are controlled by the parent hover state
-      // So, we need to pass the hover state down or use Framer Motion's group hover capabilities
-      // For simplicity, we'll use variants on the inner content div and trigger it via the parent's whileHover
     >
       {header}
       <motion.div 
-        className="transition-none" // Remove Tailwind transition as Framer Motion handles it
+        className="transition-none" 
         variants={itemContentVariants}
-        // This will animate when the parent `motion.div` (BentoGridItem) is hovered
       >
         {icon}
         <div className="mt-2 mb-2 font-poppins font-bold text-foreground">
