@@ -1,4 +1,4 @@
-// src/components/auth/admin-login-form.tsx
+
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -22,19 +22,11 @@ import { useState } from "react";
 import { verifyAdminCredentials, type AdminLoginFormValues } from "@/app/actions/auth-actions";
 
 
-// Admin credentials are now verified via server action using Firestore.
-// Ensure you have created the document 'admin_config/main_credentials' in Firestore
-// with 'email' and 'password' fields.
-// Initial values for testing:
-// email: "admin@rceomtbi.com"
-// password: "secureadminpassword" (WARNING: This will be stored as plaintext in Firestore)
-
 const formSchema = z.object({
   email: z.string().email({ message: "Please enter a valid email." }),
   password: z.string().min(1, { message: "Password is required." }),
 });
 
-// Type AdminLoginFormValues is now imported from auth-actions.ts
 
 export default function AdminLoginForm() {
   const { toast } = useToast();
@@ -51,8 +43,10 @@ export default function AdminLoginForm() {
 
   async function onSubmit(values: AdminLoginFormValues) {
     setIsLoading(true);
+    console.log("[AdminLoginForm] Attempting login with:", values);
     try {
       const result = await verifyAdminCredentials(values);
+      console.log("[AdminLoginForm] Verification result:", result);
 
       if (result.success) {
         toast({
@@ -60,8 +54,11 @@ export default function AdminLoginForm() {
           description: "Redirecting to admin dashboard...",
         });
         if (result.redirectTo) {
-          // Using setTimeout to allow toast to render before navigation
-          setTimeout(() => router.push(result.redirectTo!), 0);
+          console.log("[AdminLoginForm] Credentials correct. Attempting to redirect to", result.redirectTo);
+          setTimeout(() => {
+            console.log("[AdminLoginForm] router.push('", result.redirectTo, "') was called.");
+            router.push(result.redirectTo!);
+          }, 0);
         }
       } else {
         toast({
@@ -85,7 +82,7 @@ export default function AdminLoginForm() {
   return (
     <Card className="shadow-lg">
       <CardHeader>
-        <CardTitle className="font-orbitron text-2xl">Admin Portal</CardTitle>
+        <CardTitle className="font-montserrat text-2xl">Admin Portal</CardTitle> {/* Changed to Montserrat */}
         <CardDescription>
           Enter your administrator credentials to access the RCEOM-TBI admin panel.
         </CardDescription>

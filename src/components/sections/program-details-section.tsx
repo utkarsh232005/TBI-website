@@ -61,7 +61,7 @@ export default function ProgramDetailsSection() {
     >
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
         <motion.div className="text-center mb-12 md:mb-16" variants={itemVariants}>
-          <h2 className="font-orbitron text-3xl font-bold tracking-tight sm:text-4xl md:text-5xl text-primary">
+          <h2 className="font-montserrat text-3xl font-bold tracking-tight sm:text-4xl md:text-5xl text-primary">
             Our Program
           </h2>
           <p className="mt-4 max-w-2xl mx-auto text-lg text-muted-foreground sm:text-xl">
@@ -77,7 +77,7 @@ export default function ProgramDetailsSection() {
                 variants={itemVariants}
               >
                 <AccordionItem value={item.id} className="border border-border rounded-lg shadow-md hover:shadow-primary/20 transition-shadow bg-background">
-                  <AccordionTrigger className="p-6 text-lg font-poppins font-medium hover:no-underline text-left text-card-foreground">
+                  <AccordionTrigger className="p-6 text-lg font-montserrat font-medium hover:no-underline text-left text-card-foreground"> {/* Changed to Montserrat */}
                     <div className="flex items-center">
                       <item.Icon className="h-6 w-6 mr-3 text-primary" />
                       {item.title}

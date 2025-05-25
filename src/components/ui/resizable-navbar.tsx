@@ -1,18 +1,9 @@
 
 "use client";
 import { cn } from "@/lib/utils";
-import { IconMenu2, IconX } from "@tabler/icons-react";
-import {
-  motion,
-  AnimatePresence,
-  useScroll,
-  useMotionValueEvent,
-  type Variants, // Added type Variants import
-} from "framer-motion"; // Standardized to framer-motion
-
-import React, { useRef, useState } from "react";
-// Removed: import { InnoNexusLogo as AppLogo } from '@/components/icons/innnexus-logo';
+import { motion, AnimatePresence, useScroll, useMotionValueEvent, type Variants } from "framer-motion";
 import Link from 'next/link';
+import React, { useRef, useState } from "react";
 
 
 interface NavbarProps {
@@ -30,9 +21,13 @@ interface NavItemsProps {
   items: {
     name: string;
     link: string;
+    isButton?: boolean;
+    onClick?: () => void;
   }[];
   className?: string;
   onItemClick?: () => void;
+  hoveredItem: string | null;
+  setHoveredItem: (name: string | null) => void;
 }
 
 interface MobileNavProps {
@@ -113,38 +108,6 @@ export const NavBody = ({ children, className, visible }: NavBodyProps) => {
   );
 };
 
-export const NavItems = ({ items, className, onItemClick }: NavItemsProps) => {
-  const [hovered, setHovered] = useState<number | null>(null);
-
-  return (
-    <motion.div
-      onMouseLeave={() => setHovered(null)}
-      className={cn(
-        "absolute inset-0 hidden flex-1 flex-row items-center justify-center space-x-2 text-sm font-normal text-muted-foreground transition duration-200 lg:flex lg:space-x-2",
-        className,
-      )}
-    >
-      {items.map((item, idx) => (
-        <Link
-          href={item.link}
-          key={`link-${idx}`}
-          onMouseEnter={() => setHovered(idx)}
-          onClick={onItemClick}
-          className="relative px-4 py-2 text-muted-foreground hover:text-primary" // Adjusted hover color
-        >
-          {hovered === idx && (
-            <motion.div
-              layoutId="hovered"
-              className="absolute inset-0 h-full w-full rounded-full" // Transparent pill
-            />
-          )}
-          <span className="relative z-20">{item.name}</span>
-        </Link>
-      ))}
-    </motion.div>
-  );
-};
-
 export const MobileNav = ({ children, className, visible }: MobileNavProps) => {
   return (
     <motion.div
@@ -192,7 +155,7 @@ const Path = (props: {d?: string; variants: Variants; transition?: { duration: n
   <motion.path
     fill="transparent"
     strokeWidth="3"
-    stroke="currentColor" // Inherits color from parent
+    stroke="currentColor" 
     strokeLinecap="round"
     {...props}
   />
@@ -203,9 +166,9 @@ const AnimatedMenuToggleSVG = ({ isOpen }: { isOpen: boolean }) => (
     width="23"
     height="23"
     viewBox="0 0 23 23"
-    initial={false} // Prevent animation on initial load
+    initial={false} 
     animate={isOpen ? "open" : "closed"}
-    className="text-foreground" // Ensure SVG inherits text color
+    className="text-foreground" 
   >
     <Path
       variants={{
@@ -281,9 +244,9 @@ export const NavbarLogo = () => {
     <Link
       href="/"
       aria-label="RCEOM-TBI Home"
-      className="relative z-20 flex items-center px-2 py-1" // Adjusted padding/margin
+      className="relative z-20 flex items-center px-2 py-1"
     >
-      <span className="font-orbitron text-2xl font-bold text-primary">
+      <span className="font-montserrat text-2xl font-bold text-primary"> {/* Changed to Montserrat */}
         TBI
       </span>
     </Link>
@@ -316,7 +279,7 @@ export const NavbarButton = ({
   const variantStyles = {
     primary: "bg-primary text-primary-foreground shadow-md hover:bg-primary/90",
     secondary: "bg-secondary text-secondary-foreground hover:bg-secondary/80",
-    outline: "border border-muted bg-transparent text-muted-foreground hover:text-foreground hover:border-foreground",
+    outline: "border border-border bg-transparent text-muted-foreground hover:text-foreground hover:border-foreground", // Updated to use theme variables
     ghost: "hover:bg-accent hover:text-accent-foreground text-foreground",
   };
 

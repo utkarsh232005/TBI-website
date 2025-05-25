@@ -47,7 +47,7 @@ export default function AboutSection() {
     >
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
         <motion.div className="text-center mb-12 md:mb-16" variants={itemVariants}>
-          <h2 className="font-orbitron text-3xl font-bold tracking-tight sm:text-4xl md:text-5xl text-primary">
+          <h2 className="font-montserrat text-3xl font-bold tracking-tight sm:text-4xl md:text-5xl text-primary">
             About RCEOM-TBI
           </h2>
           <p className="mt-4 max-w-2xl mx-auto text-lg text-muted-foreground sm:text-xl">
@@ -64,7 +64,7 @@ export default function AboutSection() {
               <Card className="h-full bg-card shadow-xl hover:shadow-primary/20 transition-shadow duration-300">
                 <CardHeader className="flex flex-row items-center space-x-4 pb-4 pt-6 px-6">
                   <item.Icon className="h-10 w-10 text-primary" />
-                  <CardTitle className="font-orbitron text-2xl text-card-foreground">{item.title}</CardTitle>
+                  <CardTitle className="font-montserrat text-2xl text-card-foreground">{item.title}</CardTitle>
                 </CardHeader>
                 <CardContent className="px-6 pb-6">
                   <p className="text-muted-foreground">{item.description}</p>
@@ -85,7 +85,7 @@ export default function AboutSection() {
                   <stat.Icon className="h-12 w-12 mb-4 text-accent" />
                   <AnimatedCounter
                     targetValue={stat.value}
-                    className="font-orbitron text-4xl font-bold text-foreground"
+                    className="font-montserrat text-4xl font-bold text-foreground" // Changed to Montserrat
                     suffix={stat.suffix}
                     prefix={stat.prefix}
                   />

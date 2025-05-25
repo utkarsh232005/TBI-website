@@ -1,8 +1,8 @@
 import type { Metadata } from 'next';
-import { orbitron, poppins } from '@/lib/fonts';
+import { orbitron, poppins, montserrat } from '@/lib/fonts'; // Import montserrat
 import './globals.css';
 import { Toaster } from "@/components/ui/toaster";
-import { ThemeProvider } from "@/components/theme-provider"; // Import ThemeProvider
+import { ThemeProvider } from "@/components/theme-provider";
 
 export const metadata: Metadata = {
   title: 'RCEOM-TBI - Empowering Innovators',
@@ -16,10 +16,10 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" suppressHydrationWarning>
-      <body className={`${orbitron.variable} ${poppins.variable} font-poppins antialiased`}>
+      <body className={`${orbitron.variable} ${poppins.variable} ${montserrat.variable} font-poppins antialiased`}> {/* Add montserrat.variable */}
         <ThemeProvider
           attribute="class"
-          defaultTheme="dark" // You can set system, dark, or light as default
+          defaultTheme="dark"
           enableSystem
           disableTransitionOnChange
         >

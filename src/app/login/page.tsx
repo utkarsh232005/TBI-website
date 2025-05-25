@@ -4,7 +4,7 @@
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import AdminLoginForm from "@/components/auth/admin-login-form";
 import UserLoginForm from "@/components/auth/user-login-form";
-import { InnoNexusLogo } from "@/components/icons/innnexus-logo"; // Visually this will show RCEOM-TBI
+import { InnoNexusLogo } from "@/components/icons/innnexus-logo"; 
 import Link from "next/link";
 
 export default function LoginPage() {
@@ -14,7 +14,7 @@ export default function LoginPage() {
         <Link href="/" aria-label="Go to homepage">
           <InnoNexusLogo className="h-12 w-auto mx-auto mb-2" />
         </Link>
-        <h1 className="font-orbitron text-3xl font-bold text-primary">
+        <h1 className="font-montserrat text-3xl font-bold text-primary"> {/* Changed to Montserrat */}
           Welcome Back
         </h1>
         <p className="text-muted-foreground">

@@ -23,7 +23,7 @@ export default function UserLoginForm() {
   return (
     <Card className="shadow-lg">
       <CardHeader>
-        <CardTitle className="font-orbitron text-2xl">User Login</CardTitle>
+        <CardTitle className="font-montserrat text-2xl">User Login</CardTitle> {/* Changed to Montserrat */}
         <CardDescription>
           Sign in to your RCEOM-TBI account or apply if you're new.
         </CardDescription>
@@ -36,7 +36,7 @@ export default function UserLoginForm() {
               id="user-email"
               type="email"
               placeholder="you@example.com"
-              disabled // Disabled as it's a placeholder
+              disabled 
               className="bg-card border-border focus:border-primary focus:ring-primary"
             />
           </div>
@@ -46,7 +46,7 @@ export default function UserLoginForm() {
               id="user-password"
               type="password"
               placeholder="••••••••"
-              disabled // Disabled as it's a placeholder
+              disabled 
               className="bg-card border-border focus:border-primary focus:ring-primary"
             />
           </div>

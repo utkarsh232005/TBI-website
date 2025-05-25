@@ -57,7 +57,7 @@ export default function TestimonialsSection() {
           className="text-center mb-12 md:mb-16"
           variants={sectionTitleVariants}
         >
-          <h2 className="font-orbitron text-3xl font-bold tracking-tight sm:text-4xl md:text-5xl text-primary">
+          <h2 className="font-montserrat text-3xl font-bold tracking-tight sm:text-4xl md:text-5xl text-primary">
             Words From Our Innovators
           </h2>
           <p className="mt-4 max-w-2xl mx-auto text-lg text-muted-foreground sm:text-xl">

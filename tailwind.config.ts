@@ -12,6 +12,7 @@ export default {
       fontFamily: {
         orbitron: ['var(--font-orbitron)', 'sans-serif'],
         poppins: ['var(--font-poppins)', 'sans-serif'],
+        montserrat: ['var(--font-montserrat)', 'sans-serif'], // Add montserrat
       },
   		colors: {
   			background: 'hsl(var(--background))',
@@ -89,16 +90,14 @@ export default {
   			},
         scroll: {
           to: {
-            transform: 'translateX(calc(-50% - 0.5rem))', // Keyframe for infinite scroll
-            // This assumes a gap of 1rem (gap-4). -50% scrolls one full set of duplicated items.
-            // -0.5rem accounts for half the gap between the end of original and start of cloned.
+            transform: 'translateX(calc(-50% - 0.5rem))', 
           },
         },
   		},
   		animation: {
   			'accordion-down': 'accordion-down 0.2s ease-out',
   			'accordion-up': 'accordion-up 0.2s ease-out',
-        'scroll': 'scroll var(--animation-duration, 40s) var(--animation-direction, forwards) linear infinite', // Animation utility
+        'scroll': 'scroll var(--animation-duration, 40s) var(--animation-direction, forwards) linear infinite',
   		}
   	}
   },

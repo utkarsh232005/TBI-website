@@ -8,8 +8,7 @@ import { CampusStatusDialog } from '@/components/ui/campus-status-dialog';
 import { gsap } from 'gsap';
 import { useTheme } from 'next-themes';
 
-// DUMMY_GOOGLE_FORM_LINK: This is a placeholder. Replace with your actual Google Form link for off-campus applicants.
-const DUMMY_GOOGLE_FORM_LINK = 'https://docs.google.com/forms/d/e/YOUR_FORM_ID_HERE/viewform?usp=sf_link';
+const DUMMY_GOOGLE_FORM_LINK = 'https://docs.google.com/forms/d/e/YOUR_FORM_ID_HERE/viewform?usp=sf_link'; // DUMMY LINK
 
 interface HeroSectionProps {
   onApplyClick?: () => void;
@@ -105,7 +104,7 @@ export default function HeroSection({ onApplyClick }: HeroSectionProps) {
       >
         <p 
           ref={taglineRef}
-          className="text-sm font-normal tracking-widest uppercase mb-8 opacity-0 text-foreground"
+          className="font-montserrat text-sm font-normal tracking-widest uppercase mb-8 opacity-0 text-foreground dark:text-neutral-900"
         >
           <span className="text-transparent bg-clip-text bg-gradient-to-r from-cyan-500 to-purple-500">
             YOUR STARTUP NEEDS A KICK
@@ -113,7 +112,7 @@ export default function HeroSection({ onApplyClick }: HeroSectionProps) {
         </p>
         <h1 
           ref={headlineRef}
-          className="font-orbitron text-4xl font-normal text-foreground sm:text-5xl lg:text-6xl xl:text-7xl" 
+          className="font-montserrat text-4xl font-normal text-foreground dark:text-neutral-900 sm:text-5xl lg:text-6xl xl:text-7xl" 
         >
           Connect & grow with your targeted customers
         </h1>
