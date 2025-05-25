@@ -1,7 +1,8 @@
 import type { Metadata } from 'next';
 import { orbitron, poppins } from '@/lib/fonts';
 import './globals.css';
-import { Toaster } from "@/components/ui/toaster"; // Import Toaster
+import { Toaster } from "@/components/ui/toaster";
+import { ThemeProvider } from "@/components/theme-provider"; // Import ThemeProvider
 
 export const metadata: Metadata = {
   title: 'RCEOM-TBI - Empowering Innovators',
@@ -14,10 +15,17 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className="dark">
+    <html lang="en" suppressHydrationWarning> {/* Remove className="dark", add suppressHydrationWarning */}
       <body className={`${orbitron.variable} ${poppins.variable} font-poppins antialiased`}>
-        {children}
-        <Toaster /> {/* Add Toaster for notifications */}
+        <ThemeProvider
+          attribute="class"
+          defaultTheme="dark" // You can set system, dark, or light as default
+          enableSystem
+          disableTransitionOnChange
+        >
+          {children}
+          <Toaster />
+        </ThemeProvider>
       </body>
     </html>
   );
