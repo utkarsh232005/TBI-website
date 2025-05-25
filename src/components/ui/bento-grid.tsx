@@ -57,10 +57,10 @@ export const BentoGridItem = ({
         variants={itemContentVariants}
       >
         {icon}
-        <div className="font-poppins mt-2 mb-2 font-bold text-foreground dark:text-neutral-900"> {/* Updated to text-foreground and dark:text-neutral-900 for dark text in dark mode */}
+        <div className="font-poppins mt-2 mb-2 font-bold text-foreground">
           {title}
         </div>
-        <div className="font-poppins text-xs font-normal text-muted-foreground dark:text-neutral-700"> {/* Updated to text-muted-foreground and dark:text-neutral-700 for dark text in dark mode */}
+        <div className="font-poppins text-xs font-normal text-muted-foreground">
           {description}
         </div>
       </motion.div>
