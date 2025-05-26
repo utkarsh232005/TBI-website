@@ -14,10 +14,27 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import { Textarea } from "@/components/ui/textarea";
+import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from "@/components/ui/card";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useToast } from "@/hooks/use-toast";
 import { useState } from "react";
-import { Loader2, Save, ShieldAlert } from "lucide-react";
+import { motion } from "framer-motion";
+import { 
+  Loader2, 
+  Save, 
+  ShieldAlert, 
+  Settings, 
+  User, 
+  Lock, 
+  Globe, 
+  BellRing, 
+  Mail,
+  Paintbrush,
+  Cog,
+  Info,
+  AlertCircle
+} from "lucide-react";
 import { performUpdateAdminCredentials } from "@/app/actions/settings-actions";
 
 const settingsFormSchema = z.object({
@@ -73,93 +90,296 @@ export default function AdminSettingsPage() {
     }
   }
 
+  // Animation variants
+  const containerVariants = {
+    hidden: { opacity: 0 },
+    show: {
+      opacity: 1,
+      transition: {
+        staggerChildren: 0.1,
+        ease: [0.16, 1, 0.3, 1]
+      }
+    }
+  };
+
+  const itemVariants = {
+    hidden: { opacity: 0, y: 10 },
+    show: { 
+      opacity: 1, 
+      y: 0,
+      transition: {
+        duration: 0.3,
+        ease: [0.16, 1, 0.3, 1]
+      }
+    }
+  };
+
   return (
-    <div className="space-y-6">
-      <Card className="shadow-lg">
-        <CardHeader>
-          <CardTitle className="flex items-center text-2xl font-orbitron">
-            <ShieldAlert className="mr-3 h-7 w-7 text-primary" />
-            Admin Credentials
-          </CardTitle>
-          <CardDescription>
-            Update the administrator email and password.
-            <br />
-            <span className="text-xs text-destructive">
-              Warning: Passwords are currently stored in plaintext in Firestore for this demonstration. This is highly insecure for production.
-            </span>
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <Form {...form}>
-            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-              <FormField
-                control={form.control}
-                name="newEmail"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>New Admin Email</FormLabel>
-                    <FormControl>
-                      <Input 
-                        type="email" 
-                        placeholder="newadmin@example.com" 
-                        {...field} 
-                        disabled={isLoading}
-                        className="bg-card border-border focus:border-primary focus:ring-primary"
+    <div className="min-h-screen bg-[#121212] text-[#E0E0E0] p-6">
+      <motion.div 
+        className="max-w-5xl mx-auto"
+        initial="hidden"
+        animate="show"
+        variants={containerVariants}
+      >
+        <motion.div variants={itemVariants} className="mb-8">
+          <h1 className="text-3xl font-bold mb-2 flex items-center">
+            <Settings className="mr-3 h-7 w-7 text-[#4F46E5]" />
+            Settings
+          </h1>
+          <p className="text-gray-400">Manage your account settings and preferences</p>
+        </motion.div>
+
+        <Tabs defaultValue="account" className="w-full">
+          <TabsList className="grid grid-cols-3 mb-8 bg-[#1E1E1E] p-1 rounded-xl">
+            <TabsTrigger value="account" className="data-[state=active]:bg-[#2D2D2D] rounded-lg">
+              <User className="h-4 w-4 mr-2" />
+              Account
+            </TabsTrigger>
+            <TabsTrigger value="security" className="data-[state=active]:bg-[#2D2D2D] rounded-lg">
+              <Lock className="h-4 w-4 mr-2" />
+              Security
+            </TabsTrigger>
+            <TabsTrigger value="preferences" className="data-[state=active]:bg-[#2D2D2D] rounded-lg">
+              <Cog className="h-4 w-4 mr-2" />
+              Preferences
+            </TabsTrigger>
+          </TabsList>
+          
+          <TabsContent value="security" className="space-y-6">
+            <motion.div variants={itemVariants}>
+              <Card className="bg-[#1E1E1E] border-[#333333] shadow-xl rounded-xl overflow-hidden">
+                <CardHeader className="border-b border-[#333333] bg-[#232323]">
+                  <CardTitle className="flex items-center text-2xl">
+                    <ShieldAlert className="mr-3 h-6 w-6 text-[#4F46E5]" />
+                    Admin Credentials
+                  </CardTitle>
+                  <CardDescription className="text-gray-400">
+                    Update your administrator email and password.
+                  </CardDescription>
+                </CardHeader>
+                <CardContent className="pt-6">
+                  <div className="bg-[#2A2A2A] border-l-4 border-amber-500 p-4 mb-6 rounded-r-lg">
+                    <div className="flex">
+                      <AlertCircle className="h-5 w-5 text-amber-500 mr-2 flex-shrink-0 mt-0.5" />
+                      <div>
+                        <p className="text-sm font-semibold text-amber-500">Security Notice</p>
+                        <p className="text-xs text-gray-400 mt-1">
+                          Passwords are currently stored in plaintext in Firestore for this demonstration. 
+                          This is highly insecure for production environments.
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                  
+                  <Form {...form}>
+                    <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-5">
+                      <FormField
+                        control={form.control}
+                        name="newEmail"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel className="text-gray-300">New Admin Email</FormLabel>
+                            <FormControl>
+                              <div className="relative">
+                                <Mail className="absolute left-3 top-3 h-4 w-4 text-gray-500" />
+                                <Input 
+                                  type="email" 
+                                  placeholder="admin@example.com" 
+                                  {...field} 
+                                  disabled={isLoading}
+                                  className="bg-[#262626] border-[#333333] pl-10 focus:border-[#4F46E5] focus:ring-[#4F46E5]/10 rounded-lg"
+                                  suppressHydrationWarning
+                                />
+                              </div>
+                            </FormControl>
+                            <FormMessage className="text-red-400" />
+                          </FormItem>
+                        )}
                       />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={form.control}
-                name="newPassword"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>New Password</FormLabel>
-                    <FormControl>
-                      <Input 
-                        type="password" 
-                        placeholder="••••••••" 
-                        {...field} 
-                        disabled={isLoading}
-                        className="bg-card border-border focus:border-primary focus:ring-primary"
+                      <FormField
+                        control={form.control}
+                        name="newPassword"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel className="text-gray-300">New Password</FormLabel>
+                            <FormControl>
+                              <div className="relative">
+                                <Lock className="absolute left-3 top-3 h-4 w-4 text-gray-500" />
+                                <Input 
+                                  type="password" 
+                                  placeholder="••••••••" 
+                                  {...field} 
+                                  disabled={isLoading}
+                                  className="bg-[#262626] border-[#333333] pl-10 focus:border-[#4F46E5] focus:ring-[#4F46E5]/10 rounded-lg"
+                                  suppressHydrationWarning
+                                />
+                              </div>
+                            </FormControl>
+                            <FormMessage className="text-red-400" />
+                          </FormItem>
+                        )}
                       />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={form.control}
-                name="confirmPassword"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Confirm New Password</FormLabel>
-                    <FormControl>
-                      <Input 
-                        type="password" 
-                        placeholder="••••••••" 
-                        {...field} 
-                        disabled={isLoading}
-                        className="bg-card border-border focus:border-primary focus:ring-primary"
+                      <FormField
+                        control={form.control}
+                        name="confirmPassword"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel className="text-gray-300">Confirm New Password</FormLabel>
+                            <FormControl>
+                              <div className="relative">
+                                <Lock className="absolute left-3 top-3 h-4 w-4 text-gray-500" />
+                                <Input 
+                                  type="password" 
+                                  placeholder="••••••••" 
+                                  {...field} 
+                                  disabled={isLoading}
+                                  className="bg-[#262626] border-[#333333] pl-10 focus:border-[#4F46E5] focus:ring-[#4F46E5]/10 rounded-lg"
+                                  suppressHydrationWarning
+                                />
+                              </div>
+                            </FormControl>
+                            <FormMessage className="text-red-400" />
+                          </FormItem>
+                        )}
                       />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <Button type="submit" disabled={isLoading} className="w-full sm:w-auto">
-                {isLoading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Save className="mr-2 h-4 w-4" />}
-                Update Credentials
-              </Button>
-            </form>
-          </Form>
-        </CardContent>
-      </Card>
-      <p className="text-sm text-muted-foreground">
-        Remember to use strong, unique passwords. After updating, you will need to use the new credentials to log in.
-      </p>
+                      <CardFooter className="flex justify-end px-0 pt-4 pb-0">
+                        <Button 
+                          type="submit" 
+                          disabled={isLoading} 
+                          className="bg-[#4F46E5] hover:bg-[#4338CA] text-white rounded-lg"
+                          suppressHydrationWarning
+                        >
+                          {isLoading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Save className="mr-2 h-4 w-4" />}
+                          Update Credentials
+                        </Button>
+                      </CardFooter>
+                    </form>
+                  </Form>
+                </CardContent>
+              </Card>
+            </motion.div>
+            
+            <motion.p variants={itemVariants} className="text-sm text-gray-400 flex items-center">
+              <Info className="h-4 w-4 mr-2 text-gray-500" />
+              Remember to use strong, unique passwords. After updating, you will need to use the new credentials to log in.
+            </motion.p>
+          </TabsContent>
+          
+          <TabsContent value="account" className="space-y-6">
+            <motion.div variants={itemVariants}>
+              <Card className="bg-[#1E1E1E] border-[#333333] shadow-xl rounded-xl">
+                <CardHeader className="border-b border-[#333333] bg-[#232323]">
+                  <CardTitle className="flex items-center">
+                    <User className="mr-3 h-5 w-5 text-[#4F46E5]" />
+                    Profile Information
+                  </CardTitle>
+                  <CardDescription className="text-gray-400">
+                    Update your personal profile details
+                  </CardDescription>
+                </CardHeader>
+                <CardContent className="pt-6">
+                  <div className="space-y-4">
+                    <div className="space-y-2">
+                      <label className="text-gray-300 text-sm font-medium">Name</label>
+                      <div className="relative">
+                        <User className="absolute left-3 top-3 h-4 w-4 text-gray-500" />
+                        <Input 
+                          placeholder="Your name" 
+                          className="bg-[#262626] border-[#333333] pl-10 focus:border-[#4F46E5] focus:ring-[#4F46E5]/10 rounded-lg"
+                          suppressHydrationWarning
+                        />
+                      </div>
+                    </div>
+                    <div className="space-y-2">
+                      <label className="text-gray-300 text-sm font-medium">Bio</label>
+                      <Textarea 
+                        placeholder="Write a short bio about yourself" 
+                        className="bg-[#262626] border-[#333333] focus:border-[#4F46E5] focus:ring-[#4F46E5]/10 resize-none h-24 rounded-lg"
+                        suppressHydrationWarning
+                      />
+                    </div>
+                  </div>
+                </CardContent>
+                <CardFooter className="flex justify-end border-t border-[#333333] bg-[#232323]">
+                  <Button className="bg-[#4F46E5] hover:bg-[#4338CA] text-white rounded-lg" suppressHydrationWarning>
+                    <Save className="mr-2 h-4 w-4" />
+                    Save Changes
+                  </Button>
+                </CardFooter>
+              </Card>
+            </motion.div>
+          </TabsContent>
+          
+          <TabsContent value="preferences" className="space-y-6">
+            <motion.div variants={itemVariants}>
+              <Card className="bg-[#1E1E1E] border-[#333333] shadow-xl rounded-xl">
+                <CardHeader className="border-b border-[#333333] bg-[#232323]">
+                  <CardTitle className="flex items-center">
+                    <Paintbrush className="mr-3 h-5 w-5 text-[#4F46E5]" />
+                    Interface Settings
+                  </CardTitle>
+                  <CardDescription className="text-gray-400">
+                    Customize your interface appearance
+                  </CardDescription>
+                </CardHeader>
+                <CardContent className="pt-6">
+                  <div className="space-y-6">
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <p className="font-medium text-gray-200">Dark Mode</p>
+                        <p className="text-sm text-gray-400">Toggle dark mode on or off</p>
+                      </div>
+                      <button 
+                        type="button" 
+                        className="h-6 w-11 bg-[#4F46E5] rounded-full relative"
+                        aria-label="Toggle dark mode"
+                        suppressHydrationWarning
+                      >
+                        <span className="h-5 w-5 bg-white rounded-full absolute top-0.5 right-0.5 transition-all duration-200"></span>
+                      </button>
+                    </div>
+                    
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <p className="font-medium text-gray-200">Notifications</p>
+                        <p className="text-sm text-gray-400">Receive email notifications</p>
+                      </div>
+                      <button 
+                        type="button" 
+                        className="h-6 w-11 bg-[#333333] rounded-full relative"
+                        aria-label="Toggle notifications"
+                        suppressHydrationWarning
+                      >
+                        <span className="h-5 w-5 bg-white rounded-full absolute top-0.5 left-0.5 transition-all duration-200"></span>
+                      </button>
+                    </div>
+                    
+                    <div className="space-y-2">
+                      <label className="font-medium text-gray-200 block">Language</label>
+                      <div className="relative">
+                        <Globe className="absolute left-3 top-3 h-4 w-4 text-gray-500" />
+                        <select className="w-full bg-[#262626] border-[#333333] text-gray-300 rounded-lg h-10 pl-10 pr-3 appearance-none" suppressHydrationWarning>
+                          <option>English (US)</option>
+                          <option>Hindi</option>
+                          <option>French</option>
+                          <option>German</option>
+                        </select>
+                      </div>
+                    </div>
+                  </div>
+                </CardContent>
+                <CardFooter className="flex justify-end border-t border-[#333333] bg-[#232323]">
+                  <Button className="bg-[#4F46E5] hover:bg-[#4338CA] text-white rounded-lg" suppressHydrationWarning>
+                    <Save className="mr-2 h-4 w-4" />
+                    Save Preferences
+                  </Button>
+                </CardFooter>
+              </Card>
+            </motion.div>
+          </TabsContent>
+        </Tabs>
+      </motion.div>
     </div>
   );
 }
