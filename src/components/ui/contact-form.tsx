@@ -20,8 +20,6 @@ import { Send } from "lucide-react";
 import { db } from '@/lib/firebase';
 import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
 
-// DUMMY_GOOGLE_FORM_LINK: This is a placeholder. Replace with your actual Google Form link for off-campus applicants.
-// Ensure this link is the same as the one in hero-section.tsx
 const DUMMY_GOOGLE_FORM_LINK_FOR_OFF_CAMPUS = 'https://docs.google.com/forms/d/e/YOUR_FORM_ID_HERE/viewform?usp=sf_link';
 
 const formSchema = z.object({
@@ -29,7 +27,6 @@ const formSchema = z.object({
   email: z.string().email({ message: "Please enter a valid email address." }),
   companyName: z.string().optional(),
   idea: z.string().min(10, { message: "Please describe your idea in at least 10 characters." }),
-  // campusStatus is handled by localStorage and added programmatically
 });
 
 export type ContactFormValues = z.infer<typeof formSchema>;
@@ -40,7 +37,7 @@ interface FirestoreSubmissionData {
   companyName?: string;
   idea: string;
   submittedAt: any; 
-  campusStatus?: "campus" | "off-campus"; // Explicitly type this
+  campusStatus?: "campus" | "off-campus";
   status: "pending" | "accepted" | "rejected";
 }
 
@@ -65,16 +62,14 @@ export default function ContactForm() {
         title: "Off-Campus Applications",
         description: "Off-campus applications should be submitted via the Google Form. Redirecting you now...",
         variant: "default",
-        duration: 5000, // Give user time to read before redirect
+        duration: 5000,
       });
-      // Redirect to the Google Form if an off-campus user tries to submit here
       setTimeout(() => {
         window.location.href = DUMMY_GOOGLE_FORM_LINK_FOR_OFF_CAMPUS;
-      }, 3000); // Delay redirect slightly
-      return; // Prevent submission to Firestore
+      }, 3000);
+      return; 
     }
 
-    // Proceed with Firestore submission only for campus users or if status is not 'off-campus'
     try {
       const dataForFirestore: FirestoreSubmissionData = {
         name: values.name,
@@ -87,18 +82,10 @@ export default function ContactForm() {
       if (values.companyName) {
         dataForFirestore.companyName = values.companyName;
       }
-
-      // Only set campusStatus if it's "campus" and came from localStorage for this form.
-      // If campusStatusFromStorage is null, it means they came directly to the contact form.
       if (campusStatusFromStorage === "campus") {
         dataForFirestore.campusStatus = campusStatusFromStorage;
-      } else if (!campusStatusFromStorage) {
-        // If no status from localStorage (e.g. direct navigation to #contact),
-        // you might want to default it or leave it undefined.
-        // For now, we'll leave it undefined if not explicitly "campus".
       }
       
-      // console.log("Data being sent to Firestore:", dataForFirestore); // For debugging
       const docRef = await addDoc(collection(db, "contactSubmissions"), dataForFirestore);
       
       toast({
@@ -107,14 +94,13 @@ export default function ContactForm() {
         variant: "default", 
       });
       form.reset(); 
-      // Clear the localStorage only if it was a 'campus' submission through this form
       if (campusStatusFromStorage === "campus" && typeof window !== "undefined") {
         localStorage.removeItem('applicantCampusStatus'); 
       }
     } catch (e: any) {
       console.error("Error adding document to Firestore: ", e);
       let errorMessage = "There was an error submitting your application. Please try again.";
-      if (e instanceof Error && e.message) {
+       if (e instanceof Error && e.message) {
         errorMessage += ` Details: ${e.message}`;
       }
       toast({
@@ -137,7 +123,7 @@ export default function ContactForm() {
               <FormControl>
                 <Input 
                   placeholder="e.g. Ada Lovelace" {...field} 
-                  className="bg-card border-border focus:border-primary focus:ring-primary"
+                  className="bg-card border-border focus:border-accent focus:ring-accent"
                 />
               </FormControl>
               <FormMessage />
@@ -154,7 +140,7 @@ export default function ContactForm() {
                 <Input 
                   type="email" 
                   placeholder="e.g. ada@example.com" {...field} 
-                  className="bg-card border-border focus:border-primary focus:ring-primary"
+                  className="bg-card border-border focus:border-accent focus:ring-accent"
                 />
               </FormControl>
               <FormMessage />
@@ -170,7 +156,7 @@ export default function ContactForm() {
               <FormControl>
                 <Input 
                   placeholder="e.g. Tech Innovations Inc." {...field} 
-                  className="bg-card border-border focus:border-primary focus:ring-primary"
+                  className="bg-card border-border focus:border-accent focus:ring-accent"
                 />
               </FormControl>
               <FormMessage />
@@ -187,14 +173,14 @@ export default function ContactForm() {
                 <Textarea
                   placeholder="Briefly describe your innovative idea or project..."
                   {...field}
-                  className="min-h-[120px] bg-card border-border focus:border-primary focus:ring-primary"
+                  className="min-h-[120px] bg-card border-border focus:border-accent focus:ring-accent"
                 />
               </FormControl>
               <FormMessage />
             </FormItem>
           )}
         />
-        <Button type="submit" size="lg" className="w-full font-poppins font-semibold group bg-primary hover:bg-primary/90">
+        <Button type="submit" size="lg" className="w-full font-poppins font-semibold group bg-accent hover:bg-accent/90 text-accent-foreground">
           Let's Build the Future Together
           <Send className="ml-2 h-5 w-5 transition-transform group-hover:translate-x-1" />
         </Button>

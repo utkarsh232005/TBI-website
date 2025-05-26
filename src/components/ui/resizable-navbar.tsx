@@ -5,6 +5,8 @@ import { motion, AnimatePresence, useScroll, useMotionValueEvent, type Variants 
 import Link from 'next/link';
 import React, { useRef, useState } from "react";
 
+// InnoNexusLogo is not used here anymore, AppLogo is defined locally
+// import { InnoNexusLogo as AppLogo } from '@/components/icons/innnexus-logo';
 
 interface NavbarProps {
   children: React.ReactNode;
@@ -15,19 +17,6 @@ interface NavBodyProps {
   children: React.ReactNode;
   className?: string;
   visible?: boolean;
-}
-
-interface NavItemsProps {
-  items: {
-    name: string;
-    link: string;
-    isButton?: boolean;
-    onClick?: () => void;
-  }[];
-  className?: string;
-  onItemClick?: () => void;
-  hoveredItem: string | null;
-  setHoveredItem: (name: string | null) => void;
 }
 
 interface MobileNavProps {
@@ -228,9 +217,9 @@ export const MobileNavToggle = ({
   onClick: () => void;
 }) => {
   return (
-    <button
+     <button
       onClick={onClick}
-      className="p-1 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 focus:ring-offset-background text-foreground"
+      className="p-1 rounded-md focus:outline-none focus:ring-2 focus:ring-accent focus:ring-offset-2 focus:ring-offset-background text-foreground"
       aria-label={isOpen ? "Close menu" : "Open menu"}
       aria-expanded={isOpen}
     >
@@ -246,7 +235,7 @@ export const NavbarLogo = () => {
       aria-label="RCEOM-TBI Home"
       className="relative z-20 flex items-center px-2 py-1"
     >
-      <span className="font-montserrat text-2xl font-bold text-primary"> {/* Changed to Montserrat */}
+      <span className="font-montserrat text-2xl font-bold text-accent">
         TBI
       </span>
     </Link>
@@ -258,7 +247,7 @@ export const NavbarButton = ({
   as: Tag = "button",
   children,
   className,
-  variant = "primary",
+  variant = "primary", // This should map to a theme color, e.g., accent
   onClick,
   ...props
 }: {
@@ -275,11 +264,11 @@ export const NavbarButton = ({
 
   const baseStyles = "px-6 py-2 rounded-full text-base font-normal relative cursor-pointer hover:-translate-y-0.5 transition duration-200 inline-block text-center";
 
-
+  // Map variants to use theme's accent color for primary actions
   const variantStyles = {
-    primary: "bg-primary text-primary-foreground shadow-md hover:bg-primary/90",
+    primary: "bg-accent text-accent-foreground shadow-md hover:bg-accent/90", // Uses accent
     secondary: "bg-secondary text-secondary-foreground hover:bg-secondary/80",
-    outline: "border border-border bg-transparent text-muted-foreground hover:text-foreground hover:border-foreground", // Updated to use theme variables
+    outline: "border border-border bg-transparent text-muted-foreground hover:text-accent hover:border-accent", // Hover uses accent
     ghost: "hover:bg-accent hover:text-accent-foreground text-foreground",
   };
 

@@ -1,10 +1,11 @@
+
 // src/components/ui/mentor-card.tsx
 "use client";
 
 import { cn } from "@/lib/utils";
 import Image from 'next/image';
-import Link from 'next/link'; // Keep Link for mailto
-import { Mail, UserCircle, Briefcase, Brain, Linkedin } from 'lucide-react'; // Added Linkedin
+import Link from 'next/link';
+import { Mail, UserCircle, Briefcase, Brain, Linkedin } from 'lucide-react';
 import { motion } from 'framer-motion';
 
 export interface Mentor {
@@ -12,13 +13,13 @@ export interface Mentor {
   name: string;
   designation: string;
   description: string;
-  areaOfMentorship: string; // This is 'expertise' from Firestore
+  areaOfMentorship: string; 
   email: string;
-  avatarUrl: string; // This is 'profilePictureUrl' from Firestore
-  backgroundImageUrl: string; // This will be a default or constructed
+  avatarUrl: string; 
+  backgroundImageUrl: string; 
   dataAiHintAvatar: string;
   dataAiHintBackground: string;
-  linkedinUrl?: string; // Added from Firestore
+  linkedinUrl?: string; 
 }
 
 interface MentorCardProps {
@@ -34,10 +35,10 @@ export default function MentorCard({ mentor }: MentorCardProps) {
     >
       <div
         className={cn(
-          "cursor-pointer overflow-hidden relative card h-[480px] rounded-2xl shadow-xl flex flex-col justify-between p-5 border border-border hover:border-primary/50 transition-all duration-300",
+          "cursor-pointer overflow-hidden relative card h-[480px] rounded-2xl shadow-xl flex flex-col justify-between p-5 border border-border hover:border-accent/50 transition-all duration-300",
         )}
         style={{ 
-          backgroundImage: `url(${mentor.backgroundImageUrl || 'https://placehold.co/400x600/121212/1A1A1A.png'})`, // Fallback background
+          backgroundImage: `url(${mentor.backgroundImageUrl || 'https://placehold.co/400x600/121212/1A1A1A.png'})`, 
           backgroundSize: 'cover',
           backgroundPosition: 'center'
         }}
@@ -52,11 +53,11 @@ export default function MentorCard({ mentor }: MentorCardProps) {
               width={48}
               alt={`${mentor.name} - Avatar`}
               src={mentor.avatarUrl || `https://placehold.co/100x100/7DF9FF/121212.png?text=${mentor.name.substring(0,2)}`}
-              className="h-12 w-12 rounded-full border-2 border-primary object-cover"
+              className="h-12 w-12 rounded-full border-2 border-foreground object-cover" /* Border to white */
               data-ai-hint={mentor.dataAiHintAvatar || "professional portrait"}
             />
             <div className="flex flex-col">
-              <p className="font-orbitron text-lg font-semibold text-primary line-clamp-1">
+              <p className="font-orbitron text-lg font-semibold text-foreground line-clamp-1"> {/* Name to white */}
                 {mentor.name}
               </p>
               <p className="text-xs text-slate-300 group-hover/card:text-slate-100 flex items-center line-clamp-1">
@@ -71,7 +72,7 @@ export default function MentorCard({ mentor }: MentorCardProps) {
             </p>
           </div>
            <div className="mb-3">
-             <p className="font-poppins text-xs font-semibold text-primary flex items-center bg-primary/10 px-2 py-1 rounded-md">
+             <p className="font-poppins text-xs font-semibold text-foreground flex items-center bg-foreground/10 px-2 py-1 rounded-md"> {/* Area of Mentorship text to white */}
                 <Brain size={14} className="mr-2 flex-shrink-0" /> Area: {mentor.areaOfMentorship}
               </p>
            </div>
@@ -79,19 +80,19 @@ export default function MentorCard({ mentor }: MentorCardProps) {
           <div className="mt-auto flex items-center justify-between">
             <Link
               href={`mailto:${mentor.email}`}
-              className="font-poppins text-xs text-accent hover:text-primary transition-colors duration-200 flex items-center group/email"
+              className="font-poppins text-xs text-accent hover:text-accent/80 transition-colors duration-200 flex items-center group/email" /* Email link to accent */
             >
-              <Mail size={14} className="mr-1.5 group-hover/email:text-primary transition-colors flex-shrink-0" /> Contact
+              <Mail size={14} className="mr-1.5 group-hover/email:text-accent/80 transition-colors flex-shrink-0" /> Contact
             </Link>
             {mentor.linkedinUrl && (
               <a
                 href={mentor.linkedinUrl}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="font-poppins text-xs text-accent hover:text-primary transition-colors duration-200 flex items-center group/linkedin"
+                className="font-poppins text-xs text-accent hover:text-accent/80 transition-colors duration-200 flex items-center group/linkedin" /* LinkedIn link to accent */
                 aria-label={`${mentor.name} LinkedIn Profile`}
               >
-                <Linkedin size={14} className="mr-1.5 group-hover/linkedin:text-primary transition-colors flex-shrink-0" /> LinkedIn
+                <Linkedin size={14} className="mr-1.5 group-hover/linkedin:text-accent/80 transition-colors flex-shrink-0" /> LinkedIn
               </a>
             )}
           </div>

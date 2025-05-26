@@ -12,9 +12,9 @@ export default function LoginPage() {
     <div className="flex flex-col items-center justify-center min-h-screen bg-background p-4">
       <div className="mb-8 text-center">
         <Link href="/" aria-label="Go to homepage">
-          <InnoNexusLogo className="h-12 w-auto mx-auto mb-2" />
+          <InnoNexusLogo className="h-12 w-auto mx-auto mb-2 text-accent" /> {/* Logo color to accent */}
         </Link>
-        <h1 className="font-montserrat text-3xl font-bold text-primary"> {/* Changed to Montserrat */}
+        <h1 className="font-montserrat text-3xl font-bold text-accent"> {/* Title to accent */}
           Welcome Back
         </h1>
         <p className="text-muted-foreground">
@@ -35,7 +35,7 @@ export default function LoginPage() {
       </Tabs>
       <p className="mt-8 text-center text-sm text-muted-foreground">
         Don&apos;t have an account?{' '}
-        <Link href="#contact" className="underline hover:text-primary">
+        <Link href="#contact" className="underline hover:text-accent"> {/* Link hover to accent */}
           Apply for Incubation
         </Link>
       </p>

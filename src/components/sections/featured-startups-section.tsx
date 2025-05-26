@@ -4,12 +4,13 @@
 import { BentoGrid, BentoGridItem } from '@/components/ui/bento-grid';
 import { Rocket } from 'lucide-react'; 
 import { motion } from 'framer-motion';
+import Image from 'next/image'; // Import Image
 
 const startupsData = [
   {
     id: '1',
     name: 'QuantumLeap AI',
-    logoUrl: 'https://placehold.co/300x150/1A1A1A/7DF9FF.png?text=QAI',
+    logoUrl: 'https://placehold.co/300x150/1A1A1A/FFFFFF.png?text=QAI', // Text white for dark bg
     description: 'Revolutionizing data analytics with quantum-inspired machine learning algorithms.',
     badgeText: 'Series A Funded',
     websiteUrl: '#',
@@ -18,7 +19,7 @@ const startupsData = [
   {
     id: '2',
     name: 'EcoSynth Solutions',
-    logoUrl: 'https://placehold.co/300x150/1A1A1A/32CD32.png?text=ESS',
+    logoUrl: 'https://placehold.co/300x150/1A1A1A/FFFFFF.png?text=ESS', // Text white
     description: 'Developing sustainable materials through innovative biosynthetic processes.',
     badgeText: 'Acquired',
     websiteUrl: '#',
@@ -27,7 +28,7 @@ const startupsData = [
   {
     id: '3',
     name: 'NovaMed Devices',
-    logoUrl: 'https://placehold.co/300x150/1A1A1A/FF2D55.png?text=NMD',
+    logoUrl: 'https://placehold.co/300x150/1A1A1A/FFFFFF.png?text=NMD', // Text white
     description: 'Pioneering next-generation medical devices for remote patient monitoring.',
     badgeText: '500K+ Users',
     websiteUrl: '#',
@@ -36,7 +37,7 @@ const startupsData = [
    {
     id: '4',
     name: 'CyberGuard Inc.',
-    logoUrl: 'https://placehold.co/300x150/1A1A1A/BF5AF2.png?text=CGI',
+    logoUrl: 'https://placehold.co/300x150/1A1A1A/FFFFFF.png?text=CGI', // Text white
     description: 'Advanced cybersecurity solutions for protecting critical digital infrastructure.',
     badgeText: 'Seed Stage',
     websiteUrl: '#',
@@ -45,7 +46,7 @@ const startupsData = [
   {
     id: '5',
     name: 'AeroGlide Systems',
-    logoUrl: 'https://placehold.co/300x150/1A1A1A/0A84FF.png?text=AGS',
+    logoUrl: 'https://placehold.co/300x150/1A1A1A/FFFFFF.png?text=AGS', // Text white
     description: 'Urban air mobility platforms for efficient and eco-friendly transportation.',
     badgeText: 'Patent Pending',
     websiteUrl: '#',
@@ -54,7 +55,7 @@ const startupsData = [
   {
     id: '6',
     name: 'ConnectSphere VR',
-    logoUrl: 'https://placehold.co/300x150/1A1A1A/FF9500.png?text=CSVR',
+    logoUrl: 'https://placehold.co/300x150/1A1A1A/FFFFFF.png?text=CSVR', // Text white
     description: 'Immersive virtual reality experiences for collaboration and entertainment.',
     badgeText: 'Beta Launch',
     websiteUrl: '#',
@@ -106,7 +107,7 @@ export default function FeaturedStartupsSection() {
           className="text-center mb-12 md:mb-16"
           variants={sectionTitleVariants}
         >
-          <h2 className="font-montserrat text-3xl font-bold tracking-tight sm:text-4xl md:text-5xl text-primary">
+          <h2 className="font-montserrat text-3xl font-bold tracking-tight sm:text-4xl md:text-5xl text-accent">
             Featured Startups
           </h2>
           <p className="mt-4 max-w-2xl mx-auto text-lg text-muted-foreground sm:text-xl">
@@ -123,6 +124,7 @@ export default function FeaturedStartupsSection() {
               <motion.div
                 key={item.id}
                 variants={bentoItemVariants}
+                 whileHover={{ scale: 1.02, transition: { type: "spring", stiffness: 300, damping: 15 } }}
               >
                 <BentoGridItem
                   title={item.title}

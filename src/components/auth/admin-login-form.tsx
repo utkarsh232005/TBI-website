@@ -19,7 +19,7 @@ import { useToast } from "@/hooks/use-toast";
 import { useRouter } from "next/navigation";
 import { LogIn, Loader2 } from "lucide-react";
 import { useState } from "react";
-import { verifyAdminCredentials, type AdminLoginFormValues } from "@/app/actions/auth-actions";
+import { verifyAdminCredentials, type AdminLoginFormValues, type VerifyCredentialsResponse } from "@/app/actions/auth-actions";
 
 
 const formSchema = z.object({
@@ -45,7 +45,7 @@ export default function AdminLoginForm() {
     setIsLoading(true);
     console.log("[AdminLoginForm] Attempting login with:", values);
     try {
-      const result = await verifyAdminCredentials(values);
+      const result: VerifyCredentialsResponse = await verifyAdminCredentials(values);
       console.log("[AdminLoginForm] Verification result:", result);
 
       if (result.success) {
@@ -63,15 +63,21 @@ export default function AdminLoginForm() {
       } else {
         toast({
           title: "Login Failed",
-          description: result.message,
+          description: result.message || "An unknown error occurred.",
           variant: "destructive",
         });
       }
     } catch (error: any) {
       console.error("[AdminLoginForm] Error during login submission: ", error);
+      let message = "An unexpected error occurred.";
+      if (error.code === 'permission-denied' || (error.message && (error.message.toLowerCase().includes('permission denied') || error.message.toLowerCase().includes('insufficient permissions')))) {
+          message = 'Login Failed: Firestore permission denied. Please check your Firestore security rules to allow reading the admin credentials document.';
+      } else if (error instanceof Error) {
+        message = error.message;
+      }
       toast({
         title: "Login Error",
-        description: error.message || "An unexpected error occurred.",
+        description: message,
         variant: "destructive",
       });
     } finally {
@@ -82,7 +88,7 @@ export default function AdminLoginForm() {
   return (
     <Card className="shadow-lg">
       <CardHeader>
-        <CardTitle className="font-montserrat text-2xl">Admin Portal</CardTitle> {/* Changed to Montserrat */}
+        <CardTitle className="font-montserrat text-2xl text-accent">Admin Portal</CardTitle> {/* Title to accent */}
         <CardDescription>
           Enter your administrator credentials to access the RCEOM-TBI admin panel.
         </CardDescription>
@@ -101,7 +107,7 @@ export default function AdminLoginForm() {
                       type="email"
                       placeholder="admin@example.com"
                       {...field}
-                      className="bg-card border-border focus:border-primary focus:ring-primary"
+                      className="bg-card border-border focus:border-accent focus:ring-accent" /* Focus to accent */
                       disabled={isLoading}
                     />
                   </FormControl>
@@ -120,7 +126,7 @@ export default function AdminLoginForm() {
                       type="password"
                       placeholder="••••••••"
                       {...field}
-                      className="bg-card border-border focus:border-primary focus:ring-primary"
+                      className="bg-card border-border focus:border-accent focus:ring-accent" /* Focus to accent */
                       disabled={isLoading}
                     />
                   </FormControl>
@@ -128,7 +134,7 @@ export default function AdminLoginForm() {
                 </FormItem>
               )}
             />
-            <Button type="submit" size="lg" className="w-full font-poppins font-semibold group" disabled={isLoading}>
+            <Button type="submit" size="lg" className="w-full font-poppins font-semibold group bg-accent hover:bg-accent/90 text-accent-foreground" disabled={isLoading}> {/* Button to accent */}
               {isLoading ? (
                 <Loader2 className="mr-2 h-5 w-5 animate-spin" />
               ) : (
@@ -139,7 +145,7 @@ export default function AdminLoginForm() {
           </form>
         </Form>
          <p className="mt-4 text-xs text-center text-muted-foreground">
-          Security Warning: Admin passwords should be stored hashed. This demo stores them in plaintext in Firestore for simplicity. Do not use this approach in production.
+          Security Warning: Admin passwords should be stored hashed. This demo stores them in Firestore for simplicity. Do not use this approach in production.
         </p>
       </CardContent>
     </Card>

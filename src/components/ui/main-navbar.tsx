@@ -1,3 +1,4 @@
+
 "use client";
 
 import {
@@ -8,13 +9,12 @@ import {
   MobileNavHeader,
   MobileNavToggle,
   MobileNavMenu,
-  NavbarButton, // Keep this for mobile
+  NavbarButton,
 } from "@/components/ui/resizable-navbar";
-import { useState, useEffect } // Add useEffect for client-side checks
-  from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import { motion } from "framer-motion";
-import { ThemeToggleButton } from "@/components/ui/theme-toggle-button"; // Import the toggle button
+import { ThemeToggleButton } from "@/components/ui/theme-toggle-button";
 
 interface MainNavbarProps {
   onApplyClick?: () => void;
@@ -29,14 +29,14 @@ export default function MainNavbar({ onApplyClick }: MainNavbarProps) {
     { name: 'Mentors', link: '/mentors' },
   ];
 
-  // "Login" is now an action item on the right
   const actionNavItems = [
     { name: 'Login', link: '/login', isButton: false },
+    // Apply button is removed
   ];
 
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [hoveredItem, setHoveredItem] = useState<string | null>(null);
-  const [mounted, setMounted] = useState(false); // For client-side rendering of toggle
+  const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
     setMounted(true);
@@ -46,7 +46,6 @@ export default function MainNavbar({ onApplyClick }: MainNavbarProps) {
 
   return (
     <Navbar>
-      {/* Desktop Navigation */}
       <NavBody>
         <NavbarLogo />
 
@@ -59,7 +58,7 @@ export default function MainNavbar({ onApplyClick }: MainNavbarProps) {
               onMouseEnter={() => setHoveredItem(item.name)}
               onMouseLeave={() => setHoveredItem(null)}
               onClick={closeMobileMenu}
-              className="relative px-3 py-2 text-muted-foreground hover:text-primary transition-colors duration-200"
+              className="relative px-3 py-2 text-muted-foreground hover:text-accent transition-colors duration-200"
             >
               {hoveredItem === item.name && (
                 <motion.div
@@ -75,7 +74,7 @@ export default function MainNavbar({ onApplyClick }: MainNavbarProps) {
         
         {/* Action Items (Login, Theme Toggle) - Right Aligned */}
         <div className="flex items-center gap-2">
-          {actionNavItems.map((item) => ( // This renders the "Login" link
+          {actionNavItems.map((item) => (
             item.link ? (
               <Link
                 href={item.link}
@@ -83,11 +82,11 @@ export default function MainNavbar({ onApplyClick }: MainNavbarProps) {
                 onMouseEnter={() => setHoveredItem(item.name)}
                 onMouseLeave={() => setHoveredItem(null)}
                 onClick={closeMobileMenu}
-                className="relative px-3 py-2 text-muted-foreground hover:text-primary transition-colors duration-200 text-sm font-normal" // Matched style
+                className="relative px-3 py-2 text-muted-foreground hover:text-accent transition-colors duration-200 text-sm font-normal"
               >
                 {hoveredItem === item.name && (
                   <motion.div
-                    layoutId={`hovered-action-${item.name}`} // Unique layoutId
+                    layoutId={`hovered-action-${item.name}`}
                     className="absolute inset-0 h-full w-full rounded-full bg-muted/30"
                     transition={{ type: "spring", stiffness: 300, damping: 30 }}
                   />
@@ -96,7 +95,7 @@ export default function MainNavbar({ onApplyClick }: MainNavbarProps) {
               </Link>
             ) : null
           ))}
-          {mounted && <ThemeToggleButton />} {/* Render toggle button only on client */}
+          {mounted && <ThemeToggleButton />}
         </div>
       </NavBody>
 
@@ -119,25 +118,24 @@ export default function MainNavbar({ onApplyClick }: MainNavbarProps) {
               key={`mobile-link-${idx}`}
               href={item.link}
               onClick={closeMobileMenu}
-              className="block py-2 text-lg text-foreground hover:text-primary"
+              className="block py-2 text-lg text-foreground hover:text-accent"
             >
               {item.name}
             </Link>
           ))}
           <div className="flex w-full flex-col gap-4 pt-4 border-t border-border mt-4">
-            {actionNavItems.map((item) => item.link && ( // Renders "Login" for mobile
+            {actionNavItems.map((item) => item.link && (
               <NavbarButton
                 key={`mobile-action-${item.name}`}
                 as="a" 
                 href={item.link}
                 onClick={closeMobileMenu}
-                variant="outline"
-                className="w-full"
+                variant="outline" // Keeps it distinct
+                className="w-full hover:border-accent hover:text-accent"
               >
                 {item.name}
               </NavbarButton>
             ))}
-             {/* Add Theme Toggle to Mobile Menu if desired, might need specific styling */}
             <div className="flex justify-center pt-2">
                {mounted && <ThemeToggleButton />}
             </div>

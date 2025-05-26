@@ -23,7 +23,7 @@ export default function UserLoginForm() {
   return (
     <Card className="shadow-lg">
       <CardHeader>
-        <CardTitle className="font-montserrat text-2xl">User Login</CardTitle> {/* Changed to Montserrat */}
+        <CardTitle className="font-montserrat text-2xl text-accent">User Login</CardTitle> {/* Title to accent */}
         <CardDescription>
           Sign in to your RCEOM-TBI account or apply if you're new.
         </CardDescription>
@@ -37,7 +37,7 @@ export default function UserLoginForm() {
               type="email"
               placeholder="you@example.com"
               disabled 
-              className="bg-card border-border focus:border-primary focus:ring-primary"
+              className="bg-card border-border focus:border-accent focus:ring-accent" /* Focus to accent */
             />
           </div>
           <div className="space-y-2">
@@ -47,10 +47,10 @@ export default function UserLoginForm() {
               type="password"
               placeholder="••••••••"
               disabled 
-              className="bg-card border-border focus:border-primary focus:ring-primary"
+              className="bg-card border-border focus:border-accent focus:ring-accent" /* Focus to accent */
             />
           </div>
-          <Button type="submit" size="lg" className="w-full font-poppins font-semibold group">
+          <Button type="submit" size="lg" className="w-full font-poppins font-semibold group bg-accent hover:bg-accent/90 text-accent-foreground"> {/* Button to accent */}
             Login
             <LogIn className="ml-2 h-5 w-5 transition-transform group-hover:translate-x-1" />
           </Button>

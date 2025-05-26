@@ -15,7 +15,7 @@
     --popover: 0 0% 100%; /* White */
     --popover-foreground: 0 0% 3.9%;
 
-    --primary: 180 95% 40%; /* Darker Cyan for better contrast on light bg */
+    --primary: 195 95% 45%; /* Darker Electric Blue */
     --primary-foreground: 0 0% 98%; /* White text on primary */
 
     --secondary: 0 0% 96.1%; /* Light gray */
@@ -24,7 +24,7 @@
     --muted: 0 0% 96.1%; /* Light gray for muted elements */
     --muted-foreground: 0 0% 45.1%; /* Medium gray text */
 
-    --accent: 270 90% 55%; /* Darker Purple for better contrast on light bg */
+    --accent: 270 90% 55%; /* Darker Purple */
     --accent-foreground: 0 0% 98%; /* White text on accent */
 
     --destructive: 0 84.2% 60.2%; /* Standard red */
@@ -32,14 +32,14 @@
 
     --border: 0 0% 89.8%; /* Light gray border */
     --input: 0 0% 89.8%; 
-    --ring: 180 95% 50%; /* Cyan for focus rings */
+    --ring: 270 90% 55%; /* Purple for focus rings */
     
     --radius: 0.75rem; /* Updated radius for more rounded cards by default */
     --radius-md: calc(var(--radius) - 2px); 
     --radius-lg: calc(var(--radius) - 4px);
 
     /* Light theme chart colors */
-    --chart-1: 180 95% 45%; 
+    --chart-1: 195 95% 45%; 
     --chart-2: 270 90% 60%; 
     --chart-3: 220 80% 65%; 
     --chart-4: 30 70% 55%;  
@@ -48,16 +48,16 @@
     /* Sidebar specific vars for light theme */
     --sidebar-background: 0 0% 98%; /* Very light gray for sidebar */
     --sidebar-foreground: 0 0% 9%; 
-    --sidebar-primary: 180 95% 40%;
+    --sidebar-primary: 195 95% 45%;
     --sidebar-primary-foreground: 0 0% 98%;
     --sidebar-accent: 0 0% 94%; 
     --sidebar-accent-foreground: 0 0% 9%;
     --sidebar-border: 0 0% 90%;
-    --sidebar-ring: 180 95% 50%;
+    --sidebar-ring: 270 90% 55%;
   }
 
   .dark {
-    /* DuskUI Theme Inspired - Black background, White text, Cyan/Purple accents */
+    /* DuskUI Theme Inspired - Black background, White text, Electric Blue/Purple accents */
     --background: 0 0% 0%; /* Black background */
     --foreground: 0 0% 100%; /* White text */
 
@@ -67,8 +67,8 @@
     --popover: 0 0% 3%; /* Even darker for popovers */
     --popover-foreground: 0 0% 100%; /* White text */
 
-    --primary: 180 95% 50%; /* Cyan (approx HSL for #00FFFF or similar) */
-    --primary-foreground: 0 0% 100%; /* White text on primary */
+    --primary: 195 100% 75%; /* Electric Blue (#7DF9FF is closer to HSL(195, 100%, 74.5%)) */
+    --primary-foreground: 0 0% 0%; /* Black text on primary (for high contrast if primary is light) */
 
     --secondary: 0 0% 15%; /* Medium dark gray for secondary elements */
     --secondary-foreground: 0 0% 95%; /* Very Light gray text on secondary */
@@ -76,7 +76,7 @@
     --muted: 240 4% 15%; /* Darker gray for muted elements if card is very dark */
     --muted-foreground: 0 0% 80%; /* Light gray for muted text on dark bg */
 
-    --accent: 270 90% 65%; /* Purple (approx HSL for #8A2BE2 or similar) */
+    --accent: 270 90% 65%; /* Purple */
     --accent-foreground: 0 0% 100%; /* White text on accent */
 
     --destructive: 0 70% 55%; /* A vivid red */
@@ -84,12 +84,12 @@
 
     --border: 0 0% 25%; /* A bit lighter than gray-600 for visibility on black */
     --input: 0 0% 25%; 
-    --ring: 180 80% 65%; /* Lighter cyan for focus rings */
+    --ring: 270 90% 65%; /* Purple for focus rings */
     
     --radius: 0.75rem; /* Updated radius for .dark theme as well */
 
     /* Dark theme chart colors */
-    --chart-1: 180 95% 50%; /* Cyan */
+    --chart-1: 195 100% 75%; /* Electric Blue */
     --chart-2: 270 90% 65%; /* Purple */
     --chart-3: 220 80% 70%; /* A blue */
     --chart-4: 300 70% 60%; /* A magenta */
@@ -98,12 +98,12 @@
     /* Sidebar specific vars, ensure they blend with the black theme */
     --sidebar-background: 0 0% 3%; /* Slightly off-black for sidebar */
     --sidebar-foreground: 0 0% 100%; /* White text for sidebar text */
-    --sidebar-primary: 180 95% 50%; /* Cyan */
-    --sidebar-primary-foreground: 0 0% 100%; /* White text */
+    --sidebar-primary: 195 100% 75%; /* Electric Blue */
+    --sidebar-primary-foreground: 0 0% 0%; /* Black text */
     --sidebar-accent: 0 0% 10%; /* Darker accent for sidebar items */
     --sidebar-accent-foreground: 0 0% 100%; /* White text */
     --sidebar-border: 0 0% 12%;
-    --sidebar-ring: 180 80% 65%;
+    --sidebar-ring: 270 90% 65%; /* Purple */
   }
 }
 
@@ -122,16 +122,14 @@
 
 /* Gradient for Hero Section bottom */
 .bg-bottom-gradient-hero {
-  background-image: radial-gradient(ellipse at bottom, hsla(var(--primary-hsl, 180, 95%, 50%), 0.15) 0%, transparent 60%);
-}
-/* Define primary-hsl if not available directly, or use Tailwind's primary directly */
-/* For example, assuming primary is hsl(180, 95%, 50%) */
-html:not(.dark) {
-  --primary-hsl: 180, 95%, 40%; /* Darker Cyan for light mode */
-  --accent-hsl: 270, 90%, 55%; /* Darker Purple for light mode */
-}
-html.dark {
-  --primary-hsl: 180, 95%, 50%; /* Cyan for dark mode */
-  --accent-hsl: 270, 90%, 65%; /* Purple for dark mode */
+  background-image: radial-gradient(ellipse at bottom, hsla(var(--primary-hsl, 195, 100%, 75%), 0.15) 0%, transparent 60%);
 }
 
+html:not(.dark) {
+  --primary-hsl: 195, 95%, 45%; 
+  --accent-hsl: 270, 90%, 55%; 
+}
+html.dark {
+  --primary-hsl: 195, 100%, 75%; 
+  --accent-hsl: 270, 90%, 65%; 
+}
