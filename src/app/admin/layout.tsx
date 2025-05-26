@@ -27,7 +27,8 @@ import {
   ChevronRight,
   Users,
   LayoutDashboard,
-  FileCheck
+  FileCheck,
+  Rocket // Added Rocket icon
 } from "lucide-react";
 import { InnoNexusLogo } from "@/components/icons/innnexus-logo";
 import { motion } from "framer-motion";
@@ -78,6 +79,12 @@ function AdminLayoutContent({
       href: "/admin/events", 
       label: "Events", 
       icon: <CalendarDays className="h-5 w-5" />,
+      disabled: false 
+    },
+    { 
+      href: "/admin/startups", // Link to the startups management page
+      label: "Add-startups",   // New label
+      icon: <Rocket className="h-5 w-5" />, // Using Rocket icon
       disabled: false 
     },
     { 
@@ -188,6 +195,7 @@ function AdminLayoutContent({
                           if (item.disabled) {
                             e.preventDefault();
                           }
+                          handleMobileLinkClick(); // Close mobile menu on link click
                         }}
                       >
                         <span className="flex-shrink-0 mr-3">
@@ -204,6 +212,7 @@ function AdminLayoutContent({
                 <Link 
                   href="/" 
                   className="flex items-center px-3 py-2.5 rounded-lg text-sm font-medium text-neutral-300 hover:bg-neutral-800/50 hover:text-white transition-colors"
+                   onClick={handleMobileLinkClick} // Close mobile menu on link click
                 >
                   <Home className="h-5 w-5 mr-3" />
                   <span>Back to Home</span>
