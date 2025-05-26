@@ -25,15 +25,45 @@ import { Textarea } from "@/components/ui/textarea";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Users, PlusCircle, Loader2, AlertCircle, Edit, Trash2 } from "lucide-react";
+import { Users, PlusCircle, Loader2, AlertCircle, Edit, Trash2, Search, X, ChevronDown, ChevronUp, Mail, Linkedin, Briefcase, ExternalLink, RefreshCw } from "lucide-react";
+import { motion, AnimatePresence, Variants } from "framer-motion";
+import { Badge } from "@/components/ui/badge";
+import { cn } from "@/lib/utils";
+import { Skeleton } from "@/components/ui/skeleton";
+import { Separator } from "@/components/ui/separator";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { useToast } from "@/hooks/use-toast";
 import { db } from '@/lib/firebase';
-import { collection, getDocs, Timestamp, orderBy, query } from 'firebase/firestore';
+import { collection, getDocs, Timestamp, orderBy, query, doc, deleteDoc } from 'firebase/firestore';
 import { createMentorAction } from '@/app/actions/mentor-actions';
 import { format } from 'date-fns';
+
+// Animation variants
+const container: Variants = {
+  hidden: { opacity: 0 },
+  show: {
+    opacity: 1,
+    transition: {
+      staggerChildren: 0.1,
+      delayChildren: 0.2
+    }
+  }
+};
+
+const item: Variants = {
+  hidden: { opacity: 0, y: 20 },
+  show: { 
+    opacity: 1, 
+    y: 0, 
+    transition: { 
+      type: "spring",
+      stiffness: 100,
+      damping: 10
+    } 
+  }
+};
 
 // Schema for the mentor creation/edit form
 const mentorFormSchema = z.object({
@@ -60,12 +90,24 @@ export interface MentorDocument {
   createdAt: Timestamp; // For ordering if needed
 }
 
+// Get initials for avatar fallback
+const getInitials = (name: string) => {
+  return name
+    .split(' ')
+    .map(part => part[0])
+    .join('')
+    .toUpperCase();
+};
+
 export default function AdminMentorsPage() {
   const [mentors, setMentors] = useState<MentorDocument[]>([]);
+  const [filteredMentors, setFilteredMentors] = useState<MentorDocument[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [expandedMentor, setExpandedMentor] = useState<string | null>(null);
   const { toast } = useToast();
 
   const form = useForm<MentorFormValues>({
@@ -81,6 +123,24 @@ export default function AdminMentorsPage() {
     },
   });
 
+  // Filter mentors based on search query
+  const filterMentors = (mentorsList: MentorDocument[], query: string) => {
+    if (!query) return mentorsList;
+    
+    const lowercasedQuery = query.toLowerCase();
+    return mentorsList.filter(mentor => 
+      mentor.name.toLowerCase().includes(lowercasedQuery) ||
+      mentor.designation.toLowerCase().includes(lowercasedQuery) ||
+      mentor.expertise.toLowerCase().includes(lowercasedQuery) ||
+      mentor.email.toLowerCase().includes(lowercasedQuery)
+    );
+  };
+
+  // Update filtered mentors when search query or mentors list changes
+  useEffect(() => {
+    setFilteredMentors(filterMentors(mentors, searchQuery));
+  }, [searchQuery, mentors]);
+
   const fetchMentors = async () => {
     setIsLoading(true);
     setError(null);
@@ -89,6 +149,7 @@ export default function AdminMentorsPage() {
       const q = query(mentorsCollection, orderBy("createdAt", "desc"));
       const querySnapshot = await getDocs(q);
       const fetchedMentors: MentorDocument[] = [];
+      
       querySnapshot.forEach((doc) => {
         const data = doc.data();
         fetchedMentors.push({
@@ -103,7 +164,9 @@ export default function AdminMentorsPage() {
           createdAt: data.createdAt,
         });
       });
+      
       setMentors(fetchedMentors);
+      setFilteredMentors(filterMentors(fetchedMentors, searchQuery));
     } catch (err: any) {
       console.error("Error fetching mentors for admin page: ", err);
       let detailedError = "Failed to load mentors.";
@@ -115,6 +178,29 @@ export default function AdminMentorsPage() {
       setError(detailedError);
     } finally {
       setIsLoading(false);
+    }
+  };
+
+  // Delete mentor handler
+  const handleDeleteMentor = async (mentorId: string, mentorName: string) => {
+    if (!confirm(`Are you sure you want to delete ${mentorName}? This action cannot be undone.`)) {
+      return;
+    }
+
+    try {
+      await deleteDoc(doc(db, "mentors", mentorId));
+      toast({
+        title: "Mentor Deleted",
+        description: `${mentorName} has been removed from mentors.`,
+      });
+      fetchMentors();
+    } catch (error) {
+      console.error("Error deleting mentor: ", error);
+      toast({
+        title: "Error",
+        description: "Failed to delete mentor. Please try again.",
+        variant: "destructive",
+      });
     }
   };
 
@@ -152,198 +238,386 @@ export default function AdminMentorsPage() {
     }
   }
 
+  // Toggle mentor details expansion
+  const toggleMentorExpansion = (mentorId: string) => {
+    setExpandedMentor(expandedMentor === mentorId ? null : mentorId);
+  };
+
   return (
-    <div className="space-y-6">
-      <Card className="shadow-lg">
-        <CardHeader className="flex flex-row items-center justify-between">
-          <div>
-            <CardTitle className="flex items-center text-2xl font-orbitron">
-              <Users className="mr-3 h-7 w-7 text-primary" />
-              Mentors Management
-            </CardTitle>
-            <CardDescription>
-              Add, view, edit, and delete mentor profiles.
-            </CardDescription>
-          </div>
-          <Dialog open={isCreateDialogOpen} onOpenChange={setIsCreateDialogOpen}>
-            <DialogTrigger asChild>
-              <Button>
-                <PlusCircle className="mr-2 h-4 w-4" /> Add New Mentor
-              </Button>
-            </DialogTrigger>
-            <DialogContent className="sm:max-w-[525px] bg-card">
-              <DialogHeader>
-                <DialogTitle>Add New Mentor</DialogTitle>
-                <DialogDescription>Fill in the details for the new mentor.</DialogDescription>
-              </DialogHeader>
-              <Form {...form}>
-                <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4 py-4 max-h-[70vh] overflow-y-auto pr-2">
-                  <FormField
-                    control={form.control}
-                    name="name"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Full Name</FormLabel>
-                        <FormControl>
-                          <Input placeholder="e.g., Dr. Jane Doe" {...field} disabled={isSubmitting} />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                  <FormField
-                    control={form.control}
-                    name="designation"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Designation</FormLabel>
-                        <FormControl>
-                          <Input placeholder="e.g., Lead Innovator, Acme Corp" {...field} disabled={isSubmitting} />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                  <FormField
-                    control={form.control}
-                    name="expertise"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Area of Expertise/Mentorship</FormLabel>
-                        <FormControl>
-                          <Input placeholder="e.g., AI & Machine Learning" {...field} disabled={isSubmitting} />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                  <FormField
-                    control={form.control}
-                    name="description"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Description / Bio</FormLabel>
-                        <FormControl>
-                          <Textarea placeholder="Brief description of the mentor's background and experience..." {...field} rows={4} disabled={isSubmitting} />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                  <FormField
-                    control={form.control}
-                    name="email"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Email Address</FormLabel>
-                        <FormControl>
-                          <Input type="email" placeholder="mentor@example.com" {...field} disabled={isSubmitting} />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                  <FormField
-                    control={form.control}
-                    name="profilePictureUrl"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Profile Picture URL (Optional)</FormLabel>
-                        <FormControl>
-                          <Input type="url" placeholder="https://placehold.co/100x100.png" {...field} disabled={isSubmitting} />
-                        </FormControl>
-                        <FormMessage />
-                        <p className="text-xs text-muted-foreground">Direct upload coming soon. For now, provide a URL.</p>
-                      </FormItem>
-                    )}
-                  />
-                  <FormField
-                    control={form.control}
-                    name="linkedinUrl"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>LinkedIn Profile URL (Optional)</FormLabel>
-                        <FormControl>
-                          <Input type="url" placeholder="https://linkedin.com/in/mentorname" {...field} disabled={isSubmitting} />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                  <DialogFooter>
-                    <Button type="button" variant="outline" onClick={() => setIsCreateDialogOpen(false)} disabled={isSubmitting}>Cancel</Button>
-                    <Button type="submit" disabled={isSubmitting}>
-                      {isSubmitting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                      Add Mentor
+    <div className="min-h-screen bg-gray-900 text-gray-100">
+      <motion.div 
+        className="container mx-auto px-4 py-8"
+        initial="hidden"
+        animate="show"
+        variants={container}
+      >
+        <Card className="bg-gray-800 border-gray-700">
+          <CardHeader>
+            <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-6">
+              <div>
+                <h1 className="text-3xl font-bold bg-gradient-to-r from-indigo-400 to-purple-500 bg-clip-text text-transparent">
+                  Mentors Management
+                </h1>
+                <p className="text-gray-400">
+                  Manage and organize your team of expert mentors
+                </p>
+              </div>
+              <div>
+                <Dialog open={isCreateDialogOpen} onOpenChange={setIsCreateDialogOpen}>
+                  <DialogTrigger asChild>
+                    <Button className="bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 transition-colors shadow-lg" suppressHydrationWarning>
+                      <PlusCircle className="mr-2 h-4 w-4" /> Add New Mentor
                     </Button>
-                  </DialogFooter>
-                </form>
-              </Form>
-            </DialogContent>
-          </Dialog>
-        </CardHeader>
-        <CardContent>
-          {isLoading ? (
-            <div className="flex justify-center items-center py-10">
-              <Loader2 className="h-8 w-8 animate-spin text-primary" />
-              <span className="ml-2 text-muted-foreground">Loading mentors...</span>
+                  </DialogTrigger>
+                  <DialogContent className="sm:max-w-[600px] bg-gray-800 border-gray-700">
+                    <DialogHeader>
+                      <DialogTitle className="text-2xl font-bold bg-gradient-to-r from-indigo-200 to-purple-300 bg-clip-text text-transparent">
+                        Add New Mentor
+                      </DialogTitle>
+                      <DialogDescription className="text-gray-400">
+                        Fill in the details below to add a new mentor to the platform.
+                      </DialogDescription>
+                    </DialogHeader>
+                    <Form {...form}>
+                      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4 py-4 max-h-[70vh] overflow-y-auto pr-2">
+                        <FormField
+                          control={form.control}
+                          name="name"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel>Full Name</FormLabel>
+                              <FormControl>
+                                <Input placeholder="e.g., Dr. Jane Doe" {...field} disabled={isSubmitting} suppressHydrationWarning />
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+                        <FormField
+                          control={form.control}
+                          name="designation"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel>Designation</FormLabel>
+                              <FormControl>
+                                <Input placeholder="e.g., Lead Innovator, Acme Corp" {...field} disabled={isSubmitting} suppressHydrationWarning />
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+                        <FormField
+                          control={form.control}
+                          name="expertise"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel>Area of Expertise/Mentorship</FormLabel>
+                              <FormControl>
+                                <Input placeholder="e.g., AI & Machine Learning" {...field} disabled={isSubmitting} suppressHydrationWarning />
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+                        <FormField
+                          control={form.control}
+                          name="description"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel>Description / Bio</FormLabel>
+                              <FormControl>
+                                <Textarea 
+                                  placeholder="Brief description of the mentor's background and experience..." 
+                                  {...field} 
+                                  rows={4} 
+                                  disabled={isSubmitting}
+                                  suppressHydrationWarning 
+                                />
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+                        <FormField
+                          control={form.control}
+                          name="email"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel>Email Address</FormLabel>
+                              <FormControl>
+                                <Input 
+                                  type="email" 
+                                  placeholder="mentor@example.com" 
+                                  {...field} 
+                                  disabled={isSubmitting}
+                                  suppressHydrationWarning 
+                                />
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+                        <FormField
+                          control={form.control}
+                          name="profilePictureUrl"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel>Profile Picture URL (Optional)</FormLabel>
+                              <FormControl>
+                                <Input 
+                                  placeholder="https://example.com/avatar.jpg" 
+                                  {...field} 
+                                  value={field.value || ''}
+                                  disabled={isSubmitting}
+                                  suppressHydrationWarning 
+                                />
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+                        <FormField
+                          control={form.control}
+                          name="linkedinUrl"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel>LinkedIn Profile URL (Optional)</FormLabel>
+                              <FormControl>
+                                <Input 
+                                  placeholder="https://linkedin.com/in/username" 
+                                  {...field} 
+                                  value={field.value || ''}
+                                  disabled={isSubmitting}
+                                  suppressHydrationWarning 
+                                />
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+                        <DialogFooter className="mt-6">
+                          <Button 
+                            type="button" 
+                            variant="outline" 
+                            onClick={() => setIsCreateDialogOpen(false)}
+                            disabled={isSubmitting}
+                            suppressHydrationWarning
+                          >
+                            Cancel
+                          </Button>
+                          <Button 
+                            type="submit" 
+                            disabled={isSubmitting}
+                            className="bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700"
+                            suppressHydrationWarning
+                          >
+                            {isSubmitting ? (
+                              <>
+                                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                                Adding...
+                              </>
+                            ) : (
+                              'Add Mentor'
+                            )}
+                          </Button>
+                        </DialogFooter>
+                      </form>
+                    </Form>
+                  </DialogContent>
+                </Dialog>
+              </div>
             </div>
-          ) : error ? (
-            <div className="text-destructive flex flex-col items-center py-10">
-              <AlertCircle className="h-8 w-8 mb-2" />
-              <p className="font-semibold">Error loading mentors</p>
-              <p className="text-sm">{error}</p>
-              <Button onClick={fetchMentors} variant="outline" className="mt-4">Try Again</Button>
+          </CardHeader>
+          <CardContent>
+            <div className="relative mb-6">
+              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                <Search className="h-4 w-4 text-gray-400" />
+              </div>
+              <Input
+                type="text"
+                placeholder="Search mentors by name, email, or expertise..."
+                className="pl-10 bg-gray-750 border-gray-700 focus:border-indigo-500 focus:ring-indigo-500"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                suppressHydrationWarning
+              />
+              {searchQuery && (
+                <button
+                  type="button"
+                  onClick={() => setSearchQuery('')}
+                  className="absolute inset-y-0 right-0 pr-3 flex items-center"
+                  suppressHydrationWarning
+                >
+                  <X className="h-4 w-4 text-gray-400 hover:text-gray-300" />
+                </button>
+              )}
             </div>
-          ) : mentors.length === 0 ? (
-             <div className="text-center py-10">
-                <Users className="mx-auto h-12 w-12 text-muted-foreground mb-4" />
-                <p className="text-muted-foreground">No mentors found. Get started by adding one!</p>
-            </div>
-          ) : (
-            <div className="overflow-x-auto">
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead>Avatar</TableHead>
-                    <TableHead>Name</TableHead>
-                    <TableHead>Designation</TableHead>
-                    <TableHead>Expertise</TableHead>
-                    <TableHead>Email</TableHead>
-                    <TableHead>Added On</TableHead>
-                    <TableHead className="text-right">Actions</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {mentors.map((mentor) => (
-                    <TableRow key={mentor.id}>
-                      <TableCell>
-                        <Avatar className="h-10 w-10">
-                          <AvatarImage src={mentor.profilePictureUrl || `https://placehold.co/100x100/121212/7DF9FF.png?text=${mentor.name.substring(0,2)}`} alt={mentor.name} />
-                          <AvatarFallback>{mentor.name.substring(0,2).toUpperCase()}</AvatarFallback>
-                        </Avatar>
-                      </TableCell>
-                      <TableCell className="font-medium">{mentor.name}</TableCell>
-                      <TableCell>{mentor.designation}</TableCell>
-                      <TableCell>{mentor.expertise}</TableCell>
-                      <TableCell>{mentor.email}</TableCell>
-                       <TableCell>{mentor.createdAt ? format(mentor.createdAt.toDate(), "PP") : 'N/A'}</TableCell>
-                      <TableCell className="text-right space-x-2">
-                        <Button variant="ghost" size="icon" disabled> {/* Placeholder for Edit */}
-                          <Edit className="h-4 w-4" />
-                        </Button>
-                        <Button variant="ghost" size="icon" className="text-destructive hover:text-destructive" disabled> {/* Placeholder for Delete */}
-                          <Trash2 className="h-4 w-4" />
-                        </Button>
-                      </TableCell>
-                    </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
-            </div>
-          )}
-        </CardContent>
-      </Card>
+
+            {isLoading ? (
+              <div className="space-y-4">
+                {[...Array(3)].map((_, i) => (
+                  <div key={i} className="p-4 rounded-lg bg-gray-800/50 border border-gray-700">
+                    <div className="flex items-center space-x-4">
+                      <Skeleton className="h-12 w-12 rounded-full" />
+                      <div className="space-y-2 flex-1">
+                        <Skeleton className="h-4 w-3/4" />
+                        <Skeleton className="h-3 w-1/2" />
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            ) : error ? (
+              <div className="bg-red-900/20 border border-red-800 text-red-200 p-4 rounded-lg flex items-start space-x-3">
+                <AlertCircle className="h-5 w-5 mt-0.5 flex-shrink-0" />
+                <div>
+                  <p className="font-medium">Error loading mentors</p>
+                  <p className="text-sm text-red-300 mt-1">{error}</p>
+                  <Button 
+                    variant="outline" 
+                    size="sm" 
+                    className="mt-3 border-red-800 text-red-200 hover:bg-red-900/30 hover:text-white"
+                    onClick={fetchMentors}
+                    suppressHydrationWarning
+                  >
+                    <RefreshCw className="mr-2 h-3 w-3" /> Try Again
+                  </Button>
+                </div>
+              </div>
+            ) : (
+              <motion.div 
+                className="space-y-4"
+                variants={container}
+                initial="hidden"
+                animate="show"
+              >
+                {filteredMentors.length > 0 ? (
+                  filteredMentors.map((mentor) => (
+                    <motion.div 
+                      key={mentor.id}
+                      variants={item}
+                      className="bg-gray-800/50 rounded-xl border border-gray-700 overflow-hidden transition-all duration-200 hover:border-indigo-500/50"
+                    >
+                      <div 
+                        className="p-4 cursor-pointer flex items-center justify-between"
+                        onClick={() => toggleMentorExpansion(mentor.id)}
+                      >
+                        <div className="flex items-center space-x-4">
+                          <Avatar className="h-12 w-12">
+                            {mentor.profilePictureUrl ? (
+                              <AvatarImage src={mentor.profilePictureUrl} alt={mentor.name} />
+                            ) : null}
+                            <AvatarFallback className="bg-indigo-900/50 text-indigo-300">
+                              {getInitials(mentor.name)}
+                            </AvatarFallback>
+                          </Avatar>
+                          <div>
+                            <h3 className="font-medium text-gray-100">{mentor.name}</h3>
+                            <p className="text-sm text-gray-400">{mentor.designation}</p>
+                          </div>
+                        </div>
+                        <div className="flex items-center space-x-2">
+                          <Badge variant="outline" className="border-indigo-500/50 text-indigo-300">
+                            {mentor.expertise}
+                          </Badge>
+                          {expandedMentor === mentor.id ? (
+                            <ChevronUp className="h-5 w-5 text-gray-400" />
+                          ) : (
+                            <ChevronDown className="h-5 w-5 text-gray-400" />
+                          )}
+                        </div>
+                      </div>
+                      
+                      <AnimatePresence>
+                        {expandedMentor === mentor.id && (
+                          <motion.div
+                            initial={{ opacity: 0, height: 0 }}
+                            animate={{ opacity: 1, height: 'auto' }}
+                            exit={{ opacity: 0, height: 0 }}
+                            transition={{ duration: 0.2 }}
+                            className="overflow-hidden"
+                          >
+                            <div className="px-4 pb-4 pt-2 border-t border-gray-700">
+                              <p className="text-gray-300 text-sm mb-4">{mentor.description}</p>
+                              
+                              <div className="flex flex-wrap gap-3 text-sm">
+                                <a 
+                                  href={`mailto:${mentor.email}`}
+                                  className="inline-flex items-center text-indigo-400 hover:text-indigo-300 transition-colors"
+                                >
+                                  <Mail className="h-4 w-4 mr-1.5" />
+                                  {mentor.email}
+                                </a>
+                                
+                                {mentor.linkedinUrl && (
+                                  <a 
+                                    href={mentor.linkedinUrl} 
+                                    target="_blank" 
+                                    rel="noopener noreferrer"
+                                    className="inline-flex items-center text-blue-400 hover:text-blue-300 transition-colors"
+                                  >
+                                    <Linkedin className="h-4 w-4 mr-1.5" />
+                                    LinkedIn
+                                  </a>
+                                )}
+                                
+                                <span className="text-gray-500 text-xs flex items-center">
+                                  <span className="w-1 h-1 rounded-full bg-gray-500 mr-1.5"></span>
+                                  Added {format(mentor.createdAt?.toDate() || new Date(), 'MMM d, yyyy')}
+                                </span>
+                              </div>
+                              
+                              <div className="mt-4 flex justify-end space-x-2">
+                                <Button 
+                                  variant="outline" 
+                                  size="sm" 
+                                  className="text-amber-400 border-amber-500/30 hover:bg-amber-900/20 hover:text-amber-300"
+                                  onClick={() => {
+                                    // TODO: Implement edit functionality
+                                    toast({
+                                      title: "Edit functionality coming soon",
+                                      description: "The ability to edit mentors will be available in the next update.",
+                                    });
+                                  }}
+                                  suppressHydrationWarning
+                                >
+                                  <Edit className="h-3.5 w-3.5 mr-1.5" />
+                                  Edit
+                                </Button>
+                                <Button 
+                                  variant="outline" 
+                                  size="sm" 
+                                  className="text-red-400 border-red-500/30 hover:bg-red-900/20 hover:text-red-300"
+                                  onClick={() => handleDeleteMentor(mentor.id, mentor.name)}
+                                  suppressHydrationWarning
+                                >
+                                  <Trash2 className="h-3.5 w-3.5 mr-1.5" />
+                                  Delete
+                                </Button>
+                              </div>
+                            </div>
+                          </motion.div>
+                        )}
+                      </AnimatePresence>
+                    </motion.div>
+                  ))
+                ) : (
+                  <motion.div 
+                    variants={item}
+                    className="text-center py-12 bg-gray-800/50 rounded-xl border border-dashed border-gray-700"
+                  >
+                    <Users className="mx-auto h-12 w-12 text-gray-500 mb-4" />
+                    <h3 className="text-lg font-medium text-gray-300">No mentors found</h3>
+                    <p className="mt-1 text-sm text-gray-400">
+                      {searchQuery ? 'Try a different search term' : 'Get started by adding a new mentor'}
+                    </p>
+                  </motion.div>
+                )}
+              </motion.div>
+            )}
+          </CardContent>
+        </Card>
+      </motion.div>
     </div>
   );
 }
