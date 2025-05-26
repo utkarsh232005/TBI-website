@@ -1,4 +1,3 @@
-
 rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
@@ -17,28 +16,31 @@ service cloud.firestore {
 
     // Rules for events
     match /events/{eventId} {
-      allow read: if true; // Allows anyone to read events for the public page
-      allow create: if request.auth != null; // EXAMPLE: For dev. MUST be restricted to admin.
-      // TODO: Add update, delete rules restricted to admin
+      allow read: if true;    // Allows anyone to read events for the public page
+      allow create: if true;  // WARNING: DEVELOPMENT ONLY - Allows anyone to create events.
+                              // Secure this for production (e.g., if request.auth.token.isAdmin == true;)
+      allow update: if true; // Placeholder: No one can update events yet
+      allow delete: if true; // Placeholder: No one can delete events yet
     }
-
-    // Rules for mentors
     match /mentors/{mentorId} {
       allow read: if true; // Allows anyone to read mentors for the public page
-      allow create: if request.auth != null; // EXAMPLE: For dev. MUST be restricted to admin.
-      // TODO: Add update, delete rules restricted to admin
+      allow create: if true; 
+      allow update: if true; // Placeholder: No one can update events yet
+      allow delete: if true;
+      // EXAMPLE: Allow anyone to write for dev. MUST be restricted to admin.
+      // update, delete will be needed later
     }
-
-    // Rules for startups
+     // Rules for startups
     match /startups/{startupId} {
       allow read: if true; // Allows anyone to read startups for the public page
-      allow create: if request.auth != null; // EXAMPLE: Allows any authenticated user to create.
-                                            // In production, ensure your backend action is admin-only.
-                                            // Or, if admin uses Firebase Auth: if request.auth.token.isAdmin == true;
+      allow create: if true; // WARNING: DEVELOPMENT ONLY. Allows anyone to create.
+                                            // In production, ensure your backend action is admin-only,
+                                            // or if admin uses Firebase Auth: if request.auth.token.isAdmin == true;
       allow delete: if request.auth != null; // EXAMPLE: Allows any authenticated user to delete.
                                              // In production, ensure your backend action is admin-only.
                                              // Or, if admin uses Firebase Auth: if request.auth.token.isAdmin == true;
       // TODO: Add update rule restricted to admin
     }
+    // Add other rules for other collections if needed
   }
 }
