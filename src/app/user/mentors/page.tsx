@@ -60,9 +60,9 @@ export default function UserMentorsPage() {
             description: data.description,
             areaOfMentorship: data.expertise,
             email: data.email,
-            avatarUrl: data.profilePictureUrl || \`https://placehold.co/100x100/7DF9FF/121212.png?text=\${encodeURIComponent(data.name.substring(0,2))}\`,
-            backgroundImageUrl: \`https://placehold.co/400x600/121212/1E1E1E.png?text=\${encodeURIComponent(data.name.substring(0,1))}\`,
-            dataAiHintAvatar: \`professional \${data.name.split(' ')[0].toLowerCase()}\`,
+            avatarUrl: data.profilePictureUrl || `https://placehold.co/100x100/7DF9FF/121212.png?text=${encodeURIComponent(data.name.substring(0,2))}`,
+            backgroundImageUrl: `https://placehold.co/400x600/121212/1E1E1E.png?text=${encodeURIComponent(data.name.substring(0,1))}`,
+            dataAiHintAvatar: `professional ${data.name.split(' ')[0].toLowerCase()}`,
             dataAiHintBackground: 'abstract tech design',
             linkedinUrl: data.linkedinUrl,
           });
@@ -74,7 +74,7 @@ export default function UserMentorsPage() {
         if (err.code === 'permission-denied' || (err.message && (err.message.toLowerCase().includes('permission-denied') || err.message.toLowerCase().includes('insufficient permissions')))) {
             detailedError = "Failed to load mentors: Firestore permission issue.";
         } else if (err.message) {
-            detailedError += \` \${err.message}\`;
+            detailedError += ` ${err.message}`;
         }
         setError(detailedError);
       } finally {
