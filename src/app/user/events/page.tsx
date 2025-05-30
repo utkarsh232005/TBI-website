@@ -62,9 +62,9 @@ export default function UserEventsPage() {
             time: data.time,
             venue: data.venue,
             applyLink: data.applyLink,
-            imageUrl: data.imageUrl || \`https://placehold.co/600x400/121212/7DF9FF.png?text=\${encodeURIComponent(data.title.substring(0,10))}\`,
+            imageUrl: data.imageUrl || `https://placehold.co/600x400/121212/7DF9FF.png?text=${encodeURIComponent(data.title.substring(0,10))}`,
             createdAt: data.createdAt,
-            dataAiHint: \`event \${data.title.toLowerCase().split(' ').slice(0,1).join('') || 'general'}\`
+            dataAiHint: `event ${data.title.toLowerCase().split(' ').slice(0,1).join('') || 'general'}`
           });
         });
         setEvents(fetchedEvents);
@@ -127,11 +127,11 @@ export default function UserEventsPage() {
               const cardEvent: Event = {
                 id: eventData.id,
                 title: eventData.title,
-                date: format(new Date(eventData.date.replace(/-/g, '\\/')), "MMMM d, yyyy"),
+                date: format(new Date(eventData.date.replace(/-/g, '\/')), "MMMM d, yyyy"),
                 time: eventData.time,
                 location: eventData.venue,
                 description: eventData.description,
-                imageUrl: eventData.imageUrl || \`https://placehold.co/600x400/121212/7DF9FF.png?text=\${encodeURIComponent(eventData.title.substring(0,10))}\`,
+                imageUrl: eventData.imageUrl || `https://placehold.co/600x400/121212/7DF9FF.png?text=${encodeURIComponent(eventData.title.substring(0,10))}`,
                 dataAiHint: eventData.dataAiHint || 'event general',
                 detailsUrl: eventData.applyLink,
               };
@@ -156,3 +156,4 @@ const fadeInUp = { // Keep if used elsewhere
   hidden: { opacity: 0, y: 20 },
   visible: { opacity: 1, y: 0, transition: { duration: 0.6, ease: "easeOut" } },
 };
+
