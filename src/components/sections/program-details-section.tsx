@@ -11,6 +11,7 @@ import { Button } from '@/components/ui/button';
 import Link from 'next/link'; 
 import { CheckCircle2, Users, DollarSign, CalendarDays, Network, ArrowRight } from 'lucide-react';
 import { motion } from 'framer-motion';
+import { Card, CardHeader, CardContent, CardFooter } from "@/components/ui/card"
 
 const programData = [
   {
