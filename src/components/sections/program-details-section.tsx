@@ -1,12 +1,11 @@
 
 "use client";
 
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card'; // Consolidated import
 import { Button } from '@/components/ui/button';
 import Link from 'next/link';
-import { FileText, Users, DollarSign, Network, ArrowRight, CheckCircle2, Lightbulb, Target } from 'lucide-react';
+import { FileText, Users, DollarSign, Network, ArrowRight } from 'lucide-react';
 import { motion } from 'framer-motion';
-import { Card, CardHeader, CardContent, CardFooter } from "@/components/ui/card"
 
 const programFeatures = [
   {
@@ -14,7 +13,7 @@ const programFeatures = [
     Icon: FileText,
     title: 'Streamlined Application',
     description: 'Our application process is straightforward. Submit your idea, business plan, and team profile. We value passion, viability, and strong teams.',
-    color: "text-sky-400", // Example color, maps to text-accent
+    color: "text-sky-400",
     bgColor: "bg-sky-400/10",
   },
   {
@@ -59,7 +58,7 @@ export default function ProgramDetailsSection() {
   return (
     <motion.section
       id="program"
-      className="py-16 md:py-24 bg-background text-foreground" // Changed to bg-background
+      className="py-16 md:py-24 bg-background text-foreground"
       initial="hidden"
       whileInView="visible"
       viewport={{ once: true, amount: 0.1 }}
