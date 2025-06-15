@@ -1,18 +1,22 @@
 import type { Config } from "tailwindcss";
 
-export default {
-    darkMode: ["class"],
-    content: [
-    "./src/pages/**/*.{js,ts,jsx,tsx,mdx}",
-    "./src/components/**/*.{js,ts,jsx,tsx,mdx}",
+const config: Config = {
+  darkMode: ["class", "dark"],
+  content: [
     "./src/app/**/*.{js,ts,jsx,tsx,mdx}",
+    "./src/components/**/*.{js,ts,jsx,tsx,mdx}",
+    "./src/lib/**/*.{js,ts,jsx,tsx,mdx}",
+    "./src/hooks/**/*.{js,ts,jsx,tsx,mdx}",
   ],
   theme: {
-  	extend: {
+    extend: {
+      borderColor: ({ theme }) => ({
+        DEFAULT: theme('colors.border'),
+      }),
       fontFamily: {
         orbitron: ['var(--font-orbitron)', 'sans-serif'],
         poppins: ['var(--font-poppins)', 'sans-serif'],
-        montserrat: ['var(--font-montserrat)', 'sans-serif'], // Add montserrat
+        montserrat: ['var(--font-montserrat)', 'sans-serif'],
       },
   		colors: {
   			background: 'hsl(var(--background))',
@@ -87,40 +91,21 @@ export default {
   				to: {
   					height: '0'
   				}
-  			},        scroll: {
+  			},
+        scroll: {
           to: {
             transform: 'translateX(calc(-50% - 0.5rem))', 
           },
         },
-        aurora: {
-          '0%': {
-            'background-position': '0% 50%',
-            transform: 'rotate(-5deg) scale(0.9)',
-          },
-          '25%': {
-            'background-position': '50% 100%',
-            transform: 'rotate(5deg) scale(1.1)',
-          },
-          '50%': {
-            'background-position': '100% 50%',
-            transform: 'rotate(-3deg) scale(0.95)',
-          },
-          '75%': {
-            'background-position': '50% 0%',
-            transform: 'rotate(3deg) scale(1.05)',
-          },
-          '100%': {
-            'background-position': '0% 50%',
-            transform: 'rotate(-5deg) scale(0.9)',
-          },
-        },
-  		},  		animation: {
+  		},
+  		animation: {
   			'accordion-down': 'accordion-down 0.2s ease-out',
   			'accordion-up': 'accordion-up 0.2s ease-out',
         'scroll': 'scroll var(--animation-duration, 40s) var(--animation-direction, forwards) linear infinite',
-        'aurora': 'aurora 8s ease-in-out infinite alternate',
   		}
   	}
   },
   plugins: [require("tailwindcss-animate")],
-} satisfies Config;
+};
+
+export default config;

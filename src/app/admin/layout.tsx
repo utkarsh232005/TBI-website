@@ -88,6 +88,12 @@ function AdminLayoutContent({
       disabled: false 
     },
     { 
+      href: "/admin/analysis",
+      label: "Analysis",
+      icon: <BarChart2 className="h-5 w-5" />,
+      disabled: false 
+    },
+    { 
       href: "/admin/settings", 
       label: "Settings", 
       icon: <Settings className="h-5 w-5" />,
@@ -163,7 +169,7 @@ function AdminLayoutContent({
             </nav>
 
             {/* Footer */}
-            <div className="p-2 border-t border-neutral-800">
+            <div className="p-2">
               <SidebarLink
                 link={{
                   href: "/",
@@ -208,7 +214,7 @@ function AdminLayoutContent({
                 </div>
               </div>
               
-              <div className="p-4 border-t border-neutral-800">
+              <div className="p-4">
                 <Link 
                   href="/" 
                   className="flex items-center px-3 py-2.5 rounded-lg text-sm font-medium text-neutral-300 hover:bg-neutral-800/50 hover:text-white transition-colors"

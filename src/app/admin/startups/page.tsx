@@ -36,7 +36,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Rocket, PlusCircle, Loader2, AlertCircle, Edit, Trash2, Search, X, RefreshCw, UploadCloud, ExternalLink } from "lucide-react";
+import { Rocket, PlusCircle, Loader2, AlertCircle, Edit, Trash2, Search, X, RefreshCw, UploadCloud, Info, Globe, ExternalLink } from "lucide-react";
 import { motion, AnimatePresence, Variants } from "framer-motion";
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
@@ -293,50 +293,327 @@ export default function AdminStartupsPage() {
   };
 
   return (
-    <div className="min-h-screen bg-background text-foreground">
-      <motion.div className="container mx-auto px-4 py-8" initial="hidden" animate="show" variants={container}>
-        <Card className="bg-card border-border shadow-xl">
+    <div className="min-h-screen bg-[#121212] text-[#E0E0E0] relative overflow-hidden">
+      {/* Animated gradient background */}
+      <div className="absolute inset-0 bg-[#121212] z-0">
+        <div className="absolute top-0 -left-40 w-96 h-96 bg-purple-700/10 rounded-full filter blur-3xl opacity-20 animate-blob"></div>
+        <div className="absolute top-0 -right-40 w-96 h-96 bg-indigo-700/10 rounded-full filter blur-3xl opacity-20 animate-blob animation-delay-2000"></div>
+        <div className="absolute bottom-0 left-20 w-96 h-96 bg-blue-700/10 rounded-full filter blur-3xl opacity-20 animate-blob animation-delay-4000"></div>
+      </div>
+      <motion.div 
+        className="container mx-auto px-4 py-8 relative z-10"
+        initial="hidden"
+        animate="show"
+        variants={container}
+      >
+        <Card className="bg-gradient-to-b from-[#1E1E1E] to-[#181818] border-[#333333] shadow-2xl rounded-xl overflow-hidden backdrop-blur-sm bg-opacity-80 border-opacity-30">
           <CardHeader>
             <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-6">
               <div>
-                <h1 className="text-3xl font-bold font-montserrat text-accent flex items-center">
-                  <Rocket className="mr-3 h-7 w-7" /> Startups Management
-                </h1>
-                <p className="text-muted-foreground">Manage featured startups for the landing page.</p>
+                <div className="relative">
+                  <h1 className="text-3xl font-bold bg-gradient-to-r from-indigo-400 via-purple-500 to-indigo-400 bg-clip-text text-transparent bg-size-200 animate-gradient-x">
+                    Featured Startups Management
+                  </h1>
+                  <div className="absolute -bottom-2 left-0 w-24 h-1 bg-gradient-to-r from-indigo-500 to-purple-500 rounded-full"></div>
+                </div>
+                <p className="text-gray-400 mt-4 flex items-center">
+                  <Rocket className="h-4 w-4 mr-2 text-indigo-400" />
+                  Add, view, and manage startups showcased on the landing page.
+                </p>
               </div>
               <div className="flex items-center gap-2">
-                <Button onClick={fetchStartups} variant="outline" size="sm" disabled={isLoading}>
-                  <RefreshCw className={cn("h-4 w-4", isLoading && "animate-spin")} />
+                 <Button 
+                  onClick={fetchStartups} 
+                  variant="outline" 
+                  size="sm" 
+                  disabled={isLoading}
+                  className="border-[#333333] hover:border-indigo-500 text-gray-300 hover:bg-indigo-500/10 transition-all duration-300 shadow-inner shadow-indigo-500/5"
+                  suppressHydrationWarning
+                >
+                  <RefreshCw className={cn("h-4 w-4 transition-transform", isLoading && "animate-spin")} />
                   <span className="ml-2 hidden sm:inline">Refresh</span>
                 </Button>
-                <Button onClick={handleImportStartups} variant="secondary" size="sm" disabled={isImporting}>
-                  {isImporting ? <Loader2 className="animate-spin mr-2"/> : <UploadCloud className="mr-2"/>}
-                  <span className="hidden sm:inline">Import Data</span>
-                </Button>
-                <Button onClick={() => handleOpenFormDialog(null)} className="bg-accent hover:bg-accent/90 text-accent-foreground">
-                  <PlusCircle className="mr-2 h-4 w-4" /> Add New Startup
-                </Button>
+                <Dialog open={isFormDialogOpen} onOpenChange={(isOpen) => {
+                  setIsFormDialogOpen(isOpen);
+                  if (!isOpen) {
+                    form.reset(); // Reset form when dialog closes
+                    setLogoPreview(null);
+                  }
+                }}>
+                  <DialogTrigger asChild>
+                    <Button 
+                      className="relative overflow-hidden bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 transition-all duration-300 shadow-lg text-white group" 
+                      suppressHydrationWarning
+                    >
+                      <span className="absolute inset-0 w-full h-full bg-gradient-to-r from-indigo-600 to-purple-600 opacity-0 group-hover:opacity-100 transition-opacity duration-300 transform scale-x-0 origin-left group-hover:scale-x-100"></span>
+                      <span className="relative flex items-center">
+                        <PlusCircle className="mr-2 h-4 w-4 transition-transform group-hover:rotate-90 duration-300" /> 
+                        <span>Add New Startup</span>
+                      </span>
+                    </Button>
+                  </DialogTrigger>
+                  <DialogContent className="sm:max-w-[600px] bg-gradient-to-b from-[#1E1E1E] to-[#191919] border-[#333333] rounded-xl overflow-hidden shadow-2xl backdrop-filter backdrop-blur-lg border-opacity-40">
+                    <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-indigo-500 to-purple-500"></div>
+                    <DialogHeader>
+                      <DialogTitle className="text-2xl font-bold bg-gradient-to-r from-indigo-200 to-purple-300 bg-clip-text text-transparent">
+                        Add New Startup
+                      </DialogTitle>
+                      <DialogDescription className="text-gray-400">
+                        Fill in the details below to add a new startup.
+                      </DialogDescription>
+                    </DialogHeader>
+                    <Form {...form}>
+                      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4 py-4 max-h-[70vh] overflow-y-auto pr-2">
+                        <FormField
+                          control={form.control}
+                          name="name"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel>Startup Name</FormLabel>
+                              <FormControl>
+                                <div className="relative group">
+                                  <Input 
+                                    placeholder="e.g., Innovatech Solutions" 
+                                    {...field} 
+                                    disabled={isSubmitting} 
+                                    className="bg-[#262626] border-[#333333] focus:border-indigo-500 focus:ring-indigo-500/20 rounded-lg pl-10 transition-all duration-300 group-hover:border-indigo-500/50"
+                                    suppressHydrationWarning
+                                  />
+                                  <div className="absolute left-3 top-2.5 text-gray-500 group-hover:text-indigo-400 transition-colors duration-300">
+                                    <Rocket className="h-4 w-4" />
+                                  </div>
+                                </div>
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+                         <FormField
+                          control={form.control}
+                          name="logoFile"
+                          render={({ field: { onChange, value, ...restField }}) => ( // Destructure field to handle file input
+                            <FormItem>
+                              <FormLabel>Logo Upload</FormLabel>
+                              <FormControl>
+                                <div className="flex items-center gap-4">
+                                  <Input
+                                    type="file"
+                                    accept="image/png, image/jpeg, image/webp, image/svg+xml"
+                                    onChange={handleLogoFileChange}
+                                    disabled={isSubmitting}
+                                    className="bg-[#262626] border-[#333333] focus:border-indigo-500 focus:ring-indigo-500/10 rounded-lg flex-grow file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-indigo-600/10 file:text-indigo-400 hover:file:bg-indigo-600/20"
+                                    {...restField} // Pass rest of the field props
+                                    suppressHydrationWarning
+                                  />
+                                  {logoPreview && (
+                                    <Avatar className="h-16 w-16 rounded-md">
+                                      <AvatarImage src={logoPreview} alt="Logo preview" className="object-contain" />
+                                      <AvatarFallback><UploadCloud /></AvatarFallback>
+                                    </Avatar>
+                                  )}
+                                </div>
+                              </FormControl>
+                              <FormMessage />
+                               <p className="text-xs text-muted-foreground mt-1">Max 5MB. PNG, JPG, WEBP, SVG. If no file is uploaded, provide Logo URL below.</p>
+                            </FormItem>
+                          )}
+                        />
+                        <FormField
+                          control={form.control}
+                          name="logoUrl"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel>Logo URL (Fallback)</FormLabel>
+                              <FormControl>
+                                <div className="relative group">
+                                  <Input 
+                                    placeholder="https://example.com/logo.png" 
+                                    {...field} 
+                                    disabled={isSubmitting} 
+                                    className="bg-[#262626] border-[#333333] focus:border-indigo-500 focus:ring-indigo-500/20 rounded-lg pl-10 transition-all duration-300 group-hover:border-indigo-500/50"
+                                    suppressHydrationWarning
+                                  />
+                                  <div className="absolute left-3 top-2.5 text-gray-500 group-hover:text-indigo-400 transition-colors duration-300">
+                                    <UploadCloud className="h-4 w-4" />
+                                  </div>
+                                </div>
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+                        <FormField
+                          control={form.control}
+                          name="description"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel>Description</FormLabel>
+                              <FormControl>
+                                <div className="relative group">
+                                  <Textarea 
+                                    placeholder="Brief description of the startup..." 
+                                    {...field} 
+                                    rows={3} 
+                                    disabled={isSubmitting} 
+                                    className="bg-[#262626] border-[#333333] focus:border-indigo-500 focus:ring-indigo-500/20 rounded-lg pl-10 pt-3 transition-all duration-300 group-hover:border-indigo-500/50"
+                                    suppressHydrationWarning
+                                  />
+                                  <div className="absolute left-3 top-3 text-gray-500 group-hover:text-indigo-400 transition-colors duration-300">
+                                    <Info className="h-4 w-4" />
+                                  </div>
+                                </div>
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+                        <FormField
+                          control={form.control}
+                          name="badgeText"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel>Badge Text</FormLabel>
+                              <FormControl>
+                                <div className="relative group">
+                                  <Input 
+                                    placeholder="e.g., Seed Funded, Acquired" 
+                                    {...field} 
+                                    disabled={isSubmitting} 
+                                    className="bg-[#262626] border-[#333333] focus:border-indigo-500 focus:ring-indigo-500/20 rounded-lg pl-10 transition-all duration-300 group-hover:border-indigo-500/50"
+                                    suppressHydrationWarning
+                                  />
+                                  <div className="absolute left-3 top-2.5 text-gray-500 group-hover:text-indigo-400 transition-colors duration-300">
+                                    <Badge className="h-4 w-4" />
+                                  </div>
+                                </div>
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+                        <FormField
+                          control={form.control}
+                          name="websiteUrl"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel>Website URL (Optional)</FormLabel>
+                              <FormControl>
+                                <div className="relative group">
+                                  <Input 
+                                    placeholder="https://startupwebsite.com" 
+                                    {...field} 
+                                    value={field.value || ''} 
+                                    disabled={isSubmitting} 
+                                    className="bg-[#262626] border-[#333333] focus:border-indigo-500 focus:ring-indigo-500/20 rounded-lg pl-10 transition-all duration-300 group-hover:border-indigo-500/50"
+                                    suppressHydrationWarning
+                                  />
+                                  <div className="absolute left-3 top-2.5 text-gray-500 group-hover:text-indigo-400 transition-colors duration-300">
+                                    <Globe className="h-4 w-4" />
+                                  </div>
+                                </div>
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+                        <DialogFooter className="mt-6">
+                          <Button 
+                            type="button" 
+                            variant="outline" 
+                            onClick={() => { setIsFormDialogOpen(false); form.reset(); setLogoPreview(null); }} 
+                            disabled={isSubmitting} 
+                            className="border-[#333333] hover:border-indigo-500 text-gray-300"
+                            suppressHydrationWarning
+                          >
+                            Cancel
+                          </Button>
+                          <Button 
+                            type="submit" 
+                            disabled={isSubmitting} 
+                            className="relative overflow-hidden bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white shadow-lg shadow-indigo-600/20 transition-all duration-300"
+                            suppressHydrationWarning
+                          >
+                            <span className="absolute top-0 right-0 px-5 py-1 bg-white/10 transform rotate-45 translate-y-[-25px] translate-x-[25px]"></span>
+                            {isSubmitting ? (
+                              <span className="flex items-center">
+                                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                                <span>Processing...</span>
+                              </span>
+                            ) : (
+                              <span className="flex items-center">
+                                <PlusCircle className="mr-2 h-4 w-4" />
+                                <span>Add Startup</span>
+                              </span>
+                            )}
+                          </Button>
+                        </DialogFooter>
+                      </form>
+                    </Form>
+                  </DialogContent>
+                </Dialog>
               </div>
             </div>
           </CardHeader>
           <CardContent>
-            <div className="relative mb-6">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-              <Input type="text" placeholder="Search startups..." className="pl-10 bg-background border-border focus:border-accent" value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} />
-              {searchQuery && <X onClick={() => setSearchQuery('')} className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground hover:text-foreground cursor-pointer" />}
+            <div className="relative mb-6 group">
+              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none transition-all duration-300 group-focus-within:text-indigo-400">
+                <Search className="h-4 w-4 text-gray-500 group-hover:text-indigo-400 transition-colors duration-300" />
+              </div>
+              <Input
+                type="text"
+                placeholder="Search startups by name, badge, or description..."
+                className="pl-10 bg-[#262626] border-[#333333] focus:border-indigo-500 focus:ring-indigo-500/20 rounded-lg group-hover:border-indigo-500/50 transition-all duration-300 shadow-inner shadow-black/20"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                suppressHydrationWarning
+              />
+              <div className="absolute inset-y-0 right-0 pr-3 flex items-center">
+                {searchQuery ? (
+                  <button 
+                    type="button" 
+                    onClick={() => setSearchQuery('')} 
+                    className="text-gray-500 hover:text-red-400 transition-colors duration-300 focus:outline-none" 
+                    suppressHydrationWarning
+                  >
+                    <X className="h-4 w-4" />
+                  </button>
+                ) : (
+                  <kbd className="hidden md:flex items-center gap-1 text-[10px] font-mono text-gray-500 bg-[#1A1A1A] px-1.5 py-0.5 rounded border border-[#333333]">
+                    <span className="text-xs">⌘</span>K
+                  </kbd>
+                )}
+              </div>
             </div>
 
             {isLoading ? (
               <div className="space-y-3">
-                {[...Array(3)].map((_, i) => <Skeleton key={i} className="h-16 w-full rounded-lg bg-muted" />)}
+                {[...Array(3)].map((_, i) => (
+                  <div key={i} className="p-4 rounded-lg bg-[#242424] border border-[#333333]">
+                    <div className="flex items-center space-x-3">
+                      <Skeleton className="h-10 w-10 rounded-md bg-[#2A2A2A]" />
+                      <div className="space-y-1.5 flex-1">
+                        <Skeleton className="h-4 w-3/5 bg-[#2A2A2A]" />
+                        <Skeleton className="h-3 w-4/5 bg-[#2A2A2A]" />
+                      </div>
+                    </div>
+                  </div>
+                ))}
               </div>
             ) : error ? (
-              <div className="bg-destructive/10 border border-destructive/30 text-destructive p-4 rounded-lg flex items-start space-x-3">
-                <AlertCircle className="h-5 w-5 mt-0.5 flex-shrink-0" />
+               <div className="bg-gradient-to-r from-red-900/20 to-red-900/10 border border-red-800/50 text-red-300 p-6 rounded-lg flex items-start space-x-4 shadow-lg">
+                <div className="bg-red-900/30 p-2 rounded-full">
+                  <AlertCircle className="h-6 w-6 text-red-400" />
+                </div>
                 <div>
                   <p className="font-medium">Error Loading Startups</p>
-                  <p className="text-sm text-destructive/80 mt-1">{error}</p>
-                  <Button variant="outline" size="sm" className="mt-3 border-destructive/30 text-destructive hover:bg-destructive/20" onClick={fetchStartups}>
+                  <p className="text-sm text-red-400 mt-1">{error}</p>
+                   <Button 
+                    variant="outline" 
+                    size="sm" 
+                    className="mt-3 border-red-800 text-red-300 hover:bg-red-900/30 hover:text-red-200" 
+                    onClick={fetchStartups}
+                    suppressHydrationWarning
+                  >
                     <RefreshCw className="mr-2 h-3 w-3" /> Try Again
                   </Button>
                 </div>
@@ -344,39 +621,75 @@ export default function AdminStartupsPage() {
             ) : (
               <motion.div className="overflow-x-auto" variants={container} initial="hidden" animate="show">
                 {filteredStartups.length > 0 ? (
-                  <Table>
-                    <TableHeader>
-                      <TableRow>
-                        <TableHead className="w-[80px]">Logo</TableHead>
-                        <TableHead>Name</TableHead>
-                        <TableHead>Status</TableHead>
-                        <TableHead>Legal Status</TableHead>
-                        <TableHead>Session</TableHead>
-                        <TableHead>Contact</TableHead>
-                        <TableHead className="text-right">Actions</TableHead>
+                  <Table className="border-[#333333]">
+                    <TableHeader className="bg-gradient-to-r from-[#242424] to-[#1E1E1E]">
+                      <TableRow className="border-[#333333] hover:bg-[#2A2A2A]">
+                        <TableHead className="w-[80px] text-indigo-300 font-medium">
+                          <div className="flex items-center">
+                            <UploadCloud className="h-3.5 w-3.5 mr-2" />
+                            <span>Logo</span>
+                          </div>
+                        </TableHead>
+                        <TableHead className="text-indigo-300 font-medium">
+                          <div className="flex items-center">
+                            <Rocket className="h-3.5 w-3.5 mr-2" />
+                            <span>Name</span>
+                          </div>
+                        </TableHead>
+                        <TableHead className="text-indigo-300 font-medium">
+                          <div className="flex items-center">
+                            <Badge className="h-3.5 w-3.5 mr-2" />
+                            <span>Badge</span>
+                          </div>
+                        </TableHead>
+                        <TableHead className="text-indigo-300 font-medium">
+                          <div className="flex items-center">
+                            <Info className="h-3.5 w-3.5 mr-2" />
+                            <span>Description</span>
+                          </div>
+                        </TableHead>
+                        <TableHead className="text-right text-indigo-300 font-medium">
+                          <div className="flex items-center justify-end">
+                            <span>Actions</span>
+                          </div>
+                        </TableHead>
                       </TableRow>
                     </TableHeader>
                     <TableBody>
                       <AnimatePresence>
                         {filteredStartups.map((startup) => (
-                          <motion.tr key={startup.id} variants={itemVariants} initial="hidden" animate="show" exit={{ opacity: 0, x: -20 }} className="hover:bg-muted/50">
+                          <motion.tr 
+                            key={startup.id} 
+                            variants={itemVariants} 
+                            initial="hidden" 
+                            animate="show" 
+                            exit={{ opacity: 0, x: -20 }} 
+                            className="hover:bg-gradient-to-r hover:from-[#242424] hover:to-[#1E1E1E] border-[#333333] transition-colors duration-300"
+                            whileHover={{ scale: 1.01 }}
+                          >
                             <TableCell>
                               <Avatar className="h-10 w-10 rounded-md">
-                                <AvatarImage src={startup.logoUrl} alt={startup.name} className="object-contain" />
-                                <AvatarFallback className="rounded-md bg-muted">{startup.name.substring(0, 2).toUpperCase()}</AvatarFallback>
+                                {startup.logoUrl ? (
+                                  <AvatarImage src={startup.logoUrl} alt={startup.name} className="object-contain" />
+                                ) : null}
+                                <AvatarFallback className="rounded-md bg-[#2A2A2A] text-indigo-300">
+                                  {startup.name.substring(0, 2).toUpperCase()}
+                                </AvatarFallback>
                               </Avatar>
                             </TableCell>
-                            <TableCell className="font-medium text-foreground">{startup.name}</TableCell>
-                            <TableCell><Badge variant="secondary">{startup.status || 'N/A'}</Badge></TableCell>
-                            <TableCell className="text-muted-foreground text-sm">{startup.legalStatus || 'N/A'}</TableCell>
-                            <TableCell className="text-muted-foreground text-sm">{startup.session || 'N/A'}</TableCell>
-                            <TableCell className="text-muted-foreground text-xs">{startup.emailId || 'N/A'}</TableCell>
+                            <TableCell className="font-medium text-gray-200">{startup.name}</TableCell>
+                            <TableCell>
+                              <Badge className="bg-gradient-to-r from-indigo-900/50 to-purple-900/50 text-indigo-300 hover:from-indigo-900/70 hover:to-purple-900/70 border-none transition-colors duration-300 shadow-inner shadow-black/10">
+                                {startup.badgeText}
+                              </Badge>
+                            </TableCell>
+                            <TableCell className="text-gray-400 text-xs max-w-sm truncate">{startup.description}</TableCell>
                             <TableCell className="text-right">
                               <div className="flex items-center justify-end space-x-2">
-                                <Button variant="ghost" size="icon" className="hover:text-accent" onClick={() => handleOpenFormDialog(startup)}>
+                                <Button variant="ghost" size="icon" disabled className="hover:text-indigo-400 text-gray-500" suppressHydrationWarning>
                                   <Edit className="h-4 w-4" />
                                 </Button>
-                                <Button variant="ghost" size="icon" className="hover:text-destructive" onClick={() => handleDeleteClick(startup)}>
+                                <Button variant="ghost" size="icon" disabled className="hover:text-red-400 text-gray-500" suppressHydrationWarning>
                                   <Trash2 className="h-4 w-4" />
                                 </Button>
                                 {startup.websiteUrl && (
@@ -394,10 +707,38 @@ export default function AdminStartupsPage() {
                     </TableBody>
                   </Table>
                 ) : (
-                  <motion.div variants={itemVariants} className="text-center py-12 bg-muted/20 rounded-xl border border-dashed border-border">
-                    <Rocket className="mx-auto h-12 w-12 text-muted-foreground mb-4" />
-                    <h3 className="text-lg font-medium text-foreground">No startups found</h3>
-                    <p className="mt-1 text-sm text-muted-foreground">{searchQuery ? 'Try a different search term' : 'Get started by adding a new startup'}</p>
+                  <motion.div 
+                    variants={itemVariants} 
+                    className="text-center py-12 bg-gradient-to-b from-[#1A1A1A] to-[#161616] rounded-xl border border-dashed border-[#333333] shadow-inner shadow-black/20"
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.5 }}
+                  >
+                    <div className="mb-6 relative">
+                      <div className="absolute inset-0 bg-indigo-600/20 rounded-full blur-xl opacity-70 animate-pulse"></div>
+                      <Rocket className="mx-auto h-16 w-16 text-indigo-300 relative z-10" />
+                    </div>
+                    <h3 className="text-2xl font-medium text-gray-100 mb-2">
+                      {searchQuery ? 'No matching startups found' : 'No startups yet'}
+                    </h3>
+                    <p className="mt-1 text-base text-gray-400 max-w-sm mx-auto">
+                      {searchQuery ? (
+                        'Try a different search term or clear the search to see all startups.'
+                      ) : (
+                        'Get started by adding your first startup to showcase on the landing page.'
+                      )}
+                    </p>
+                    {searchQuery && (
+                      <Button 
+                        onClick={() => setSearchQuery('')} 
+                        variant="outline" 
+                        className="mt-6 border-indigo-500/30 text-indigo-300 hover:bg-indigo-900/20"
+                        suppressHydrationWarning
+                      >
+                        <X className="mr-2 h-4 w-4" />
+                        Clear Search
+                      </Button>
+                    )}
                   </motion.div>
                 )}
               </motion.div>

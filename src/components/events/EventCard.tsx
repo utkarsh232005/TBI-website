@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import { CalendarDays, Clock, MapPin, ExternalLink, ChevronDown, ChevronUp, Edit, Trash2 } from 'lucide-react';
 import { format } from 'date-fns';
 import { Button } from '../ui/button';
@@ -151,7 +151,13 @@ export const EventCard = ({
               
               <div className="mt-4 pt-4 border-t border-gray-800/50 flex flex-wrap items-center justify-between gap-3">
                 <div className="flex items-center gap-2">
-                  <span className="text-xs text-gray-500">Created: {format(new Date(event.createdAt.seconds * 1000), 'MMM d, yyyy')}</span>
+                  <span className="text-xs text-gray-500">
+                    Created: {event.createdAt?.toDate 
+                      ? format(event.createdAt.toDate(), 'MMM d, yyyy')
+                      : event.createdAt?.seconds 
+                        ? format(new Date(event.createdAt.seconds * 1000), 'MMM d, yyyy')
+                        : 'N/A'}
+                  </span>
                 </div>
                 
                 <div className="flex items-center gap-2">
