@@ -11,6 +11,7 @@ import { cn } from "@/lib/utils";
 import { AnimatePresence, motion } from "framer-motion";
 import Image, { ImageProps } from "next/image";
 import { useOutsideClick } from "@/hooks/use-outside-click";
+import { useNavbar } from "@/contexts/navbar-context";
 
 interface CarouselProps {
   items: JSX.Element[];
@@ -212,6 +213,7 @@ export const Card = ({
   const [open, setOpen] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
   const { onCardClose, currentIndex } = useContext(CarouselContext);
+  const { hideNavbar, showNavbar } = useNavbar();
 
   useEffect(() => {
     function onKeyDown(event: KeyboardEvent) {
@@ -222,13 +224,15 @@ export const Card = ({
 
     if (open) {
       document.body.style.overflow = "hidden";
+      hideNavbar(); // Hide navbar when card opens
     } else {
       document.body.style.overflow = "auto";
+      showNavbar(); // Show navbar when card closes
     }
 
     window.addEventListener("keydown", onKeyDown);
     return () => window.removeEventListener("keydown", onKeyDown);
-  }, [open]);
+  }, [open, hideNavbar, showNavbar]);
 
   useOutsideClick(containerRef, () => handleClose());
 
@@ -240,87 +244,164 @@ export const Card = ({
     setOpen(false);
     onCardClose(index);
   };
-
   return (
     <>
       <AnimatePresence>
         {open && (
-          <div className="fixed inset-0 z-50 h-screen overflow-auto">
+          <div className="fixed inset-0 z-[100] h-screen overflow-auto">
             <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
+              transition={{ duration: 0.3, ease: "easeInOut" }}
               className="fixed inset-0 h-full w-full bg-black/80 backdrop-blur-lg"
             />
             <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
+              initial={{ 
+                opacity: 0, 
+                scale: 0.8, 
+                y: 100,
+                rotateX: 15
+              }}
+              animate={{ 
+                opacity: 1, 
+                scale: 1, 
+                y: 0,
+                rotateX: 0
+              }}
+              exit={{ 
+                opacity: 0, 
+                scale: 0.8, 
+                y: 100,
+                rotateX: 15,
+                transition: {
+                  duration: 0.25,
+                  ease: [0.4, 0.0, 0.2, 1]
+                }
+              }}
+              transition={{
+                type: "spring",
+                stiffness: 300,
+                damping: 25,
+                duration: 0.4
+              }}
               ref={containerRef}
               layoutId={layout ? `card-${card.title}` : undefined}
-              className="relative z-[60] mx-auto my-10 h-fit max-w-5xl rounded-3xl bg-card p-4 font-sans md:p-10"
+              className="relative z-[110] mx-auto my-10 h-fit max-w-5xl rounded-3xl bg-card p-4 font-sans md:p-10 shadow-2xl"
+              style={{ 
+                transformPerspective: 1000,
+                transformOrigin: "center center"
+              }}
             >
-              <button
+              <motion.button
                 className="sticky top-4 right-0 ml-auto flex h-8 w-8 items-center justify-center rounded-full bg-accent"
                 onClick={handleClose}
+                whileHover={{ scale: 1.1, rotate: 90 }}
+                whileTap={{ scale: 0.95 }}
+                transition={{ type: "spring", stiffness: 400, damping: 17 }}
               >
                 <X className="h-5 w-5 text-accent-foreground" />
-              </button>
+              </motion.button>
               <motion.p
                 layoutId={layout ? `category-${card.title}` : undefined}
                 className="text-base font-medium text-accent"
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.1, duration: 0.3 }}
               >
                 {card.category}
               </motion.p>
               <motion.p
                 layoutId={layout ? `title-${card.title}` : undefined}
                 className="mt-4 text-2xl font-semibold text-foreground md:text-5xl"
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.2, duration: 0.3 }}
               >
                 {card.title}
               </motion.p>
-              <div className="py-10">{card.content}</div>
+              <motion.div 
+                className="py-10"
+                initial={{ opacity: 0, y: 30 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.3, duration: 0.4 }}
+              >
+                {card.content}
+              </motion.div>
             </motion.div>
           </div>
         )}
       </AnimatePresence>      <motion.button
         layoutId={layout ? `card-${card.title}` : undefined}
         onClick={handleOpen}
-        className="relative z-10 flex aspect-square h-60 w-60 flex-col items-start justify-start overflow-hidden rounded-xl bg-card border border-border md:h-64 md:w-64"
-        initial={{ opacity: 0, scale: 0.95 }}
-        animate={{ opacity: 1, scale: 1 }}
-        transition={{ duration: 0.4, ease: "easeOut" }}
-        whileHover={{ scale: 1.02, transition: { duration: 0.2 } }}
-        style={{ willChange: "transform" }} // Optimize for animations
-      >
-        {/* Background image - moved to lowest z-index */}
-        <div className="absolute inset-0 z-0 bg-muted/10">
+        className="relative z-10 flex aspect-square h-60 w-60 flex-col items-start justify-start overflow-hidden rounded-xl bg-card border border-border md:h-64 md:w-64 group"
+        initial={{ opacity: 0, scale: 0.95, y: 20 }}
+        animate={{ opacity: 1, scale: 1, y: 0 }}
+        transition={{ 
+          duration: 0.4, 
+          ease: "easeOut",
+          delay: index * 0.1 // Stagger animation
+        }}
+        whileHover={{ 
+          scale: 1.05, 
+          y: -8,
+          rotateY: 5,
+          transition: { 
+            type: "spring", 
+            stiffness: 300, 
+            damping: 20 
+          } 
+        }}
+        whileTap={{ 
+          scale: 0.98,
+          transition: { duration: 0.1 }
+        }}
+        style={{ 
+          willChange: "transform",
+          transformStyle: "preserve-3d",
+          transformPerspective: 1000
+        }}
+      >        {/* Background image with enhanced effects */}
+        <div className="absolute inset-0 z-0 bg-muted/10 overflow-hidden">
           <BlurImage
             src={card.src}
             alt={card.title}
             width={500}
             height={500}
-            className="object-cover"
+            className="object-cover transition-transform duration-700 group-hover:scale-110"
           />
+          {/* Animated shine effect on hover */}
+          <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 transform -translate-x-full group-hover:translate-x-full group-hover:duration-1000" />
         </div>
         
-        {/* Gradient overlay */}
-        <div className="pointer-events-none absolute inset-0 z-20 bg-gradient-to-b from-black/50 via-transparent to-transparent" />
+        {/* Enhanced gradient overlay */}
+        <div className="pointer-events-none absolute inset-0 z-20 bg-gradient-to-b from-black/60 via-black/20 to-black/70 group-hover:from-black/40 group-hover:to-black/60 transition-all duration-300" />
         
-        {/* Text content */}
-        <div className="relative z-30 p-5">
+        {/* Floating particles effect */}
+        <div className="absolute inset-0 z-25 opacity-0 group-hover:opacity-100 transition-opacity duration-500">
+          <div className="absolute top-1/4 left-1/4 w-1 h-1 bg-white/30 rounded-full animate-pulse" />
+          <div className="absolute top-3/4 right-1/3 w-0.5 h-0.5 bg-white/40 rounded-full animate-pulse delay-75" />
+          <div className="absolute bottom-1/4 left-1/2 w-0.5 h-0.5 bg-white/30 rounded-full animate-pulse delay-150" />
+        </div>
+        
+        {/* Text content with enhanced animations */}
+        <div className="relative z-30 p-5 group-hover:transform group-hover:translate-y-[-2px] transition-transform duration-300">
           <motion.p
             layoutId={layout ? `category-${card.category}` : undefined}
-            className="text-left font-sans text-sm font-medium text-white md:text-base"
+            className="text-left font-sans text-sm font-medium text-white/90 group-hover:text-white md:text-base transition-colors duration-300"
           >
             {card.category}
           </motion.p>
           <motion.p
             layoutId={layout ? `title-${card.title}` : undefined}
-            className="mt-2 max-w-xs text-left font-sans text-lg font-semibold [text-wrap:balance] text-white md:text-xl"
+            className="mt-2 max-w-xs text-left font-sans text-lg font-semibold [text-wrap:balance] text-white group-hover:text-white/95 md:text-xl transition-colors duration-300"
           >
             {card.title}
           </motion.p>
         </div>
+        
+        {/* Border glow effect */}
+        <div className="absolute inset-0 z-35 rounded-xl border border-transparent group-hover:border-white/20 group-hover:shadow-[0_0_20px_rgba(255,255,255,0.1)] transition-all duration-300" />
       </motion.button>
     </>
   );

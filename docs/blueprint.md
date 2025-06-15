@@ -1,4 +1,4 @@
-# **App Name**: InnoNexus
+# **App Name**: TBI
 
 ## Core Features:
 

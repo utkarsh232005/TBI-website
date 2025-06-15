@@ -3,6 +3,7 @@ import { orbitron, poppins, montserrat } from '@/lib/fonts'; // Import montserra
 import './globals.css';
 import { Toaster } from "@/components/ui/toaster";
 import { ThemeProvider } from "@/components/theme-provider";
+import { NavbarProvider } from "@/contexts/navbar-context";
 
 export const metadata: Metadata = {
   title: 'RCEOM-TBI - Empowering Innovators',
@@ -16,14 +17,15 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" suppressHydrationWarning>
-      <body className={`${orbitron.variable} ${poppins.variable} ${montserrat.variable} font-poppins antialiased`}> {/* Add montserrat.variable */}
-        <ThemeProvider
+      <body className={`${orbitron.variable} ${poppins.variable} ${montserrat.variable} font-poppins antialiased`}> {/* Add montserrat.variable */}        <ThemeProvider
           attribute="class"
           defaultTheme="dark"
           enableSystem
           disableTransitionOnChange
         >
-          {children}
+          <NavbarProvider>
+            {children}
+          </NavbarProvider>
           <Toaster />
         </ThemeProvider>
       </body>

@@ -9,6 +9,7 @@
 import Image from 'next/image';
 // import ContactForm from '@/components/ui/contact-form'; // ContactForm is now used by ApplicationFormDialog
 import { Mail, Phone, MapPin } from 'lucide-react';
+import { AuroraText } from "@/components/magicui/aurora-text";
 
 const contactDetails = [
   { Icon: Mail, text: 'apply@innnexus.com', href: 'mailto:apply@innnexus.com' },
@@ -30,12 +31,9 @@ export default function ContactSection() {
   // If you want a static contact info section, you can keep and simplify this.
   // For now, returning a minimal placeholder or null if it's not meant to be displayed.
   return (
-    <section id="contact-info" className="py-16 md:py-24 bg-card text-foreground">
-      <div className="container mx-auto px-4 sm:px-6 lg:px-8">
+    <section id="contact-info" className="py-16 md:py-24 bg-card text-foreground">      <div className="container mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center mb-12 md:mb-16">
-          <h2 className="font-orbitron text-3xl font-bold tracking-tight sm:text-4xl md:text-5xl text-primary">
-            Contact Us
-          </h2>
+          <AuroraText>Contact Us</AuroraText>
           <p className="mt-4 max-w-2xl mx-auto text-lg text-muted-foreground sm:text-xl">
             Have questions? We'd love to hear from you.
           </p>
