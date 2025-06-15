@@ -36,10 +36,11 @@ service cloud.firestore {
       allow create: if true; // WARNING: DEVELOPMENT ONLY. Allows anyone to create.
                                             // In production, ensure your backend action is admin-only,
                                             // or if admin uses Firebase Auth: if request.auth.token.isAdmin == true;
+      allow update: if request.auth != null; // WARNING: DEVELOPMENT ONLY. Secure for production.
+                                             // Should be restricted to admin: if request.auth.token.isAdmin == true;
       allow delete: if request.auth != null; // EXAMPLE: Allows any authenticated user to delete.
                                              // In production, ensure your backend action is admin-only.
                                              // Or, if admin uses Firebase Auth: if request.auth.token.isAdmin == true;
-      // TODO: Add update rule restricted to admin
     }
     // Add other rules for other collections if needed
   }
