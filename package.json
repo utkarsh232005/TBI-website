@@ -45,6 +45,8 @@
     "firebase": "^11.7.3",
     "framer-motion": "^11.3.8",
     "genkit": "^1.8.0",
+    "google-auth-library": "^10.1.0",
+    "googleapis": "^150.0.1",
     "gsap": "^3.12.5",
     "lucide-react": "^0.475.0",
     "motion": "^10.18.0",
