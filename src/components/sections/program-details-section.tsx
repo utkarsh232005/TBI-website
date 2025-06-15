@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/button';
 import Link from 'next/link';
 import { FileText, Users, DollarSign, Network, ArrowRight, CheckCircle2, Lightbulb, Target } from 'lucide-react';
 import { motion } from 'framer-motion';
+import { Card, CardHeader, CardContent, CardFooter } from "@/components/ui/card"
 
 const programFeatures = [
   {

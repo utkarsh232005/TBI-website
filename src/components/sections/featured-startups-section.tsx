@@ -1,13 +1,12 @@
-
 "use client";
 
-import { BentoGrid, BentoGridItem } from '@/components/ui/bento-grid';
 import { Rocket, Loader2, AlertCircle } from 'lucide-react'; 
 import { motion } from 'framer-motion';
-import Image from 'next/image';
 import { useEffect, useState } from 'react';
 import { db } from '@/lib/firebase';
 import { collection, query, orderBy, getDocs, Timestamp } from 'firebase/firestore';
+import { Carousel, Card } from '@/components/ui/apple-cards-carousel';
+import { Skeleton } from '@/components/ui/skeleton';
 
 interface StartupDoc {
   id: string;
@@ -20,8 +19,32 @@ interface StartupDoc {
   createdAt: Timestamp;
 }
 
+// Skeleton loader for startup cards
+const StartupCardSkeleton = ({ index }: { index: number }) => (
+  <motion.div
+    initial={{ opacity: 0, y: 20 }}
+    animate={{ opacity: 1, y: 0 }}
+    transition={{ duration: 0.5, delay: index * 0.1 }}
+    className="relative z-10 flex aspect-square h-60 w-60 flex-col items-start justify-start overflow-hidden rounded-xl bg-card border border-border md:h-64 md:w-64 flex-shrink-0"
+  >
+    {/* Gradient overlay */}
+    <div className="pointer-events-none absolute inset-x-0 top-0 z-30 h-full bg-gradient-to-b from-black/50 via-transparent to-transparent" />
+    
+    {/* Text content skeleton */}
+    <div className="relative z-40 p-5 space-y-2">
+      <Skeleton className="h-4 w-20 bg-white/20 animate-pulse" />
+      <Skeleton className="h-5 w-32 bg-white/30 animate-pulse" />
+    </div>
+    
+    {/* Background image skeleton with shimmer effect */}
+    <div className="absolute inset-0 z-10 bg-gradient-to-r from-muted/30 via-muted/50 to-muted/30 animate-pulse">
+      <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent animate-shimmer"></div>
+    </div>
+  </motion.div>
+);
+
 // Skeleton for the header, adapted to use theme variables
-const Skeleton = () => (
+const SkeletonHeader = () => (
   <div className="flex flex-1 w-full h-full min-h-[6rem] rounded-xl bg-gradient-to-br from-card to-secondary"></div>
 );
 
@@ -30,20 +53,22 @@ const sectionTitleVariants = {
   visible: { opacity: 1, y: 0, transition: { duration: 0.6, ease: "easeOut" } },
 };
 
-const bentoGridVariants = {
-  hidden: { opacity: 0 },
-  visible: { opacity: 1, transition: { staggerChildren: 0.1, delayChildren: 0.2 } },
-};
-
-const bentoItemVariants = {
-  hidden: { opacity: 0, y: 20 },
-  visible: { opacity: 1, y: 0, transition: { duration: 0.5, ease: "easeOut" } },
-};
-
 export default function FeaturedStartupsSection() {
   const [startups, setStartups] = useState<StartupDoc[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [imagesLoaded, setImagesLoaded] = useState(false);
+  const [preloadedImages, setPreloadedImages] = useState<Set<string>>(new Set());
+
+  // Image preloading function
+  const preloadImage = (src: string): Promise<void> => {
+    return new Promise((resolve, reject) => {
+      const img = new Image();
+      img.onload = () => resolve();
+      img.onerror = () => reject();
+      img.src = src;
+    });
+  };
 
   useEffect(() => {
     const fetchStartups = async () => {
@@ -58,38 +83,78 @@ export default function FeaturedStartupsSection() {
           fetchedStartups.push({ id: doc.id, ...doc.data() } as StartupDoc);
         });
         setStartups(fetchedStartups);
+
+        // Preload all images
+        const imageUrls = fetchedStartups.map(startup => 
+          startup.logoUrl || 
+          `https://placehold.co/500x500/121212/FFFFFF.png?text=${encodeURIComponent(startup.name.substring(0,3))}`
+        );
+
+        try {
+          await Promise.allSettled(imageUrls.map(url => preloadImage(url)));
+          setPreloadedImages(new Set(imageUrls));
+          setImagesLoaded(true);
+        } catch (imgErr) {
+          console.warn("Some images failed to preload, but continuing anyway:", imgErr);
+          setImagesLoaded(true); // Still continue even if some images fail
+        }
+
       } catch (err: any) {
         console.error("Error fetching startups for landing page: ", err);
         setError("Failed to load featured startups. " + err.message);
       } finally {
-        setIsLoading(false);
+        // Only set loading to false after both data and images are ready
+        if (startups.length === 0) {
+          setIsLoading(false);
+        }
       }
     };
     fetchStartups();
   }, []);
 
-  const bentoItems = startups.map((startup, i) => ({
-    id: startup.id,
-    title: startup.name,
-    description: startup.description,
-    header: (
-      <div className="flex flex-1 w-full h-full min-h-[6rem] rounded-xl bg-card-foreground/5 items-center justify-center p-2">
-        <Image
-          src={startup.logoUrl || `https://placehold.co/300x150/121212/FFFFFF.png?text=${encodeURIComponent(startup.name.substring(0,3))}`}
-          alt={`${startup.name} logo`}
-          width={150} 
-          height={75} 
-          style={{ objectFit: 'contain', maxHeight: '100%', maxWidth: '100%' }}
-          data-ai-hint={startup.dataAiHint || "startup logo"}
-          className="rounded-md"
-        />
-      </div>
-    ),
-    icon: <Rocket className="h-4 w-4 text-muted-foreground" />,
-    className: i === 3 ? "md:col-span-2" : "", // Example: make the 4th item larger if 6 items: 0,1,2 (row1), 3 (spans), 4 (row2), 5 (row3)
-                                            // Adjust i === x based on total items and desired layout
-  }));
-  
+  // Set loading to false when both startups and images are ready
+  useEffect(() => {
+    if (startups.length > 0 && imagesLoaded) {
+      // Add a small delay to ensure smooth transition
+      const timer = setTimeout(() => {
+        setIsLoading(false);
+      }, 300);
+      return () => clearTimeout(timer);
+    }
+  }, [startups.length, imagesLoaded]);// Transform startups into cards for the carousel
+  const carouselItems = startups.map((startup, index) => {
+    // Ensure we have a valid image URL with proper fallback
+    const imageUrl = startup.logoUrl || 
+      `https://placehold.co/500x500/121212/FFFFFF.png?text=${encodeURIComponent(startup.name.substring(0,3))}`;
+    
+    return (
+      <Card
+        key={`${startup.id}-${index}`} // More stable key
+        index={index}
+        layout={false} // Disable layout animations to prevent conflicts
+        card={{
+          src: imageUrl,
+          title: startup.name,
+          category: startup.badgeText || "Featured Startup",
+          content: (
+            <div className="text-foreground">
+              <p className="text-lg leading-relaxed">{startup.description}</p>
+              {startup.websiteUrl && (
+                <a 
+                  href={startup.websiteUrl} 
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                  className="mt-6 inline-block px-5 py-2.5 bg-accent text-accent-foreground rounded-md font-medium hover:bg-accent/90 transition-colors"
+                >
+                  Visit Website
+                </a>
+              )}
+            </div>
+          )
+        }}
+      />
+    );
+  });
 
   return (
     <motion.section 
@@ -110,13 +175,37 @@ export default function FeaturedStartupsSection() {
           <p className="mt-4 max-w-2xl mx-auto text-lg text-muted-foreground dark:text-neutral-700 sm:text-xl">
             Meet some of the innovative companies thriving in the RCEOM-TBI ecosystem.
           </p>
-        </motion.div>
-        
-        {isLoading ? (
-          <div className="flex justify-center items-center py-10">
-            <Loader2 className="h-12 w-12 animate-spin text-accent" />
-            <p className="ml-3 text-muted-foreground">Loading startups...</p>
-          </div>
+        </motion.div>        {isLoading ? (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            className="w-full"
+          >
+            <div className="relative w-full">
+              {/* Left vignette effect */}
+              <div className="absolute left-0 top-0 bottom-0 z-[1000] w-[12%] bg-gradient-to-r from-background via-background/60 to-transparent pointer-events-none"></div>
+              
+              {/* Right vignette effect */}
+              <div className="absolute right-0 top-0 bottom-0 z-[1000] w-[12%] bg-gradient-to-l from-background via-background/60 to-transparent pointer-events-none"></div>
+              
+              {/* Skeleton cards container - matches carousel's overflow and gap */}
+              <div className="flex gap-4 md:gap-8 overflow-x-hidden px-4 py-4 scroll-smooth">
+                {[...Array(5)].map((_, index) => (
+                  <StartupCardSkeleton key={index} index={index} />
+                ))}
+              </div>
+            </div>
+            
+            {/* Loading text with subtle animation */}
+            <motion.div 
+              className="flex justify-center items-center mt-6"
+              animate={{ opacity: [0.5, 1, 0.5] }}
+              transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
+            >
+              <Loader2 className="h-5 w-5 animate-spin text-accent mr-2" />
+              <p className="text-muted-foreground">Loading featured startups...</p>
+            </motion.div>
+          </motion.div>
         ) : error ? (
           <div className="text-center py-10 text-destructive">
             <AlertCircle className="mx-auto h-12 w-12 mb-4" />
@@ -132,26 +221,11 @@ export default function FeaturedStartupsSection() {
           </div>
         ) : (
           <motion.div
-            variants={bentoGridVariants}
-            className="max-w-4xl mx-auto" 
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1, transition: { duration: 0.6 } }}
+            className="w-full"
           >
-            <BentoGrid>
-              {bentoItems.map((item) => (
-                <motion.div
-                  key={item.id}
-                  variants={bentoItemVariants}
-                  whileHover={{ scale: 1.02, transition: { type: "spring", stiffness: 300, damping: 15 } }}
-                >
-                  <BentoGridItem
-                    title={item.title}
-                    description={item.description}
-                    header={item.header}
-                    icon={item.icon}
-                    className={item.className} 
-                  />
-                </motion.div>
-              ))}
-            </BentoGrid>
+            <Carousel items={carouselItems} />
           </motion.div>
         )}
       </div>
@@ -159,4 +233,3 @@ export default function FeaturedStartupsSection() {
   );
 }
 
-    

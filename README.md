@@ -1,5 +1,5 @@
-# Firebase Studio
+# RCOEM-TBI
 
-This is a NextJS starter in Firebase Studio.
+This is a NextJS starter webapp.
 
 To get started, take a look at src/app/page.tsx.

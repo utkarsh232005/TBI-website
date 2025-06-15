@@ -70,15 +70,20 @@ export const InfiniteMovingCards = ({
         containerRef.current.style.setProperty("--animation-duration", "80s");
       }
     }
-  };
-  return (
+  };  return (
     <div
       ref={containerRef}
       className={cn(
-        "scroller relative z-20 max-w-7xl overflow-hidden [mask-image:linear-gradient(to_right,transparent,white_20%,white_80%,transparent)]",
+        "scroller relative z-20 max-w-7xl overflow-hidden",
         className,
       )}
     >
+      {/* Left vignette effect */}
+      <div className="absolute left-0 top-0 bottom-0 z-30 w-[15%] bg-gradient-to-r from-background via-background/80 to-transparent pointer-events-none"></div>
+      
+      {/* Right vignette effect */}
+      <div className="absolute right-0 top-0 bottom-0 z-30 w-[15%] bg-gradient-to-l from-background via-background/80 to-transparent pointer-events-none"></div>
+      
       <ul
         ref={scrollerRef}
         className={cn(
