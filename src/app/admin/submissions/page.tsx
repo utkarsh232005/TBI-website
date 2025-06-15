@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, Suspense } from 'react';
 import { Button } from "@/components/ui/button";
 import { FileTextIcon } from "lucide-react";
 import { AlertCircle, Loader2, ThumbsUp, ThumbsDown, KeyRound, UserCircle, CheckCircle, XCircle, Clock, Landmark, Building, RefreshCw, UploadCloud } from "lucide-react";
@@ -21,7 +21,7 @@ interface ProcessingActionState {
   type: 'accept' | 'reject';
 }
 
-export default function AdminSubmissionsPage() {
+function AdminSubmissionsContent() {
   const [submissions, setSubmissions] = useState<Submission[]>([]);
   const [onCampusSubmissions, setOnCampusSubmissions] = useState<Submission[]>([]);
   const [offCampusSubmissions, setOffCampusSubmissions] = useState<Submission[]>([]);
@@ -38,7 +38,7 @@ export default function AdminSubmissionsPage() {
   useEffect(() => {
     const tab = searchParams.get('tab');
     if (tab) {
-      setActiveTab(tab);
+      setActiveTab(tab as 'on-campus' | 'off-campus');
     }
   }, [searchParams]);
 
@@ -262,7 +262,30 @@ export default function AdminSubmissionsPage() {
         isOpen={isModalOpen}
         onClose={handleCloseModal}
         submission={selectedSubmission}
-      />
-    </div>
+      />    </div>
   );
-} 
+}
+
+export default function AdminSubmissionsPage() {
+  return (
+    <Suspense fallback={
+      <div className="space-y-8">
+        <div className="rounded-2xl bg-neutral-900/50 border border-neutral-800/50 overflow-hidden">
+          <div className="p-6 flex flex-col sm:flex-row sm:justify-between items-start sm:items-center">
+            <div>
+              <h2 className="text-xl font-bold text-white flex items-center">
+                <FileTextIcon className="mr-2"/>Submissions
+              </h2>
+              <p className="text-sm text-neutral-400">Loading submissions...</p>
+            </div>
+          </div>
+          <div className="p-6 flex items-center justify-center">
+            <Loader2 className="animate-spin h-8 w-8 text-neutral-400" />
+          </div>
+        </div>
+      </div>
+    }>
+      <AdminSubmissionsContent />
+    </Suspense>
+  );
+}
