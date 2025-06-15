@@ -32,6 +32,7 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -59,6 +60,14 @@ const startupFormSchema = z.object({
   description: z.string().min(10, { message: "Description must be at least 10 characters." }),
   badgeText: z.string().min(2, { message: "Badge text must be at least 2 characters." }),
   websiteUrl: z.string().url({ message: "Please enter a valid website URL." }).optional().or(z.literal('')),
+  funnelSource: z.string().min(1, { message: "Funnel source is required." }),
+  session: z.string().min(1, { message: "Session is required." }),
+  monthYearOfIncubation: z.string().min(1, { message: "Month year of incubation is required." }),
+  status: z.string().min(1, { message: "Status is required." }),
+  legalStatus: z.string().min(1, { message: "Legal status is required." }),
+  rknecEmailId: z.string().email({ message: "Please enter a valid RKNEC email address." }),
+  emailId: z.string().email({ message: "Please enter a valid email address." }),
+  mobileNumber: z.string().min(10, { message: "Mobile number must be at least 10 digits." }).max(15, { message: "Mobile number must not exceed 15 digits." }),
 });
 
 export type StartupFormValues = z.infer<typeof startupFormSchema>;
@@ -70,6 +79,14 @@ export interface StartupDocument {
   description: string;
   badgeText: string;
   websiteUrl?: string;
+  funnelSource: string;
+  session: string;
+  monthYearOfIncubation: string;
+  status: string;
+  legalStatus: string;
+  rknecEmailId: string;
+  emailId: string;
+  mobileNumber: string;
   createdAt: Timestamp;
 }
 
@@ -87,11 +104,22 @@ export default function AdminStartupsPage() {
   const [isImporting, setIsImporting] = useState(false);
   const { toast } = useToast();
   const [logoPreview, setLogoPreview] = useState<string | null>(null);
-
   const form = useForm<StartupFormValues>({
     resolver: zodResolver(startupFormSchema),
     defaultValues: {
-      name: "", logoUrl: "", description: "", badgeText: "", websiteUrl: "",
+      name: "", 
+      logoUrl: "", 
+      description: "", 
+      badgeText: "", 
+      websiteUrl: "",
+      funnelSource: "",
+      session: "",
+      monthYearOfIncubation: "",
+      status: "",
+      legalStatus: "",
+      rknecEmailId: "",
+      emailId: "",
+      mobileNumber: "",
     },
   });
 
@@ -116,14 +144,18 @@ export default function AdminStartupsPage() {
   }, []);
 
   useEffect(() => { fetchStartups(); }, [fetchStartups]);
-
   useEffect(() => {
     const lowercasedQuery = searchQuery.toLowerCase();
     setFilteredStartups(
       startups.filter(startup =>
         startup.name.toLowerCase().includes(lowercasedQuery) ||
         startup.badgeText.toLowerCase().includes(lowercasedQuery) ||
-        startup.description.toLowerCase().includes(lowercasedQuery)
+        startup.description.toLowerCase().includes(lowercasedQuery) ||
+        (startup.status && startup.status.toLowerCase().includes(lowercasedQuery)) ||
+        (startup.legalStatus && startup.legalStatus.toLowerCase().includes(lowercasedQuery)) ||
+        (startup.session && startup.session.toLowerCase().includes(lowercasedQuery)) ||
+        (startup.emailId && startup.emailId.toLowerCase().includes(lowercasedQuery)) ||
+        (startup.funnelSource && startup.funnelSource.toLowerCase().includes(lowercasedQuery))
       )
     );
   }, [searchQuery, startups]);
@@ -140,7 +172,6 @@ export default function AdminStartupsPage() {
       setLogoPreview(editingStartupData?.logoUrl || null); // Revert to original/empty on file removal
     }
   };
-
   const handleOpenFormDialog = (startup: StartupDocument | null = null) => {
     setEditingStartupData(startup);
     if (startup) {
@@ -150,11 +181,34 @@ export default function AdminStartupsPage() {
         description: startup.description,
         badgeText: startup.badgeText,
         websiteUrl: startup.websiteUrl || "",
+        funnelSource: startup.funnelSource || "",
+        session: startup.session || "",
+        monthYearOfIncubation: startup.monthYearOfIncubation || "",
+        status: startup.status || "",
+        legalStatus: startup.legalStatus || "",
+        rknecEmailId: startup.rknecEmailId || "",
+        emailId: startup.emailId || "",
+        mobileNumber: startup.mobileNumber || "",
         logoFile: undefined, // Reset logoFile for edit
       });
       setLogoPreview(startup.logoUrl || null);
     } else {
-      form.reset({ name: "", logoUrl: "", description: "", badgeText: "", websiteUrl: "", logoFile: undefined });
+      form.reset({ 
+        name: "", 
+        logoUrl: "", 
+        description: "", 
+        badgeText: "", 
+        websiteUrl: "", 
+        funnelSource: "",
+        session: "",
+        monthYearOfIncubation: "",
+        status: "",
+        legalStatus: "",
+        rknecEmailId: "",
+        emailId: "",
+        mobileNumber: "",
+        logoFile: undefined 
+      });
       setLogoPreview(null);
     }
     setIsFormDialogOpen(true);
@@ -295,8 +349,10 @@ export default function AdminStartupsPage() {
                       <TableRow>
                         <TableHead className="w-[80px]">Logo</TableHead>
                         <TableHead>Name</TableHead>
-                        <TableHead>Badge</TableHead>
-                        <TableHead>Description</TableHead>
+                        <TableHead>Status</TableHead>
+                        <TableHead>Legal Status</TableHead>
+                        <TableHead>Session</TableHead>
+                        <TableHead>Contact</TableHead>
                         <TableHead className="text-right">Actions</TableHead>
                       </TableRow>
                     </TableHeader>
@@ -311,8 +367,10 @@ export default function AdminStartupsPage() {
                               </Avatar>
                             </TableCell>
                             <TableCell className="font-medium text-foreground">{startup.name}</TableCell>
-                            <TableCell><Badge variant="secondary">{startup.badgeText}</Badge></TableCell>
-                            <TableCell className="text-muted-foreground text-xs max-w-xs truncate" title={startup.description}>{startup.description}</TableCell>
+                            <TableCell><Badge variant="secondary">{startup.status || 'N/A'}</Badge></TableCell>
+                            <TableCell className="text-muted-foreground text-sm">{startup.legalStatus || 'N/A'}</TableCell>
+                            <TableCell className="text-muted-foreground text-sm">{startup.session || 'N/A'}</TableCell>
+                            <TableCell className="text-muted-foreground text-xs">{startup.emailId || 'N/A'}</TableCell>
                             <TableCell className="text-right">
                               <div className="flex items-center justify-end space-x-2">
                                 <Button variant="ghost" size="icon" className="hover:text-accent" onClick={() => handleOpenFormDialog(startup)}>
@@ -352,16 +410,117 @@ export default function AdminStartupsPage() {
         setIsFormDialogOpen(isOpen);
         if (!isOpen) { form.reset(); setLogoPreview(null); setEditingStartupData(null); }
       }}>
-        <DialogContent className="sm:max-w-[600px] bg-card border-border">
+        <DialogContent className="sm:max-w-[900px] max-h-[90vh] bg-card border-border">
           <DialogHeader>
             <DialogTitle className="font-montserrat text-2xl text-accent">{editingStartupData ? "Edit Startup" : "Add New Startup"}</DialogTitle>
             <DialogDescription className="text-muted-foreground">{editingStartupData ? "Update the details of the startup." : "Fill in the details to add a new startup."}</DialogDescription>
           </DialogHeader>
           <Form {...form}>
-            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4 py-4 max-h-[70vh] overflow-y-auto pr-2">
+            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6 py-4 max-h-[60vh] overflow-y-auto pr-2">
               <FormField control={form.control} name="name" render={({ field }) => (
-                <FormItem><FormLabel>Startup Name</FormLabel><FormControl><Input placeholder="e.g., Innovatech" {...field} disabled={isSubmitting} className="bg-background focus:border-accent"/></FormControl><FormMessage /></FormItem>
+                <FormItem><FormLabel>Startup Company Name</FormLabel><FormControl><Input placeholder="e.g., Innovatech" {...field} disabled={isSubmitting} className="bg-background focus:border-accent"/></FormControl><FormMessage /></FormItem>
               )}/>
+              
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <FormField control={form.control} name="funnelSource" render={({ field }) => (
+                  <FormItem><FormLabel>Funnel Source</FormLabel><FormControl>
+                    <Select onValueChange={field.onChange} value={field.value} disabled={isSubmitting}>
+                      <SelectTrigger className="bg-background focus:border-accent">
+                        <SelectValue placeholder="Select funnel source" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="Website">Website</SelectItem>
+                        <SelectItem value="Social Media">Social Media</SelectItem>
+                        <SelectItem value="Referral">Referral</SelectItem>
+                        <SelectItem value="Event">Event</SelectItem>
+                        <SelectItem value="Direct Application">Direct Application</SelectItem>
+                        <SelectItem value="College Network">College Network</SelectItem>
+                        <SelectItem value="Other">Other</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </FormControl><FormMessage /></FormItem>
+                )}/>
+                
+                <FormField control={form.control} name="session" render={({ field }) => (
+                  <FormItem><FormLabel>Session</FormLabel><FormControl>
+                    <Select onValueChange={field.onChange} value={field.value} disabled={isSubmitting}>
+                      <SelectTrigger className="bg-background focus:border-accent">
+                        <SelectValue placeholder="Select session" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="2023-24">2023-24</SelectItem>
+                        <SelectItem value="2024-25">2024-25</SelectItem>
+                        <SelectItem value="2025-26">2025-26</SelectItem>
+                        <SelectItem value="2026-27">2026-27</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </FormControl><FormMessage /></FormItem>
+                )}/>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <FormField control={form.control} name="monthYearOfIncubation" render={({ field }) => (
+                  <FormItem><FormLabel>Month Year of Incubation</FormLabel><FormControl><Input placeholder="e.g., January 2024" {...field} disabled={isSubmitting} className="bg-background focus:border-accent"/></FormControl><FormMessage /></FormItem>
+                )}/>
+                
+                <FormField control={form.control} name="status" render={({ field }) => (
+                  <FormItem><FormLabel>Status</FormLabel><FormControl>
+                    <Select onValueChange={field.onChange} value={field.value} disabled={isSubmitting}>
+                      <SelectTrigger className="bg-background focus:border-accent">
+                        <SelectValue placeholder="Select status" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="Active">Active</SelectItem>
+                        <SelectItem value="Incubating">Incubating</SelectItem>
+                        <SelectItem value="Graduated">Graduated</SelectItem>
+                        <SelectItem value="Pre-Incubation">Pre-Incubation</SelectItem>
+                        <SelectItem value="Alumni">Alumni</SelectItem>
+                        <SelectItem value="Suspended">Suspended</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </FormControl><FormMessage /></FormItem>
+                )}/>
+              </div>
+
+              <FormField control={form.control} name="legalStatus" render={({ field }) => (
+                <FormItem><FormLabel>Legal Status</FormLabel><FormControl>
+                  <Select onValueChange={field.onChange} value={field.value} disabled={isSubmitting}>
+                    <SelectTrigger className="bg-background focus:border-accent">
+                      <SelectValue placeholder="Select legal status" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="Private Limited Company">Private Limited Company</SelectItem>
+                      <SelectItem value="Limited Liability Partnership (LLP)">Limited Liability Partnership (LLP)</SelectItem>
+                      <SelectItem value="Partnership Firm">Partnership Firm</SelectItem>
+                      <SelectItem value="Sole Proprietorship">Sole Proprietorship</SelectItem>
+                      <SelectItem value="MSME SSI">MSME SSI</SelectItem>
+                      <SelectItem value="Not Registered">Not Registered</SelectItem>
+                      <SelectItem value="Other">Other</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </FormControl><FormMessage /></FormItem>
+              )}/>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <FormField control={form.control} name="rknecEmailId" render={({ field }) => (
+                  <FormItem><FormLabel>RKNEC Email ID</FormLabel><FormControl><Input placeholder="example@rknec.edu" {...field} disabled={isSubmitting} className="bg-background focus:border-accent"/></FormControl><FormMessage /></FormItem>
+                )}/>
+                
+                <FormField control={form.control} name="emailId" render={({ field }) => (
+                  <FormItem><FormLabel>Email ID</FormLabel><FormControl><Input placeholder="example@company.com" {...field} disabled={isSubmitting} className="bg-background focus:border-accent"/></FormControl><FormMessage /></FormItem>
+                )}/>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <FormField control={form.control} name="mobileNumber" render={({ field }) => (
+                  <FormItem><FormLabel>Mobile Number</FormLabel><FormControl><Input placeholder="+91 9876543210" {...field} disabled={isSubmitting} className="bg-background focus:border-accent"/></FormControl><FormMessage /></FormItem>
+                )}/>
+                
+                <FormField control={form.control} name="websiteUrl" render={({ field }) => (
+                  <FormItem><FormLabel>Website URL (Optional)</FormLabel><FormControl><Input placeholder="https://startup.com" {...field} value={field.value || ''} disabled={isSubmitting} className="bg-background focus:border-accent"/></FormControl><FormMessage /></FormItem>
+                )}/>
+              </div>
+              
               <FormField control={form.control} name="logoFile" render={({ field }) => (
                 <FormItem><FormLabel>Logo Upload (Optional)</FormLabel>
                   <FormControl><div className="flex items-center gap-4">
@@ -370,18 +529,19 @@ export default function AdminStartupsPage() {
                   </div></FormControl><FormMessage /><p className="text-xs text-muted-foreground mt-1">Max 5MB. If no file, provide Logo URL below.</p>
                 </FormItem>
               )}/>
+              
               <FormField control={form.control} name="logoUrl" render={({ field }) => (
                 <FormItem><FormLabel>Logo URL {form.getValues('logoFile') ? '(Fallback if upload fails)' : ''}</FormLabel><FormControl><Input placeholder="https://example.com/logo.png" {...field} disabled={isSubmitting} className="bg-background focus:border-accent"/></FormControl><FormMessage /></FormItem>
               )}/>
+              
               <FormField control={form.control} name="description" render={({ field }) => (
-                <FormItem><FormLabel>Description</FormLabel><FormControl><Textarea placeholder="Brief description..." {...field} rows={3} disabled={isSubmitting} className="bg-background focus:border-accent"/></FormControl><FormMessage /></FormItem>
+                <FormItem><FormLabel>Description</FormLabel><FormControl><Textarea placeholder="Brief description of the startup..." {...field} rows={3} disabled={isSubmitting} className="bg-background focus:border-accent"/></FormControl><FormMessage /></FormItem>
               )}/>
+              
               <FormField control={form.control} name="badgeText" render={({ field }) => (
-                <FormItem><FormLabel>Badge Text</FormLabel><FormControl><Input placeholder="e.g., Seed Funded" {...field} disabled={isSubmitting} className="bg-background focus:border-accent"/></FormControl><FormMessage /></FormItem>
+                <FormItem><FormLabel>Badge Text</FormLabel><FormControl><Input placeholder="e.g., Seed Funded, Revenue Generation" {...field} disabled={isSubmitting} className="bg-background focus:border-accent"/></FormControl><FormMessage /></FormItem>
               )}/>
-              <FormField control={form.control} name="websiteUrl" render={({ field }) => (
-                <FormItem><FormLabel>Website URL (Optional)</FormLabel><FormControl><Input placeholder="https://startup.com" {...field} value={field.value || ''} disabled={isSubmitting} className="bg-background focus:border-accent"/></FormControl><FormMessage /></FormItem>
-              )}/>
+              
               <DialogFooter className="mt-6">
                 <Button type="button" variant="outline" onClick={() => setIsFormDialogOpen(false)} disabled={isSubmitting} className="hover:border-accent">Cancel</Button>
                 <Button type="submit" disabled={isSubmitting} className="bg-accent hover:bg-accent/90 text-accent-foreground">

@@ -14,6 +14,14 @@ const startupFormSchema = z.object({
   description: z.string().min(10),
   badgeText: z.string().min(2),
   websiteUrl: z.string().url().optional().or(z.literal('')),
+  funnelSource: z.string().min(1),
+  session: z.string().min(1),
+  monthYearOfIncubation: z.string().min(1),
+  status: z.string().min(1),
+  legalStatus: z.string().min(1),
+  rknecEmailId: z.string().email(),
+  emailId: z.string().email(),
+  mobileNumber: z.string().min(10).max(15),
 });
 
 export type StartupFormValues = z.infer<typeof startupFormSchema>;
@@ -57,8 +65,7 @@ export async function createStartupAction(values: StartupFormValues): Promise<Cr
       console.error("Server-side validation failed for startup creation:", validatedValues.error.flatten().fieldErrors);
       return { success: false, message: "Invalid input data for startup. " + JSON.stringify(validatedValues.error.flatten().fieldErrors) };
     }
-    
-    const { name, logoUrl, logoFile, description, badgeText, websiteUrl } = validatedValues.data;
+      const { name, logoUrl, logoFile, description, badgeText, websiteUrl, funnelSource, session, monthYearOfIncubation, status, legalStatus, rknecEmailId, emailId, mobileNumber } = validatedValues.data;
     const finalLogoUrl = determineLogoUrl(name, logoUrl, logoFile);
 
     const startupData = {
@@ -66,7 +73,15 @@ export async function createStartupAction(values: StartupFormValues): Promise<Cr
       logoUrl: finalLogoUrl,
       description,
       badgeText,
-      websiteUrl: websiteUrl || null,
+      websiteUrl: websiteUrl || undefined,
+      funnelSource,
+      session,
+      monthYearOfIncubation,
+      status,
+      legalStatus,
+      rknecEmailId,
+      emailId,
+      mobileNumber,
       createdAt: serverTimestamp(),
       updatedAt: serverTimestamp(),
     };
@@ -97,9 +112,7 @@ export async function updateStartupAction(startupId: string, values: StartupForm
     if (!validatedValues.success) {
       console.error("Server-side validation failed for startup update:", validatedValues.error.flatten().fieldErrors);
       return { success: false, message: "Invalid input data for startup update. " + JSON.stringify(validatedValues.error.flatten().fieldErrors) };
-    }
-
-    const { name, logoUrl, logoFile, description, badgeText, websiteUrl } = validatedValues.data;
+    }    const { name, logoUrl, logoFile, description, badgeText, websiteUrl, funnelSource, session, monthYearOfIncubation, status, legalStatus, rknecEmailId, emailId, mobileNumber } = validatedValues.data;
     const startupDocRef = doc(db, "startups", startupId);
     
     // Determine logo URL - needs careful handling to preserve existing if not changed
@@ -117,7 +130,15 @@ export async function updateStartupAction(startupId: string, values: StartupForm
       name,
       description,
       badgeText,
-      websiteUrl: websiteUrl || null,
+      websiteUrl: websiteUrl || undefined,
+      funnelSource,
+      session,
+      monthYearOfIncubation,
+      status,
+      legalStatus,
+      rknecEmailId,
+      emailId,
+      mobileNumber,
       updatedAt: serverTimestamp(),
     };
 
@@ -195,13 +216,22 @@ export async function importStartupsFromTable(data: StartupRowData[]): Promise<I
   const importErrors: any[] = [];
 
   for (const row of data) {
-    try {
-      const name = row["Startup Name"] || "Unknown Startup";
+    try {      const name = row["Startup Name"] || "Unknown Startup";
       const badgeText = row["Business Category & Industry"] || "General";
       const description = `Startup: ${row["Startup Name"]}. Founded by: ${row["Founder Details"]}. Incubation Stage: ${row["Incubation Stage"]}. Legal Type: ${row["Legal Registration Type"]}. Funding: ${row["Funding Support"]}. Recognition: ${row["Recognition"]}. Category: ${row["Business Category & Industry"]}. Contact: ${row["Contact Information"]}.`;
       
       const logoUrl = `https://placehold.co/300x150/1A1A1A/FFFFFF.png?text=${encodeURIComponent(name.substring(0,3))}`;
       const websiteUrl = ""; // No direct mapping, leave empty
+
+      // Map new required fields with defaults or extracted data
+      const funnelSource = "Direct Application"; // Default value
+      const session = "2024-25"; // Default current session
+      const monthYearOfIncubation = "January 2024"; // Default value
+      const status = row["Incubation Stage"] || "Active"; // Map from existing data
+      const legalStatus = row["Legal Registration Type"] || "Not Registered"; // Map from existing data
+      const rknecEmailId = "contact@rknec.edu"; // Default institutional email
+      const emailId = row["Contact Information"] || "contact@startup.com"; // Extract from contact info or default
+      const mobileNumber = "9876543210"; // Default mobile number
 
       const startupData = {
         name,
@@ -209,6 +239,14 @@ export async function importStartupsFromTable(data: StartupRowData[]): Promise<I
         description,
         badgeText,
         websiteUrl,
+        funnelSource,
+        session,
+        monthYearOfIncubation,
+        status,
+        legalStatus,
+        rknecEmailId,
+        emailId,
+        mobileNumber,
       };
 
       // Validate against the existing schema
