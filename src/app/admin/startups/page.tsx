@@ -36,11 +36,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-<<<<<<< HEAD
-import { Rocket, PlusCircle, Loader2, AlertCircle, Edit, Trash2, Search, X, RefreshCw, UploadCloud, Info, Globe } from "lucide-react";
-=======
-import { Rocket, PlusCircle, Loader2, AlertCircle, Edit, Trash2, Search, X, RefreshCw, UploadCloud, ExternalLink } from "lucide-react";
->>>>>>> d7a0f6bf394223ef6df6c0e132df66210c33bf39
+import { Rocket, PlusCircle, Loader2, AlertCircle, Edit, Trash2, Search, X, RefreshCw, UploadCloud, Info, Globe, ExternalLink } from "lucide-react";
 import { motion, AnimatePresence, Variants } from "framer-motion";
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
@@ -297,7 +293,6 @@ export default function AdminStartupsPage() {
   };
 
   return (
-<<<<<<< HEAD
     <div className="min-h-screen bg-[#121212] text-[#E0E0E0] relative overflow-hidden">
       {/* Animated gradient background */}
       <div className="absolute inset-0 bg-[#121212] z-0">
@@ -338,8 +333,8 @@ export default function AdminStartupsPage() {
                   <RefreshCw className={cn("h-4 w-4 transition-transform", isLoading && "animate-spin")} />
                   <span className="ml-2 hidden sm:inline">Refresh</span>
                 </Button>
-                <Dialog open={isCreateDialogOpen} onOpenChange={(isOpen) => {
-                  setIsCreateDialogOpen(isOpen);
+                <Dialog open={isFormDialogOpen} onOpenChange={(isOpen) => {
+                  setIsFormDialogOpen(isOpen);
                   if (!isOpen) {
                     form.reset(); // Reset form when dialog closes
                     setLogoPreview(null);
@@ -525,7 +520,7 @@ export default function AdminStartupsPage() {
                           <Button 
                             type="button" 
                             variant="outline" 
-                            onClick={() => { setIsCreateDialogOpen(false); form.reset(); setLogoPreview(null); }} 
+                            onClick={() => { setIsFormDialogOpen(false); form.reset(); setLogoPreview(null); }} 
                             disabled={isSubmitting} 
                             className="border-[#333333] hover:border-indigo-500 text-gray-300"
                             suppressHydrationWarning
@@ -556,36 +551,10 @@ export default function AdminStartupsPage() {
                     </Form>
                   </DialogContent>
                 </Dialog>
-=======
-    <div className="min-h-screen bg-background text-foreground">
-      <motion.div className="container mx-auto px-4 py-8" initial="hidden" animate="show" variants={container}>
-        <Card className="bg-card border-border shadow-xl">
-          <CardHeader>
-            <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-6">
-              <div>
-                <h1 className="text-3xl font-bold font-montserrat text-accent flex items-center">
-                  <Rocket className="mr-3 h-7 w-7" /> Startups Management
-                </h1>
-                <p className="text-muted-foreground">Manage featured startups for the landing page.</p>
-              </div>
-              <div className="flex items-center gap-2">
-                <Button onClick={fetchStartups} variant="outline" size="sm" disabled={isLoading}>
-                  <RefreshCw className={cn("h-4 w-4", isLoading && "animate-spin")} />
-                  <span className="ml-2 hidden sm:inline">Refresh</span>
-                </Button>
-                <Button onClick={handleImportStartups} variant="secondary" size="sm" disabled={isImporting}>
-                  {isImporting ? <Loader2 className="animate-spin mr-2"/> : <UploadCloud className="mr-2"/>}
-                  <span className="hidden sm:inline">Import Data</span>
-                </Button>
-                <Button onClick={() => handleOpenFormDialog(null)} className="bg-accent hover:bg-accent/90 text-accent-foreground">
-                  <PlusCircle className="mr-2 h-4 w-4" /> Add New Startup
-                </Button>
->>>>>>> d7a0f6bf394223ef6df6c0e132df66210c33bf39
               </div>
             </div>
           </CardHeader>
           <CardContent>
-<<<<<<< HEAD
             <div className="relative mb-6 group">
               <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none transition-all duration-300 group-focus-within:text-indigo-400">
                 <Search className="h-4 w-4 text-gray-500 group-hover:text-indigo-400 transition-colors duration-300" />
@@ -614,17 +583,10 @@ export default function AdminStartupsPage() {
                   </kbd>
                 )}
               </div>
-=======
-            <div className="relative mb-6">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-              <Input type="text" placeholder="Search startups..." className="pl-10 bg-background border-border focus:border-accent" value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} />
-              {searchQuery && <X onClick={() => setSearchQuery('')} className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground hover:text-foreground cursor-pointer" />}
->>>>>>> d7a0f6bf394223ef6df6c0e132df66210c33bf39
             </div>
 
             {isLoading ? (
               <div className="space-y-3">
-<<<<<<< HEAD
                 {[...Array(3)].map((_, i) => (
                   <div key={i} className="p-4 rounded-lg bg-[#242424] border border-[#333333]">
                     <div className="flex items-center space-x-3">
@@ -652,17 +614,6 @@ export default function AdminStartupsPage() {
                     onClick={fetchStartups}
                     suppressHydrationWarning
                   >
-=======
-                {[...Array(3)].map((_, i) => <Skeleton key={i} className="h-16 w-full rounded-lg bg-muted" />)}
-              </div>
-            ) : error ? (
-              <div className="bg-destructive/10 border border-destructive/30 text-destructive p-4 rounded-lg flex items-start space-x-3">
-                <AlertCircle className="h-5 w-5 mt-0.5 flex-shrink-0" />
-                <div>
-                  <p className="font-medium">Error Loading Startups</p>
-                  <p className="text-sm text-destructive/80 mt-1">{error}</p>
-                  <Button variant="outline" size="sm" className="mt-3 border-destructive/30 text-destructive hover:bg-destructive/20" onClick={fetchStartups}>
->>>>>>> d7a0f6bf394223ef6df6c0e132df66210c33bf39
                     <RefreshCw className="mr-2 h-3 w-3" /> Try Again
                   </Button>
                 </div>
@@ -670,7 +621,6 @@ export default function AdminStartupsPage() {
             ) : (
               <motion.div className="overflow-x-auto" variants={container} initial="hidden" animate="show">
                 {filteredStartups.length > 0 ? (
-<<<<<<< HEAD
                   <Table className="border-[#333333]">
                     <TableHeader className="bg-gradient-to-r from-[#242424] to-[#1E1E1E]">
                       <TableRow className="border-[#333333] hover:bg-[#2A2A2A]">
@@ -703,27 +653,14 @@ export default function AdminStartupsPage() {
                             <span>Actions</span>
                           </div>
                         </TableHead>
-=======
-                  <Table>
-                    <TableHeader>
-                      <TableRow>
-                        <TableHead className="w-[80px]">Logo</TableHead>
-                        <TableHead>Name</TableHead>
-                        <TableHead>Status</TableHead>
-                        <TableHead>Legal Status</TableHead>
-                        <TableHead>Session</TableHead>
-                        <TableHead>Contact</TableHead>
-                        <TableHead className="text-right">Actions</TableHead>
->>>>>>> d7a0f6bf394223ef6df6c0e132df66210c33bf39
                       </TableRow>
                     </TableHeader>
                     <TableBody>
                       <AnimatePresence>
                         {filteredStartups.map((startup) => (
-<<<<<<< HEAD
                           <motion.tr 
                             key={startup.id} 
-                            variants={item} 
+                            variants={itemVariants} 
                             initial="hidden" 
                             animate="show" 
                             exit={{ opacity: 0, x: -20 }} 
@@ -753,26 +690,6 @@ export default function AdminStartupsPage() {
                                   <Edit className="h-4 w-4" />
                                 </Button>
                                 <Button variant="ghost" size="icon" disabled className="hover:text-red-400 text-gray-500" suppressHydrationWarning>
-=======
-                          <motion.tr key={startup.id} variants={itemVariants} initial="hidden" animate="show" exit={{ opacity: 0, x: -20 }} className="hover:bg-muted/50">
-                            <TableCell>
-                              <Avatar className="h-10 w-10 rounded-md">
-                                <AvatarImage src={startup.logoUrl} alt={startup.name} className="object-contain" />
-                                <AvatarFallback className="rounded-md bg-muted">{startup.name.substring(0, 2).toUpperCase()}</AvatarFallback>
-                              </Avatar>
-                            </TableCell>
-                            <TableCell className="font-medium text-foreground">{startup.name}</TableCell>
-                            <TableCell><Badge variant="secondary">{startup.status || 'N/A'}</Badge></TableCell>
-                            <TableCell className="text-muted-foreground text-sm">{startup.legalStatus || 'N/A'}</TableCell>
-                            <TableCell className="text-muted-foreground text-sm">{startup.session || 'N/A'}</TableCell>
-                            <TableCell className="text-muted-foreground text-xs">{startup.emailId || 'N/A'}</TableCell>
-                            <TableCell className="text-right">
-                              <div className="flex items-center justify-end space-x-2">
-                                <Button variant="ghost" size="icon" className="hover:text-accent" onClick={() => handleOpenFormDialog(startup)}>
-                                  <Edit className="h-4 w-4" />
-                                </Button>
-                                <Button variant="ghost" size="icon" className="hover:text-destructive" onClick={() => handleDeleteClick(startup)}>
->>>>>>> d7a0f6bf394223ef6df6c0e132df66210c33bf39
                                   <Trash2 className="h-4 w-4" />
                                 </Button>
                                 {startup.websiteUrl && (
@@ -790,9 +707,8 @@ export default function AdminStartupsPage() {
                     </TableBody>
                   </Table>
                 ) : (
-<<<<<<< HEAD
                   <motion.div 
-                    variants={item} 
+                    variants={itemVariants} 
                     className="text-center py-12 bg-gradient-to-b from-[#1A1A1A] to-[#161616] rounded-xl border border-dashed border-[#333333] shadow-inner shadow-black/20"
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
@@ -823,12 +739,6 @@ export default function AdminStartupsPage() {
                         Clear Search
                       </Button>
                     )}
-=======
-                  <motion.div variants={itemVariants} className="text-center py-12 bg-muted/20 rounded-xl border border-dashed border-border">
-                    <Rocket className="mx-auto h-12 w-12 text-muted-foreground mb-4" />
-                    <h3 className="text-lg font-medium text-foreground">No startups found</h3>
-                    <p className="mt-1 text-sm text-muted-foreground">{searchQuery ? 'Try a different search term' : 'Get started by adding a new startup'}</p>
->>>>>>> d7a0f6bf394223ef6df6c0e132df66210c33bf39
                   </motion.div>
                 )}
               </motion.div>
