@@ -1,21 +1,13 @@
 "use client";
 
-<<<<<<< HEAD
 import { Button } from '@/components/ui/button';
 import Link from 'next/link';
-import { CheckCircle2, Users, DollarSign, HandCoins, IndianRupee, Lightbulb, Landmark, CalendarDays, Network, ArrowRight, Rocket, Star, CreditCard, Building2 } from 'lucide-react';
+import { CheckCircle2, Users,FileText, DollarSign, HandCoins, IndianRupee, Lightbulb, Landmark, CalendarDays, Network, ArrowRight, Rocket, Star, CreditCard, Building2 } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { Card, CardHeader, CardContent, CardFooter } from "@/components/ui/card";
 import { AuroraText } from "@/components/magicui/aurora-text";
 import { AnimatedBeam } from "@/components/magicui/animated-beam";
 import { useRef, useEffect } from 'react';
-=======
-import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card'; // Consolidated import
-import { Button } from '@/components/ui/button';
-import Link from 'next/link';
-import { FileText, Users, DollarSign, Network, ArrowRight } from 'lucide-react';
-import { motion } from 'framer-motion';
->>>>>>> 7fbd3d10183281dbdd133313f2ea8d3efc2825dc
 
 const programFeatures = [
   {
@@ -38,17 +30,9 @@ const programFeatures = [
   },
   {
     id: 'funding',
-<<<<<<< HEAD
     title: 'Funding Opportunities',
     Icon: IndianRupee,
     content: 'RCEOM-TBI provides seed funding for promising startups and facilitates connections with angel investors and venture capital firms. We help you prepare your pitch deck and financial projections to secure the capital needed for growth.',
-=======
-    Icon: DollarSign,
-    title: 'Funding Pathways',
-    description: 'We provide seed funding and connect you with angel investors and VCs. We help prepare your pitch and financial projections.',
-    color: "text-lime-400",
-    bgColor: "bg-lime-400/10",
->>>>>>> 7fbd3d10183281dbdd133313f2ea8d3efc2825dc
   },
   {
     id: 'networking',
@@ -163,7 +147,6 @@ export default function ProgramDetailsSection() {
   }, []);
 
   return (
-<<<<<<< HEAD
     <>      <style jsx>{`
         @keyframes glowBurst {
           0% {
@@ -201,27 +184,11 @@ export default function ProgramDetailsSection() {
       >
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">        <motion.div className="text-center mb-12 md:mb-16" variants={itemVariants}>
           <AuroraText>Our Program</AuroraText>
-=======
-    <motion.section
-      id="program"
-      className="py-16 md:py-24 bg-background text-foreground"
-      initial="hidden"
-      whileInView="visible"
-      viewport={{ once: true, amount: 0.1 }}
-      variants={sectionVariants}
-    >
-      <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-        <motion.div className="text-center mb-12 md:mb-16" variants={itemVariants}>
-          <h2 className="font-montserrat text-3xl font-bold tracking-tight sm:text-4xl md:text-5xl text-accent">
-            Program Highlights
-          </h2>
->>>>>>> 7fbd3d10183281dbdd133313f2ea8d3efc2825dc
           <p className="mt-4 max-w-2xl mx-auto text-lg text-muted-foreground sm:text-xl">
             Discover how RCEOM-TBI fuels your startup's growth and success with these key features.
           </p>
-<<<<<<< HEAD
         </motion.div>        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-6xl mx-auto">
-            {programData.map((item) => (
+            {programFeatures.map((item) => (
               <motion.div
                 key={item.id}
                 variants={itemVariants}
@@ -237,20 +204,24 @@ export default function ProgramDetailsSection() {
                         {item.title}
                       </h3>
                     </div>
-                  </CardHeader>                  <CardContent className="flex-grow">
+                  </CardHeader>
+
+                  <CardContent className="flex-grow">
                     {item.id === 'application' ? (
                       <div className="space-y-6">
                         <p className="text-muted-foreground leading-relaxed">
-                          {item.content}
+                          {item.description}
                         </p>
-                        <div className="relative flex h-32 w-full items-center justify-center overflow-hidden p-8" ref={containerRef}>                        {/* From element - representing submission */}
+                        <div className="relative flex h-32 w-full items-center justify-center overflow-hidden p-8" ref={containerRef}>
+                          {/* From element - representing submission */}
                           <div
                             ref={fromRef}
                             className="z-20 flex size-12 items-center justify-center rounded-full bg-background/90 backdrop-blur-md shadow-lg"
                           >
                             <CheckCircle2 className="h-6 w-6 text-accent" />
                           </div>
-                          {/* To element - representing approval */}                          <div
+                          {/* To element - representing approval */}
+                          <div
                             ref={toRef}
                             className="z-20 flex size-12 items-center justify-center rounded-full bg-background/90 backdrop-blur-md shadow-lg ml-auto"
                           >
@@ -268,312 +239,301 @@ export default function ProgramDetailsSection() {
                         </div>
                         <div className="text-center">
                           <p className="text-sm text-muted-foreground">
-                            Submit → Review → Approval                          </p>
-                        </div>
-                      </div>) : item.id === 'mentorship' ? (                        <div className="space-y-6">
-                          <p className="text-muted-foreground leading-relaxed">
-                            {item.contentP1}
-                          </p>                          <div className="relative flex w-full max-w-[900px] items-center justify-center overflow-hidden p-24 mx-auto" ref={mentorshipContainerRef}>
-                            {/* User Circle - Positioned at far left */}                            <div
-                              ref={mentorshipUserRef}
-                              className="z-10 flex size-12 items-center justify-center rounded-full  bg-background/90 backdrop-blur-md p-3 shadow-[0_0_20px_-12px_rgba(0,0,0,0.8)] absolute left-8"
-                            >
-                              <svg
-                                width="24"
-                                height="24"
-                                viewBox="0 0 24 24"
-                                fill="none"
-                                stroke="currentColor"
-                                strokeWidth="2"
-                                className="text-accent"
-                              >
-                                <path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2" />
-                                <circle cx="12" cy="7" r="4" />
-                              </svg>
-                            </div>
-                              {/* Mentor Circle - Positioned at far right */}                            <div
-                              ref={mentorshipMentorRef}
-                              className="z-10 flex size-12 items-center justify-center rounded-full  bg-background/90 backdrop-blur-md p-3 shadow-[0_0_20px_-12px_rgba(0,0,0,0.8)] absolute right-8"
-                            >
-                              <Users className="h-6 w-6 text-accent" />
-                            </div>
-
-                            {/* Bi-directional animated beams with curvature */}
-                            <AnimatedBeam
-                              containerRef={mentorshipContainerRef}
-                              fromRef={mentorshipUserRef}
-                              toRef={mentorshipMentorRef}
-                              startYOffset={10}
-                              endYOffset={10}
-                              curvature={-20}
-                              className="opacity-75"
-                              duration={2.5}
-                              delay={0}
-                            />
-                            <AnimatedBeam
-                              containerRef={mentorshipContainerRef}
-                              fromRef={mentorshipUserRef}
-                              toRef={mentorshipMentorRef}
-                              startYOffset={-10}
-                              endYOffset={-10}
-                              curvature={20}
-                              reverse
-                              className="opacity-60"
-                              duration={2.8}
-                              delay={1.2}
-                            />
-                          </div>                          <div className="text-center">
-                            <p className="text-sm text-muted-foreground">
-                              Startup ⇄ Mentor
-                            </p>
-                          </div>
-                        </div>
-                      ) : item.id === 'networking' ? (
-                        <div className="space-y-6">
-                          <p className="text-muted-foreground leading-relaxed">
-                            {item.content}
-                          </p>                      <div className="relative flex h-56 w-full items-center justify-center overflow-hidden p-4" ref={networkingContainerRef}>                        {/* Left side - People icon (source) */}
-                            <div
-                              ref={networkingFromRef}
-                              className="z-20 flex size-12 items-center justify-center rounded-full bg-background/90 backdrop-blur-md shadow-lg absolute left-4"
-                            >
-                              <Users className="h-6 w-6 text-accent" />
-                            </div>                        {/* Center - Main networking hub */}                            <div
-                              ref={networkingCenterRef}
-                              className="z-20 flex size-16 items-center justify-center rounded-full bg-background/90 backdrop-blur-md shadow-lg"
-                            >
-                              <Network className="h-8 w-8 text-accent" />
-                            </div>
-
-                            {/* Tree structure - Multiple branches extending from center */}                        {/* Top right branch - Events */}                            <div
-                              ref={networkingTo1Ref}
-                              className="z-20 flex size-12 items-center justify-center rounded-full bg-background/90 backdrop-blur-md shadow-lg absolute top-6 right-6"
-                            >
-                              <CalendarDays className="h-5 w-5 text-accent" />
-                            </div>
-                            {/* Middle right branch - Investors */}
-                            <div
-                              ref={networkingTo2Ref}
-                              className="z-20 flex size-12 items-center justify-center rounded-full bg-background/90 backdrop-blur-md shadow-lg absolute right-4"
-                            >
-                              <IndianRupee className="h-5 w-5 text-accent" />
-                            </div>
-                            {/* Bottom right branch - Network */}
-                            <div
-                              ref={networkingTo3Ref}
-                              className="z-20 flex size-12 items-center justify-center rounded-full bg-background/90 backdrop-blur-md shadow-lg absolute bottom-6 right-6"
-                            >
-                              <Network className="h-5 w-5 text-accent" />
-                            </div>
-                            {/* Extended bottom branch - Partners */}
-                            <div
-                              ref={networkingTo4Ref}
-                              className="z-20 flex size-12 items-center justify-center rounded-full bg-background/90 backdrop-blur-md shadow-lg absolute bottom-2 left-3/4 transform -translate-x-1/2"
-                            >
-                              <Users className="h-5 w-5 text-accent" />
-                            </div>{/* Multiple animated beams */}
-                            {/* From left source to center hub */}
-                            <AnimatedBeam
-                              containerRef={networkingContainerRef}
-                              fromRef={networkingFromRef}
-                              toRef={networkingCenterRef}
-                              className="opacity-75"
-                              duration={2}
-                              delay={0}
-                            />
-                            {/* From center hub to tree branches */}
-                            <AnimatedBeam
-                              containerRef={networkingContainerRef}
-                              fromRef={networkingCenterRef}
-                              toRef={networkingTo1Ref}
-                              className="opacity-75"
-                              duration={2.5}
-                              delay={0.5}
-                            />
-                            <AnimatedBeam
-                              containerRef={networkingContainerRef}
-                              fromRef={networkingCenterRef}
-                              toRef={networkingTo2Ref}
-                              className="opacity-75"
-                              duration={2.8}
-                              delay={0.8}
-                            />
-                            <AnimatedBeam
-                              containerRef={networkingContainerRef}
-                              fromRef={networkingCenterRef}
-                              toRef={networkingTo3Ref}
-                              className="opacity-75"
-                              duration={3.2}
-                              delay={1.1}
-                            />
-                            <AnimatedBeam
-                              containerRef={networkingContainerRef}
-                              fromRef={networkingCenterRef}
-                              toRef={networkingTo4Ref}
-                              className="opacity-75"
-                              duration={3.5}
-                              delay={1.4}
-                            />
-                          </div>
-                          <div className="text-center">
-                            <p className="text-sm text-muted-foreground">
-                              People → Events → Investors → Network → Partners
-                            </p>
-                          </div>
-                        </div>
-                      ) : item.id === 'funding' ? (
-                        <div className="space-y-6">
-                          <p className="text-muted-foreground leading-relaxed">
-                            {item.content}
+                            Submit → Review → Approval
                           </p>
-                          <div className="relative flex h-56 w-full items-center justify-center overflow-hidden p-4" ref={fundingContainerRef}>                        {/* Center - Main funding hub */}                            <div
-                              ref={fundingCenterRef}
-                              className="z-20 flex size-16 items-center justify-center rounded-full bg-background/90 backdrop-blur-md shadow-lg"
-                            >
-                              <IndianRupee className="h-8 w-8 text-accent" />
-                            </div>{/* Multiple funding sources */}                        {/* Grants - Top source */}
-                            <div
-                              ref={fundingFrom1Ref}
-                              className="z-20 flex size-12 items-center justify-center rounded-full bg-background/90 backdrop-blur-md shadow-lg absolute top-2"
-                            >
-                              <Lightbulb className="h-5 w-5 text-accent" />
-                            </div>
-                            {/* Angel Investors - Top left source */}
-                            <div
-                              ref={fundingFrom2Ref}
-                              className="z-20 flex size-12 items-center justify-center rounded-full bg-background/90 backdrop-blur-md shadow-lg absolute top-4 left-8"
-                            >
-                              <Users className="h-5 w-5 text-accent" />
-                            </div>
-                            {/* Crowdfunding - Left source */}
-                            <div
-                              ref={fundingFrom3Ref}
-                              className="z-20 flex size-12 items-center justify-center rounded-full bg-background/90 backdrop-blur-md shadow-lg absolute left-4"
-                            >
-                              <HandCoins className="h-5 w-5 text-accent" />
-                            </div>
-                            {/* VCs - Bottom left source */}
-                            <div
-                              ref={fundingFrom4Ref}
-                              className="z-20 flex size-12 items-center justify-center rounded-full bg-background/90 backdrop-blur-md shadow-lg absolute bottom-4 left-8"
-                            >
-                              <Landmark className="h-5 w-5 text-accent" />
-                            </div>
-                            {/* Bank Loans - Bottom source */}
-                            <div
-                              ref={fundingFrom5Ref}
-                              className="z-20 flex size-12 items-center justify-center rounded-full bg-background/90 backdrop-blur-md shadow-lg absolute bottom-2"
-                            >
-                              <Building2 className="h-5 w-5 text-accent" />
-                            </div>                        {/* Output - Startup/Entrepreneur */}                            <div
-                              ref={fundingToRef}
-                              className="z-20 flex size-12 items-center justify-center rounded-full bg-background/90 backdrop-blur-md shadow-lg absolute right-6"
-                            >
-                              <Rocket className="h-5 w-5 text-accent" />
-                            </div>
-
-                            {/* Animated beams from sources to center */}
-                            <AnimatedBeam
-                              containerRef={fundingContainerRef}
-                              fromRef={fundingFrom1Ref}
-                              toRef={fundingCenterRef}
-                              className="opacity-75"
-                              duration={2}
-                              delay={0}
-                            />
-                            <AnimatedBeam
-                              containerRef={fundingContainerRef}
-                              fromRef={fundingFrom2Ref}
-                              toRef={fundingCenterRef}
-                              className="opacity-75"
-                              duration={2.2}
-                              delay={0.3}
-                            />
-                            <AnimatedBeam
-                              containerRef={fundingContainerRef}
-                              fromRef={fundingFrom3Ref}
-                              toRef={fundingCenterRef}
-                              className="opacity-75"
-                              duration={2.4}
-                              delay={0.6}
-                            />
-                            <AnimatedBeam
-                              containerRef={fundingContainerRef}
-                              fromRef={fundingFrom4Ref}
-                              toRef={fundingCenterRef}
-                              className="opacity-75"
-                              duration={2.6}
-                              delay={0.9}
-                            />
-                            <AnimatedBeam
-                              containerRef={fundingContainerRef}
-                              fromRef={fundingFrom5Ref}
-                              toRef={fundingCenterRef}
-                              className="opacity-75"
-                              duration={2.8}
-                              delay={1.2}
-                            />
-
-                            {/* Animated beam from center to destination */}
-                            <AnimatedBeam
-                              containerRef={fundingContainerRef}
-                              fromRef={fundingCenterRef}
-                              toRef={fundingToRef}
-                              className="opacity-75"
-                              duration={3}
-                              delay={1.5}
-                            />
-                          </div>                      <div className="text-center">
-                            <p className="text-sm text-muted-foreground">
-                              Grants → Angel Investors → Crowdfunding → VCs → Bank Loans → Strategic Investors
-                            </p>
-                          </div>
                         </div>
-                      ) : (
+                      </div>
+                    ) : item.id === 'mentorship' ? (
+                      <div className="space-y-6">
+                        <p className="text-muted-foreground leading-relaxed">
+                          {item.description}
+                        </p>
+                        <div className="relative flex w-full max-w-[900px] items-center justify-center overflow-hidden p-24 mx-auto" ref={mentorshipContainerRef}>
+                          {/* User Circle - Positioned at far left */}
+                          <div
+                            ref={mentorshipUserRef}
+                            className="z-10 flex size-12 items-center justify-center rounded-full  bg-background/90 backdrop-blur-md p-3 shadow-[0_0_20px_-12px_rgba(0,0,0,0.8)] absolute left-8"
+                          >
+                            <svg
+                              width="24"
+                              height="24"
+                              viewBox="0 0 24 24"
+                              fill="none"
+                              stroke="currentColor"
+                              strokeWidth="2"
+                              className="text-accent"
+                            >
+                              <path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2" />
+                              <circle cx="12" cy="7" r="4" />
+                            </svg>
+                          </div>
+                          {/* Mentor Circle - Positioned at far right */}
+                          <div
+                            ref={mentorshipMentorRef}
+                            className="z-10 flex size-12 items-center justify-center rounded-full  bg-background/90 backdrop-blur-md p-3 shadow-[0_0_20px_-12px_rgba(0,0,0,0.8)] absolute right-8"
+                          >
+                            <Users className="h-6 w-6 text-accent" />
+                          </div>
+
+                          {/* Bi-directional animated beams with curvature */}
+                          <AnimatedBeam
+                            containerRef={mentorshipContainerRef}
+                            fromRef={mentorshipUserRef}
+                            toRef={mentorshipMentorRef}
+                            startYOffset={10}
+                            endYOffset={10}
+                            curvature={-20}
+                            className="opacity-75"
+                            duration={2.5}
+                            delay={0}
+                          />
+                          <AnimatedBeam
+                            containerRef={mentorshipContainerRef}
+                            fromRef={mentorshipUserRef}
+                            toRef={mentorshipMentorRef}
+                            startYOffset={-10}
+                            endYOffset={-10}
+                            curvature={20}
+                            reverse
+                            className="opacity-60"
+                            duration={2.8}
+                            delay={1.2}
+                          />
+                        </div>
+                        <div className="text-center">
+                          <p className="text-sm text-muted-foreground">
+                            Startup ⇄ Mentor
+                          </p>
+                        </div>
+                      </div>
+                    ) : item.id === 'networking' ? (
+                      <div className="space-y-6">
+                        <p className="text-muted-foreground leading-relaxed">
+                          {item.description}
+                        </p>
+                        <div className="relative flex h-56 w-full items-center justify-center overflow-hidden p-4" ref={networkingContainerRef}>
+                          {/* Left side - People icon (source) */}
+                          <div
+                            ref={networkingFromRef}
+                            className="z-20 flex size-12 items-center justify-center rounded-full bg-background/90 backdrop-blur-md shadow-lg absolute left-4"
+                          >
+                            <Users className="h-6 w-6 text-accent" />
+                          </div>
+
+                          {/* Center - Main networking hub */}
+                          <div
+                            ref={networkingCenterRef}
+                            className="z-20 flex size-16 items-center justify-center rounded-full bg-background/90 backdrop-blur-md shadow-lg"
+                          >
+                            <Network className="h-8 w-8 text-accent" />
+                          </div>
+
+                          {/* Tree structure - Multiple branches extending from center */}
+                          {/* Top right branch - Events */}
+                          <div
+                            ref={networkingTo1Ref}
+                            className="z-20 flex size-12 items-center justify-center rounded-full bg-background/90 backdrop-blur-md shadow-lg absolute top-6 right-6"
+                          >
+                            <CalendarDays className="h-5 w-5 text-accent" />
+                          </div>
+                          {/* Middle right branch - Investors */}
+                          <div
+                            ref={networkingTo2Ref}
+                            className="z-20 flex size-12 items-center justify-center rounded-full bg-background/90 backdrop-blur-md shadow-lg absolute right-4"
+                          >
+                            <IndianRupee className="h-5 w-5 text-accent" />
+                          </div>
+                          {/* Bottom right branch - Network */}
+                          <div
+                            ref={networkingTo3Ref}
+                            className="z-20 flex size-12 items-center justify-center rounded-full bg-background/90 backdrop-blur-md shadow-lg absolute bottom-6 right-6"
+                          >
+                            <Network className="h-5 w-5 text-accent" />
+                          </div>
+                          {/* Extended bottom branch - Partners */}
+                          <div
+                            ref={networkingTo4Ref}
+                            className="z-20 flex size-12 items-center justify-center rounded-full bg-background/90 backdrop-blur-md shadow-lg absolute bottom-2 left-3/4 transform -translate-x-1/2"
+                          >
+                            <Users className="h-5 w-5 text-accent" />
+                          </div>
+
+                          {/* Multiple animated beams */}
+                          {/* From left source to center hub */}
+                          <AnimatedBeam
+                            containerRef={networkingContainerRef}
+                            fromRef={networkingFromRef}
+                            toRef={networkingCenterRef}
+                            className="opacity-75"
+                            duration={2}
+                            delay={0}
+                          />
+                          {/* From center hub to tree branches */}
+                          <AnimatedBeam
+                            containerRef={networkingContainerRef}
+                            fromRef={networkingCenterRef}
+                            toRef={networkingTo1Ref}
+                            className="opacity-75"
+                            duration={2.5}
+                            delay={0.5}
+                          />
+                          <AnimatedBeam
+                            containerRef={networkingContainerRef}
+                            fromRef={networkingCenterRef}
+                            toRef={networkingTo2Ref}
+                            className="opacity-75"
+                            duration={2.8}
+                            delay={0.8}
+                          />
+                          <AnimatedBeam
+                            containerRef={networkingContainerRef}
+                            fromRef={networkingCenterRef}
+                            toRef={networkingTo3Ref}
+                            className="opacity-75"
+                            duration={3.2}
+                            delay={1.1}
+                          />
+                          <AnimatedBeam
+                            containerRef={networkingContainerRef}
+                            fromRef={networkingCenterRef}
+                            toRef={networkingTo4Ref}
+                            className="opacity-75"
+                            duration={3.5}
+                            delay={1.4}
+                          />
+                        </div>
+                        <div className="text-center">
+                          <p className="text-sm text-muted-foreground">
+                            People → Events → Investors → Network → Partners
+                          </p>
+                        </div>
+                      </div>
+                    ) : item.id === 'funding' ? (
+                      <div className="space-y-6">
+                        <p className="text-muted-foreground leading-relaxed">
+                          RCEOM-TBI provides seed funding for promising startups and facilitates connections with angel investors and venture capital firms. We help you prepare your pitch deck and financial projections to secure the capital needed for growth.
+                        </p>
+                        <div className="relative flex h-56 w-full items-center justify-center overflow-hidden p-4" ref={fundingContainerRef}>
+                          {/* Center - Main funding hub */}
+                          <div
+                            ref={fundingCenterRef}
+                            className="z-20 flex size-16 items-center justify-center rounded-full bg-background/90 backdrop-blur-md shadow-lg"
+                          >
+                            <IndianRupee className="h-8 w-8 text-accent" />
+                          </div>
+
+                          {/* Multiple funding sources */}
+                          {/* Grants - Top source */}
+                          <div
+                            ref={fundingFrom1Ref}
+                            className="z-20 flex size-12 items-center justify-center rounded-full bg-background/90 backdrop-blur-md shadow-lg absolute top-2"
+                          >
+                            <Lightbulb className="h-5 w-5 text-accent" />
+                          </div>
+                          {/* Angel Investors - Top left source */}
+                          <div
+                            ref={fundingFrom2Ref}
+                            className="z-20 flex size-12 items-center justify-center rounded-full bg-background/90 backdrop-blur-md shadow-lg absolute top-4 left-8"
+                          >
+                            <Users className="h-5 w-5 text-accent" />
+                          </div>
+                          {/* Crowdfunding - Left source */}
+                          <div
+                            ref={fundingFrom3Ref}
+                            className="z-20 flex size-12 items-center justify-center rounded-full bg-background/90 backdrop-blur-md shadow-lg absolute left-4"
+                          >
+                            <HandCoins className="h-5 w-5 text-accent" />
+                          </div>
+                          {/* VCs - Bottom left source */}
+                          <div
+                            ref={fundingFrom4Ref}
+                            className="z-20 flex size-12 items-center justify-center rounded-full bg-background/90 backdrop-blur-md shadow-lg absolute bottom-4 left-8"
+                          >
+                            <Landmark className="h-5 w-5 text-accent" />
+                          </div>
+                          {/* Bank Loans - Bottom source */}
+                          <div
+                            ref={fundingFrom5Ref}
+                            className="z-20 flex size-12 items-center justify-center rounded-full bg-background/90 backdrop-blur-md shadow-lg absolute bottom-2"
+                          >
+                            <Building2 className="h-5 w-5 text-accent" />
+                          </div>
+
+                          {/* Output - Startup/Entrepreneur */}
+                          <div
+                            ref={fundingToRef}
+                            className="z-20 flex size-12 items-center justify-center rounded-full bg-background/90 backdrop-blur-md shadow-lg absolute right-6"
+                          >
+                            <Rocket className="h-5 w-5 text-accent" />
+                          </div>
+
+                          {/* Animated beams from sources to center */}
+                          <AnimatedBeam
+                            containerRef={fundingContainerRef}
+                            fromRef={fundingFrom1Ref}
+                            toRef={fundingCenterRef}
+                            className="opacity-75"
+                            duration={2}
+                            delay={0}
+                          />
+                          <AnimatedBeam
+                            containerRef={fundingContainerRef}
+                            fromRef={fundingFrom2Ref}
+                            toRef={fundingCenterRef}
+                            className="opacity-75"
+                            duration={2.2}
+                            delay={0.3}
+                          />
+                          <AnimatedBeam
+                            containerRef={fundingContainerRef}
+                            fromRef={fundingFrom3Ref}
+                            toRef={fundingCenterRef}
+                            className="opacity-75"
+                            duration={2.4}
+                            delay={0.6}
+                          />
+                          <AnimatedBeam
+                            containerRef={fundingContainerRef}
+                            fromRef={fundingFrom4Ref}
+                            toRef={fundingCenterRef}
+                            className="opacity-75"
+                            duration={2.6}
+                            delay={0.9}
+                          />
+                          <AnimatedBeam
+                            containerRef={fundingContainerRef}
+                            fromRef={fundingFrom5Ref}
+                            toRef={fundingCenterRef}
+                            className="opacity-75"
+                            duration={2.8}
+                            delay={1.2}
+                          />
+
+                          {/* Animated beam from center to destination */}
+                          <AnimatedBeam
+                            containerRef={fundingContainerRef}
+                            fromRef={fundingCenterRef}
+                            toRef={fundingToRef}
+                            className="opacity-75"
+                            duration={3}
+                            delay={1.5}
+                          />
+                        </div>
+                        <div className="text-center">
+                          <p className="text-sm text-muted-foreground">
+                            Grants → Angel Investors → Crowdfunding → VCs → Bank Loans → Strategic Investors
+                          </p>
+                        </div>
+                      </div>
+                    ) : (
                       <p className="text-muted-foreground leading-relaxed">
-                        {item.contentP1 || item.content}
+                        {item.description}
                       </p>
                     )}
                   </CardContent>
                 </Card>
               </motion.div>
-            ))}        </div>
-=======
-        </motion.div>
-
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 lg:gap-8">
-          {programFeatures.map((feature) => (
-            <motion.div
-              key={feature.id}
-              variants={itemVariants}
-              className="h-full"
-            >
-              <Card className="flex flex-col h-full bg-card shadow-xl hover:shadow-accent/20 transition-shadow duration-300 rounded-2xl border border-border overflow-hidden">
-                <CardHeader className="p-6">
-                  <div className={`mb-4 inline-flex items-center justify-center rounded-lg p-3 ${feature.bgColor}`}>
-                    <feature.Icon className={`h-8 w-8 ${feature.color}`} />
-                  </div>
-                  <CardTitle className="font-orbitron text-2xl text-card-foreground">
-                    {feature.title}
-                  </CardTitle>
-                </CardHeader>
-                <CardContent className="p-6 pt-0 flex-grow">
-                  <p className="text-muted-foreground">{feature.description}</p>
-                </CardContent>
-                {feature.buttonText && feature.buttonLink && (
-                  <div className="p-6 pt-0 mt-auto">
-                    <Button asChild variant="default" size="lg" className="w-full group bg-accent hover:bg-accent/90 text-accent-foreground">
-                      <Link href={feature.buttonLink}>
-                        {feature.buttonText}
-                        <ArrowRight className="ml-2 h-5 w-5 transition-transform group-hover:translate-x-1" />
-                      </Link>
-                    </Button>
-                  </div>
-                )}
-              </Card>
-            </motion.div>
-          ))}
->>>>>>> 7fbd3d10183281dbdd133313f2ea8d3efc2825dc
+            ))}</div>
         </div>
       </motion.section>
     </>
