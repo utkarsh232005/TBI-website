@@ -3,7 +3,7 @@
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Submission, CampusStatus } from "@/app/admin/dashboard/types";
+import { Submission, CampusStatus } from "@/types/Submission";
 import { format } from 'date-fns';
 import { FileTextIcon, UserCircle, KeyRound, Mail, CalendarDays, FlaskConical, Building, Landmark, Phone, ExternalLink, GraduationCap, User, Info } from "lucide-react";
 import { SubmissionActions } from "@/app/admin/dashboard/components/SubmissionActions";

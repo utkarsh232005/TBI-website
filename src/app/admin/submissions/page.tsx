@@ -32,13 +32,14 @@ function AdminSubmissionsContent() {
   const [activeTab, setActiveTab] = useState<'on-campus' | 'off-campus'>('on-campus');
   const [isImporting, setIsImporting] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [selectedSubmission, setSelectedSubmission] = useState<Submission | null>(null);
-  const searchParams = useSearchParams();
+  const [selectedSubmission, setSelectedSubmission] = useState<Submission | null>(null);  const searchParams = useSearchParams();
 
   useEffect(() => {
-    const tab = searchParams.get('tab');
-    if (tab) {
-      setActiveTab(tab as 'on-campus' | 'off-campus');
+    if (searchParams) {
+      const tab = searchParams.get('tab');
+      if (tab && (tab === 'on-campus' || tab === 'off-campus')) {
+        setActiveTab(tab);
+      }
     }
   }, [searchParams]);
 
