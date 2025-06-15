@@ -8,6 +8,8 @@ import { CampusStatusDialog } from '@/components/ui/campus-status-dialog';
 import { gsap } from 'gsap';
 import { useTheme } from 'next-themes'; // Keep for potential theme-specific logic if needed later
 import { motion } from 'framer-motion';
+import { InteractiveHoverButton } from "@/components/magicui/interactive-hover-button";
+
 
 
 const DUMMY_GOOGLE_FORM_LINK = 'https://docs.google.com/forms/d/e/YOUR_FORM_ID_HERE/viewform?usp=sf_link'; // DUMMY LINK
@@ -121,21 +123,12 @@ export default function HeroSection({ onApplyClick }: HeroSectionProps) {
         >
           Connect & grow with your targeted customers
         </h1>
-        
-        <div 
+          <div 
           ref={buttonsRef}
           className="mt-12 flex flex-col items-center justify-center gap-5 sm:flex-row opacity-0"
         >
-          <div className="relative inline-flex items-center justify-center w-full sm:w-auto group">
-            <div className="absolute transition-all duration-200 rounded-full -inset-px bg-gradient-to-r from-foreground to-accent group-hover:shadow-lg group-hover:shadow-accent/50"></div> {/* from-white to-purple */}
-            <Button
-              size="lg"
-              onClick={handleApplyForIncubationClick}
-              className="relative inline-flex items-center justify-center w-full px-8 py-3 text-base font-normal text-foreground bg-background border border-transparent rounded-full sm:w-auto group"
-            >
-              Apply for Incubation
-              <ArrowRight className="ml-2 h-5 w-5 transition-transform group-hover:translate-x-1" />
-            </Button>
+          <div onClick={handleApplyForIncubationClick}>
+            <InteractiveHoverButton>Apply for the Incubation</InteractiveHoverButton>
           </div>
 
           <Button

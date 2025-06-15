@@ -9,12 +9,13 @@ import AboutSection from '@/components/sections/about-section';
 import FeaturedStartupsSection from '@/components/sections/featured-startups-section';
 import ProgramDetailsSection from '@/components/sections/program-details-section';
 import TestimonialsSection from '@/components/sections/testimonials-section';
+import RcoemSplashScreen from '@/components/sections/rcoem-splash-screen';
 // import ContactSection from '@/components/sections/contact-section'; // No longer directly rendered
 import ApplicationFormDialog from '@/components/ui/application-form-dialog'; // Import the new dialog
 
 export default function HomePage() {
   const [isApplicationFormOpen, setIsApplicationFormOpen] = useState(false);
-
+  const [showMainContent, setShowMainContent] = useState(false);
   const handleOpenApplicationForm = () => {
     // Ensure off-campus users are still handled correctly if they reach here.
     const campusStatusFromStorage = typeof window !== "undefined" ? localStorage.getItem('applicantCampusStatus') as "campus" | "off-campus" | null : null;
@@ -26,6 +27,33 @@ export default function HomePage() {
     }
     setIsApplicationFormOpen(true);
   };
+
+  const handleSplashComplete = () => {
+    setShowMainContent(true);
+  };
+
+  // Show splash screen first, then main content
+  if (!showMainContent) {
+    return (
+      <RcoemSplashScreen onComplete={handleSplashComplete}>
+        <div className="flex flex-col min-h-screen bg-background font-poppins">
+          <MainNavbar onApplyClick={handleOpenApplicationForm} />
+          <main className="flex-grow">
+            <HeroSection onApplyClick={handleOpenApplicationForm} />
+            <AboutSection />
+            <FeaturedStartupsSection />
+            <ProgramDetailsSection />
+            <TestimonialsSection />
+          </main>
+          <Footer />
+          <ApplicationFormDialog 
+            open={isApplicationFormOpen} 
+            onOpenChange={setIsApplicationFormOpen} 
+          />
+        </div>
+      </RcoemSplashScreen>
+    );
+  }
 
   return (
     <div className="flex flex-col min-h-screen bg-background font-poppins">

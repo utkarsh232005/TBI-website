@@ -1,8 +1,9 @@
 
 "use client";
 
-import { InfiniteMovingCards } from '@/components/ui/infinite-moving-cards'; 
+import { InfiniteMovingCards } from '@/components/ui/infinite-moving-cards';
 import { motion } from 'framer-motion';
+import { AuroraText } from "@/components/magicui/aurora-text";
 
 const testimonialsData = [
   {
@@ -52,14 +53,11 @@ export default function TestimonialsSection() {
       whileInView="visible"
       viewport={{ once: true, amount: 0.1 }}
     >
-      <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-        <motion.div 
+      <div className="container mx-auto px-4 sm:px-6 lg:px-8">        <motion.div 
           className="text-center mb-12 md:mb-16"
           variants={sectionTitleVariants}
         >
-          <h2 className="font-montserrat text-3xl font-bold tracking-tight sm:text-4xl md:text-5xl text-accent">
-            Words From Our Innovators
-          </h2>
+          <AuroraText>Words From Our Innovators</AuroraText>
           <p className="mt-4 max-w-2xl mx-auto text-lg text-muted-foreground sm:text-xl">
             Hear what founders say about their journey with RCEOM-TBI.
           </p>

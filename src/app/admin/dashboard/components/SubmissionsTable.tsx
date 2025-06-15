@@ -1,6 +1,6 @@
 import { FileTextIcon, Loader2, AlertCircle, RefreshCw, UserCircle, KeyRound } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Submission, SubmissionStatus, CampusStatus } from "../types";
+import { Submission, SubmissionStatus, CampusStatus } from "@/types/Submission";
 import { StatusBadge } from "./StatusBadge";
 import { CampusBadge } from "./CampusBadge";
 import { format } from 'date-fns';

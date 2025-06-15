@@ -7,6 +7,7 @@ import { db } from '@/lib/firebase';
 import { collection, query, orderBy, getDocs, Timestamp } from 'firebase/firestore';
 import { Carousel, Card } from '@/components/ui/apple-cards-carousel';
 import { Skeleton } from '@/components/ui/skeleton';
+import { AuroraText } from "@/components/magicui/aurora-text";
 
 interface StartupDoc {
   id: string;
@@ -164,18 +165,15 @@ export default function FeaturedStartupsSection() {
       whileInView="visible"
       viewport={{ once: true, amount: 0.1 }}
     >
-      <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-        <motion.div 
+      <div className="container mx-auto px-4 sm:px-6 lg:px-8">        <motion.div 
           className="text-center mb-12 md:mb-16"
           variants={sectionTitleVariants}
         >
-          <h2 className="font-montserrat text-3xl font-bold tracking-tight sm:text-4xl md:text-5xl text-accent">
-            Featured Startups
-          </h2>
+          <AuroraText>Featured Startups</AuroraText>
           <p className="mt-4 max-w-2xl mx-auto text-lg text-muted-foreground dark:text-neutral-700 sm:text-xl">
             Meet some of the innovative companies thriving in the RCEOM-TBI ecosystem.
           </p>
-        </motion.div>        {isLoading ? (
+        </motion.div>{isLoading ? (
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}

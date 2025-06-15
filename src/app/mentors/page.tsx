@@ -9,6 +9,7 @@ import { motion } from 'framer-motion';
 import { db } from '@/lib/firebase';
 import { collection, getDocs, orderBy, query, Timestamp } from 'firebase/firestore';
 import { Loader2, AlertCircle, Users } from 'lucide-react';
+import { AuroraText } from "@/components/magicui/aurora-text";
 
 const pageTitleVariants = {
   hidden: { opacity: 0, y: -20 },
@@ -92,16 +93,13 @@ export default function MentorsPage() {
     <div className="flex flex-col min-h-screen bg-background font-poppins">
       <MainNavbar />
       <main className="flex-grow py-16 md:py-24">
-        <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-          <motion.div 
+        <div className="container mx-auto px-4 sm:px-6 lg:px-8">          <motion.div 
             className="text-center mb-12 md:mb-16"
             initial="hidden"
             animate="visible"
             variants={pageTitleVariants}
           >
-            <h1 className="font-orbitron text-3xl font-bold tracking-tight sm:text-4xl md:text-5xl text-primary">
-              Meet Our Mentors
-            </h1>
+            <AuroraText>Meet Our Mentors</AuroraText>
             <motion.p 
               className="mt-4 max-w-2xl mx-auto text-lg text-muted-foreground sm:text-xl"
               initial={{ opacity: 0, y: 10 }}
