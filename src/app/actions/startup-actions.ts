@@ -62,18 +62,17 @@ export async function createStartupAction(values: StartupFormValues): Promise<Cr
   try {
     const validatedValues = startupFormSchema.safeParse(values);
     if (!validatedValues.success) {
-      console.error("Server-side validation failed for startup creation:", validatedValues.error.flatten().fieldErrors);
-      return { success: false, message: "Invalid input data for startup. " + JSON.stringify(validatedValues.error.flatten().fieldErrors) };
+      console.error("Server-side validation failed for startup creation:", validatedValues.error.flatten().fieldErrors);      return { success: false, message: "Invalid input data for startup. " + JSON.stringify(validatedValues.error.flatten().fieldErrors) };
     }
-      const { name, logoUrl, logoFile, description, badgeText, websiteUrl, funnelSource, session, monthYearOfIncubation, status, legalStatus, rknecEmailId, emailId, mobileNumber } = validatedValues.data;
+    const { name, logoUrl, logoFile, description, badgeText, websiteUrl, funnelSource, session, monthYearOfIncubation, status, legalStatus, rknecEmailId, emailId, mobileNumber } = validatedValues.data;
     const finalLogoUrl = determineLogoUrl(name, logoUrl, logoFile);
-
+    
     const startupData = {
       name,
       logoUrl: finalLogoUrl,
       description,
       badgeText,
-      websiteUrl: websiteUrl || undefined,
+      websiteUrl: websiteUrl || "",  // Use empty string instead of undefined
       funnelSource,
       session,
       monthYearOfIncubation,
@@ -112,7 +111,8 @@ export async function updateStartupAction(startupId: string, values: StartupForm
     if (!validatedValues.success) {
       console.error("Server-side validation failed for startup update:", validatedValues.error.flatten().fieldErrors);
       return { success: false, message: "Invalid input data for startup update. " + JSON.stringify(validatedValues.error.flatten().fieldErrors) };
-    }    const { name, logoUrl, logoFile, description, badgeText, websiteUrl, funnelSource, session, monthYearOfIncubation, status, legalStatus, rknecEmailId, emailId, mobileNumber } = validatedValues.data;
+    }
+    const { name, logoUrl, logoFile, description, badgeText, websiteUrl, funnelSource, session, monthYearOfIncubation, status, legalStatus, rknecEmailId, emailId, mobileNumber } = validatedValues.data;
     const startupDocRef = doc(db, "startups", startupId);
     
     // Determine logo URL - needs careful handling to preserve existing if not changed
@@ -125,12 +125,12 @@ export async function updateStartupAction(startupId: string, values: StartupForm
     // Let's assume the client sends the intended final logoUrl (either existing or new one from URL input, or one from file upload simulation).
     // The current form logic will likely send an empty `logoUrl` if it was cleared, or the existing one if not touched, or a new one if typed.
     // The `determineLogoUrl` will handle the file upload simulation.
-
+    
     const updateData: Partial<StartupFormValues & { updatedAt: any, logoUrl?: string }> = {
       name,
       description,
       badgeText,
-      websiteUrl: websiteUrl || undefined,
+      websiteUrl: websiteUrl || "",  // Use empty string instead of undefined
       funnelSource,
       session,
       monthYearOfIncubation,

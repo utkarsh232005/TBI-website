@@ -353,13 +353,15 @@ export default function AdminStartupsPage() {
                     </Button>
                   </DialogTrigger>
                   <DialogContent className="sm:max-w-[600px] bg-gradient-to-b from-[#1E1E1E] to-[#191919] border-[#333333] rounded-xl overflow-hidden shadow-2xl backdrop-filter backdrop-blur-lg border-opacity-40">
-                    <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-indigo-500 to-purple-500"></div>
-                    <DialogHeader>
+                    <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-indigo-500 to-purple-500"></div>                    <DialogHeader>
                       <DialogTitle className="text-2xl font-bold bg-gradient-to-r from-indigo-200 to-purple-300 bg-clip-text text-transparent">
-                        Add New Startup
+                        {editingStartupData ? "Edit Startup" : "Add New Startup"}
                       </DialogTitle>
                       <DialogDescription className="text-gray-400">
-                        Fill in the details below to add a new startup.
+                        {editingStartupData 
+                          ? "Update the details below to modify the startup information." 
+                          : "Fill in the details below to add a new startup."
+                        }
                       </DialogDescription>
                     </DialogHeader>
                     <Form {...form}>
@@ -686,10 +688,22 @@ export default function AdminStartupsPage() {
                             <TableCell className="text-gray-400 text-xs max-w-sm truncate">{startup.description}</TableCell>
                             <TableCell className="text-right">
                               <div className="flex items-center justify-end space-x-2">
-                                <Button variant="ghost" size="icon" disabled className="hover:text-indigo-400 text-gray-500" suppressHydrationWarning>
+                                <Button 
+                                  variant="ghost" 
+                                  size="icon" 
+                                  onClick={() => handleOpenFormDialog(startup)}
+                                  className="hover:text-indigo-400 text-gray-500 hover:bg-indigo-500/10 transition-colors duration-200" 
+                                  suppressHydrationWarning
+                                >
                                   <Edit className="h-4 w-4" />
                                 </Button>
-                                <Button variant="ghost" size="icon" disabled className="hover:text-red-400 text-gray-500" suppressHydrationWarning>
+                                <Button 
+                                  variant="ghost" 
+                                  size="icon" 
+                                  onClick={() => handleDeleteClick(startup)}
+                                  className="hover:text-red-400 text-gray-500 hover:bg-red-500/10 transition-colors duration-200" 
+                                  suppressHydrationWarning
+                                >
                                   <Trash2 className="h-4 w-4" />
                                 </Button>
                                 {startup.websiteUrl && (
