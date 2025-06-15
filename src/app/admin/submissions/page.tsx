@@ -10,20 +10,11 @@ import { format } from 'date-fns';
 import { useToast } from "@/hooks/use-toast";
 import { processApplicationAction, importOffCampusSubmissionsFromSheet } from '@/app/actions/admin-actions';
 import { SubmissionsTable } from '../dashboard/components/SubmissionsTable';
-
-interface Submission {
-  id: string;
-  name: string;
-  email: string;
-  companyName?: string;
-  idea: string;
-  campusStatus?: "campus" | "off-campus";
-  submittedAt: Date | string;
-  status: "pending" | "accepted" | "rejected";
-  temporaryUserId?: string;
-  temporaryPassword?: string;
-  processedByAdminAt?: Date | string;
-}
+import { OnCampusSubmissionCard } from './components/OnCampusSubmissionCard';
+import { Submission } from '@/types/Submission';
+import { useSearchParams } from 'next/navigation';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import SubmissionDetailModal from './components/SubmissionDetailModal';
 
 interface ProcessingActionState {
   id: string;
@@ -40,6 +31,16 @@ export default function AdminSubmissionsPage() {
   const [processingActionState, setProcessingActionState] = useState<ProcessingActionState | null>(null);
   const [activeTab, setActiveTab] = useState<'on-campus' | 'off-campus'>('on-campus');
   const [isImporting, setIsImporting] = useState(false);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [selectedSubmission, setSelectedSubmission] = useState<Submission | null>(null);
+  const searchParams = useSearchParams();
+
+  useEffect(() => {
+    const tab = searchParams.get('tab');
+    if (tab) {
+      setActiveTab(tab);
+    }
+  }, [searchParams]);
 
   const fetchSubmissions = async () => {
     setIsLoading(true);
@@ -130,20 +131,81 @@ export default function AdminSubmissionsPage() {
     }
   };
 
+  const handleViewDetails = (submission: Submission) => {
+    setSelectedSubmission(submission);
+    setIsModalOpen(true);
+  };
+
+  const handleCloseModal = () => {
+    setIsModalOpen(false);
+    setSelectedSubmission(null);
+  };
+
   const SubmissionsOverview = ({ type }: { type: "on-campus" | "off-campus" }) => {
     const currentSubmissions = type === "on-campus" ? onCampusSubmissions : offCampusSubmissions;
 
-    return (
-      <SubmissionsTable
-        submissions={currentSubmissions}
-        processingAction={processingActionState}
-        onProcessAction={handleProcess}
-        isLoading={isLoading}
-        error={error}
-        onRetry={fetchSubmissions}
-        className="mt-6"
-      />
-    );
+    if (type === "on-campus") {
+      if (isLoading && currentSubmissions.length === 0) {
+        return (
+          <div className="flex items-center justify-center py-10 rounded-xl bg-neutral-900/30">
+            <Loader2 className="mr-3 h-8 w-8 animate-spin text-indigo-400" />
+            <span className="text-neutral-300">Loading on-campus submissions...</span>
+          </div>
+        );
+      }
+    
+      if (error) {
+        return (
+          <div className="flex flex-col items-center justify-center py-10 rounded-xl bg-rose-900/10 border border-rose-900/30">
+            <AlertCircle className="h-10 w-10 text-rose-400 mb-3" />
+            <h3 className="text-lg font-semibold text-rose-100">Error loading data</h3>
+            <p className="text-sm text-rose-300 mt-1 mb-4 text-center max-w-md">{error}</p>
+            <Button 
+              onClick={fetchSubmissions} 
+              variant="outline" 
+              className="border-rose-500/30 text-rose-300 hover:bg-rose-900/30 hover:text-white"
+            >
+              Try Again
+            </Button>
+          </div>
+        );
+      }
+    
+      if (currentSubmissions.length === 0) {
+        return (
+          <div className="text-center py-12 rounded-xl bg-neutral-900/30 border border-dashed border-neutral-700/50">
+            <FileTextIcon className="mx-auto h-12 w-12 text-neutral-500 mb-4" />
+            <h3 className="text-lg font-medium text-neutral-200">No on-campus submissions yet</h3>
+            <p className="text-neutral-400 mt-1">On-campus applications will appear here once submitted</p>
+          </div>
+        );
+      }
+      return (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-6">
+          {currentSubmissions.map(submission => (
+            <OnCampusSubmissionCard
+              key={submission.id}
+              submission={submission}
+              processingAction={processingActionState}
+              onProcessAction={handleProcess}
+              onViewDetails={handleViewDetails}
+            />
+          ))}
+        </div>
+      );
+    } else { // off-campus or any other type using table
+      return (
+        <SubmissionsTable
+          submissions={currentSubmissions}
+          processingAction={processingActionState}
+          onProcessAction={handleProcess}
+          isLoading={isLoading}
+          error={error}
+          onRetry={fetchSubmissions}
+          className="mt-6"
+        />
+      );
+    }
   };
 
   return (
@@ -196,6 +258,11 @@ export default function AdminSubmissionsPage() {
           )}
         </div>
       </div>
+      <SubmissionDetailModal
+        isOpen={isModalOpen}
+        onClose={handleCloseModal}
+        submission={selectedSubmission}
+      />
     </div>
   );
 } 
