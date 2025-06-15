@@ -1,5 +1,6 @@
 "use client";
 
+<<<<<<< HEAD
 import { Button } from '@/components/ui/button';
 import Link from 'next/link';
 import { CheckCircle2, Users, DollarSign, HandCoins, IndianRupee, Lightbulb, Landmark, CalendarDays, Network, ArrowRight, Rocket, Star, CreditCard, Building2 } from 'lucide-react';
@@ -8,31 +9,54 @@ import { Card, CardHeader, CardContent, CardFooter } from "@/components/ui/card"
 import { AuroraText } from "@/components/magicui/aurora-text";
 import { AnimatedBeam } from "@/components/magicui/animated-beam";
 import { useRef, useEffect } from 'react';
+=======
+import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card'; // Consolidated import
+import { Button } from '@/components/ui/button';
+import Link from 'next/link';
+import { FileText, Users, DollarSign, Network, ArrowRight } from 'lucide-react';
+import { motion } from 'framer-motion';
+>>>>>>> 7fbd3d10183281dbdd133313f2ea8d3efc2825dc
 
-const programData = [
+const programFeatures = [
   {
     id: 'application',
-    title: 'Application Process',
-    Icon: CalendarDays,
-    content: 'Our application process is streamlined and transparent. Submit your innovative idea, a brief business plan, and your team profile. Selected applicants will be invited for an interview and pitch session. We look for passion, viability, and a strong team.',
+    Icon: FileText,
+    title: 'Streamlined Application',
+    description: 'Our application process is straightforward. Submit your idea, business plan, and team profile. We value passion, viability, and strong teams.',
+    color: "text-sky-400",
+    bgColor: "bg-sky-400/10",
   },
   {
     id: 'mentorship',
-    title: 'Mentorship Programs',
     Icon: Users,
-    contentP1: 'Gain access to a network of experienced mentors, industry experts, and successful entrepreneurs. Our tailored mentorship programs cover areas like product development, market strategy, fundraising, and operational excellence to guide you at every step.',
+    title: 'Expert Mentorship',
+    description: 'Access experienced mentors and industry experts. Our tailored programs cover product development, market strategy, fundraising, and more.',
+    buttonText: 'See Our Mentors',
+    buttonLink: '/mentors',
+    color: "text-purple-400",
+    bgColor: "bg-purple-400/10",
   },
   {
     id: 'funding',
+<<<<<<< HEAD
     title: 'Funding Opportunities',
     Icon: IndianRupee,
     content: 'RCEOM-TBI provides seed funding for promising startups and facilitates connections with angel investors and venture capital firms. We help you prepare your pitch deck and financial projections to secure the capital needed for growth.',
+=======
+    Icon: DollarSign,
+    title: 'Funding Pathways',
+    description: 'We provide seed funding and connect you with angel investors and VCs. We help prepare your pitch and financial projections.',
+    color: "text-lime-400",
+    bgColor: "bg-lime-400/10",
+>>>>>>> 7fbd3d10183281dbdd133313f2ea8d3efc2825dc
   },
   {
     id: 'networking',
-    title: 'Networking Events',
     Icon: Network,
-    content: 'Participate in exclusive networking events, workshops, and demo days. Connect with potential partners, clients, investors, and fellow innovators. Build valuable relationships that can accelerate your startup\'s journey.',
+    title: 'Vibrant Networking',
+    description: 'Join exclusive events, workshops, and demo days. Connect with partners, clients, investors, and fellow innovators to accelerate your journey.',
+    color: "text-amber-400",
+    bgColor: "bg-amber-400/10",
   },
 ];
 
@@ -139,6 +163,7 @@ export default function ProgramDetailsSection() {
   }, []);
 
   return (
+<<<<<<< HEAD
     <>      <style jsx>{`
         @keyframes glowBurst {
           0% {
@@ -176,9 +201,25 @@ export default function ProgramDetailsSection() {
       >
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">        <motion.div className="text-center mb-12 md:mb-16" variants={itemVariants}>
           <AuroraText>Our Program</AuroraText>
+=======
+    <motion.section
+      id="program"
+      className="py-16 md:py-24 bg-background text-foreground"
+      initial="hidden"
+      whileInView="visible"
+      viewport={{ once: true, amount: 0.1 }}
+      variants={sectionVariants}
+    >
+      <div className="container mx-auto px-4 sm:px-6 lg:px-8">
+        <motion.div className="text-center mb-12 md:mb-16" variants={itemVariants}>
+          <h2 className="font-montserrat text-3xl font-bold tracking-tight sm:text-4xl md:text-5xl text-accent">
+            Program Highlights
+          </h2>
+>>>>>>> 7fbd3d10183281dbdd133313f2ea8d3efc2825dc
           <p className="mt-4 max-w-2xl mx-auto text-lg text-muted-foreground sm:text-xl">
-            Discover how RCEOM-TBI can fuel your startup's growth and success.
+            Discover how RCEOM-TBI fuels your startup's growth and success with these key features.
           </p>
+<<<<<<< HEAD
         </motion.div>        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-6xl mx-auto">
             {programData.map((item) => (
               <motion.div
@@ -497,6 +538,42 @@ export default function ProgramDetailsSection() {
                 </Card>
               </motion.div>
             ))}        </div>
+=======
+        </motion.div>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 lg:gap-8">
+          {programFeatures.map((feature) => (
+            <motion.div
+              key={feature.id}
+              variants={itemVariants}
+              className="h-full"
+            >
+              <Card className="flex flex-col h-full bg-card shadow-xl hover:shadow-accent/20 transition-shadow duration-300 rounded-2xl border border-border overflow-hidden">
+                <CardHeader className="p-6">
+                  <div className={`mb-4 inline-flex items-center justify-center rounded-lg p-3 ${feature.bgColor}`}>
+                    <feature.Icon className={`h-8 w-8 ${feature.color}`} />
+                  </div>
+                  <CardTitle className="font-orbitron text-2xl text-card-foreground">
+                    {feature.title}
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="p-6 pt-0 flex-grow">
+                  <p className="text-muted-foreground">{feature.description}</p>
+                </CardContent>
+                {feature.buttonText && feature.buttonLink && (
+                  <div className="p-6 pt-0 mt-auto">
+                    <Button asChild variant="default" size="lg" className="w-full group bg-accent hover:bg-accent/90 text-accent-foreground">
+                      <Link href={feature.buttonLink}>
+                        {feature.buttonText}
+                        <ArrowRight className="ml-2 h-5 w-5 transition-transform group-hover:translate-x-1" />
+                      </Link>
+                    </Button>
+                  </div>
+                )}
+              </Card>
+            </motion.div>
+          ))}
+>>>>>>> 7fbd3d10183281dbdd133313f2ea8d3efc2825dc
         </div>
       </motion.section>
     </>

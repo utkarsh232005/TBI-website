@@ -9,6 +9,7 @@ import { collection, getDocs, orderBy, query, Timestamp } from 'firebase/firesto
 import { format } from 'date-fns';
 import { useToast } from "@/hooks/use-toast";
 import { processApplicationAction } from '@/app/actions/admin-actions';
+import { SubmissionsTable } from './components/SubmissionsTable';
 
 interface Submission {
   id: string;
