@@ -1,4 +1,3 @@
-
 // src/app/user/layout.tsx
 "use client";
 
@@ -21,10 +20,15 @@ import {
   LogOut,
   Home,
   Menu,
+  User,
 } from "lucide-react";
 import { InnoNexusLogo } from "@/components/icons/innnexus-logo";
 import { motion } from "framer-motion";
 import { cn } from "@/lib/utils";
+import { OnboardingPopup } from "@/components/ui/onboarding-popup";
+import { useOnboarding } from "@/hooks/useOnboarding";
+import { UserProvider, useUser } from "@/contexts/user-context";
+import { clearUserSession } from "@/lib/client-utils";
 
 interface NavItem {
   href: string;
@@ -37,11 +41,11 @@ function UserLayoutContent({
   children,
 }: {
   children: React.ReactNode;
-}) {
-  const pathname = usePathname();
+}) {  const pathname = usePathname();
   const router = useRouter(); // For logout
-  const { open, setOpen } = useSidebar();
-
+  const { open, setOpen } = useSidebar();  const { showOnboarding, completeOnboarding } = useOnboarding();
+  const { user } = useUser();
+  
   React.useEffect(() => {
     if (typeof window !== 'undefined' && window.innerWidth < 768) {
       setOpen(false);
@@ -66,16 +70,17 @@ function UserLayoutContent({
       label: "Events",
       icon: <CalendarDays className="h-5 w-5" />,
       disabled: false
-    },
-    {
+    },    {
       href: "/user/settings",
-      label: "Settings",
-      icon: <Settings className="h-5 w-5" />,
-      disabled: true // Placeholder for now
+      label: "Profile",
+      icon: <User className="h-5 w-5" />,
+      disabled: false // Now functional
     },
   ];
-
   const handleLogout = () => {
+    // Clear all user session data including onboarding status
+    clearUserSession();
+    
     // For temporary credentials, logout is effectively redirecting
     // More complex logic would be needed for actual session invalidation
     if (typeof window !== 'undefined' && window.innerWidth < 768) {
@@ -271,7 +276,13 @@ function UserLayoutContent({
         <main className="flex-1 overflow-y-auto p-4 md:p-6 bg-neutral-900/50">
           {children}
         </main>
-      </div>
+      </div>      {/* Onboarding Popup */}
+      <OnboardingPopup 
+        isOpen={showOnboarding}
+        onClose={completeOnboarding}
+        onComplete={completeOnboarding}
+        userIdentifier={user?.identifier}
+      />
     </div>
   );
 }
@@ -283,9 +294,11 @@ export default function UserLayout({
 }) {
   return (
     <SidebarProvider>
-      <UserLayoutContent>
-        {children}
-      </UserLayoutContent>
+      <UserProvider>
+        <UserLayoutContent>
+          {children}
+        </UserLayoutContent>
+      </UserProvider>
     </SidebarProvider>
   );
 }

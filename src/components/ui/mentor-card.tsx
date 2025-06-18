@@ -3,6 +3,7 @@
 "use client";
 
 import { cn } from "@/lib/utils";
+import { processImageUrl } from "@/lib/utils";
 import Image from 'next/image';
 import Link from 'next/link';
 import { Mail, UserCircle, Briefcase, Brain, Linkedin } from 'lucide-react';
@@ -36,9 +37,8 @@ export default function MentorCard({ mentor }: MentorCardProps) {
       <div
         className={cn(
           "cursor-pointer overflow-hidden relative card h-[480px] rounded-2xl shadow-xl flex flex-col justify-between p-5 border border-border hover:border-accent/50 transition-all duration-300",
-        )}
-        style={{ 
-          backgroundImage: `url(${mentor.backgroundImageUrl || 'https://placehold.co/400x600/121212/1A1A1A.png'})`, 
+        )}        style={{ 
+          backgroundImage: `url(${processImageUrl(mentor.backgroundImageUrl, mentor.name.substring(0,1))})`, 
           backgroundSize: 'cover',
           backgroundPosition: 'center'
         }}
@@ -46,16 +46,21 @@ export default function MentorCard({ mentor }: MentorCardProps) {
       >
         <div className="absolute w-full h-full top-0 left-0 transition duration-300 group-hover/card:bg-black/70 bg-black/60"></div>
 
-        <div className="relative z-10 flex flex-col h-full">
-          <div className="flex flex-row items-center space-x-3 mb-4">
-            <Image
-              height={48}
-              width={48}
-              alt={`${mentor.name} - Avatar`}
-              src={mentor.avatarUrl || `https://placehold.co/100x100/7DF9FF/121212.png?text=${mentor.name.substring(0,2)}`}
-              className="h-12 w-12 rounded-full border-2 border-foreground object-cover" /* Border to white */
-              data-ai-hint={mentor.dataAiHintAvatar || "professional portrait"}
-            />
+        <div className="relative z-10 flex flex-col h-full">          <div className="flex flex-row items-center space-x-3 mb-4">
+            <div className="h-12 w-12 rounded-full border-2 border-foreground overflow-hidden bg-white/10">              <Image
+                height={48}
+                width={48}
+                alt={`${mentor.name} - Avatar`}
+                src={processImageUrl(mentor.avatarUrl, mentor.name.substring(0,2))}
+                className="h-full w-full object-cover"
+                data-ai-hint={mentor.dataAiHintAvatar || "professional portrait"}
+                onError={(e) => {
+                  // Fallback to placeholder if image fails to load
+                  const target = e.target as HTMLImageElement;
+                  target.src = `https://placehold.co/100x100/7DF9FF/121212.png?text=${mentor.name.substring(0,2)}`;
+                }}
+              />
+            </div>
             <div className="flex flex-col">
               <p className="font-orbitron text-lg font-semibold text-foreground line-clamp-1"> {/* Name to white */}
                 {mentor.name}

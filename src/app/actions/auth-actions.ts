@@ -1,4 +1,3 @@
-
 // src/app/actions/auth-actions.ts
 'use server';
 
@@ -106,6 +105,12 @@ export interface VerifyUserCredentialsResponse {
   success: boolean;
   message: string;
   redirectTo?: string;
+  userData?: {
+    identifier: string;
+    email: string;
+    name: string;
+    temporaryUserId?: string;
+  };
 }
 
 export async function verifyUserCredentials(
@@ -135,15 +140,18 @@ export async function verifyUserCredentials(
       if (userData.email === identifier || userData.temporaryUserId === identifier) {
         matchedUser = userData;
       }
-    });
-
-    if (matchedUser) {
+    });    if (matchedUser) {
       // WARNING: Plaintext password comparison. Highly insecure for production.
-      if (matchedUser.temporaryPassword === password) {
-        return {
+      if ((matchedUser as any).temporaryPassword === password) {        return {
           success: true,
           message: 'User login successful!',
           redirectTo: '/user/dashboard', // Placeholder, adjust as needed
+          userData: {
+            identifier: identifier,
+            email: (matchedUser as any).email,
+            name: (matchedUser as any).name,
+            temporaryUserId: (matchedUser as any).temporaryUserId,
+          }
         };
       } else {
         return { success: false, message: 'Invalid password.' };
@@ -169,3 +177,5 @@ export async function verifyUserCredentials(
     };
   }
 }
+
+

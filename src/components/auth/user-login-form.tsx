@@ -20,6 +20,7 @@ import { useRouter } from "next/navigation";
 import { LogIn, Loader2 } from "lucide-react";
 import { useState } from "react";
 import { verifyUserCredentials, type UserLoginFormValues, type VerifyUserCredentialsResponse } from "@/app/actions/auth-actions";
+import { setFirstLoginFlag, setCurrentUser } from "@/lib/client-utils";
 
 const formSchema = z.object({
   identifier: z.string().min(1, { message: "User ID or Email is required." }),
@@ -42,15 +43,28 @@ export default function UserLoginForm() {
   async function onSubmit(values: UserLoginFormValues) {
     setIsLoading(true);
     try {
-      const result: VerifyUserCredentialsResponse = await verifyUserCredentials(values);
-
-      if (result.success) {
+      const result: VerifyUserCredentialsResponse = await verifyUserCredentials(values);      if (result.success) {
+        // Only set first login flag if onboarding hasn't been completed
+        const hasCompletedOnboarding = localStorage.getItem('onboarding_completed') === 'true';
+        if (!hasCompletedOnboarding) {
+          setFirstLoginFlag();
+        }
+        
+        // Store user data if provided
+        if (result.userData) {
+          setCurrentUser(result.userData);
+        }
+        
         toast({
           title: "Login Successful",
           description: result.message || "Redirecting to dashboard...",
         });
+        
+        // Small delay to ensure localStorage is written before redirect
         if (result.redirectTo) {
-          router.push(result.redirectTo);
+          setTimeout(() => {
+            router.push(result.redirectTo!);
+          }, 100);
         }
       } else {
         toast({

@@ -45,20 +45,27 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { useToast } from "@/hooks/use-toast";
+import { uploadImage } from "@/lib/image-upload";
 import { db } from '@/lib/firebase';
 import { collection, getDocs, Timestamp, orderBy, query, doc, deleteDoc } from 'firebase/firestore';
 import { createStartupAction, updateStartupAction, deleteStartupAction, importStartupsFromTable } from '@/app/actions/startup-actions';
 import Image from 'next/image';
+import ImageUploadComponent from '@/components/ui/image-upload';
 
 const container: Variants = { hidden: { opacity: 0 }, show: { opacity: 1, transition: { staggerChildren: 0.05 }}};
 const itemVariants: Variants = { hidden: { opacity: 0, y: 10 }, show: { opacity: 1, y: 0, transition: {duration: 0.3}}};
 
 const startupFormSchema = z.object({
   name: z.string().min(3, { message: "Startup name must be at least 3 characters." }),
-  logoUrl: z.string().url({ message: "Please enter a valid URL for the logo." }).optional().or(z.literal('')),
-  logoFile: z.any().optional().refine(file => !file || file.size <= 5 * 1024 * 1024, `Max file size is 5MB.`).refine(file => !file || ['image/jpeg', 'image/png', 'image/webp', 'image/svg+xml'].includes(file.type), `Only .jpg, .png, .webp, .svg files are accepted.`),
+  logoUrl: z.string().optional().or(z.literal(''))
+    .refine((val) => {
+      if (!val || val === '') return true; // Allow empty
+      return val.startsWith('http') || val.startsWith('data:image/'); // Allow URLs or base64
+    }, {
+      message: 'Logo URL must be a valid URL or base64 image data'
+    }),
+  logoFile: z.any().optional(),
   description: z.string().min(10, { message: "Description must be at least 10 characters." }),
-  badgeText: z.string().min(2, { message: "Badge text must be at least 2 characters." }),
   websiteUrl: z.string().url({ message: "Please enter a valid website URL." }).optional().or(z.literal('')),
   funnelSource: z.string().min(1, { message: "Funnel source is required." }),
   session: z.string().min(1, { message: "Session is required." }),
@@ -77,7 +84,6 @@ export interface StartupDocument {
   name: string;
   logoUrl?: string;
   description: string;
-  badgeText: string;
   websiteUrl?: string;
   funnelSource: string;
   session: string;
@@ -105,12 +111,11 @@ export default function AdminStartupsPage() {
   const { toast } = useToast();
   const [logoPreview, setLogoPreview] = useState<string | null>(null);
   const form = useForm<StartupFormValues>({
-    resolver: zodResolver(startupFormSchema),
-    defaultValues: {
+    resolver: zodResolver(startupFormSchema),    defaultValues: {
       name: "", 
       logoUrl: "", 
+      logoFile: undefined,
       description: "", 
-      badgeText: "", 
       websiteUrl: "",
       funnelSource: "",
       session: "",
@@ -145,11 +150,9 @@ export default function AdminStartupsPage() {
 
   useEffect(() => { fetchStartups(); }, [fetchStartups]);
   useEffect(() => {
-    const lowercasedQuery = searchQuery.toLowerCase();
-    setFilteredStartups(
+    const lowercasedQuery = searchQuery.toLowerCase();    setFilteredStartups(
       startups.filter(startup =>
         startup.name.toLowerCase().includes(lowercasedQuery) ||
-        startup.badgeText.toLowerCase().includes(lowercasedQuery) ||
         startup.description.toLowerCase().includes(lowercasedQuery) ||
         (startup.status && startup.status.toLowerCase().includes(lowercasedQuery)) ||
         (startup.legalStatus && startup.legalStatus.toLowerCase().includes(lowercasedQuery)) ||
@@ -158,28 +161,49 @@ export default function AdminStartupsPage() {
         (startup.funnelSource && startup.funnelSource.toLowerCase().includes(lowercasedQuery))
       )
     );
-  }, [searchQuery, startups]);
-
-  const handleLogoFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+  }, [searchQuery, startups]);  const handleLogoFileChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (file) {
-      form.setValue('logoFile', file, { shouldValidate: true });
-      const reader = new FileReader();
-      reader.onloadend = () => setLogoPreview(reader.result as string);
-      reader.readAsDataURL(file);
+      try {
+        // Convert file to base64 using the image upload utility
+        const result = await uploadImage(file);
+        
+        if (result.success && result.url) {
+          // Store the base64 string in the logoUrl field instead of logoFile
+          form.setValue('logoUrl', result.url, { shouldValidate: true });
+          form.setValue('logoFile', undefined); // Clear logoFile since we're using logoUrl
+          setLogoPreview(result.url);
+        } else {
+          toast({ 
+            title: "Upload Error", 
+            description: result.error || "Failed to process image", 
+            variant: "destructive" 
+          });
+          form.setValue('logoFile', undefined);
+          setLogoPreview(editingStartupData?.logoUrl || null);
+        }
+      } catch (error: any) {
+        toast({ 
+          title: "Upload Error", 
+          description: error.message || "Failed to process image", 
+          variant: "destructive" 
+        });
+        form.setValue('logoFile', undefined);
+        setLogoPreview(editingStartupData?.logoUrl || null);
+      }
     } else {
       form.setValue('logoFile', undefined);
-      setLogoPreview(editingStartupData?.logoUrl || null); // Revert to original/empty on file removal
+      form.setValue('logoUrl', editingStartupData?.logoUrl || ''); // Revert to original logoUrl
+      setLogoPreview(editingStartupData?.logoUrl || null);
     }
   };
   const handleOpenFormDialog = (startup: StartupDocument | null = null) => {
     setEditingStartupData(startup);
-    if (startup) {
-      form.reset({
+    if (startup) {      form.reset({
         name: startup.name,
         logoUrl: startup.logoUrl || "",
+        logoFile: undefined, // Reset logoFile for edit
         description: startup.description,
-        badgeText: startup.badgeText,
         websiteUrl: startup.websiteUrl || "",
         funnelSource: startup.funnelSource || "",
         session: startup.session || "",
@@ -189,15 +213,12 @@ export default function AdminStartupsPage() {
         rknecEmailId: startup.rknecEmailId || "",
         emailId: startup.emailId || "",
         mobileNumber: startup.mobileNumber || "",
-        logoFile: undefined, // Reset logoFile for edit
       });
       setLogoPreview(startup.logoUrl || null);
-    } else {
-      form.reset({ 
-        name: "", 
+    } else {      form.reset({        name: "", 
         logoUrl: "", 
+        logoFile: undefined,
         description: "", 
-        badgeText: "", 
         websiteUrl: "", 
         funnelSource: "",
         session: "",
@@ -207,7 +228,6 @@ export default function AdminStartupsPage() {
         rknecEmailId: "",
         emailId: "",
         mobileNumber: "",
-        logoFile: undefined 
       });
       setLogoPreview(null);
     }
@@ -353,7 +373,8 @@ export default function AdminStartupsPage() {
                     </Button>
                   </DialogTrigger>
                   <DialogContent className="sm:max-w-[600px] bg-gradient-to-b from-[#1E1E1E] to-[#191919] border-[#333333] rounded-xl overflow-hidden shadow-2xl backdrop-filter backdrop-blur-lg border-opacity-40">
-                    <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-indigo-500 to-purple-500"></div>                    <DialogHeader>
+                    <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-indigo-500 to-purple-500"></div>
+                    <DialogHeader>
                       <DialogTitle className="text-2xl font-bold bg-gradient-to-r from-indigo-200 to-purple-300 bg-clip-text text-transparent">
                         {editingStartupData ? "Edit Startup" : "Add New Startup"}
                       </DialogTitle>
@@ -390,55 +411,33 @@ export default function AdminStartupsPage() {
                             </FormItem>
                           )}
                         />
-                         <FormField
-                          control={form.control}
-                          name="logoFile"
-                          render={({ field: { onChange, value, ...restField }}) => ( // Destructure field to handle file input
-                            <FormItem>
-                              <FormLabel>Logo Upload</FormLabel>
-                              <FormControl>
-                                <div className="flex items-center gap-4">
-                                  <Input
-                                    type="file"
-                                    accept="image/png, image/jpeg, image/webp, image/svg+xml"
-                                    onChange={handleLogoFileChange}
-                                    disabled={isSubmitting}
-                                    className="bg-[#262626] border-[#333333] focus:border-indigo-500 focus:ring-indigo-500/10 rounded-lg flex-grow file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-indigo-600/10 file:text-indigo-400 hover:file:bg-indigo-600/20"
-                                    {...restField} // Pass rest of the field props
-                                    suppressHydrationWarning
-                                  />
-                                  {logoPreview && (
-                                    <Avatar className="h-16 w-16 rounded-md">
-                                      <AvatarImage src={logoPreview} alt="Logo preview" className="object-contain" />
-                                      <AvatarFallback><UploadCloud /></AvatarFallback>
-                                    </Avatar>
-                                  )}
-                                </div>
-                              </FormControl>
-                              <FormMessage />
-                               <p className="text-xs text-muted-foreground mt-1">Max 5MB. PNG, JPG, WEBP, SVG. If no file is uploaded, provide Logo URL below.</p>
-                            </FormItem>
-                          )}
-                        />
                         <FormField
                           control={form.control}
                           name="logoUrl"
                           render={({ field }) => (
                             <FormItem>
-                              <FormLabel>Logo URL (Fallback)</FormLabel>
+                              <FormLabel>Startup Logo</FormLabel>
                               <FormControl>
-                                <div className="relative group">
-                                  <Input 
-                                    placeholder="https://example.com/logo.png" 
-                                    {...field} 
-                                    disabled={isSubmitting} 
-                                    className="bg-[#262626] border-[#333333] focus:border-indigo-500 focus:ring-indigo-500/20 rounded-lg pl-10 transition-all duration-300 group-hover:border-indigo-500/50"
-                                    suppressHydrationWarning
-                                  />
-                                  <div className="absolute left-3 top-2.5 text-gray-500 group-hover:text-indigo-400 transition-colors duration-300">
-                                    <UploadCloud className="h-4 w-4" />
-                                  </div>
-                                </div>
+                                <ImageUploadComponent
+                                  value={field.value}
+                                  onChange={(imageUrl) => {
+                                    field.onChange(imageUrl || '');
+                                  }}
+                                  placeholder="Upload startup logo or enter URL"
+                                  options={{
+                                    maxSizeBytes: 5 * 1024 * 1024, // 5MB
+                                    allowedTypes: ['image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'image/webp', 'image/svg+xml'],
+                                    quality: 0.9,
+                                    maxWidth: 800,
+                                    maxHeight: 800,
+                                  }}
+                                  onUploadComplete={(result) => {
+                                    if (result.success) {
+                                      console.log('Startup logo uploaded successfully:', result.metadata);
+                                    }
+                                  }}
+                                  className="bg-[#262626] border-[#333333]"
+                                />
                               </FormControl>
                               <FormMessage />
                             </FormItem>
@@ -466,32 +465,7 @@ export default function AdminStartupsPage() {
                                 </div>
                               </FormControl>
                               <FormMessage />
-                            </FormItem>
-                          )}
-                        />
-                        <FormField
-                          control={form.control}
-                          name="badgeText"
-                          render={({ field }) => (
-                            <FormItem>
-                              <FormLabel>Badge Text</FormLabel>
-                              <FormControl>
-                                <div className="relative group">
-                                  <Input 
-                                    placeholder="e.g., Seed Funded, Acquired" 
-                                    {...field} 
-                                    disabled={isSubmitting} 
-                                    className="bg-[#262626] border-[#333333] focus:border-indigo-500 focus:ring-indigo-500/20 rounded-lg pl-10 transition-all duration-300 group-hover:border-indigo-500/50"
-                                    suppressHydrationWarning
-                                  />
-                                  <div className="absolute left-3 top-2.5 text-gray-500 group-hover:text-indigo-400 transition-colors duration-300">
-                                    <Badge className="h-4 w-4" />
-                                  </div>
-                                </div>
-                              </FormControl>
-                              <FormMessage />
-                            </FormItem>
-                          )}
+                            </FormItem>                          )}
                         />
                         <FormField
                           control={form.control}
@@ -640,12 +614,6 @@ export default function AdminStartupsPage() {
                         </TableHead>
                         <TableHead className="text-indigo-300 font-medium">
                           <div className="flex items-center">
-                            <Badge className="h-3.5 w-3.5 mr-2" />
-                            <span>Badge</span>
-                          </div>
-                        </TableHead>
-                        <TableHead className="text-indigo-300 font-medium">
-                          <div className="flex items-center">
                             <Info className="h-3.5 w-3.5 mr-2" />
                             <span>Description</span>
                           </div>
@@ -666,8 +634,7 @@ export default function AdminStartupsPage() {
                             initial="hidden" 
                             animate="show" 
                             exit={{ opacity: 0, x: -20 }} 
-                            className="hover:bg-gradient-to-r hover:from-[#242424] hover:to-[#1E1E1E] border-[#333333] transition-colors duration-300"
-                            whileHover={{ scale: 1.01 }}
+                            className="hover:bg-gradient-to-r hover:from-[#242424] hover:to-[#1E1E1E] border-[#333333] transition-colors duration-300"                            whileHover={{ scale: 1.01 }}
                           >
                             <TableCell>
                               <Avatar className="h-10 w-10 rounded-md">
@@ -680,11 +647,6 @@ export default function AdminStartupsPage() {
                               </Avatar>
                             </TableCell>
                             <TableCell className="font-medium text-gray-200">{startup.name}</TableCell>
-                            <TableCell>
-                              <Badge className="bg-gradient-to-r from-indigo-900/50 to-purple-900/50 text-indigo-300 hover:from-indigo-900/70 hover:to-purple-900/70 border-none transition-colors duration-300 shadow-inner shadow-black/10">
-                                {startup.badgeText}
-                              </Badge>
-                            </TableCell>
                             <TableCell className="text-gray-400 text-xs max-w-sm truncate">{startup.description}</TableCell>
                             <TableCell className="text-right">
                               <div className="flex items-center justify-end space-x-2">
@@ -888,13 +850,8 @@ export default function AdminStartupsPage() {
               <FormField control={form.control} name="logoUrl" render={({ field }) => (
                 <FormItem><FormLabel>Logo URL {form.getValues('logoFile') ? '(Fallback if upload fails)' : ''}</FormLabel><FormControl><Input placeholder="https://example.com/logo.png" {...field} disabled={isSubmitting} className="bg-background focus:border-accent"/></FormControl><FormMessage /></FormItem>
               )}/>
-              
-              <FormField control={form.control} name="description" render={({ field }) => (
+                <FormField control={form.control} name="description" render={({ field }) => (
                 <FormItem><FormLabel>Description</FormLabel><FormControl><Textarea placeholder="Brief description of the startup..." {...field} rows={3} disabled={isSubmitting} className="bg-background focus:border-accent"/></FormControl><FormMessage /></FormItem>
-              )}/>
-              
-              <FormField control={form.control} name="badgeText" render={({ field }) => (
-                <FormItem><FormLabel>Badge Text</FormLabel><FormControl><Input placeholder="e.g., Seed Funded, Revenue Generation" {...field} disabled={isSubmitting} className="bg-background focus:border-accent"/></FormControl><FormMessage /></FormItem>
               )}/>
               
               <DialogFooter className="mt-6">

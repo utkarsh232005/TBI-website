@@ -8,6 +8,7 @@ import { Button } from '@/components/ui/button';
 import { CalendarDays, MapPin, ArrowRight, Link as LinkIcon } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { format } from 'date-fns'; 
+import { processImageUrl } from '@/lib/utils';
 
 export interface Event {
   id: string;
@@ -42,15 +43,18 @@ export default function EventCard({ event }: EventCardProps) {
       transition={{ type: "spring", stiffness: 400, damping: 15 }}
       className="h-full" 
     >
-      <Card className="group flex flex-col overflow-hidden bg-card shadow-lg transition-all duration-300 hover:shadow-accent/20 rounded-2xl border border-border h-full">
-        <div className="relative w-full h-48 sm:h-56 overflow-hidden">
-          <Image
-            src={event.imageUrl || `https://placehold.co/600x400/121212/7DF9FF.png?text=${encodeURIComponent(event.title.substring(0,10))}`}
+      <Card className="group flex flex-col overflow-hidden bg-card shadow-lg transition-all duration-300 hover:shadow-accent/20 rounded-2xl border border-border h-full">        <div className="relative w-full h-48 sm:h-56 overflow-hidden">          <Image
+            src={processImageUrl(event.imageUrl, event.title.substring(0,10))}
             alt={event.title}
             fill
             style={{ objectFit: 'cover' }}
             className="transition-transform duration-500 group-hover:scale-105"
             data-ai-hint={event.dataAiHint || "event image"}
+            onError={(e) => {
+              // Fallback to placeholder if image fails to load
+              const target = e.target as HTMLImageElement;
+              target.src = `https://placehold.co/600x400/121212/7DF9FF.png?text=${encodeURIComponent(event.title.substring(0,10))}`;
+            }}
           />
           <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/30 to-transparent"></div>
           <div className="absolute bottom-0 left-0 p-4">

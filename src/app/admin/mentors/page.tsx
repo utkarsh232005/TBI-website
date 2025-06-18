@@ -39,6 +39,7 @@ import { db } from '@/lib/firebase';
 import { collection, getDocs, Timestamp, orderBy, query, doc, deleteDoc } from 'firebase/firestore';
 import { createMentorAction } from '@/app/actions/mentor-actions';
 import { format } from 'date-fns';
+import ImageUploadComponent from '@/components/ui/image-upload';
 
 // Animation variants
 const container: Variants = {
@@ -71,7 +72,7 @@ const mentorFormSchema = z.object({
   designation: z.string().min(3, { message: "Designation must be at least 3 characters." }),
   expertise: z.string().min(3, { message: "Expertise area must be at least 3 characters." }),
   description: z.string().min(10, { message: "Description must be at least 10 characters." }),
-  profilePictureUrl: z.string().url({ message: "Please enter a valid image URL." }).optional().or(z.literal('')),
+  profilePictureUrl: z.string().optional(),
   linkedinUrl: z.string().url({ message: "Please enter a valid LinkedIn URL." }).optional().or(z.literal('')),
   email: z.string().email({ message: "Please enter a valid email address." }),
 });
@@ -356,20 +357,32 @@ export default function AdminMentorsPage() {
                               <FormMessage />
                             </FormItem>
                           )}
-                        />
-                        <FormField
+                        />                        <FormField
                           control={form.control}
                           name="profilePictureUrl"
                           render={({ field }) => (
                             <FormItem>
-                              <FormLabel>Profile Picture URL (Optional)</FormLabel>
+                              <FormLabel>Profile Picture</FormLabel>
                               <FormControl>
-                                <Input 
-                                  placeholder="https://example.com/avatar.jpg" 
-                                  {...field} 
-                                  value={field.value || ''}
-                                  disabled={isSubmitting}
-                                  suppressHydrationWarning 
+                                <ImageUploadComponent
+                                  value={field.value}
+                                  onChange={(imageUrl) => {
+                                    field.onChange(imageUrl || '');
+                                  }}
+                                  placeholder="Upload profile picture or enter URL"
+                                  options={{
+                                    maxSizeBytes: 3 * 1024 * 1024, // 3MB
+                                    allowedTypes: ['image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'image/webp'],
+                                    quality: 0.8,
+                                    maxWidth: 500,
+                                    maxHeight: 500,
+                                  }}
+                                  onUploadComplete={(result) => {
+                                    if (result.success) {
+                                      console.log('Profile picture uploaded successfully:', result.metadata);
+                                    }
+                                  }}
+                                  previewClassName="w-24 h-24 rounded-full"
                                 />
                               </FormControl>
                               <FormMessage />

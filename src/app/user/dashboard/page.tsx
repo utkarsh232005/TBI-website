@@ -1,4 +1,3 @@
-
 // src/app/user/dashboard/page.tsx
 "use client";
 
@@ -12,7 +11,6 @@ export default function UserDashboardPage() {
 
   const applicationStatus = "Accepted"; // Placeholder
   const userName = "Innovator"; // Placeholder
-
   return (
     <div className="space-y-8">
       <Card className="bg-neutral-800/50 border-neutral-700/50 shadow-lg">

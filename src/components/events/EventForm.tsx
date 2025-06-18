@@ -13,6 +13,8 @@ import { Popover, PopoverContent, PopoverTrigger } from '../ui/popover';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../ui/select';
 import { eventFormSchema, EventFormValues } from '@/schemas/event.schema';
 import { EventStatus } from '@/types/events';
+import { processImageUrl, isValidImageUrl } from '@/lib/utils';
+import ImageUploadComponent from '@/components/ui/image-upload';
 
 interface EventFormProps {
   defaultValues?: Partial<EventFormValues>;
@@ -216,24 +218,30 @@ export const EventForm = ({
             <p className="text-sm text-red-500">
               {form.formState.errors.registrationLink.message}
             </p>
-          )}
-        </div>
+          )}        </div>
 
-        {/* Image URL */}
+        {/* Image Upload */}
         <div className="space-y-2">
-          <Label htmlFor="imageUrl">Image URL</Label>
-          <div className="relative">
-            <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
-              <ImageIcon className="h-4 w-4 text-gray-400" />
-            </div>
-            <Input
-              id="imageUrl"
-              type="url"
-              placeholder="https://example.com/image.jpg"
-              className="pl-10 bg-gray-900/50 border-gray-700"
-              {...form.register('imageUrl')}
-            />
-          </div>
+          <Label htmlFor="imageUrl">Event Image</Label>
+          <ImageUploadComponent
+            value={form.watch('imageUrl')}
+            onChange={(imageUrl) => {
+              form.setValue('imageUrl', imageUrl || '');
+            }}
+            placeholder="Upload an event image or enter URL"
+            options={{
+              maxSizeBytes: 5 * 1024 * 1024, // 5MB
+              allowedTypes: ['image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'image/webp'],
+              quality: 0.8,
+              maxWidth: 1200,
+              maxHeight: 800,
+            }}
+            onUploadComplete={(result) => {
+              if (result.success) {
+                console.log('Event image uploaded successfully:', result.metadata);
+              }
+            }}
+          />
           {form.formState.errors.imageUrl && (
             <p className="text-sm text-red-500">
               {form.formState.errors.imageUrl.message}

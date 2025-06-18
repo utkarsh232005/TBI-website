@@ -10,6 +10,7 @@ import { db } from '@/lib/firebase';
 import { collection, getDocs, orderBy, query, Timestamp } from 'firebase/firestore';
 import { Loader2, AlertCircle, Users } from 'lucide-react';
 import { AuroraText } from "@/components/magicui/aurora-text";
+import { processImageUrl } from "@/lib/utils";
 
 const pageTitleVariants = {
   hidden: { opacity: 0, y: -20 },
@@ -53,8 +54,7 @@ export default function MentorsPage() {
         const mentorsCollection = collection(db, "mentors");
         const q = query(mentorsCollection, orderBy("createdAt", "desc"));
         const querySnapshot = await getDocs(q);
-        const fetchedMentors: PublicMentor[] = [];
-        querySnapshot.forEach((doc) => {
+        const fetchedMentors: PublicMentor[] = [];        querySnapshot.forEach((doc) => {
           const data = doc.data() as Omit<FirestoreMentor, 'id'>; // Cast to known Firestore structure
           fetchedMentors.push({
             id: doc.id,
@@ -63,9 +63,12 @@ export default function MentorsPage() {
             description: data.description,
             areaOfMentorship: data.expertise, // Map expertise to areaOfMentorship
             email: data.email,
-            avatarUrl: data.profilePictureUrl || `https://placehold.co/100x100/7DF9FF/121212.png?text=${encodeURIComponent(data.name.substring(0,2))}`,
+            avatarUrl: processImageUrl(data.profilePictureUrl, data.name.substring(0,2)),
             // Using a default placeholder for background, as this is not in Firestore
-            backgroundImageUrl: `https://placehold.co/400x600/121212/1E1E1E.png?text=${encodeURIComponent(data.name.substring(0,1))}`,
+            backgroundImageUrl: processImageUrl(
+              data.backgroundImageUrl || '',
+              data.name.substring(0,1)
+            ),
             dataAiHintAvatar: `professional ${data.name.split(' ')[0].toLowerCase()}`,
             dataAiHintBackground: 'abstract tech design',
             linkedinUrl: data.linkedinUrl,

@@ -9,10 +9,15 @@ import { revalidatePath } from 'next/cache';
 // Schema matches the form validation schema in the page component
 const startupFormSchema = z.object({
   name: z.string().min(3),
-  logoUrl: z.string().url().optional().or(z.literal('')),
-  logoFile: z.any().optional(), 
+  logoUrl: z.string().optional().or(z.literal(''))
+    .refine((val) => {
+      if (!val || val === '') return true; // Allow empty
+      return val.startsWith('http') || val.startsWith('data:image/'); // Allow URLs or base64
+    }, {
+      message: 'Logo URL must be a valid URL or base64 image data'
+    }),
+  logoFile: z.any().optional(),
   description: z.string().min(10),
-  badgeText: z.string().min(2),
   websiteUrl: z.string().url().optional().or(z.literal('')),
   funnelSource: z.string().min(1),
   session: z.string().min(1),
@@ -43,18 +48,9 @@ interface DeleteStartupResponse {
 }
 
 // --- Helper to determine logo URL ---
-function determineLogoUrl(name: string, providedLogoUrl?: string, providedLogoFile?: any): string {
-  let logoUrlToStore = providedLogoUrl || `https://placehold.co/300x150/1A1A1A/FFFFFF.png?text=${encodeURIComponent(name.substring(0,3))}`;
-  if (providedLogoFile) {
-    // SIMULATION: In a real app, upload logoFile to Firebase Storage and get its public URL.
-    // For this simulation, if a file is provided, we use a specific placeholder.
-    logoUrlToStore = `https://placehold.co/300x150/7DF9FF/121212.png?text=${encodeURIComponent(name.substring(0,3))}&file=uploaded`;
-    console.log("--- SIMULATING FILE UPLOAD ---");
-    console.log("Received logo file:", providedLogoFile.name);
-    console.log("Using placeholder URL for 'uploaded' file:", logoUrlToStore);
-    console.log("--- END SIMULATION ---");
-  }
-  return logoUrlToStore;
+function determineLogoUrl(name: string, providedLogoUrl?: string): string {
+  // If logoUrl is provided (including base64), use it; otherwise use placeholder
+  return providedLogoUrl || `https://placehold.co/300x150/1A1A1A/FFFFFF.png?text=${encodeURIComponent(name.substring(0,3))}`;
 }
 
 // --- Create Startup Action ---
@@ -63,15 +59,13 @@ export async function createStartupAction(values: StartupFormValues): Promise<Cr
     const validatedValues = startupFormSchema.safeParse(values);
     if (!validatedValues.success) {
       console.error("Server-side validation failed for startup creation:", validatedValues.error.flatten().fieldErrors);      return { success: false, message: "Invalid input data for startup. " + JSON.stringify(validatedValues.error.flatten().fieldErrors) };
-    }
-    const { name, logoUrl, logoFile, description, badgeText, websiteUrl, funnelSource, session, monthYearOfIncubation, status, legalStatus, rknecEmailId, emailId, mobileNumber } = validatedValues.data;
-    const finalLogoUrl = determineLogoUrl(name, logoUrl, logoFile);
+    }    const { name, logoUrl, logoFile, description, websiteUrl, funnelSource, session, monthYearOfIncubation, status, legalStatus, rknecEmailId, emailId, mobileNumber } = validatedValues.data;
+    const finalLogoUrl = determineLogoUrl(name, logoUrl);
     
     const startupData = {
       name,
       logoUrl: finalLogoUrl,
       description,
-      badgeText,
       websiteUrl: websiteUrl || "",  // Use empty string instead of undefined
       funnelSource,
       session,
@@ -111,8 +105,7 @@ export async function updateStartupAction(startupId: string, values: StartupForm
     if (!validatedValues.success) {
       console.error("Server-side validation failed for startup update:", validatedValues.error.flatten().fieldErrors);
       return { success: false, message: "Invalid input data for startup update. " + JSON.stringify(validatedValues.error.flatten().fieldErrors) };
-    }
-    const { name, logoUrl, logoFile, description, badgeText, websiteUrl, funnelSource, session, monthYearOfIncubation, status, legalStatus, rknecEmailId, emailId, mobileNumber } = validatedValues.data;
+    }    const { name, logoUrl, logoFile, description, websiteUrl, funnelSource, session, monthYearOfIncubation, status, legalStatus, rknecEmailId, emailId, mobileNumber } = validatedValues.data;
     const startupDocRef = doc(db, "startups", startupId);
     
     // Determine logo URL - needs careful handling to preserve existing if not changed
@@ -129,7 +122,6 @@ export async function updateStartupAction(startupId: string, values: StartupForm
     const updateData: Partial<StartupFormValues & { updatedAt: any, logoUrl?: string }> = {
       name,
       description,
-      badgeText,
       websiteUrl: websiteUrl || "",  // Use empty string instead of undefined
       funnelSource,
       session,
@@ -140,12 +132,10 @@ export async function updateStartupAction(startupId: string, values: StartupForm
       emailId,
       mobileNumber,
       updatedAt: serverTimestamp(),
-    };
-
-    // Only update logoUrl if a new file is uploaded OR a new logoUrl is provided
+    };    // Only update logoUrl if a new file is uploaded OR a new logoUrl is provided
     // This means if form.logoUrl is empty and no file, it will use placeholder via determineLogoUrl logic
     // Client should send existing logoUrl if no change is desired
-    const finalLogoUrl = determineLogoUrl(name, logoUrl, logoFile);
+    const finalLogoUrl = determineLogoUrl(name, logoUrl);
     updateData.logoUrl = finalLogoUrl;
 
 
@@ -215,9 +205,7 @@ export async function importStartupsFromTable(data: StartupRowData[]): Promise<I
   let importedCount = 0;
   const importErrors: any[] = [];
 
-  for (const row of data) {
-    try {      const name = row["Startup Name"] || "Unknown Startup";
-      const badgeText = row["Business Category & Industry"] || "General";
+  for (const row of data) {    try {      const name = row["Startup Name"] || "Unknown Startup";
       const description = `Startup: ${row["Startup Name"]}. Founded by: ${row["Founder Details"]}. Incubation Stage: ${row["Incubation Stage"]}. Legal Type: ${row["Legal Registration Type"]}. Funding: ${row["Funding Support"]}. Recognition: ${row["Recognition"]}. Category: ${row["Business Category & Industry"]}. Contact: ${row["Contact Information"]}.`;
       
       const logoUrl = `https://placehold.co/300x150/1A1A1A/FFFFFF.png?text=${encodeURIComponent(name.substring(0,3))}`;
@@ -237,7 +225,6 @@ export async function importStartupsFromTable(data: StartupRowData[]): Promise<I
         name,
         logoUrl,
         description,
-        badgeText,
         websiteUrl,
         funnelSource,
         session,
