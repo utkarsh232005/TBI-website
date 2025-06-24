@@ -1,8 +1,6 @@
-
 import { initializeApp, getApp, getApps, FirebaseApp } from 'firebase/app';
 import { getFirestore, Firestore } from 'firebase/firestore';
-// import { getAuth, Auth } from 'firebase/auth';
-// import { getStorage, FirebaseStorage } from 'firebase/storage';
+import { getStorage, FirebaseStorage } from 'firebase/storage';
 
 const firebaseConfig = {
   apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
@@ -23,7 +21,7 @@ if (!getApps().length) {
 }
 
 const db: Firestore = getFirestore(app);
-// const auth: Auth = getAuth(app); // Uncomment if you need Firebase Auth
-// const storage: FirebaseStorage = getStorage(app); // Uncomment if you need Firebase Storage
+const storage: FirebaseStorage = getStorage(app);
+// Note: uploadBytesResumable will be used for file uploads with retry logic in the form handler.
 
-export { app, db /*, auth, storage */ };
+export { app, db, storage };

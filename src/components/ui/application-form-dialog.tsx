@@ -1,4 +1,3 @@
-
 "use client";
 
 import {
@@ -8,7 +7,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import ContactForm from "@/components/ui/contact-form"; // Make sure ContactForm styles are also reviewed
+import IncubationApplicationForm from "@/components/ui/incubation-application-form";
 
 interface ApplicationFormDialogProps {
   open: boolean;
@@ -18,16 +17,15 @@ interface ApplicationFormDialogProps {
 export default function ApplicationFormDialog({ open, onOpenChange }: ApplicationFormDialogProps) {
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[525px] bg-card">
+      <DialogContent className="sm:max-w-[800px] bg-card max-h-[90vh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle className="font-montserrat text-2xl text-accent">Incubation Application</DialogTitle> {/* Title to accent */}
+          <DialogTitle className="font-montserrat text-2xl text-accent">Incubation Application</DialogTitle>
           <DialogDescription className="text-muted-foreground">
-            Ready to turn your vision into reality? Fill out the form below.
-            This form is for campus applicants. Off-campus applicants should use the provided Google Form link.
+            Ready to turn your vision into reality? Please fill out all required fields marked with *. Off-campus applicants should use the provided Google Form link instead.
           </DialogDescription>
         </DialogHeader>
         <div className="py-4">
-          <ContactForm /> {/* Ensure ContactForm's submit button also uses accent */}
+          <IncubationApplicationForm />
         </div>
       </DialogContent>
     </Dialog>
