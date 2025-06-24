@@ -24,6 +24,27 @@ export interface Submission {
   temporaryPassword?: string;
   processedByAdminAt?: Date | Timestamp | string;
   source?: 'campus' | 'off-campus';
+  
+  // New fields from CampusApplicationForm
+  fullName?: string;
+  natureOfInquiry?: string;
+  companyEmail?: string;
+  founderNames?: string;
+  founderBio?: string;
+  portfolioUrl?: string;
+  teamInfo?: string;
+  targetAudience?: string;
+  problemSolving?: string;
+  uniqueness?: string;
+  currentStage?: string;
+  
+  // New dropdown fields
+  domain?: string;
+  sector?: string;
+  legalStatus?: string;
+  
+  attachmentBase64?: string;
+  attachmentName?: string;
 }
 
 export interface ProcessingActionState {
