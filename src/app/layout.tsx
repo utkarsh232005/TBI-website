@@ -17,7 +17,8 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" suppressHydrationWarning>
-      <body className={`${orbitron.variable} ${poppins.variable} ${montserrat.variable} font-poppins antialiased`}> {/* Add montserrat.variable */}        <ThemeProvider
+      <body style={{ position: 'relative' }} className={`${orbitron.variable} ${poppins.variable} ${montserrat.variable} font-poppins antialiased`}> {/* Add montserrat.variable */}
+        <ThemeProvider
           attribute="class"
           defaultTheme="dark"
           enableSystem
