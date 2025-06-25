@@ -2,7 +2,7 @@
 "use client";
 
 import { useEffect, useState } from 'react';
-import MentorCard, { type Mentor as PublicMentor } from '@/components/ui/mentor-card'; // PublicMentor type from card
+import MentorCard, { type Mentor as PublicMentor } from '@/components/ui/mentor-card'; 
 import MainNavbar from '@/components/ui/main-navbar';
 import Footer from '@/components/ui/footer';
 import { motion } from 'framer-motion';
@@ -11,6 +11,7 @@ import { collection, getDocs, orderBy, query, Timestamp } from 'firebase/firesto
 import { Loader2, AlertCircle, Users } from 'lucide-react';
 import { AuroraText } from "@/components/magicui/aurora-text";
 import { processImageUrl } from "@/lib/utils";
+import { useToast } from "@/hooks/use-toast";
 
 const pageTitleVariants = {
   hidden: { opacity: 0, y: -20 },
@@ -45,6 +46,7 @@ export default function MentorsPage() {
   const [mentors, setMentors] = useState<PublicMentor[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const { toast } = useToast();
 
   useEffect(() => {
     const fetchMentors = async () => {
@@ -63,10 +65,10 @@ export default function MentorsPage() {
             description: data.description,
             areaOfMentorship: data.expertise, // Map expertise to areaOfMentorship
             email: data.email,
-            avatarUrl: processImageUrl(data.profilePictureUrl, data.name.substring(0,2)),
+            avatarUrl: processImageUrl(data.profilePictureUrl || '', data.name.substring(0,2)),
             // Using a default placeholder for background, as this is not in Firestore
             backgroundImageUrl: processImageUrl(
-              data.backgroundImageUrl || '',
+              '',
               data.name.substring(0,1)
             ),
             dataAiHintAvatar: `professional ${data.name.split(' ')[0].toLowerCase()}`,
@@ -139,7 +141,10 @@ export default function MentorsPage() {
             >
               {mentors.map((mentor) => (
                 <motion.div key={mentor.id} variants={cardItemVariants}>
-                  <MentorCard mentor={mentor} />
+                  <MentorCard 
+                    mentor={mentor} 
+                    showSelectButton={false}
+                  />
                 </motion.div>
               ))}
             </motion.div>

@@ -32,11 +32,20 @@ export interface Submission {
   founderNames?: string;
   founderBio?: string;
   portfolioUrl?: string;
+  linkedinUrl?: string;
   teamInfo?: string;
   targetAudience?: string;
   problemSolving?: string;
   uniqueness?: string;
   currentStage?: string;
+  developmentStage?: string;
+  businessCategory?: string;
+  contactInfo?: string;
+  
+  // Import tracking fields
+  sourceRow?: number;
+  importedAt?: Date | Timestamp | string;
+  formSubmittedAt?: string;
   
   // New dropdown fields
   domain?: string;

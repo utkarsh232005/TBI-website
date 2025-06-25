@@ -11,6 +11,7 @@ import { useToast } from "@/hooks/use-toast";
 import { processApplicationAction, importOffCampusSubmissionsFromSheet } from '@/app/actions/admin-actions';
 import { SubmissionsTable } from '../dashboard/components/SubmissionsTable';
 import { OnCampusSubmissionCard } from './components/OnCampusSubmissionCard';
+import { OffCampusSubmissionCard } from './components/OffCampusSubmissionCard';
 import { Submission } from '@/types/Submission';
 import { useSearchParams } from 'next/navigation';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -145,45 +146,63 @@ function AdminSubmissionsContent() {
   const SubmissionsOverview = ({ type }: { type: "on-campus" | "off-campus" }) => {
     const currentSubmissions = type === "on-campus" ? onCampusSubmissions : offCampusSubmissions;
 
-    if (type === "on-campus") {
-      if (isLoading && currentSubmissions.length === 0) {
-        return (
-          <div className="flex items-center justify-center py-10 rounded-xl bg-neutral-900/30">
-            <Loader2 className="mr-3 h-8 w-8 animate-spin text-indigo-400" />
-            <span className="text-neutral-300">Loading on-campus submissions...</span>
-          </div>
-        );
-      }
-    
-      if (error) {
-        return (
-          <div className="flex flex-col items-center justify-center py-10 rounded-xl bg-rose-900/10 border border-rose-900/30">
-            <AlertCircle className="h-10 w-10 text-rose-400 mb-3" />
-            <h3 className="text-lg font-semibold text-rose-100">Error loading data</h3>
-            <p className="text-sm text-rose-300 mt-1 mb-4 text-center max-w-md">{error}</p>
-            <Button 
-              onClick={fetchSubmissions} 
-              variant="outline" 
-              className="border-rose-500/30 text-rose-300 hover:bg-rose-900/30 hover:text-white"
-            >
-              Try Again
-            </Button>
-          </div>
-        );
-      }
-    
-      if (currentSubmissions.length === 0) {
-        return (
-          <div className="text-center py-12 rounded-xl bg-neutral-900/30 border border-dashed border-neutral-700/50">
-            <FileTextIcon className="mx-auto h-12 w-12 text-neutral-500 mb-4" />
-            <h3 className="text-lg font-medium text-neutral-200">No on-campus submissions yet</h3>
-            <p className="text-neutral-400 mt-1">On-campus applications will appear here once submitted</p>
-          </div>
-        );
-      }
+    if (isLoading && currentSubmissions.length === 0) {
       return (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-6">
-          {currentSubmissions.map(submission => (
+        <div className="flex items-center justify-center py-10 rounded-xl bg-neutral-900/30">
+          <Loader2 className="mr-3 h-8 w-8 animate-spin text-indigo-400" />
+          <span className="text-neutral-300">Loading {type} submissions...</span>
+        </div>
+      );
+    }
+  
+    if (error) {
+      return (
+        <div className="flex flex-col items-center justify-center py-10 rounded-xl bg-rose-900/10 border border-rose-900/30">
+          <AlertCircle className="h-10 w-10 text-rose-400 mb-3" />
+          <h3 className="text-lg font-semibold text-rose-100">Error loading data</h3>
+          <p className="text-sm text-rose-300 mt-1 mb-4 text-center max-w-md">{error}</p>
+          <Button 
+            onClick={fetchSubmissions} 
+            variant="outline" 
+            className="border-rose-500/30 text-rose-300 hover:bg-rose-900/30 hover:text-white"
+          >
+            Try Again
+          </Button>
+        </div>
+      );
+    }
+  
+    if (currentSubmissions.length === 0) {
+      return (
+        <div className="text-center py-12 rounded-xl bg-neutral-900/30 border border-dashed border-neutral-700/50">
+          <FileTextIcon className="mx-auto h-12 w-12 text-neutral-500 mb-4" />
+          <h3 className="text-lg font-medium text-neutral-200">No {type} submissions yet</h3>
+          <p className="text-neutral-400 mt-1">
+            {type === 'on-campus' 
+              ? 'On-campus applications will appear here once submitted' 
+              : 'Off-campus applications will appear here once imported or submitted'
+            }
+          </p>
+          {type === 'off-campus' && (
+            <Button 
+              onClick={handleImportOffCampus}
+              disabled={isImporting}
+              variant="secondary" 
+              size="sm" 
+              className="mt-4"
+            >
+              {isImporting ? <Loader2 className="animate-spin mr-2"/> : <UploadCloud className="mr-2"/>}
+              Import Off-Campus Data
+            </Button>
+          )}
+        </div>
+      );
+    }
+
+    return (
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-6">
+        {currentSubmissions.map(submission => (
+          type === "on-campus" ? (
             <OnCampusSubmissionCard
               key={submission.id}
               submission={submission}
@@ -191,22 +210,18 @@ function AdminSubmissionsContent() {
               onProcessAction={handleProcess}
               onViewDetails={handleViewDetails}
             />
-          ))}
-        </div>
-      );
-    } else { // off-campus or any other type using table
-      return (
-        <SubmissionsTable
-          submissions={currentSubmissions}
-          processingAction={processingActionState}
-          onProcessAction={handleProcess}
-          isLoading={isLoading}
-          error={error}
-          onRetry={fetchSubmissions}
-          className="mt-6"
-        />
-      );
-    }
+          ) : (
+            <OffCampusSubmissionCard
+              key={submission.id}
+              submission={submission}
+              processingAction={processingActionState}
+              onProcessAction={handleProcess}
+              onViewDetails={handleViewDetails}
+            />
+          )
+        ))}
+      </div>
+    );
   };
 
   return (

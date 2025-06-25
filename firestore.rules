@@ -1,7 +1,8 @@
 rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
-    // Allows reading the specific admin credentials document    match /admin_config/main_credentials {
+    // Allows reading the specific admin credentials document
+    match /admin_config/main_credentials {
       allow read: if true; // Allows any authenticated or unauthenticated client to read
       allow write: if request.auth != null; // Example: only allow authenticated users to write (you'd restrict this to admins)
     }
@@ -19,7 +20,8 @@ service cloud.firestore {
     }
     
     // Helper functions for contactSubmissions rules
-    function isValidOnboardingUpdate(existingData, incomingRequest) {      let existingDoc = existingData.data;
+    function isValidOnboardingUpdate(existingData, incomingRequest) {
+      let existingDoc = existingData.data;
       let incomingDoc = incomingRequest.resource.data;
       
       // Check if this is an accepted user updating their own onboarding data
@@ -45,7 +47,8 @@ service cloud.firestore {
         'submittedAt', 'campusStatus', 'companyName', 'idea'
       ];
       
-      // Check that only allowed fields are being modified      return incomingDoc.keys().hasOnly(allowedFields);
+      // Check that only allowed fields are being modified
+      return incomingDoc.keys().hasOnly(allowedFields);
     }
     
     function isValidOnboardingData(incomingDoc) {
@@ -97,13 +100,15 @@ service cloud.firestore {
       allow update: if true; // Placeholder: No one can update events yet
       allow delete: if true; // Placeholder: No one can delete events yet
     }
+    
     match /mentors/{mentorId} {
       allow read: if true; // Allows anyone to read mentors for the public page
       allow create: if true; 
       allow update: if true; // Placeholder: No one can update events yet
       allow delete: if true;
       // EXAMPLE: Allow anyone to write for dev. MUST be restricted to admin.
-      // update, delete will be needed later    }
+      // update, delete will be needed later
+    }
     
     // Rules for startups
     match /startups/{startupId} {
@@ -118,6 +123,74 @@ service cloud.firestore {
                                              // In production, ensure your backend action is admin-only.
                                              // Or, if admin uses Firebase Auth: if request.auth.token.isAdmin == true;
     }
+
+    // PRODUCTION SECURITY RECOMMENDATIONS:
+    // 1. Implement proper authentication checks
+    // 2. Restrict mentorRequests write access to authenticated users only
+    // 3. Limit emailTokens access to server-side operations only
+    // 4. Add rate limiting for token generation
+    
+    // Example production rules (currently using permissive dev rules):
+    // match /mentorRequests/{requestId} {
+    //   allow read: if request.auth != null;
+    //   allow create: if request.auth != null && isValidUser(request.auth.uid);
+    //   allow update: if request.auth != null && (isOwner(resource, request.auth.uid) || isAdmin(request.auth.uid));
+    // }
+    //
+    // match /emailTokens/{tokenId} {
+    //   allow read, write: if false; // Server-side only access
+    // }
+
+    // DEVELOPMENT RULES for mentor requests (More permissive for testing)
+    // NOTE: These rules are permissive for development/testing purposes.
+    // In production, you should implement proper authentication checks.
+    match /mentorRequests/{requestId} {
+      // Allow anyone to create mentor requests (for development/testing)
+      allow create: if true;
+      
+      // Allow anyone to read mentor requests (for development/testing)
+      allow read: if true;
+      
+      // Allow anyone to update mentor requests (for development/testing)
+      allow update: if true;
+      
+      // Allow anyone to delete mentor requests (for development/testing)
+      allow delete: if true;
+    }
+
+    // DEVELOPMENT RULES for notifications (More permissive for testing)
+    match /notifications/{notificationId} {
+      // Allow anyone to create notifications (for development/testing)
+      allow create: if true;
+      
+      // Allow anyone to read notifications (for development/testing)
+      allow read: if true;
+      
+      // Allow anyone to update notifications (for development/testing)
+      allow update: if true;
+      
+      // Allow anyone to delete notifications (for development/testing)
+      allow delete: if true;
+    }
+
+    // DEVELOPMENT RULES for user profile collections
+    match /users/{userId} {
+      allow read: if true;
+      allow write: if true;
+    }
+
+    match /submissions/{submissionId} {
+      allow read: if true;
+      allow write: if true;
+    }
+
+    // DEVELOPMENT RULES for email tokens
+    match /emailTokens/{tokenId} {
+      allow read: if true;
+      allow write: if true;
+      allow delete: if true;
+    }
+
     // Add other rules for other collections if needed
   }
 }

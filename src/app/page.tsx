@@ -22,7 +22,7 @@ export default function HomePage() {
     if (campusStatusFromStorage === "off-campus") {
       // This case should ideally be handled before calling this, 
       // e.g. in HeroSection, but as a fallback:
-      window.location.href = 'https://docs.google.com/forms/d/e/YOUR_FORM_ID_HERE/viewform?usp=sf_link'; // DUMMY LINK
+      window.location.href = 'https://docs.google.com/forms/d/1WNPpTVLahffQ_n3rdDbnsVFjcXrKqslVFyk4Lmib2uo/viewform?edit_requested=true';
       return;
     }
     setIsApplicationFormOpen(true);

@@ -28,11 +28,13 @@ import {
   Users,
   LayoutDashboard,
   FileCheck,
+  MessageSquare,
   Rocket // Added Rocket icon
 } from "lucide-react";
 import { InnoNexusLogo } from "@/components/icons/innnexus-logo";
 import { motion } from "framer-motion";
 import { cn } from "@/lib/utils";
+import NotificationsPanel from "@/components/ui/notifications-panel";
 
 interface NavItem {
   href: string;
@@ -73,6 +75,12 @@ function AdminLayoutContent({
       href: "/admin/mentors", 
       label: "Mentors", 
       icon: <Users className="h-5 w-5" />,
+      disabled: false 
+    },
+    { 
+      href: "/admin/mentor-requests", 
+      label: "Mentor Requests", 
+      icon: <MessageSquare className="h-5 w-5" />,
       disabled: false 
     },
     { 
@@ -245,6 +253,12 @@ function AdminLayoutContent({
               <span className="text-lg font-semibold text-white">Admin</span>
             </Link>
           </div>
+          <NotificationsPanel userId="admin@tbi.com" />
+        </header>
+
+        {/* Desktop header with notifications */}
+        <header className="hidden md:flex items-center justify-end h-16 px-6 border-b border-neutral-800 bg-neutral-900/80 backdrop-blur-sm">
+          <NotificationsPanel userId="admin@tbi.com" />
         </header>
 
         {/* Page content */}

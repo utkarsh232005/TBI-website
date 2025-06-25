@@ -6,8 +6,9 @@ import { cn } from "@/lib/utils";
 import { processImageUrl } from "@/lib/utils";
 import Image from 'next/image';
 import Link from 'next/link';
-import { Mail, UserCircle, Briefcase, Brain, Linkedin } from 'lucide-react';
+import { Mail, UserCircle, Briefcase, Brain, Linkedin, UserPlus } from 'lucide-react';
 import { motion } from 'framer-motion';
+import { Button } from "@/components/ui/button";
 
 export interface Mentor {
   id: string;
@@ -25,9 +26,11 @@ export interface Mentor {
 
 interface MentorCardProps {
   mentor: Mentor;
+  onSelectMentor?: (mentorId: string) => void;
+  showSelectButton?: boolean;
 }
 
-export default function MentorCard({ mentor }: MentorCardProps) {
+export default function MentorCard({ mentor, onSelectMentor, showSelectButton = false }: MentorCardProps) {
   return (
     <motion.div 
       className="w-full group/card max-w-sm mx-auto"
@@ -82,24 +85,38 @@ export default function MentorCard({ mentor }: MentorCardProps) {
               </p>
            </div>
 
-          <div className="mt-auto flex items-center justify-between">
-            <Link
-              href={`mailto:${mentor.email}`}
-              className="font-poppins text-xs text-accent hover:text-accent/80 transition-colors duration-200 flex items-center group/email" /* Email link to accent */
-            >
-              <Mail size={14} className="mr-1.5 group-hover/email:text-accent/80 transition-colors flex-shrink-0" /> Contact
-            </Link>
-            {mentor.linkedinUrl && (
-              <a
-                href={mentor.linkedinUrl}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="font-poppins text-xs text-accent hover:text-accent/80 transition-colors duration-200 flex items-center group/linkedin" /* LinkedIn link to accent */
-                aria-label={`${mentor.name} LinkedIn Profile`}
-              >
-                <Linkedin size={14} className="mr-1.5 group-hover/linkedin:text-accent/80 transition-colors flex-shrink-0" /> LinkedIn
-              </a>
+          <div className="mt-auto">
+            {showSelectButton && onSelectMentor && (
+              <div className="mb-3">
+                <Button
+                  onClick={() => onSelectMentor(mentor.id)}
+                  className="w-full bg-accent hover:bg-accent/90 text-accent-foreground font-poppins text-sm py-2 rounded-lg transition-colors duration-200 flex items-center justify-center group/select"
+                  size="sm"
+                >
+                  <UserPlus size={16} className="mr-2 group-hover/select:scale-110 transition-transform flex-shrink-0" />
+                  Select as Mentor
+                </Button>
+              </div>
             )}
+            <div className="flex items-center justify-between">
+              <Link
+                href={`mailto:${mentor.email}`}
+                className="font-poppins text-xs text-accent hover:text-accent/80 transition-colors duration-200 flex items-center group/email" /* Email link to accent */
+              >
+                <Mail size={14} className="mr-1.5 group-hover/email:text-accent/80 transition-colors flex-shrink-0" /> Contact
+              </Link>
+              {mentor.linkedinUrl && (
+                <a
+                  href={mentor.linkedinUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="font-poppins text-xs text-accent hover:text-accent/80 transition-colors duration-200 flex items-center group/linkedin" /* LinkedIn link to accent */
+                  aria-label={`${mentor.name} LinkedIn Profile`}
+                >
+                  <Linkedin size={14} className="mr-1.5 group-hover/linkedin:text-accent/80 transition-colors flex-shrink-0" /> LinkedIn
+                </a>
+              )}
+            </div>
           </div>
         </div>
       </div>

@@ -20,27 +20,40 @@ const UserContext = createContext<UserContextType | undefined>(undefined);
 export function UserProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [isMounted, setIsMounted] = useState(false);
 
   useEffect(() => {
+    setIsMounted(true);
+  }, []);
+
+  useEffect(() => {
+    if (!isMounted) return;
+    
     // Try to get user data from localStorage on mount
-    const storedUser = localStorage.getItem('currentUser');
-    if (storedUser) {
-      try {
-        setUser(JSON.parse(storedUser));
-      } catch (error) {
-        console.error('Error parsing stored user data:', error);
+    try {
+      const storedUser = localStorage.getItem('currentUser');
+      if (storedUser) {
+        const parsedUser = JSON.parse(storedUser);
+        setUser(parsedUser);
+      }
+    } catch (error) {
+      console.error('Error parsing stored user data:', error);
+      if (typeof window !== 'undefined') {
         localStorage.removeItem('currentUser');
       }
+    } finally {
+      setIsLoading(false);
     }
-    setIsLoading(false);
-  }, []);
+  }, [isMounted]);
 
   const updateUser = (newUser: User | null) => {
     setUser(newUser);
-    if (newUser) {
-      localStorage.setItem('currentUser', JSON.stringify(newUser));
-    } else {
-      localStorage.removeItem('currentUser');
+    if (typeof window !== 'undefined') {
+      if (newUser) {
+        localStorage.setItem('currentUser', JSON.stringify(newUser));
+      } else {
+        localStorage.removeItem('currentUser');
+      }
     }
   };
 

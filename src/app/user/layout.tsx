@@ -22,6 +22,7 @@ import {
   Menu,
   User,
 } from "lucide-react";
+import NotificationsPanel from "@/components/ui/notifications-panel";
 import { InnoNexusLogo } from "@/components/icons/innnexus-logo";
 import { motion } from "framer-motion";
 import { cn } from "@/lib/utils";
@@ -62,6 +63,12 @@ function UserLayoutContent({
     {
       href: "/user/mentors",
       label: "Mentors",
+      icon: <Users className="h-5 w-5" />,
+      disabled: false
+    },
+    {
+      href: "/user/mentor-requests",
+      label: "Mentor Requests",
       icon: <Users className="h-5 w-5" />,
       disabled: false
     },
@@ -270,6 +277,16 @@ function UserLayoutContent({
               <span className="text-lg font-semibold text-white">Portal</span>
             </Link>
           </div>
+          {user?.identifier && (
+            <NotificationsPanel userId={user.identifier} />
+          )}
+        </header>
+
+        {/* Desktop header with notifications */}
+        <header className="hidden md:flex items-center justify-end h-16 px-6 border-b border-neutral-800 bg-neutral-900/80 backdrop-blur-sm">
+          {user?.identifier && (
+            <NotificationsPanel userId={user.identifier} />
+          )}
         </header>
 
         {/* Page content */}
@@ -294,11 +311,9 @@ export default function UserLayout({
 }) {
   return (
     <SidebarProvider>
-      <UserProvider>
-        <UserLayoutContent>
-          {children}
-        </UserLayoutContent>
-      </UserProvider>
+      <UserLayoutContent>
+        {children}
+      </UserLayoutContent>
     </SidebarProvider>
   );
 }

@@ -12,7 +12,7 @@ import { InteractiveHoverButton } from "@/components/magicui/interactive-hover-b
 
 
 
-const DUMMY_GOOGLE_FORM_LINK = 'https://docs.google.com/forms/d/e/YOUR_FORM_ID_HERE/viewform?usp=sf_link'; // DUMMY LINK
+const DUMMY_GOOGLE_FORM_LINK = 'https://docs.google.com/forms/d/1WNPpTVLahffQ_n3rdDbnsVFjcXrKqslVFyk4Lmib2uo/viewform?edit_requested=true';
 
 interface HeroSectionProps {
   onApplyClick?: () => void;

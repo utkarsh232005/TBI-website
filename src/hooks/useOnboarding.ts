@@ -10,7 +10,9 @@ export function useOnboarding() {
   const [state, setState] = useState<OnboardingState>({
     showOnboarding: false,
     isCompleted: false,
-  });  useEffect(() => {
+  });
+
+  useEffect(() => {
     // Add a small delay to ensure localStorage is ready
     const checkOnboardingStatusTimer = () => {
       const shouldShowOnboarding = checkOnboardingStatus();
@@ -26,11 +28,18 @@ export function useOnboarding() {
         }
       } else {
         // Check if onboarding was already completed
-        const hasCompletedOnboarding = localStorage.getItem('onboarding_completed') === 'true';
-        setState({
-          showOnboarding: false,
-          isCompleted: hasCompletedOnboarding,
-        });
+        if (typeof window !== 'undefined') {
+          const hasCompletedOnboarding = localStorage.getItem('onboarding_completed') === 'true';
+          setState({
+            showOnboarding: false,
+            isCompleted: hasCompletedOnboarding,
+          });
+        } else {
+          setState({
+            showOnboarding: false,
+            isCompleted: false,
+          });
+        }
       }
     };
 
@@ -38,7 +47,9 @@ export function useOnboarding() {
     const timer = setTimeout(checkOnboardingStatusTimer, 100);
     
     return () => clearTimeout(timer);
-  }, []);  const completeOnboarding = () => {
+  }, []);
+
+  const completeOnboarding = () => {
     if (typeof window !== 'undefined') {
       localStorage.setItem('onboarding_completed', 'true');
       localStorage.removeItem('first_login'); // Ensure first_login flag is cleared
@@ -56,8 +67,10 @@ export function useOnboarding() {
     }));
   };
   const resetOnboarding = () => {
-    localStorage.removeItem('onboarding_completed');
-    localStorage.setItem('first_login', 'true');
+    if (typeof window !== 'undefined') {
+      localStorage.removeItem('onboarding_completed');
+      localStorage.setItem('first_login', 'true');
+    }
     setState({
       showOnboarding: true,
       isCompleted: false,

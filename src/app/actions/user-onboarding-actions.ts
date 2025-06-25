@@ -371,7 +371,9 @@ function serializeUserData(userData: UserDocument): any {
     'passwordUpdatedAt', 
     'profileUpdatedAt',
     'onboardingCompletedAt',
-    'processedByAdminAt'
+    'processedByAdminAt',
+    'importedAt',
+    'formSubmittedAt'
   ];
   
   timestampFields.forEach(field => {

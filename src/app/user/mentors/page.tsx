@@ -4,10 +4,14 @@
 
 import { useEffect, useState } from 'react';
 import MentorCard, { type Mentor as PublicMentor } from '@/components/ui/mentor-card';
+import MentorRequestDialog from '@/components/ui/mentor-request-dialog';
 import { motion } from 'framer-motion';
 import { db } from '@/lib/firebase';
 import { collection, getDocs, orderBy, query, Timestamp } from 'firebase/firestore';
-import { Loader2, AlertCircle, Users } from 'lucide-react';
+import { Loader2, AlertCircle, Users, Lock } from 'lucide-react';
+import { processImageUrl } from "@/lib/utils";
+import { useToast } from "@/hooks/use-toast";
+import { useUser } from '@/contexts/user-context';
 
 // This is the structure of mentor data stored in Firestore (from admin side)
 interface FirestoreMentor {
@@ -41,6 +45,23 @@ export default function UserMentorsPage() {
   const [mentors, setMentors] = useState<PublicMentor[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [selectedMentor, setSelectedMentor] = useState<PublicMentor | null>(null);
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const { user, isLoading: userLoading } = useUser();
+  const { toast } = useToast();
+
+  const handleSelectMentor = (mentorId: string) => {
+    const mentor = mentors.find(m => m.id === mentorId);
+    if (mentor) {
+      setSelectedMentor(mentor);
+      setIsDialogOpen(true);
+    }
+  };
+
+  const handleCloseDialog = () => {
+    setIsDialogOpen(false);
+    setSelectedMentor(null);
+  };
 
   useEffect(() => {
     const fetchMentors = async () => {
@@ -85,10 +106,32 @@ export default function UserMentorsPage() {
     fetchMentors();
   }, []);
 
+  // Show loading state while checking user authentication
+  if (userLoading) {
+    return (
+      <div className="flex justify-center items-center py-20">
+        <Loader2 className="h-12 w-12 animate-spin text-indigo-400" />
+      </div>
+    );
+  }
+
+  // Show authentication required message if user is not logged in
+  if (!user) {
+    return (
+      <div className="text-center py-20">
+        <Lock className="mx-auto h-12 w-12 text-neutral-500 mb-4" />
+        <h2 className="text-2xl font-semibold text-white mb-2">Authentication Required</h2>
+        <p className="text-neutral-400 text-lg">
+          Please log in to view and select mentors.
+        </p>
+      </div>
+    );
+  }
+
   return (
     <div className="space-y-8">
         <motion.div 
-            className="text-left mb-8" // Changed to text-left
+            className="text-left mb-8"
             initial="hidden"
             animate="visible"
             variants={pageTitleVariants}
@@ -105,7 +148,17 @@ export default function UserMentorsPage() {
             </motion.p>
         </motion.div>
 
-        {isLoading ? (
+        {userLoading ? (
+            <div className="flex justify-center items-center py-20">
+              <Loader2 className="h-12 w-12 animate-spin text-indigo-400" />
+            </div>
+        ) : !user ? (
+            <div className="text-center py-10 bg-amber-900/20 border border-amber-500/30 rounded-lg p-6">
+              <Lock className="mx-auto h-10 w-10 mb-3 text-amber-400" />
+              <p className="text-xl font-semibold text-amber-300">Authentication Required</p>
+              <p className="text-neutral-400">Please log in to view and select mentors.</p>
+            </div>
+        ) : isLoading ? (
             <div className="flex justify-center items-center py-20">
               <Loader2 className="h-12 w-12 animate-spin text-indigo-400" />
             </div>
@@ -123,19 +176,37 @@ export default function UserMentorsPage() {
               </p>
             </div>
         ) : (
-            <motion.div 
-              className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 xl:gap-10"
-              initial="hidden"
-              whileInView="visible"
-              viewport={{ once: true, amount: 0.1 }}
-              variants={gridVariants}
-            >
-              {mentors.map((mentor) => (
-                <motion.div key={mentor.id} variants={cardItemVariants}>
-                  <MentorCard mentor={mentor} />
-                </motion.div>
-              ))}
-            </motion.div>
+            <>
+              <motion.div 
+                className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 xl:gap-10"
+                initial="hidden"
+                whileInView="visible"
+                viewport={{ once: true, amount: 0.1 }}
+                variants={gridVariants}
+              >
+                {mentors.map((mentor) => (
+                  <motion.div key={mentor.id} variants={cardItemVariants}>
+                    <MentorCard 
+                      mentor={mentor} 
+                      showSelectButton={true}
+                      onSelectMentor={handleSelectMentor}
+                    />
+                  </motion.div>
+                ))}
+              </motion.div>
+
+              {/* Mentor Request Dialog */}
+              {selectedMentor && user && (
+                <MentorRequestDialog
+                  isOpen={isDialogOpen}
+                  onClose={handleCloseDialog}
+                  mentor={selectedMentor}
+                  userId={user.identifier}
+                  userEmail={user.email}
+                  userName={user.name}
+                />
+              )}
+            </>
         )}
     </div>
   );

@@ -62,11 +62,16 @@ async function sendEmailNotification(to: string, subject: string, body: string):
   const resend = new Resend(process.env.RESEND_API_KEY);
 
   try {
-    // IMPORTANT: For best deliverability, replace 'onboarding@resend.dev' 
-    // with an email address from a domain you have verified with Resend.
-    // e.g., 'Your Name <notifications@yourverifieddomain.com>'
+    // Use the configured FROM email address from environment variables
+    const fromEmail = process.env.RESEND_FROM_EMAIL || 'TBI Platform <onboarding@resend.dev>';
+    
+    console.log("Attempting to send email:");
+    console.log("From:", fromEmail);
+    console.log("To:", to);
+    console.log("Subject:", subject);
+    
     const { data, error } = await resend.emails.send({
-      from: 'RCEOM-TBI <onboarding@resend.dev>', 
+      from: fromEmail, 
       to: [to],
       subject: subject,
       text: body, // For HTML emails, use 'html: "<strong>your html content</strong>"'
@@ -74,7 +79,8 @@ async function sendEmailNotification(to: string, subject: string, body: string):
 
     if (error) {
       console.error("Resend API Error:", error);
-      return { success: false, message: `Failed to send email via Resend: ${error.message}`, error: JSON.stringify(error) };
+      const errorMessage = error.message || error.name || JSON.stringify(error) || 'Unknown Resend API error';
+      return { success: false, message: `Failed to send email via Resend: ${errorMessage}`, error: JSON.stringify(error) };
     }
 
     console.log("Email sent successfully via Resend. ID:", data?.id);
@@ -99,11 +105,11 @@ const processApplicationFlow = ai.defineFlow(
     try {
       const submissionSnap = await getDoc(submissionRef);
       if (!submissionSnap.exists()) {
-        return { status: 'error', message: `Submission with ID ${submissionId} not found.` };
+        return { status: 'error' as const, message: `Submission with ID ${submissionId} not found.` };
       }
       const submissionData = submissionSnap.data();
       if (submissionData.status !== 'pending') {
-         return { status: 'error', message: `Submission ${submissionId} has already been processed (status: ${submissionData.status}).` };
+         return { status: 'error' as const, message: `Submission ${submissionId} has already been processed (status: ${submissionData.status}).` };
       }
 
       let emailSubject = '';
@@ -136,7 +142,7 @@ const processApplicationFlow = ai.defineFlow(
       const emailResult = await sendEmailNotification(applicantEmail, emailSubject, emailBody);
 
       return {
-        status: 'success',
+        status: 'success' as const,
         message: `Application ${action === 'accept' ? 'accepted' : 'rejected'} successfully. ${emailResult.message}`,
         email: {
           to: applicantEmail,
@@ -152,7 +158,7 @@ const processApplicationFlow = ai.defineFlow(
     } catch (error: any) {
       console.error('Error processing application:', error);
       return {
-        status: 'error',
+        status: 'error' as const,
         message: `Failed to process application: ${error.message}`,
       };
     }
