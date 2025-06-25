@@ -19,7 +19,7 @@ import { useToast } from "@/hooks/use-toast";
 import { useRouter } from "next/navigation";
 import { LogIn, Loader2 } from "lucide-react";
 import { useState } from "react";
-import { verifyAdminCredentials, type AdminLoginFormValues, type VerifyCredentialsResponse } from "@/app/actions/auth-actions";
+import { verifyAdminCredentials, type AdminLoginFormValues, type VerifyUserCredentialsResponse } from "@/app/actions/auth-actions";
 
 
 const formSchema = z.object({
@@ -45,7 +45,7 @@ export default function AdminLoginForm() {
     setIsLoading(true);
     console.log("[AdminLoginForm] Attempting login with:", values);
     try {
-      const result: VerifyCredentialsResponse = await verifyAdminCredentials(values);
+      const result: VerifyUserCredentialsResponse = await verifyAdminCredentials(values);
       console.log("[AdminLoginForm] Verification result:", result);
 
       if (result.success) {
