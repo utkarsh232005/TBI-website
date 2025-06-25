@@ -1,7 +1,7 @@
 // src/app/mentor/requests/page.tsx
 "use client";
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, Suspense } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -48,7 +48,20 @@ import { db } from '@/lib/firebase';
 import type { MentorRequest } from '@/types/mentor-request';
 import { format } from 'date-fns';
 
-export default function MentorRequestsPage() {
+// Loading component for Suspense fallback
+function LoadingPage() {
+  return (
+    <div className="min-h-screen flex justify-center items-center">
+      <div className="text-center">
+        <Loader2 className="h-8 w-8 animate-spin mx-auto mb-4" />
+        <p className="text-gray-600">Loading mentor request...</p>
+      </div>
+    </div>
+  );
+}
+
+// Main component that uses useSearchParams
+function MentorRequestsContent() {
   const [request, setRequest] = useState<MentorRequest | null>(null);
   const [userDetails, setUserDetails] = useState<any>(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -556,5 +569,14 @@ export default function MentorRequestsPage() {
         </AlertDialog>
       </div>
     </div>
+  );
+}
+
+// Main page component with Suspense boundary
+export default function MentorRequestsPage() {
+  return (
+    <Suspense fallback={<LoadingPage />}>
+      <MentorRequestsContent />
+    </Suspense>
   );
 }
