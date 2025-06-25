@@ -234,8 +234,10 @@ export function OnboardingPopup({ isOpen, onClose, onComplete, userIdentifier }:
         setNotificationPreferences({ enabled: enable });
         completeStep(2);
         
-        // Complete the entire onboarding process
-        await completeUserOnboarding(userIdentifier);
+        // Complete the entire onboarding process and close popup
+        setTimeout(async () => {
+          await handleComplete();
+        }, 500);
       } else {
         toast({
           title: "Error",
@@ -274,7 +276,39 @@ export function OnboardingPopup({ isOpen, onClose, onComplete, userIdentifier }:
     }
   };
 
-  const handleComplete = () => {
+  const handleComplete = async () => {
+    // Mark onboarding as completed in database
+    try {
+      if (userIdentifier) {
+        console.log('Completing onboarding for user:', userIdentifier);
+        const result = await completeUserOnboarding(userIdentifier);
+        if (result.success) {
+          console.log('Onboarding marked as completed in database');
+          
+          // Show success message
+          toast({
+            title: "Welcome!",
+            description: "Your onboarding has been completed successfully.",
+          });
+        } else {
+          console.error('Failed to complete onboarding:', result.message);
+          toast({
+            title: "Warning",
+            description: "Onboarding steps completed, but there was an issue saving to database.",
+            variant: "destructive",
+          });
+        }
+      }
+    } catch (error) {
+      console.error('Error completing onboarding:', error);
+      toast({
+        title: "Warning", 
+        description: "Onboarding steps completed, but there was an issue saving to database.",
+        variant: "destructive",
+      });
+    }
+    
+    // Always call parent completion handler and close popup, regardless of database save status
     onComplete();
     onClose();
   };
@@ -283,15 +317,28 @@ export function OnboardingPopup({ isOpen, onClose, onComplete, userIdentifier }:
     if (allStepsCompleted && currentStep === steps.length - 1) {
       // Auto-complete after a short delay when all steps are done
       const timer = setTimeout(() => {
-        handleComplete();
-      }, 1500);
+        if (allStepsCompleted) { // Double check to ensure all steps are still completed
+          handleComplete();
+        }
+      }, 1000);
       return () => clearTimeout(timer);
     }
   }, [allStepsCompleted, currentStep]);
 
   return (
-    <Dialog open={isOpen} onOpenChange={() => {}}>
-      <DialogContent className="max-w-2xl bg-neutral-900 border-neutral-800 text-white">
+    <Dialog open={isOpen} onOpenChange={(open) => {
+      if (!open && allStepsCompleted) {
+        // Only allow closing if all steps are completed
+        handleComplete();
+      }
+    }}>
+      <DialogContent className="max-w-2xl bg-neutral-900 border-neutral-800 text-white"
+                     onPointerDownOutside={(e) => {
+                       // Prevent closing by clicking outside unless all steps are completed
+                       if (!allStepsCompleted) {
+                         e.preventDefault();
+                       }
+                     }}>
         <DialogHeader>
           <DialogTitle className="text-2xl font-bold text-center text-white">
             Welcome! Let's get you started

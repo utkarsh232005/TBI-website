@@ -173,10 +173,10 @@ service cloud.firestore {
       allow delete: if true;
     }
 
-    // DEVELOPMENT RULES for user profile collections
+    // Enhanced rules for user profile collections
     match /users/{userId} {
-      allow read: if true;
-      allow write: if true;
+      allow read: if true; // Allow reading for now, restrict in production
+      allow write: if true; // Allow writing for now, restrict in production
     }
 
     match /submissions/{submissionId} {

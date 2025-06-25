@@ -1,63 +1,64 @@
 import { useState, useEffect } from 'react';
-import { checkOnboardingStatus } from '@/lib/client-utils';
+import { useAuth } from '@/contexts/AuthContext';
+import { useUser } from '@/contexts/user-context';
 
 interface OnboardingState {
   showOnboarding: boolean;
   isCompleted: boolean;
+  loading: boolean;
 }
 
 export function useOnboarding() {
+  const { user } = useUser();
+  const { userData, loading: authLoading, checkOnboardingStatus } = useAuth();
   const [state, setState] = useState<OnboardingState>({
     showOnboarding: false,
     isCompleted: false,
+    loading: true,
   });
 
   useEffect(() => {
-    // Add a small delay to ensure localStorage is ready
-    const checkOnboardingStatusTimer = () => {
-      const shouldShowOnboarding = checkOnboardingStatus();
-      
-      if (shouldShowOnboarding) {
+    const checkStatus = async () => {
+      if (!authLoading && user && userData) {
+        console.log('useOnboarding: Checking status from database');
+        
+        // Check onboarding status from database
+        const isCompleted = userData.onboardingCompleted || false;
+        
         setState({
-          showOnboarding: true,
-          isCompleted: false,
+          showOnboarding: !isCompleted,
+          isCompleted: isCompleted,
+          loading: false,
         });
-        // Clear the first login flag after showing onboarding
-        if (typeof window !== 'undefined') {
-          localStorage.removeItem('first_login');
-        }
-      } else {
-        // Check if onboarding was already completed
-        if (typeof window !== 'undefined') {
-          const hasCompletedOnboarding = localStorage.getItem('onboarding_completed') === 'true';
-          setState({
-            showOnboarding: false,
-            isCompleted: hasCompletedOnboarding,
-          });
-        } else {
-          setState({
-            showOnboarding: false,
-            isCompleted: false,
-          });
-        }
+        
+        console.log('useOnboarding: Status determined:', {
+          showOnboarding: !isCompleted,
+          isCompleted: isCompleted
+        });
+      } else if (!authLoading && !user) {
+        setState({
+          showOnboarding: false,
+          isCompleted: false,
+          loading: false,
+        });
       }
     };
 
-    // Small delay to ensure localStorage is accessible
-    const timer = setTimeout(checkOnboardingStatusTimer, 100);
-    
-    return () => clearTimeout(timer);
-  }, []);
+    checkStatus();
+  }, [user, userData, authLoading]);
 
-  const completeOnboarding = () => {
-    if (typeof window !== 'undefined') {
-      localStorage.setItem('onboarding_completed', 'true');
-      localStorage.removeItem('first_login'); // Ensure first_login flag is cleared
-    }
-    setState({
+  const completeOnboarding = async () => {
+    console.log('useOnboarding: Completing onboarding');
+    setState(prev => ({
+      ...prev,
       showOnboarding: false,
       isCompleted: true,
-    });
+    }));
+    
+    // Refresh the auth context to get updated data
+    if (checkOnboardingStatus) {
+      await checkOnboardingStatus();
+    }
   };
 
   const skipOnboarding = () => {
@@ -66,20 +67,19 @@ export function useOnboarding() {
       showOnboarding: false,
     }));
   };
+
   const resetOnboarding = () => {
-    if (typeof window !== 'undefined') {
-      localStorage.removeItem('onboarding_completed');
-      localStorage.setItem('first_login', 'true');
-    }
     setState({
       showOnboarding: true,
       isCompleted: false,
+      loading: false,
     });
   };
 
   return {
     showOnboarding: state.showOnboarding,
     isCompleted: state.isCompleted,
+    loading: state.loading,
     completeOnboarding,
     skipOnboarding,
     resetOnboarding,

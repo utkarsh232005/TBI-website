@@ -20,7 +20,7 @@ import { useRouter } from "next/navigation";
 import { LogIn, Loader2 } from "lucide-react";
 import { useState } from "react";
 import { verifyUserCredentials, type UserLoginFormValues, type VerifyUserCredentialsResponse } from "@/app/actions/auth-actions";
-import { setFirstLoginFlag, setCurrentUser } from "@/lib/client-utils";
+import { setCurrentUser } from "@/lib/client-utils";
 
 const formSchema = z.object({
   identifier: z.string().min(1, { message: "User ID or Email is required." }),
@@ -43,13 +43,8 @@ export default function UserLoginForm() {
   async function onSubmit(values: UserLoginFormValues) {
     setIsLoading(true);
     try {
-      const result: VerifyUserCredentialsResponse = await verifyUserCredentials(values);      if (result.success) {
-        // Only set first login flag if onboarding hasn't been completed
-        const hasCompletedOnboarding = localStorage.getItem('onboarding_completed') === 'true';
-        if (!hasCompletedOnboarding) {
-          setFirstLoginFlag();
-        }
-        
+      const result: VerifyUserCredentialsResponse = await verifyUserCredentials(values);      
+      if (result.success) {
         // Store user data if provided
         if (result.userData) {
           setCurrentUser(result.userData);
@@ -60,7 +55,10 @@ export default function UserLoginForm() {
           description: result.message || "Redirecting to dashboard...",
         });
         
-        // Small delay to ensure localStorage is written before redirect
+        // The dashboard will check onboarding status from database
+        // No need to manipulate localStorage here
+        
+        // Small delay to ensure user data is stored before redirect
         if (result.redirectTo) {
           setTimeout(() => {
             router.push(result.redirectTo!);
