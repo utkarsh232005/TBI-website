@@ -1,7 +1,7 @@
 "use client";
 
 import React from "react";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -48,6 +48,8 @@ interface OnboardingPopupProps {
 
 export function OnboardingPopup({ isOpen, onClose, onComplete, userUid }: OnboardingPopupProps) {
   const { toast } = useToast();
+  
+  console.log('OnboardingPopup render:', { isOpen, userUid });
   const { firebaseUser, authReady } = useUser();
   const [currentStep, setCurrentStep] = React.useState(0);
   const [isLoading, setIsLoading] = React.useState(false);
@@ -422,6 +424,7 @@ export function OnboardingPopup({ isOpen, onClose, onComplete, userUid }: Onboar
 
   return (
     <Dialog open={isOpen} onOpenChange={(open) => {
+      console.log('Dialog onOpenChange called:', { open, allStepsCompleted, isCompleting });
       // Allow closing if all steps are completed or if not showing the modal
       if (!open && (allStepsCompleted || !isCompleting)) {
         console.log('Dialog onOpenChange: Closing modal', { 
@@ -439,8 +442,10 @@ export function OnboardingPopup({ isOpen, onClose, onComplete, userUid }: Onboar
         onClose();
       }
     }}>
-      <DialogContent className="max-w-2xl bg-neutral-900 border-neutral-800 text-white relative overflow-hidden"
+      <DialogContent className="max-w-2xl bg-neutral-900 border-neutral-800 text-white relative overflow-hidden z-50"
+                     style={{ position: 'fixed', top: '50%', left: '50%', transform: 'translate(-50%, -50%)' }}
                      onPointerDownOutside={(e) => {
+                       console.log('Pointer down outside, preventing close:', { allStepsCompleted, isCompleting });
                        // Prevent closing by clicking outside only if steps are not completed and we're not completing
                        if (!allStepsCompleted && !isCompleting) {
                          e.preventDefault();
@@ -533,6 +538,9 @@ export function OnboardingPopup({ isOpen, onClose, onComplete, userUid }: Onboar
           <DialogTitle className="text-2xl font-bold text-center text-white">
             Welcome! Let's get you started
           </DialogTitle>
+          <DialogDescription className="text-center text-gray-400">
+            Complete these steps to set up your account and access all features.
+          </DialogDescription>
         </DialogHeader>
 
         {/* Stepper */}
@@ -624,9 +632,9 @@ export function OnboardingPopup({ isOpen, onClose, onComplete, userUid }: Onboar
               <form onSubmit={handlePasswordSubmit} className="space-y-4"
                     style={{ opacity: authReady && firebaseUser ? 1 : 0.5 }}>
                 <div>
-                  <Label htmlFor="currentPassword">Current Password</Label>
+                  <Label htmlFor="onboarding-currentPassword">Current Password</Label>
                   <Input
-                    id="currentPassword"
+                    id="onboarding-currentPassword"
                     type="password"
                     value={passwordForm.currentPassword}
                     onChange={(e) => setPasswordForm(prev => ({ ...prev, currentPassword: e.target.value }))}
@@ -635,9 +643,9 @@ export function OnboardingPopup({ isOpen, onClose, onComplete, userUid }: Onboar
                   />
                 </div>
                 <div>
-                  <Label htmlFor="newPassword">New Password</Label>
+                  <Label htmlFor="onboarding-newPassword">New Password</Label>
                   <Input
-                    id="newPassword"
+                    id="onboarding-newPassword"
                     type="password"
                     value={passwordForm.newPassword}
                     onChange={(e) => setPasswordForm(prev => ({ ...prev, newPassword: e.target.value }))}
@@ -646,9 +654,9 @@ export function OnboardingPopup({ isOpen, onClose, onComplete, userUid }: Onboar
                   />
                 </div>
                 <div>
-                  <Label htmlFor="confirmPassword">Confirm New Password</Label>
+                  <Label htmlFor="onboarding-confirmPassword">Confirm New Password</Label>
                   <Input
-                    id="confirmPassword"
+                    id="onboarding-confirmPassword"
                     type="password"
                     value={passwordForm.confirmPassword}
                     onChange={(e) => setPasswordForm(prev => ({ ...prev, confirmPassword: e.target.value }))}

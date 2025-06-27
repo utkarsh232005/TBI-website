@@ -306,7 +306,9 @@ function UserLayoutContent({
         <main className="flex-1 overflow-y-auto p-4 md:p-6 bg-neutral-900/50">
           {children}
         </main>
-      </div>      {/* Onboarding Popup */}
+      </div>
+      
+      {/* Onboarding Popup */}
       <OnboardingPopup 
         isOpen={showOnboarding}
         onClose={completeOnboarding}

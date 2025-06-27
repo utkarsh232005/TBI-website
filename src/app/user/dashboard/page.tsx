@@ -6,13 +6,10 @@ import { CheckCircle, Info, FileText, Lock, Loader2 } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { useUser } from "@/contexts/user-context";
 import { useEffect, useState } from "react";
-import { OnboardingPopup } from "@/components/ui/onboarding-popup";
 
 export default function UserDashboardPage() {
   const { user, firebaseUser, isLoading: userLoading, authReady } = useUser();
   const { userData, loading: authLoading, isOnboardingCompleted, refreshUserData } = useAuth();
-  const [showOnboarding, setShowOnboarding] = useState(false);
-  const [checkingOnboarding, setCheckingOnboarding] = useState(true);
 
   // Debug logging
   useEffect(() => {
@@ -26,63 +23,8 @@ export default function UserDashboardPage() {
     });
   }, [user, firebaseUser, userLoading, authReady, authLoading, userData]);
 
-  useEffect(() => {
-    const checkOnboardingStatus = async () => {
-      if (!userLoading && !authLoading && authReady && user && userData) {
-        setCheckingOnboarding(true);
-        
-        // Always check onboarding status from database, not localStorage
-        console.log('Checking onboarding status from database for user:', user.uid);
-        console.log('User data:', userData);
-        
-        const onboardingCompleted = userData.onboardingCompleted || false;
-        
-        console.log('Database onboarding status:', {
-          user: user.uid,
-          onboardingCompleted,
-          onboardingProgress: userData.onboardingProgress
-        });
-
-        // Show onboarding popup if not completed in database
-        if (!onboardingCompleted) {
-          console.log('Onboarding not completed, showing popup');
-          setShowOnboarding(true);
-        } else {
-          console.log('Onboarding already completed, skipping popup');
-          setShowOnboarding(false);
-        }
-        
-        setCheckingOnboarding(false);
-      } else if (!userLoading && !authLoading && authReady && !user) {
-        console.log('Auth ready but no user found');
-        setCheckingOnboarding(false);
-      }
-    };
-
-    checkOnboardingStatus();
-  }, [user, userData, userLoading, authLoading, authReady]);
-
-  const handleOnboardingComplete = async () => {
-    console.log('Onboarding completed, refreshing user data...');
-    setShowOnboarding(false);
-    
-    // Refresh user data to get updated onboarding status
-    try {
-      await refreshUserData();
-      console.log('User data refreshed after onboarding completion');
-      
-      // Force a small delay to ensure state updates
-      setTimeout(() => {
-        setCheckingOnboarding(false);
-      }, 500);
-    } catch (error) {
-      console.error('Error refreshing user data after onboarding:', error);
-      setCheckingOnboarding(false);
-    }
-  };
-
-  // Show loading while checking user authentication and onboarding status
-  if (userLoading || authLoading || !authReady || checkingOnboarding) {
+  // Show loading while checking user authentication
+  if (userLoading || authLoading || !authReady) {
     return (
       <div className="flex justify-center items-center min-h-screen">
         <div className="text-center">
@@ -119,14 +61,6 @@ export default function UserDashboardPage() {
 
   return (
     <div className="space-y-8">
-      {/* Onboarding Popup */}
-      <OnboardingPopup
-        isOpen={showOnboarding}
-        onClose={() => setShowOnboarding(false)}
-        onComplete={handleOnboardingComplete}
-        userUid={user.uid}
-      />
-
       <Card className="bg-neutral-800/50 border-neutral-700/50 shadow-lg">
         <CardHeader>
           <CardTitle className="text-2xl font-bold text-white">
@@ -219,14 +153,8 @@ export default function UserDashboardPage() {
               {!isOnboardingCompleted && (
                 <div className="mt-4 p-3 bg-amber-500/10 border border-amber-500/30 rounded-lg">
                   <p className="text-amber-300 text-sm">
-                    Please complete your onboarding steps to access all features.
+                    Please complete your onboarding steps to access all features. The onboarding popup will appear automatically.
                   </p>
-                  <button
-                    onClick={() => setShowOnboarding(true)}
-                    className="mt-2 text-sm text-indigo-400 hover:text-indigo-300 underline"
-                  >
-                    Complete Onboarding
-                  </button>
                 </div>
               )}
             </div>
