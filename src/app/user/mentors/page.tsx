@@ -201,7 +201,7 @@ export default function UserMentorsPage() {
                   isOpen={isDialogOpen}
                   onClose={handleCloseDialog}
                   mentor={selectedMentor}
-                  userId={user.identifier}
+                  userId={user.uid}
                   userEmail={user.email}
                   userName={user.name}
                 />

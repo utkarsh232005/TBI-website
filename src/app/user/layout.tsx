@@ -30,6 +30,8 @@ import { OnboardingPopup } from "@/components/ui/onboarding-popup";
 import { useOnboarding } from "@/hooks/useOnboarding";
 import { UserProvider, useUser } from "@/contexts/user-context";
 import { clearUserSession } from "@/lib/client-utils";
+// import { logoutUser } from "@/app/actions/auth-actions";
+import { logoutUser } from "@/app/actions/auth-actions";
 
 interface NavItem {
   href: string;
@@ -84,16 +86,27 @@ function UserLayoutContent({
       disabled: false // Now functional
     },
   ];
-  const handleLogout = () => {
-    // Clear all user session data including onboarding status
-    clearUserSession();
-    
-    // For temporary credentials, logout is effectively redirecting
-    // More complex logic would be needed for actual session invalidation
-    if (typeof window !== 'undefined' && window.innerWidth < 768) {
-      setOpen(false);
+  const handleLogout = async () => {
+    try {
+      // Sign out from Firebase Auth
+      await logoutUser();
+      
+      // Clear local session data
+      clearUserSession();
+      
+      // Close sidebar if on mobile
+      if (typeof window !== 'undefined' && window.innerWidth < 768) {
+        setOpen(false);
+      }
+      
+      // Redirect to login
+      router.push('/login');
+    } catch (error) {
+      console.error('Error during logout:', error);
+      // Even if Firebase logout fails, still redirect
+      clearUserSession();
+      router.push('/login');
     }
-    router.push('/login');
   };
   
   const handleMobileLinkClick = () => {
@@ -277,15 +290,15 @@ function UserLayoutContent({
               <span className="text-lg font-semibold text-white">Portal</span>
             </Link>
           </div>
-          {user?.identifier && (
-            <NotificationsPanel userId={user.identifier} />
+          {user?.uid && (
+            <NotificationsPanel userId={user.uid} />
           )}
         </header>
 
         {/* Desktop header with notifications */}
         <header className="hidden md:flex items-center justify-end h-16 px-6 border-b border-neutral-800 bg-neutral-900/80 backdrop-blur-sm">
-          {user?.identifier && (
-            <NotificationsPanel userId={user.identifier} />
+          {user?.uid && (
+            <NotificationsPanel userId={user.uid} />
           )}
         </header>
 
@@ -298,7 +311,7 @@ function UserLayoutContent({
         isOpen={showOnboarding}
         onClose={completeOnboarding}
         onComplete={completeOnboarding}
-        userIdentifier={user?.identifier}
+        userUid={user?.uid}
       />
     </div>
   );

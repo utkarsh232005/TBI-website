@@ -22,15 +22,17 @@ import {
   Linkedin
 } from "lucide-react";
 import { useUser } from "@/contexts/user-context";
-import { getUserProfileData } from "@/app/actions/user-onboarding-actions";
+import { getUserData } from "@/app/actions/user-actions";
 import { useToast } from "@/hooks/use-toast";
 import { motion } from "framer-motion";
 
 interface UserProfileData {
+  uid: string;
   name: string;
   email: string;
-  temporaryUserId?: string;
   status: string;
+  role: string;
+  submissionId?: string;
   firstName?: string;
   lastName?: string;
   phone?: string;
@@ -67,13 +69,13 @@ export default function UserSettingsPage() {
 
   useEffect(() => {
     const fetchProfileData = async () => {
-      if (!user?.identifier) {
+      if (!user?.uid) {
         setIsLoading(false);
         return;
       }
 
       try {
-        const result = await getUserProfileData(user.identifier);
+        const result = await getUserData(user.uid);
         if (result.success && result.data) {
           setProfileData(result.data as UserProfileData);
         } else {
@@ -282,11 +284,11 @@ export default function UserSettingsPage() {
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
-              {profileData?.temporaryUserId && (
+              {profileData?.uid && (
                 <div>
                   <label className="text-sm text-neutral-400">User ID</label>
                   <p className="text-white font-medium font-mono">
-                    {profileData.temporaryUserId}
+                    {profileData.uid}
                   </p>
                 </div>
               )}

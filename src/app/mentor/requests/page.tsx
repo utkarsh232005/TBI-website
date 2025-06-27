@@ -110,7 +110,7 @@ function MentorRequestsContent() {
       // If not found in users collection, try submissions (onboarding data)
       const submissionsQuery = query(
         collection(db, 'submissions'),
-        where('identifier', '==', userId)
+        where('uid', '==', userId)
       );
       const submissionsSnapshot = await getDocs(submissionsQuery);
       

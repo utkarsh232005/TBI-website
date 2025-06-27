@@ -4,15 +4,16 @@
  * @fileOverview Flow to process application submissions (accept or reject).
  *
  * - processApplication - Handles accepting or rejecting an application,
- *   updating Firestore, and preparing a notification email.
+ *   updating Firestore, creating Firebase Auth users, and preparing a notification email.
  * - ProcessApplicationInput - Input type for the flow.
  * - ProcessApplicationOutput - Output type for the flow.
  */
 
 import {ai} from '@/ai/genkit';
 import {z} from 'genkit';
-import { db } from '@/lib/firebase';
-import { doc, updateDoc, serverTimestamp, getDoc } from 'firebase/firestore';
+import { db, auth } from '@/lib/firebase';
+import { doc, updateDoc, serverTimestamp, getDoc, setDoc, collection, addDoc } from 'firebase/firestore';
+import { createUserWithEmailAndPassword, signOut } from 'firebase/auth';
 import { Resend } from 'resend';
 
 // Helper function to generate a simple random string
@@ -38,7 +39,7 @@ const ProcessApplicationOutputSchema = z.object({
     sent: z.boolean(),
     sendError: z.string().optional(),
   }).optional().describe('Details of the email operation. Optional if email sending is not applicable.'),
-  temporaryUserId: z.string().optional().describe('Generated temporary user ID if accepted.'),
+  firebaseUid: z.string().optional().describe('Firebase Auth UID if user was created successfully.'),
   temporaryPassword: z.string().optional().describe('Generated temporary password if accepted.'),
 });
 export type ProcessApplicationOutput = z.infer<typeof ProcessApplicationOutputSchema>;
@@ -121,16 +122,61 @@ const processApplicationFlow = ai.defineFlow(
       let temporaryPassword: string | undefined = undefined;
 
       if (action === 'accept') {
-        temporaryUserId = generateRandomString(8);
+        // Generate a temporary password for the user
         temporaryPassword = generateRandomString(10);
         
-        updateData.status = 'accepted';
-        updateData.temporaryUserId = temporaryUserId;
-        updateData.temporaryPassword = temporaryPassword;
+        try {
+          // Create Firebase Auth user with email and temporary password
+          const userCredential = await createUserWithEmailAndPassword(auth, applicantEmail, temporaryPassword);
+          const firebaseUser = userCredential.user;
+          
+          // Immediately sign out to prevent session conflicts
+          await signOut(auth);
+          
+          // Create user document in the users collection
+          const userDoc = {
+            email: applicantEmail,
+            name: applicantName,
+            uid: firebaseUser.uid,
+            status: 'active',
+            role: 'user',
+            submissionId: submissionId,
+            onboardingCompleted: false,
+            onboardingProgress: {
+              passwordChanged: false,
+              profileCompleted: false,
+              notificationsConfigured: false,
+              completed: false,
+            },
+            notificationPreferences: {
+              emailNotifications: true,
+            },
+            createdAt: serverTimestamp(),
+            updatedAt: serverTimestamp(),
+          };
+          
+          // Store user document in users collection with UID as document ID
+          await setDoc(doc(db, 'users', firebaseUser.uid), userDoc);
+          
+          // Update submission document to link with Firebase Auth UID
+          updateData.status = 'accepted';
+          updateData.firebaseUid = firebaseUser.uid;
+          // Remove plain text credentials from submission
+          delete updateData.temporaryUserId;
+          delete updateData.temporaryPassword;
 
-        emailSubject = 'Congratulations! Your RCEOM-TBI Application has been Accepted!';
-        emailBody = `Dear ${applicantName},\n\nWe are thrilled to inform you that your application to RCEOM-TBI has been accepted!\n\nWe were very impressed with your idea and believe in its potential. Here are your temporary login credentials to access our portal (feature coming soon):\nUser ID: ${temporaryUserId}\nPassword: ${temporaryPassword}\n\nPlease keep these safe. We will be in touch shortly with the next steps.\n\nWelcome to RCEOM-TBI!\n\nBest regards,\nThe RCEOM-TBI Team`;
-
+          emailSubject = 'Congratulations! Your RCEOM-TBI Application has been Accepted!';
+          emailBody = `Dear ${applicantName},\n\nWe are thrilled to inform you that your application to RCEOM-TBI has been accepted!\n\nWe were very impressed with your idea and believe in its potential. Here are your login credentials to access our portal:\n\nEmail: ${applicantEmail}\nTemporary Password: ${temporaryPassword}\n\nPlease keep these safe and change your password after your first login. We will be in touch shortly with the next steps.\n\nWelcome to RCEOM-TBI!\n\nBest regards,\nThe RCEOM-TBI Team`;
+          
+          temporaryUserId = firebaseUser.uid; // Store UID for response
+          
+        } catch (authError: any) {
+          console.error('Error creating Firebase Auth user:', authError);
+          return { 
+            status: 'error' as const, 
+            message: `Failed to create user account: ${authError.message}` 
+          };
+        }
       } else { // action === 'reject'
         updateData.status = 'rejected';
         emailSubject = 'Update on Your RCEOM-TBI Application';
@@ -151,7 +197,7 @@ const processApplicationFlow = ai.defineFlow(
           sent: emailResult.success,
           sendError: emailResult.error,
         },
-        temporaryUserId: temporaryUserId,
+        firebaseUid: temporaryUserId, // This is actually the Firebase UID now
         temporaryPassword: temporaryPassword,
       };
 

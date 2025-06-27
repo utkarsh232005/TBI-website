@@ -57,13 +57,13 @@ export default function UserMentorRequestsPage() {
   const { user } = useUser();
 
   const fetchRequests = async () => {
-    if (!user?.identifier) {
+    if (!user?.uid) {
       setIsLoading(false);
       return;
     }
     
     try {
-      const fetchedRequests = await getUserMentorRequests(user.identifier);
+      const fetchedRequests = await getUserMentorRequests(user.uid);
       setRequests(fetchedRequests);
     } catch (error) {
       console.error('Error fetching mentor requests:', error);

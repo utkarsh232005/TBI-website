@@ -9,24 +9,36 @@ import { useEffect, useState } from "react";
 import { OnboardingPopup } from "@/components/ui/onboarding-popup";
 
 export default function UserDashboardPage() {
-  const { user, isLoading: userLoading } = useUser();
+  const { user, firebaseUser, isLoading: userLoading, authReady } = useUser();
   const { userData, loading: authLoading, isOnboardingCompleted, refreshUserData } = useAuth();
   const [showOnboarding, setShowOnboarding] = useState(false);
   const [checkingOnboarding, setCheckingOnboarding] = useState(true);
 
+  // Debug logging
+  useEffect(() => {
+    console.log('Dashboard render state:', {
+      user: user ? { uid: user.uid, email: user.email } : null,
+      firebaseUser: firebaseUser ? { uid: firebaseUser.uid, email: firebaseUser.email } : null,
+      userLoading,
+      authReady,
+      authLoading,
+      userData: userData ? { uid: userData.uid, onboardingCompleted: userData.onboardingCompleted } : null
+    });
+  }, [user, firebaseUser, userLoading, authReady, authLoading, userData]);
+
   useEffect(() => {
     const checkOnboardingStatus = async () => {
-      if (!userLoading && !authLoading && user && userData) {
+      if (!userLoading && !authLoading && authReady && user && userData) {
         setCheckingOnboarding(true);
         
         // Always check onboarding status from database, not localStorage
-        console.log('Checking onboarding status from database for user:', user.identifier);
+        console.log('Checking onboarding status from database for user:', user.uid);
         console.log('User data:', userData);
         
         const onboardingCompleted = userData.onboardingCompleted || false;
         
         console.log('Database onboarding status:', {
-          user: user.identifier,
+          user: user.uid,
           onboardingCompleted,
           onboardingProgress: userData.onboardingProgress
         });
@@ -41,14 +53,14 @@ export default function UserDashboardPage() {
         }
         
         setCheckingOnboarding(false);
-      } else if (!userLoading && !user) {
-        console.log('No user found, redirecting to login');
+      } else if (!userLoading && !authLoading && authReady && !user) {
+        console.log('Auth ready but no user found');
         setCheckingOnboarding(false);
       }
     };
 
     checkOnboardingStatus();
-  }, [user, userData, userLoading, authLoading]);
+  }, [user, userData, userLoading, authLoading, authReady]);
 
   const handleOnboardingComplete = async () => {
     console.log('Onboarding completed, refreshing user data...');
@@ -70,19 +82,22 @@ export default function UserDashboardPage() {
   };
 
   // Show loading while checking user authentication and onboarding status
-  if (userLoading || authLoading || checkingOnboarding) {
+  if (userLoading || authLoading || !authReady || checkingOnboarding) {
     return (
       <div className="flex justify-center items-center min-h-screen">
         <div className="text-center">
           <Loader2 className="h-12 w-12 animate-spin mx-auto mb-4 text-indigo-400" />
           <p className="text-neutral-400">Loading your dashboard...</p>
+          {!authReady && (
+            <p className="text-xs text-neutral-500 mt-2">Initializing authentication...</p>
+          )}
         </div>
       </div>
     );
   }
 
   // Show authentication required message if user is not logged in
-  if (!user) {
+  if (!user || !firebaseUser) {
     return (
       <div className="flex justify-center items-center min-h-screen">
         <div className="text-center py-20">
@@ -90,6 +105,9 @@ export default function UserDashboardPage() {
           <h2 className="text-2xl font-semibold text-white mb-2">Authentication Required</h2>
           <p className="text-neutral-400 text-lg">
             Please log in to access your dashboard.
+          </p>
+          <p className="text-xs text-neutral-500 mt-2">
+            Debug: authReady={authReady.toString()}, user={user ? 'exists' : 'null'}, firebaseUser={firebaseUser ? 'exists' : 'null'}
           </p>
         </div>
       </div>
@@ -106,7 +124,7 @@ export default function UserDashboardPage() {
         isOpen={showOnboarding}
         onClose={() => setShowOnboarding(false)}
         onComplete={handleOnboardingComplete}
-        userIdentifier={user.identifier}
+        userUid={user.uid}
       />
 
       <Card className="bg-neutral-800/50 border-neutral-700/50 shadow-lg">

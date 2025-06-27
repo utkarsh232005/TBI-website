@@ -19,63 +19,107 @@ import { useToast } from "@/hooks/use-toast";
 import { useRouter } from "next/navigation";
 import { LogIn, Loader2 } from "lucide-react";
 import { useState } from "react";
-import { verifyUserCredentials, type UserLoginFormValues, type VerifyUserCredentialsResponse } from "@/app/actions/auth-actions";
+import { signInWithEmailAndPassword } from "firebase/auth";
+import { auth } from "@/lib/firebase";
+import { getUserData } from "@/app/actions/user-actions";
 import { setCurrentUser } from "@/lib/client-utils";
 
 const formSchema = z.object({
-  identifier: z.string().min(1, { message: "User ID or Email is required." }),
+  email: z.string().email({ message: "Please enter a valid email address." }),
   password: z.string().min(1, { message: "Password is required." }),
 });
+
+type FormValues = z.infer<typeof formSchema>;
 
 export default function UserLoginForm() {
   const { toast } = useToast();
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
 
-  const form = useForm<UserLoginFormValues>({
+  const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      identifier: "",
+      email: "",
       password: "",
     },
   });
 
-  async function onSubmit(values: UserLoginFormValues) {
+  async function onSubmit(values: FormValues) {
     setIsLoading(true);
     try {
-      const result: VerifyUserCredentialsResponse = await verifyUserCredentials(values);      
-      if (result.success) {
-        // Store user data if provided
-        if (result.userData) {
-          setCurrentUser(result.userData);
-        }
-        
-        toast({
-          title: "Login Successful",
-          description: result.message || "Redirecting to dashboard...",
-        });
-        
-        // The dashboard will check onboarding status from database
-        // No need to manipulate localStorage here
-        
-        // Small delay to ensure user data is stored before redirect
-        if (result.redirectTo) {
-          setTimeout(() => {
-            router.push(result.redirectTo!);
-          }, 100);
-        }
-      } else {
+      console.log('Attempting login with:', { email: values.email });
+      
+      // Authenticate with Firebase Auth (client-side)
+      const userCredential = await signInWithEmailAndPassword(auth, values.email, values.password);
+      const firebaseUser = userCredential.user;
+      
+      console.log('Firebase Auth successful:', { uid: firebaseUser.uid, email: firebaseUser.email });
+      
+      // Get user data from Firestore
+      const userDataResult = await getUserData(firebaseUser.uid);
+      
+      if (!userDataResult.success || !userDataResult.data) {
+        // If user document doesn't exist, sign out and show error
+        await auth.signOut();
         toast({
           title: "Login Failed",
-          description: result.message || "Invalid credentials or user not found.",
+          description: "User profile not found. Please contact support.",
           variant: "destructive",
         });
+        return;
       }
-    } catch (error: any) {
-      console.error("Error during user login submission: ", error);
+      
+      const userData = userDataResult.data;
+      
+      // Check if user is active
+      if (userData.status !== 'active') {
+        // If user is not active, sign out and show error
+        await auth.signOut();
+        toast({
+          title: "Login Failed", 
+          description: "Your account is not active. Please contact support.",
+          variant: "destructive",
+        });
+        return;
+      }
+
+      // Store user data for the context
+      const userForContext = {
+        uid: firebaseUser.uid,
+        email: firebaseUser.email || values.email,
+        name: userData.name || 'User',
+      };
+      setCurrentUser(userForContext);
+      
+      console.log('Login successful, user data stored:', userForContext);
+      
       toast({
-        title: "Login Error",
-        description: error.message || "An unexpected error occurred.",
+        title: "Login Successful",
+        description: "Welcome back!",
+      });
+      
+      // Navigate to dashboard
+      router.push('/user/dashboard');
+      
+    } catch (error: any) {
+      console.error("Error during user login:", error);
+      
+      // Handle specific Firebase Auth errors
+      let errorMessage = "An unexpected error occurred.";
+      
+      if (error.code === 'auth/user-not-found' || error.code === 'auth/wrong-password') {
+        errorMessage = "Invalid email or password.";
+      } else if (error.code === 'auth/user-disabled') {
+        errorMessage = "This account has been disabled.";
+      } else if (error.code === 'auth/too-many-requests') {
+        errorMessage = "Too many failed login attempts. Please try again later.";
+      } else if (error.message) {
+        errorMessage = error.message;
+      }
+      
+      toast({
+        title: "Login Failed",
+        description: errorMessage,
         variant: "destructive",
       });
     } finally {
@@ -88,7 +132,7 @@ export default function UserLoginForm() {
       <CardHeader>
         <CardTitle className="font-montserrat text-2xl text-accent">User Login</CardTitle>
         <CardDescription>
-          Sign in with your temporary User ID or Email and Password.
+          Sign in with your email address and password provided after acceptance.
         </CardDescription>
       </CardHeader>
       <CardContent>
@@ -96,14 +140,14 @@ export default function UserLoginForm() {
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
             <FormField
               control={form.control}
-              name="identifier"
+              name="email"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel className="text-foreground">User ID / Email</FormLabel>
+                  <FormLabel className="text-foreground">Email Address</FormLabel>
                   <FormControl>
                     <Input
-                      type="text"
-                      placeholder="Your User ID or Email"
+                      type="email"
+                      placeholder="your.email@example.com"
                       {...field}
                       className="bg-card border-border focus:border-accent focus:ring-accent"
                       // Removed disabled={isLoading}
@@ -141,7 +185,7 @@ export default function UserLoginForm() {
               Login
             </Button>
             <p className="text-xs text-center text-muted-foreground pt-2">
-              Accepted applicants can log in with their temporary credentials.
+              Accepted applicants can log in with their email and temporary password.
             </p>
           </form>
         </Form>

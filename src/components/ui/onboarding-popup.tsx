@@ -1,6 +1,6 @@
 "use client";
 
-import * as React from "react";
+import React from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -9,6 +9,7 @@ import { Switch } from "@/components/ui/switch";
 import { Textarea } from "@/components/ui/textarea";
 import { cn } from "@/lib/utils";
 import { useToast } from "@/hooks/use-toast";
+import { motion, AnimatePresence } from "framer-motion";
 import { 
   Lock, 
   User, 
@@ -16,17 +17,19 @@ import {
   Check, 
   ChevronRight,
   ChevronLeft,
-  Loader2
+  Loader2,
+  CheckCircle
 } from "lucide-react";
 import {
-  updateUserPassword,
   updateUserProfile,
   updateNotificationPreferences,
   completeUserOnboarding,
-  type UpdatePasswordFormValues,
-  type UpdateProfileFormValues,
+  markPasswordChanged,
+  type UpdateUserProfileFormValues,
   type UpdateNotificationPreferencesFormValues,
-} from "@/app/actions/user-onboarding-actions";
+} from "@/app/actions/user-actions";
+import { updateUserPassword } from "@/lib/client-utils";
+import { useUser } from "@/contexts/user-context";
 
 interface OnboardingStep {
   id: number;
@@ -40,13 +43,16 @@ interface OnboardingPopupProps {
   isOpen: boolean;
   onClose: () => void;
   onComplete: () => void;
-  userIdentifier?: string; // email or temporaryUserId of logged in user
+  userUid?: string; // Firebase Auth UID of logged in user
 }
 
-export function OnboardingPopup({ isOpen, onClose, onComplete, userIdentifier }: OnboardingPopupProps) {
+export function OnboardingPopup({ isOpen, onClose, onComplete, userUid }: OnboardingPopupProps) {
   const { toast } = useToast();
+  const { firebaseUser, authReady } = useUser();
   const [currentStep, setCurrentStep] = React.useState(0);
   const [isLoading, setIsLoading] = React.useState(false);
+  const [showSuccessAnimation, setShowSuccessAnimation] = React.useState(false);
+  const [isCompleting, setIsCompleting] = React.useState(false);
   
   const [steps, setSteps] = React.useState<OnboardingStep[]>([
     {
@@ -101,10 +107,28 @@ export function OnboardingPopup({ isOpen, onClose, onComplete, userIdentifier }:
 
   const handlePasswordSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!userIdentifier) {
+    if (!userUid) {
       toast({
         title: "Error",
         description: "User not identified. Please log in again.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    if (!authReady) {
+      toast({
+        title: "Error",
+        description: "Authentication is still loading. Please wait a moment and try again.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    if (!firebaseUser) {
+      toast({
+        title: "Error",
+        description: "No authenticated user found. Please log in again.",
         variant: "destructive",
       });
       return;
@@ -119,29 +143,47 @@ export function OnboardingPopup({ isOpen, onClose, onComplete, userIdentifier }:
       return;
     }
 
+    if (passwordForm.newPassword.length < 6) {
+      toast({
+        title: "Error",
+        description: "Password must be at least 6 characters long.",
+        variant: "destructive",
+      });
+      return;
+    }
+
     setIsLoading(true);
     try {
-      const result = await updateUserPassword({
-        userIdentifier,
-        currentPassword: passwordForm.currentPassword,
-        newPassword: passwordForm.newPassword,
-        confirmPassword: passwordForm.confirmPassword,
-      });
-
-      if (result.success) {
-        toast({
-          title: "Success",
-          description: result.message,
-        });
-        completeStep(0);
-        setCurrentStep(1);
-      } else {
+      console.log('Attempting password update for user:', { uid: firebaseUser.uid, email: firebaseUser.email });
+      
+      // Update password using client-side Firebase Auth
+      const passwordResult = await updateUserPassword(
+        passwordForm.newPassword, 
+        passwordForm.currentPassword
+      );
+      
+      if (!passwordResult.success) {
         toast({
           title: "Error",
-          description: result.message,
+          description: passwordResult.message,
           variant: "destructive",
         });
+        return;
       }
+      
+      // Mark password as changed in Firestore
+      const firestoreResult = await markPasswordChanged(userUid);
+      
+      if (!firestoreResult.success) {
+        console.warn('Password updated but failed to record in Firestore:', firestoreResult.message);
+      }
+      
+      toast({
+        title: "Success",
+        description: "Password updated successfully!",
+      });
+      completeStep(0);
+      setCurrentStep(1);
     } catch (error) {
       toast({
         title: "Error",
@@ -155,7 +197,7 @@ export function OnboardingPopup({ isOpen, onClose, onComplete, userIdentifier }:
 
   const handleProfileSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!userIdentifier) {
+    if (!userUid) {
       toast({
         title: "Error",
         description: "User not identified. Please log in again.",
@@ -176,7 +218,7 @@ export function OnboardingPopup({ isOpen, onClose, onComplete, userIdentifier }:
     setIsLoading(true);
     try {
       const result = await updateUserProfile({
-        userIdentifier,
+        uid: userUid,
         firstName: profileForm.firstName,
         lastName: profileForm.lastName,
         phone: profileForm.phone,
@@ -210,7 +252,7 @@ export function OnboardingPopup({ isOpen, onClose, onComplete, userIdentifier }:
   };
 
   const handleNotificationSubmit = async (enable: boolean) => {
-    if (!userIdentifier) {
+    if (!userUid) {
       toast({
         title: "Error",
         description: "User not identified. Please log in again.",
@@ -222,7 +264,7 @@ export function OnboardingPopup({ isOpen, onClose, onComplete, userIdentifier }:
     setIsLoading(true);
     try {
       const result = await updateNotificationPreferences({
-        userIdentifier,
+        uid: userUid,
         emailNotifications: enable,
       });
 
@@ -277,19 +319,56 @@ export function OnboardingPopup({ isOpen, onClose, onComplete, userIdentifier }:
   };
 
   const handleComplete = async () => {
+    if (isCompleting) return; // Prevent multiple calls
+    
+    setIsCompleting(true);
+    
     // Mark onboarding as completed in database
     try {
-      if (userIdentifier) {
-        console.log('Completing onboarding for user:', userIdentifier);
-        const result = await completeUserOnboarding(userIdentifier);
+      if (userUid) {
+        console.log('Completing onboarding for user:', userUid);
+        const result = await completeUserOnboarding(userUid);
         if (result.success) {
           console.log('Onboarding marked as completed in database');
           
-          // Show success message
-          toast({
-            title: "Welcome!",
-            description: "Your onboarding has been completed successfully.",
-          });
+          // Show success animation
+          setShowSuccessAnimation(true);
+          
+          // Wait for animation to complete, then close modal
+          setTimeout(() => {
+            console.log('Animation complete, closing modal');
+            setShowSuccessAnimation(false);
+            setIsCompleting(false);
+            
+            // Reset all form states for next user
+            setCurrentStep(0);
+            setPasswordForm({
+              currentPassword: "",
+              newPassword: "",
+              confirmPassword: "",
+            });
+            setProfileForm({
+              firstName: "",
+              lastName: "",
+              phone: "",
+              bio: "",
+              linkedin: "",
+            });
+            setNotificationPreferences({
+              enabled: false,
+            });
+            
+            // Reset step completion states
+            setSteps(prev => prev.map(step => ({ ...step, completed: false })));
+            
+            // Call completion handlers after a short delay to ensure state is reset
+            setTimeout(() => {
+              onComplete();
+              onClose();
+            }, 100);
+          }, 3500); // 3.5 seconds for the full animation experience
+          
+          return;
         } else {
           console.error('Failed to complete onboarding:', result.message);
           toast({
@@ -308,7 +387,8 @@ export function OnboardingPopup({ isOpen, onClose, onComplete, userIdentifier }:
       });
     }
     
-    // Always call parent completion handler and close popup, regardless of database save status
+    // If there was an error, still complete but without animation
+    setIsCompleting(false);
     onComplete();
     onClose();
   };
@@ -325,20 +405,130 @@ export function OnboardingPopup({ isOpen, onClose, onComplete, userIdentifier }:
     }
   }, [allStepsCompleted, currentStep]);
 
+  // Fallback: Force close modal if animation has been showing for too long
+  React.useEffect(() => {
+    if (showSuccessAnimation) {
+      const forceCloseTimer = setTimeout(() => {
+        console.log('Force closing modal after animation timeout');
+        setShowSuccessAnimation(false);
+        setIsCompleting(false);
+        onComplete();
+        onClose();
+      }, 4000); // 4 seconds fallback
+      
+      return () => clearTimeout(forceCloseTimer);
+    }
+  }, [showSuccessAnimation, onComplete, onClose]);
+
   return (
     <Dialog open={isOpen} onOpenChange={(open) => {
-      if (!open && allStepsCompleted) {
-        // Only allow closing if all steps are completed
-        handleComplete();
+      // Allow closing if all steps are completed or if not showing the modal
+      if (!open && (allStepsCompleted || !isCompleting)) {
+        console.log('Dialog onOpenChange: Closing modal', { 
+          allStepsCompleted, 
+          showSuccessAnimation, 
+          isCompleting 
+        });
+        
+        // Only reset animation state if it's still showing
+        if (showSuccessAnimation) {
+          setShowSuccessAnimation(false);
+        }
+        
+        onComplete();
+        onClose();
       }
     }}>
-      <DialogContent className="max-w-2xl bg-neutral-900 border-neutral-800 text-white"
+      <DialogContent className="max-w-2xl bg-neutral-900 border-neutral-800 text-white relative overflow-hidden"
                      onPointerDownOutside={(e) => {
-                       // Prevent closing by clicking outside unless all steps are completed
-                       if (!allStepsCompleted) {
+                       // Prevent closing by clicking outside only if steps are not completed and we're not completing
+                       if (!allStepsCompleted && !isCompleting) {
                          e.preventDefault();
                        }
                      }}>
+        
+        {/* Success Animation Overlay */}
+        <AnimatePresence>
+          {showSuccessAnimation && (
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="absolute inset-0 bg-green-600/95 flex flex-col items-center justify-center z-50"
+            >
+              {/* Animated Checkmark */}
+              <motion.div
+                initial={{ scale: 0, rotate: -180 }}
+                animate={{ scale: 1, rotate: 0 }}
+                transition={{ 
+                  type: "spring", 
+                  stiffness: 200, 
+                  damping: 15,
+                  delay: 0.2 
+                }}
+                className="mb-6"
+              >
+                <motion.div
+                  initial={{ scale: 0 }}
+                  animate={{ scale: [0, 1.2, 1] }}
+                  transition={{ 
+                    duration: 0.6,
+                    delay: 0.5,
+                    times: [0, 0.7, 1]
+                  }}
+                  className="w-24 h-24 bg-white rounded-full flex items-center justify-center"
+                >
+                  <CheckCircle className="w-16 h-16 text-green-600" />
+                </motion.div>
+              </motion.div>
+
+              {/* Success Message */}
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.8 }}
+                className="text-center"
+              >
+                <h3 className="text-2xl font-bold text-white mb-2">
+                  Welcome Aboard! 🎉
+                </h3>
+                <p className="text-green-100 text-lg">
+                  Your onboarding is complete
+                </p>
+              </motion.div>
+
+              {/* Floating Particles Animation */}
+              {[...Array(6)].map((_, i) => (
+                <motion.div
+                  key={i}
+                  initial={{ 
+                    opacity: 0, 
+                    scale: 0,
+                    x: 0,
+                    y: 0
+                  }}
+                  animate={{ 
+                    opacity: [0, 1, 0], 
+                    scale: [0, 1, 0.5],
+                    x: Math.random() * 400 - 200,
+                    y: Math.random() * 300 - 150
+                  }}
+                  transition={{ 
+                    duration: 2,
+                    delay: 1 + i * 0.1,
+                    ease: "easeOut"
+                  }}
+                  className="absolute w-3 h-3 bg-white rounded-full"
+                  style={{
+                    left: '50%',
+                    top: '50%'
+                  }}
+                />
+              ))}
+            </motion.div>
+          )}
+        </AnimatePresence>
+
         <DialogHeader>
           <DialogTitle className="text-2xl font-bold text-center text-white">
             Welcome! Let's get you started
@@ -408,7 +598,31 @@ export function OnboardingPopup({ isOpen, onClose, onComplete, userIdentifier }:
           {currentStep === 0 && (
             <div className="space-y-4">
               <h3 className="text-lg font-semibold text-center">Change Your Password</h3>
-              <form onSubmit={handlePasswordSubmit} className="space-y-4">
+              
+              {/* Authentication Status */}
+              {!authReady && (
+                <div className="bg-yellow-900/30 border border-yellow-600/50 rounded-lg p-3 text-center">
+                  <div className="flex items-center justify-center space-x-2">
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                    <span className="text-yellow-200">Loading authentication...</span>
+                  </div>
+                </div>
+              )}
+              
+              {authReady && !firebaseUser && (
+                <div className="bg-red-900/30 border border-red-600/50 rounded-lg p-3 text-center">
+                  <span className="text-red-200">Authentication error. Please refresh and try again.</span>
+                </div>
+              )}
+              
+              {authReady && firebaseUser && (
+                <div className="bg-green-900/30 border border-green-600/50 rounded-lg p-3 text-center">
+                  <span className="text-green-200">✓ Authenticated as {firebaseUser.email}</span>
+                </div>
+              )}
+              
+              <form onSubmit={handlePasswordSubmit} className="space-y-4"
+                    style={{ opacity: authReady && firebaseUser ? 1 : 0.5 }}>
                 <div>
                   <Label htmlFor="currentPassword">Current Password</Label>
                   <Input
@@ -441,12 +655,18 @@ export function OnboardingPopup({ isOpen, onClose, onComplete, userIdentifier }:
                     className="bg-neutral-800 border-neutral-700 text-white"
                     required
                   />
-                </div>                <Button type="submit" className="w-full bg-indigo-600 hover:bg-indigo-700" disabled={isLoading}>
+                </div>                <Button type="submit" 
+                        className="w-full bg-indigo-600 hover:bg-indigo-700" 
+                        disabled={isLoading || !authReady || !firebaseUser}>
                   {isLoading ? (
                     <>
                       <Loader2 className="h-4 w-4 mr-2 animate-spin" />
                       Updating Password...
                     </>
+                  ) : !authReady ? (
+                    "Loading Authentication..."
+                  ) : !firebaseUser ? (
+                    "Authentication Required"
                   ) : (
                     "Update Password"
                   )}
@@ -590,7 +810,7 @@ export function OnboardingPopup({ isOpen, onClose, onComplete, userIdentifier }:
         )}
 
         {/* Completion Message */}
-        {allStepsCompleted && (
+        {allStepsCompleted && !showSuccessAnimation && (
           <div className="text-center space-y-4 pt-4 border-t border-neutral-800">
             <div className="text-green-400 font-semibold">
               🎉 All steps completed! Welcome to the platform.
@@ -598,8 +818,16 @@ export function OnboardingPopup({ isOpen, onClose, onComplete, userIdentifier }:
             <Button
               onClick={handleComplete}
               className="bg-green-600 hover:bg-green-700"
+              disabled={isCompleting}
             >
-              Get Started
+              {isCompleting ? (
+                <>
+                  <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                  Completing Setup...
+                </>
+              ) : (
+                "Get Started"
+              )}
             </Button>
           </div>
         )}

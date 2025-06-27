@@ -70,6 +70,14 @@ export default function MentorRequestDialog({
     if (!mentor) return;
 
     setIsSubmitting(true);
+    console.log('Submitting mentor request with data:', {
+      userId,
+      userEmail, 
+      userName,
+      mentorId: mentor.id,
+      requestMessage: values.requestMessage
+    });
+    
     try {
       const result = await submitMentorRequest(
         userId,
@@ -81,6 +89,8 @@ export default function MentorRequestDialog({
         }
       );
 
+      console.log('Mentor request result:', result);
+
       if (result.success) {
         toast({
           title: "Request Submitted!",
@@ -89,6 +99,7 @@ export default function MentorRequestDialog({
         form.reset();
         onClose();
       } else {
+        console.error('Mentor request failed:', result.message);
         toast({
           title: "Failed to Submit Request",
           description: result.message,
@@ -96,6 +107,7 @@ export default function MentorRequestDialog({
         });
       }
     } catch (error) {
+      console.error('Mentor request error:', error);
       toast({
         title: "Error",
         description: "Something went wrong. Please try again.",

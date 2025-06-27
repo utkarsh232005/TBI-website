@@ -2,8 +2,9 @@
 'use server';
 
 import { z } from 'zod';
-import { db } from '@/lib/firebase';
+import { db, auth } from '@/lib/firebase';
 import { doc, getDoc, collection, query, where, getDocs, QuerySnapshot, DocumentData } from 'firebase/firestore';
+import { signInWithEmailAndPassword, signOut } from 'firebase/auth';
 
 // --- Admin Credentials ---
 const AdminLoginFormSchema = z.object({
@@ -96,7 +97,7 @@ export async function verifyAdminCredentials(
 
 // --- User Credentials (for accepted applicants) ---
 const UserLoginFormSchema = z.object({
-  identifier: z.string().min(1, { message: "User ID or Email is required." }),
+  email: z.string().email({ message: "Please enter a valid email address." }),
   password: z.string().min(1, { message: "Password is required." }),
 });
 export type UserLoginFormValues = z.infer<typeof UserLoginFormSchema>;
@@ -106,10 +107,9 @@ export interface VerifyUserCredentialsResponse {
   message: string;
   redirectTo?: string;
   userData?: {
-    identifier: string;
+    uid: string;
     email: string;
     name: string;
-    temporaryUserId?: string;
   };
 }
 
@@ -118,62 +118,93 @@ export async function verifyUserCredentials(
 ): Promise<VerifyUserCredentialsResponse> {
   try {
     const validatedValues = UserLoginFormSchema.parse(values);
-    const { identifier, password } = validatedValues;
+    const { email, password } = validatedValues;
 
-    const submissionsRef = collection(db, 'contactSubmissions');
-    // Query for accepted submissions matching either email or temporaryUserId
-    const q = query(
-      submissionsRef,
-      where('status', '==', 'accepted'),
-      // Firestore doesn't support OR queries directly on different fields.
-      // We'll fetch potential matches by email and then by temporaryUserId if needed,
-      // or fetch all accepted and filter, which is less efficient for large datasets.
-      // For simplicity here, we'll try matching by email, then by temporaryUserId if no email match.
-      // A more robust solution for larger scale might involve two separate queries or restructuring data.
-    );
-
-    const querySnapshot = await getDocs(q);
-    let matchedUser: DocumentData | null = null;
-
-    querySnapshot.forEach((docSnap) => {
-      const userData = docSnap.data();
-      if (userData.email === identifier || userData.temporaryUserId === identifier) {
-        matchedUser = userData;
-      }
-    });    if (matchedUser) {
-      // WARNING: Plaintext password comparison. Highly insecure for production.
-      if ((matchedUser as any).temporaryPassword === password) {        return {
-          success: true,
-          message: 'User login successful!',
-          redirectTo: '/user/dashboard', // Placeholder, adjust as needed
-          userData: {
-            identifier: identifier,
-            email: (matchedUser as any).email,
-            name: (matchedUser as any).name,
-            temporaryUserId: (matchedUser as any).temporaryUserId,
-          }
+    try {
+      // Authenticate with Firebase Auth
+      const userCredential = await signInWithEmailAndPassword(auth, email, password);
+      const firebaseUser = userCredential.user;
+      
+      // Keep user signed in - do not sign out
+      // The user context will handle the auth state
+      
+      // Get user data from users collection
+      const userDocRef = doc(db, 'users', firebaseUser.uid);
+      const userDoc = await getDoc(userDocRef);
+      
+      if (!userDoc.exists()) {
+        // If user document doesn't exist, sign out and return error
+        await signOut(auth);
+        return { 
+          success: false, 
+          message: 'User profile not found. Please contact support.' 
         };
-      } else {
-        return { success: false, message: 'Invalid password.' };
       }
-    } else {
-      return { success: false, message: 'User not found or application not accepted.' };
+      
+      const userData = userDoc.data();
+      
+      // Check if user is active
+      if (userData.status !== 'active') {
+        // If user is not active, sign out and return error
+        await signOut(auth);
+        return { 
+          success: false, 
+          message: 'Your account is not active. Please contact support.' 
+        };
+      }
+
+      return {
+        success: true,
+        message: 'User login successful!',
+        redirectTo: '/user/dashboard',
+        userData: {
+          uid: firebaseUser.uid,
+          email: firebaseUser.email || email,
+          name: userData.name || 'User',
+        }
+      };
+      
+    } catch (authError: any) {
+      console.error('Firebase Auth error:', authError);
+      
+      // Handle specific Firebase Auth errors
+      if (authError.code === 'auth/user-not-found' || authError.code === 'auth/wrong-password') {
+        return { success: false, message: 'Invalid email or password.' };
+      } else if (authError.code === 'auth/user-disabled') {
+        return { success: false, message: 'This account has been disabled.' };
+      } else if (authError.code === 'auth/too-many-requests') {
+        return { success: false, message: 'Too many failed login attempts. Please try again later.' };
+      } else {
+        return { success: false, message: 'Login failed. Please try again.' };
+      }
     }
+    
   } catch (error: any) {
     console.error('[AuthActions] Error verifying user credentials:', error);
     if (error instanceof z.ZodError) {
       return { success: false, message: 'Invalid input data.' };
     }
-    if (error.code === 'permission-denied' || (error.message && (error.message.toLowerCase().includes('permission denied') || error.message.toLowerCase().includes('insufficient permissions')))) {
-      return {
-        success: false,
-        message: 'Login Failed: Firestore permission denied. Please check your Firestore security rules.',
-      };
-    }
     const errorMessage = error instanceof Error ? error.message : 'An unexpected error occurred.';
     return {
       success: false,
       message: `An unexpected error occurred during user login: ${errorMessage}`,
+    };
+  }
+}
+
+// User logout function
+export async function logoutUser(): Promise<{ success: boolean; message: string }> {
+  try {
+    await signOut(auth);
+    return {
+      success: true,
+      message: 'Logged out successfully'
+    };
+  } catch (error: any) {
+    console.error('Error during logout:', error);
+    return {
+      success: false,
+      message: 'Failed to logout. Please try again.'
     };
   }
 }

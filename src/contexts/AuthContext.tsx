@@ -1,11 +1,11 @@
 'use client';
 
 import { createContext, useContext, useEffect, useState, ReactNode } from 'react';
-import { getUserProfileData } from '@/app/actions/user-onboarding-actions';
+import { getUserData } from '@/app/actions/user-actions';
 import { useUser } from './user-context';
 
 interface UserData {
-  id: string;
+  uid: string;
   email: string;
   name: string;
   firstName?: string;
@@ -13,7 +13,6 @@ interface UserData {
   phone?: string;
   bio?: string;
   linkedin?: string;
-  temporaryUserId?: string;
   onboardingCompleted?: boolean;
   onboardingProgress?: {
     passwordChanged?: boolean;
@@ -42,16 +41,16 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [loading, setLoading] = useState(true);
   const [isOnboardingCompleted, setIsOnboardingCompleted] = useState(false);
 
-  const fetchUserData = async (identifier: string): Promise<UserData | null> => {
+  const fetchUserData = async (uid: string): Promise<UserData | null> => {
     try {
-      console.log('Fetching user data for identifier:', identifier);
+      console.log('Fetching user data for UID:', uid);
       
-      const response = await getUserProfileData(identifier);
+      const response = await getUserData(uid);
       
       if (response.success && response.data) {
         const data = response.data;
         const userData: UserData = {
-          id: data.id || identifier,
+          uid: data.uid,
           email: data.email,
           name: data.name,
           firstName: data.firstName,
@@ -59,7 +58,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           phone: data.phone,
           bio: data.bio,
           linkedin: data.linkedin,
-          temporaryUserId: data.temporaryUserId,
           onboardingCompleted: data.onboardingCompleted,
           onboardingProgress: data.onboardingProgress,
           notificationPreferences: data.notificationPreferences
@@ -80,20 +78,20 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   };
 
   const refreshUserData = async () => {
-    if (user?.identifier) {
+    if (user?.uid) {
       setLoading(true);
-      const data = await fetchUserData(user.identifier);
+      const data = await fetchUserData(user.uid);
       setUserData(data);
       setLoading(false);
     }
   };
 
   const checkOnboardingStatus = async (): Promise<boolean> => {
-    if (!user?.identifier) return false;
+    if (!user?.uid) return false;
     
     try {
-      console.log('Checking onboarding status from database for:', user.identifier);
-      const response = await getUserProfileData(user.identifier);
+      console.log('Checking onboarding status from database for:', user.uid);
+      const response = await getUserData(user.uid);
       
       if (response.success && response.data) {
         const completed = response.data.onboardingCompleted || false;
@@ -114,9 +112,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     const loadUserData = async () => {
-      if (!userLoading && user?.identifier) {
+      if (!userLoading && user?.uid) {
         setLoading(true);
-        const data = await fetchUserData(user.identifier);
+        const data = await fetchUserData(user.uid);
         setUserData(data);
         setLoading(false);
       } else if (!userLoading && !user) {

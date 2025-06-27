@@ -143,7 +143,7 @@ async function getUserProfileDetails(userId: string): Promise<{
     // If not found in users collection, try submissions (onboarding data)
     const submissionsQuery = query(
       collection(db, 'submissions'),
-      where('identifier', '==', userId)
+      where('uid', '==', userId)
     );
     const submissionsSnapshot = await getDocs(submissionsQuery);
     
@@ -421,20 +421,27 @@ export async function submitMentorRequest(
   userName: string,
   formData: MentorRequestFormData
 ): Promise<{ success: boolean; message: string; requestId?: string }> {
+  console.log('submitMentorRequest called with:', { userId, userEmail, userName, formData });
+  
   try {
     // Validate form data
     const validatedData = mentorRequestSchema.safeParse(formData);
     if (!validatedData.success) {
+      console.error('Validation failed:', validatedData.error);
       return { success: false, message: "Invalid request data" };
     }
+
+    console.log('Form data validated successfully');
 
     // Get mentor details
     const mentorDoc = await getDoc(doc(db, 'mentors', formData.mentorId));
     if (!mentorDoc.exists()) {
+      console.error('Mentor not found:', formData.mentorId);
       return { success: false, message: "Mentor not found" };
     }
 
     const mentorData = mentorDoc.data();
+    console.log('Mentor found:', { id: formData.mentorId, name: mentorData.name, email: mentorData.email });
 
     // Check if user already has a pending request for this mentor
     const existingRequestQuery = query(
@@ -446,8 +453,11 @@ export async function submitMentorRequest(
     
     const existingRequests = await getDocs(existingRequestQuery);
     if (!existingRequests.empty) {
+      console.error('Duplicate request found');
       return { success: false, message: "You already have a pending request for this mentor" };
     }
+
+    console.log('No duplicate request found, creating new request');
 
     // Create mentor request
     const requestData: Omit<MentorRequest, 'id'> = {
@@ -463,7 +473,9 @@ export async function submitMentorRequest(
       updatedAt: serverTimestamp() as any,
     };
 
+    console.log('About to add document to Firestore:', requestData);
     const docRef = await addDoc(collection(db, 'mentorRequests'), requestData);
+    console.log('Document added successfully with ID:', docRef.id);
 
     revalidatePath('/admin/mentor-requests');
     
