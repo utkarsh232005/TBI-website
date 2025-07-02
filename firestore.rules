@@ -191,6 +191,16 @@ service cloud.firestore {
       allow delete: if true;
     }
 
+    // Rules for evaluation_rounds collection
+    match /evaluation_rounds/{docId} {
+      allow read, write: if true; // Allow all access for admin panel functionality
+    }
+
+    // Rules for notifications collection (used by evaluation feature)
+    match /notifications/{docId} {
+      allow read, write: if true; // Allow all access for admin panel functionality
+    }
+
     // Add other rules for other collections if needed
   }
 }
