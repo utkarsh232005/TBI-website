@@ -55,14 +55,14 @@ const container: Variants = {
 
 const item: Variants = {
   hidden: { opacity: 0, y: 20 },
-  show: { 
-    opacity: 1, 
-    y: 0, 
-    transition: { 
+  show: {
+    opacity: 1,
+    y: 0,
+    transition: {
       type: "spring",
       stiffness: 100,
       damping: 10
-    } 
+    }
   }
 };
 
@@ -127,9 +127,9 @@ export default function AdminMentorsPage() {
   // Filter mentors based on search query
   const filterMentors = (mentorsList: MentorDocument[], query: string) => {
     if (!query) return mentorsList;
-    
+
     const lowercasedQuery = query.toLowerCase();
-    return mentorsList.filter(mentor => 
+    return mentorsList.filter(mentor =>
       mentor.name.toLowerCase().includes(lowercasedQuery) ||
       mentor.designation.toLowerCase().includes(lowercasedQuery) ||
       mentor.expertise.toLowerCase().includes(lowercasedQuery) ||
@@ -150,7 +150,7 @@ export default function AdminMentorsPage() {
       const q = query(mentorsCollection, orderBy("createdAt", "desc"));
       const querySnapshot = await getDocs(q);
       const fetchedMentors: MentorDocument[] = [];
-      
+
       querySnapshot.forEach((doc) => {
         const data = doc.data();
         fetchedMentors.push({
@@ -165,7 +165,7 @@ export default function AdminMentorsPage() {
           createdAt: data.createdAt,
         });
       });
-      
+
       setMentors(fetchedMentors);
       setFilteredMentors(filterMentors(fetchedMentors, searchQuery));
     } catch (err: any) {
@@ -246,7 +246,7 @@ export default function AdminMentorsPage() {
 
   return (
     <div className="min-h-screen bg-gray-900 text-gray-100">
-      <motion.div 
+      <motion.div
         className="container mx-auto px-4 py-8"
         initial="hidden"
         animate="show"
@@ -327,12 +327,12 @@ export default function AdminMentorsPage() {
                             <FormItem>
                               <FormLabel>Description / Bio</FormLabel>
                               <FormControl>
-                                <Textarea 
-                                  placeholder="Brief description of the mentor's background and experience..." 
-                                  {...field} 
-                                  rows={4} 
+                                <Textarea
+                                  placeholder="Brief description of the mentor's background and experience..."
+                                  {...field}
+                                  rows={4}
                                   disabled={isSubmitting}
-                                  suppressHydrationWarning 
+                                  suppressHydrationWarning
                                 />
                               </FormControl>
                               <FormMessage />
@@ -346,12 +346,12 @@ export default function AdminMentorsPage() {
                             <FormItem>
                               <FormLabel>Email Address</FormLabel>
                               <FormControl>
-                                <Input 
-                                  type="email" 
-                                  placeholder="mentor@example.com" 
-                                  {...field} 
+                                <Input
+                                  type="email"
+                                  placeholder="mentor@example.com"
+                                  {...field}
                                   disabled={isSubmitting}
-                                  suppressHydrationWarning 
+                                  suppressHydrationWarning
                                 />
                               </FormControl>
                               <FormMessage />
@@ -396,12 +396,12 @@ export default function AdminMentorsPage() {
                             <FormItem>
                               <FormLabel>LinkedIn Profile URL (Optional)</FormLabel>
                               <FormControl>
-                                <Input 
-                                  placeholder="https://linkedin.com/in/username" 
-                                  {...field} 
+                                <Input
+                                  placeholder="https://linkedin.com/in/username"
+                                  {...field}
                                   value={field.value || ''}
                                   disabled={isSubmitting}
-                                  suppressHydrationWarning 
+                                  suppressHydrationWarning
                                 />
                               </FormControl>
                               <FormMessage />
@@ -409,17 +409,17 @@ export default function AdminMentorsPage() {
                           )}
                         />
                         <DialogFooter className="mt-6">
-                          <Button 
-                            type="button" 
-                            variant="outline" 
+                          <Button
+                            type="button"
+                            variant="outline"
                             onClick={() => setIsCreateDialogOpen(false)}
                             disabled={isSubmitting}
                             suppressHydrationWarning
                           >
                             Cancel
                           </Button>
-                          <Button 
-                            type="submit" 
+                          <Button
+                            type="submit"
                             disabled={isSubmitting}
                             className="bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700"
                             suppressHydrationWarning
@@ -486,9 +486,9 @@ export default function AdminMentorsPage() {
                 <div>
                   <p className="font-medium">Error loading mentors</p>
                   <p className="text-sm text-red-300 mt-1">{error}</p>
-                  <Button 
-                    variant="outline" 
-                    size="sm" 
+                  <Button
+                    variant="outline"
+                    size="sm"
                     className="mt-3 border-red-800 text-red-200 hover:bg-red-900/30 hover:text-white"
                     onClick={fetchMentors}
                     suppressHydrationWarning
@@ -498,7 +498,7 @@ export default function AdminMentorsPage() {
                 </div>
               </div>
             ) : (
-              <motion.div 
+              <motion.div
                 className="space-y-4"
                 variants={container}
                 initial="hidden"
@@ -506,12 +506,12 @@ export default function AdminMentorsPage() {
               >
                 {filteredMentors.length > 0 ? (
                   filteredMentors.map((mentor) => (
-                    <motion.div 
+                    <motion.div
                       key={mentor.id}
                       variants={item}
                       className="bg-gray-800/50 rounded-xl border border-gray-700 overflow-hidden transition-all duration-200 hover:border-indigo-500/50"
                     >
-                      <div 
+                      <div
                         className="p-4 cursor-pointer flex items-center justify-between"
                         onClick={() => toggleMentorExpansion(mentor.id)}
                       >
@@ -540,7 +540,7 @@ export default function AdminMentorsPage() {
                           )}
                         </div>
                       </div>
-                      
+
                       <AnimatePresence>
                         {expandedMentor === mentor.id && (
                           <motion.div
@@ -552,20 +552,20 @@ export default function AdminMentorsPage() {
                           >
                             <div className="px-4 pb-4 pt-2 border-t border-gray-700">
                               <p className="text-gray-300 text-sm mb-4">{mentor.description}</p>
-                              
+
                               <div className="flex flex-wrap gap-3 text-sm">
-                                <a 
+                                <a
                                   href={`mailto:${mentor.email}`}
                                   className="inline-flex items-center text-indigo-400 hover:text-indigo-300 transition-colors"
                                 >
                                   <Mail className="h-4 w-4 mr-1.5" />
                                   {mentor.email}
                                 </a>
-                                
+
                                 {mentor.linkedinUrl && (
-                                  <a 
-                                    href={mentor.linkedinUrl} 
-                                    target="_blank" 
+                                  <a
+                                    href={mentor.linkedinUrl}
+                                    target="_blank"
                                     rel="noopener noreferrer"
                                     className="inline-flex items-center text-blue-400 hover:text-blue-300 transition-colors"
                                   >
@@ -573,17 +573,17 @@ export default function AdminMentorsPage() {
                                     LinkedIn
                                   </a>
                                 )}
-                                
+
                                 <span className="text-gray-500 text-xs flex items-center">
                                   <span className="w-1 h-1 rounded-full bg-gray-500 mr-1.5"></span>
                                   Added {format(mentor.createdAt?.toDate() || new Date(), 'MMM d, yyyy')}
                                 </span>
                               </div>
-                              
+
                               <div className="mt-4 flex justify-end space-x-2">
-                                <Button 
-                                  variant="outline" 
-                                  size="sm" 
+                                <Button
+                                  variant="outline"
+                                  size="sm"
                                   className="text-amber-400 border-amber-500/30 hover:bg-amber-900/20 hover:text-amber-300"
                                   onClick={() => {
                                     // TODO: Implement edit functionality
@@ -597,9 +597,9 @@ export default function AdminMentorsPage() {
                                   <Edit className="h-3.5 w-3.5 mr-1.5" />
                                   Edit
                                 </Button>
-                                <Button 
-                                  variant="outline" 
-                                  size="sm" 
+                                <Button
+                                  variant="outline"
+                                  size="sm"
                                   className="text-red-400 border-red-500/30 hover:bg-red-900/20 hover:text-red-300"
                                   onClick={() => handleDeleteMentor(mentor.id, mentor.name)}
                                   suppressHydrationWarning
@@ -615,7 +615,7 @@ export default function AdminMentorsPage() {
                     </motion.div>
                   ))
                 ) : (
-                  <motion.div 
+                  <motion.div
                     variants={item}
                     className="text-center py-12 bg-gray-800/50 rounded-xl border border-dashed border-gray-700"
                   >

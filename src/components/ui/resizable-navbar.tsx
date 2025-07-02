@@ -5,8 +5,6 @@ import { motion, AnimatePresence, useScroll, useMotionValueEvent, type Variants 
 import Link from 'next/link';
 import React, { useRef, useState } from "react";
 
-// InnoNexusLogo is not used here anymore, AppLogo is defined locally
-// import { InnoNexusLogo as AppLogo } from '@/components/icons/innnexus-logo';
 
 interface NavbarProps {
   children: React.ReactNode;
@@ -61,9 +59,9 @@ export const Navbar = ({ children, className }: NavbarProps) => {
       {React.Children.map(children, (child) =>
         React.isValidElement(child)
           ? React.cloneElement(
-              child as React.ReactElement<{ visible?: boolean }>,
-              { visible },
-            )
+            child as React.ReactElement<{ visible?: boolean }>,
+            { visible },
+          )
           : child,
       )}
     </motion.div>
@@ -74,7 +72,7 @@ export const NavBody = ({ children, className, visible }: NavBodyProps) => {
   return (
     <motion.div
       animate={{
-        backdropFilter: visible ? "blur(10px)" : "none",
+        backdropFilter: visible ? "blur(20px) saturate(180%)" : "none",
         width: visible ? "40%" : "100%",
         y: visible ? 20 : 0,
       }}
@@ -87,8 +85,10 @@ export const NavBody = ({ children, className, visible }: NavBodyProps) => {
         minWidth: "800px",
       }}
       className={cn(
-        "relative z-[60] mx-auto hidden w-full max-w-screen-2xl flex-row items-center justify-between self-start rounded-full bg-transparent px-4 py-2 lg:flex",
-        visible && "bg-background/80 border border-border shadow-lg",
+        "relative z-[60] mx-auto hidden w-full max-w-screen-2xl flex-row items-center justify-between self-start rounded-full px-4 py-2 lg:flex",
+        visible
+          ? "bg-slate-900/80 border border-purple-500/30 shadow-2xl shadow-purple-500/20"
+          : "bg-slate-900/60",
         className,
       )}
     >
@@ -101,7 +101,7 @@ export const MobileNav = ({ children, className, visible }: MobileNavProps) => {
   return (
     <motion.div
       animate={{
-        backdropFilter: visible ? "blur(10px)" : "none",
+        backdropFilter: visible ? "blur(20px) saturate(180%)" : "none",
         width: visible ? "90%" : "100%",
         paddingRight: visible ? "12px" : "0px",
         paddingLeft: visible ? "12px" : "0px",
@@ -114,8 +114,10 @@ export const MobileNav = ({ children, className, visible }: MobileNavProps) => {
         damping: 50,
       }}
       className={cn(
-        "relative z-50 mx-auto flex w-full max-w-[calc(100vw-2rem)] flex-col items-center justify-between bg-transparent px-0 py-2 lg:hidden",
-        visible && "bg-background/80 border border-border shadow-lg",
+        "relative z-50 mx-auto flex w-full max-w-[calc(100vw-2rem)] flex-col items-center justify-between px-0 py-2 lg:hidden",
+        visible
+          ? "bg-slate-900/80 border border-purple-500/30 shadow-2xl shadow-purple-500/20"
+          : "bg-slate-900/60",
         className,
       )}
     >
@@ -140,11 +142,11 @@ export const MobileNavHeader = ({
   );
 };
 
-const Path = (props: {d?: string; variants: Variants; transition?: { duration: number }; initial?: string | boolean | undefined; animate?: string | undefined;}) => (
+const Path = (props: { d?: string; variants: Variants; transition?: { duration: number }; initial?: string | boolean | undefined; animate?: string | undefined; }) => (
   <motion.path
     fill="transparent"
     strokeWidth="3"
-    stroke="currentColor" 
+    stroke="currentColor"
     strokeLinecap="round"
     {...props}
   />
@@ -155,9 +157,9 @@ const AnimatedMenuToggleSVG = ({ isOpen }: { isOpen: boolean }) => (
     width="23"
     height="23"
     viewBox="0 0 23 23"
-    initial={false} 
+    initial={false}
     animate={isOpen ? "open" : "closed"}
-    className="text-foreground" 
+    className="text-foreground"
   >
     <Path
       variants={{
@@ -217,7 +219,7 @@ export const MobileNavToggle = ({
   onClick: () => void;
 }) => {
   return (
-     <button
+    <button
       onClick={onClick}
       className="p-1 rounded-md focus:outline-none focus:ring-2 focus:ring-accent focus:ring-offset-2 focus:ring-offset-background text-foreground"
       aria-label={isOpen ? "Close menu" : "Open menu"}
@@ -235,32 +237,33 @@ export const NavbarLogo = () => {
       aria-label="RCEOM-TBI Home"
       className="relative z-20 flex items-center px-2 py-1"
     >
-      <span className="font-montserrat text-2xl font-bold text-accent">
-        TBI
-      </span>
+      <img
+        src="/logo192.png"
+        alt="RCOEM-TBI Logo"
+        className="h-8 w-8 brightness-110 drop-shadow-sm"
+      />
     </Link>
   );
 };
+
+interface NavbarButtonProps {
+  href?: string;
+  as?: React.ElementType;
+  children: React.ReactNode;
+  className?: string;
+  variant?: "primary" | "secondary" | "outline" | "ghost";
+  onClick?: React.MouseEventHandler<HTMLElement>;
+}
 
 export const NavbarButton = ({
   href,
   as: Tag = "button",
   children,
   className,
-  variant = "primary", // This should map to a theme color, e.g., accent
+  variant = "primary",
   onClick,
   ...props
-}: {
-  href?: string;
-  as?: React.ElementType;
-  children: React.ReactNode;
-  className?: string;
-  variant?: "primary" | "secondary" | "outline" | "ghost";
-  onClick?: React.MouseEventHandler<HTMLButtonElement | HTMLAnchorElement>;
-} & (
-  | React.ComponentPropsWithoutRef<"a">
-  | React.ComponentPropsWithoutRef<"button">
-)) => {
+}: NavbarButtonProps & Omit<React.ComponentPropsWithoutRef<"button"> & React.ComponentPropsWithoutRef<"a">, keyof NavbarButtonProps>) => {
 
   const baseStyles = "px-6 py-2 rounded-full text-base font-normal relative cursor-pointer hover:-translate-y-0.5 transition duration-200 inline-block text-center";
 
@@ -272,7 +275,10 @@ export const NavbarButton = ({
     ghost: "hover:bg-accent hover:text-accent-foreground text-foreground",
   };
 
-  const buttonProps = Tag === "button" ? { type: "button", ...props } : props;
+  // Clean props for the specific element type
+  const cleanProps = Tag === "a" ?
+    Object.fromEntries(Object.entries(props).filter(([key]) => !['type', 'form', 'formAction', 'formEncType', 'formMethod', 'formNoValidate', 'formTarget', 'value'].includes(key))) :
+    Object.fromEntries(Object.entries(props).filter(([key]) => !['download', 'hreflang', 'media', 'ping', 'referrerPolicy', 'rel', 'target', 'type'].includes(key)));
 
   if (Tag === "a" && href) {
     return (
@@ -280,7 +286,7 @@ export const NavbarButton = ({
         <Tag
           className={cn(baseStyles, variantStyles[variant as keyof typeof variantStyles], className)}
           onClick={onClick}
-          {...buttonProps}
+          {...cleanProps}
         >
           {children}
         </Tag>
@@ -289,10 +295,11 @@ export const NavbarButton = ({
   }
 
   return (
-     <Tag
+    <Tag
       className={cn(baseStyles, variantStyles[variant as keyof typeof variantStyles], className)}
       onClick={onClick}
-      {...buttonProps}
+      type={Tag === "button" ? "button" : undefined}
+      {...cleanProps}
     >
       {children}
     </Tag>

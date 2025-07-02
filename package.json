@@ -75,6 +75,8 @@
     "@types/react-dom": "^18",
     "@types/uuid": "^10.0.0",
     "autoprefixer": "^10.4.16",
+    "eslint": "9.30.0",
+    "eslint-config-next": "15.3.4",
     "genkit-cli": "^1.8.0",
     "postcss": "^8.4.32",
     "postcss-import": "^15.1.0",

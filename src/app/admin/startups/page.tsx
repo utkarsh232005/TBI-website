@@ -52,8 +52,8 @@ import { createStartupAction, updateStartupAction, deleteStartupAction, importSt
 import Image from 'next/image';
 import ImageUploadComponent from '@/components/ui/image-upload';
 
-const container: Variants = { hidden: { opacity: 0 }, show: { opacity: 1, transition: { staggerChildren: 0.05 }}};
-const itemVariants: Variants = { hidden: { opacity: 0, y: 10 }, show: { opacity: 1, y: 0, transition: {duration: 0.3}}};
+const container: Variants = { hidden: { opacity: 0 }, show: { opacity: 1, transition: { staggerChildren: 0.05 } } };
+const itemVariants: Variants = { hidden: { opacity: 0, y: 10 }, show: { opacity: 1, y: 0, transition: { duration: 0.3 } } };
 
 const startupFormSchema = z.object({
   name: z.string().min(3, { message: "Startup name must be at least 3 characters." }),
@@ -111,11 +111,11 @@ export default function AdminStartupsPage() {
   const { toast } = useToast();
   const [logoPreview, setLogoPreview] = useState<string | null>(null);
   const form = useForm<StartupFormValues>({
-    resolver: zodResolver(startupFormSchema),    defaultValues: {
-      name: "", 
-      logoUrl: "", 
+    resolver: zodResolver(startupFormSchema), defaultValues: {
+      name: "",
+      logoUrl: "",
       logoFile: undefined,
-      description: "", 
+      description: "",
       websiteUrl: "",
       funnelSource: "",
       session: "",
@@ -140,7 +140,7 @@ export default function AdminStartupsPage() {
       setFilteredStartups(fetchedStartups);
     } catch (err: any) {
       console.error("Error fetching startups: ", err);
-      setError(err.code === 'permission-denied' || (err.message && err.message.toLowerCase().includes('permission-denied')) 
+      setError(err.code === 'permission-denied' || (err.message && err.message.toLowerCase().includes('permission-denied'))
         ? "Failed to load startups: Missing Firestore permissions for 'startups' collection."
         : "Failed to load startups. " + err.message);
     } finally {
@@ -150,7 +150,7 @@ export default function AdminStartupsPage() {
 
   useEffect(() => { fetchStartups(); }, [fetchStartups]);
   useEffect(() => {
-    const lowercasedQuery = searchQuery.toLowerCase();    setFilteredStartups(
+    const lowercasedQuery = searchQuery.toLowerCase(); setFilteredStartups(
       startups.filter(startup =>
         startup.name.toLowerCase().includes(lowercasedQuery) ||
         startup.description.toLowerCase().includes(lowercasedQuery) ||
@@ -161,32 +161,32 @@ export default function AdminStartupsPage() {
         (startup.funnelSource && startup.funnelSource.toLowerCase().includes(lowercasedQuery))
       )
     );
-  }, [searchQuery, startups]);  const handleLogoFileChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
+  }, [searchQuery, startups]); const handleLogoFileChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (file) {
       try {
         // Convert file to base64 using the image upload utility
         const result = await uploadImage(file);
-        
+
         if (result.success && result.url) {
           // Store the base64 string in the logoUrl field instead of logoFile
           form.setValue('logoUrl', result.url, { shouldValidate: true });
           form.setValue('logoFile', undefined); // Clear logoFile since we're using logoUrl
           setLogoPreview(result.url);
         } else {
-          toast({ 
-            title: "Upload Error", 
-            description: result.error || "Failed to process image", 
-            variant: "destructive" 
+          toast({
+            title: "Upload Error",
+            description: result.error || "Failed to process image",
+            variant: "destructive"
           });
           form.setValue('logoFile', undefined);
           setLogoPreview(editingStartupData?.logoUrl || null);
         }
       } catch (error: any) {
-        toast({ 
-          title: "Upload Error", 
-          description: error.message || "Failed to process image", 
-          variant: "destructive" 
+        toast({
+          title: "Upload Error",
+          description: error.message || "Failed to process image",
+          variant: "destructive"
         });
         form.setValue('logoFile', undefined);
         setLogoPreview(editingStartupData?.logoUrl || null);
@@ -199,7 +199,8 @@ export default function AdminStartupsPage() {
   };
   const handleOpenFormDialog = (startup: StartupDocument | null = null) => {
     setEditingStartupData(startup);
-    if (startup) {      form.reset({
+    if (startup) {
+      form.reset({
         name: startup.name,
         logoUrl: startup.logoUrl || "",
         logoFile: undefined, // Reset logoFile for edit
@@ -215,11 +216,13 @@ export default function AdminStartupsPage() {
         mobileNumber: startup.mobileNumber || "",
       });
       setLogoPreview(startup.logoUrl || null);
-    } else {      form.reset({        name: "", 
-        logoUrl: "", 
+    } else {
+      form.reset({
+        name: "",
+        logoUrl: "",
         logoFile: undefined,
-        description: "", 
-        websiteUrl: "", 
+        description: "",
+        websiteUrl: "",
         funnelSource: "",
         session: "",
         monthYearOfIncubation: "",
@@ -280,7 +283,7 @@ export default function AdminStartupsPage() {
       setStartupToDelete(null);
     }
   };
-  
+
   const handleImportStartups = async () => {
     setIsImporting(true);
     // This is a predefined list for now. In a real app, this would come from a file upload or API.
@@ -301,7 +304,7 @@ export default function AdminStartupsPage() {
       const result = await importStartupsFromTable(startupDataToImport);
       if (result.success) {
         toast({ title: "Import Successful", description: result.message, });
-        fetchStartups(); 
+        fetchStartups();
       } else {
         toast({ title: "Import Failed", description: result.message || "An unknown error occurred during import.", variant: "destructive", });
       }
@@ -320,7 +323,7 @@ export default function AdminStartupsPage() {
         <div className="absolute top-0 -right-40 w-96 h-96 bg-indigo-700/10 rounded-full filter blur-3xl opacity-20 animate-blob animation-delay-2000"></div>
         <div className="absolute bottom-0 left-20 w-96 h-96 bg-blue-700/10 rounded-full filter blur-3xl opacity-20 animate-blob animation-delay-4000"></div>
       </div>
-      <motion.div 
+      <motion.div
         className="container mx-auto px-4 py-8 relative z-10"
         initial="hidden"
         animate="show"
@@ -342,10 +345,10 @@ export default function AdminStartupsPage() {
                 </p>
               </div>
               <div className="flex items-center gap-2">
-                 <Button 
-                  onClick={fetchStartups} 
-                  variant="outline" 
-                  size="sm" 
+                <Button
+                  onClick={fetchStartups}
+                  variant="outline"
+                  size="sm"
                   disabled={isLoading}
                   className="border-[#333333] hover:border-indigo-500 text-gray-300 hover:bg-indigo-500/10 transition-all duration-300 shadow-inner shadow-indigo-500/5"
                   suppressHydrationWarning
@@ -361,13 +364,13 @@ export default function AdminStartupsPage() {
                   }
                 }}>
                   <DialogTrigger asChild>
-                    <Button 
-                      className="relative overflow-hidden bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 transition-all duration-300 shadow-lg text-white group" 
+                    <Button
+                      className="relative overflow-hidden bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 transition-all duration-300 shadow-lg text-white group"
                       suppressHydrationWarning
                     >
                       <span className="absolute inset-0 w-full h-full bg-gradient-to-r from-indigo-600 to-purple-600 opacity-0 group-hover:opacity-100 transition-opacity duration-300 transform scale-x-0 origin-left group-hover:scale-x-100"></span>
                       <span className="relative flex items-center">
-                        <PlusCircle className="mr-2 h-4 w-4 transition-transform group-hover:rotate-90 duration-300" /> 
+                        <PlusCircle className="mr-2 h-4 w-4 transition-transform group-hover:rotate-90 duration-300" />
                         <span>Add New Startup</span>
                       </span>
                     </Button>
@@ -379,8 +382,8 @@ export default function AdminStartupsPage() {
                         {editingStartupData ? "Edit Startup" : "Add New Startup"}
                       </DialogTitle>
                       <DialogDescription className="text-gray-400">
-                        {editingStartupData 
-                          ? "Update the details below to modify the startup information." 
+                        {editingStartupData
+                          ? "Update the details below to modify the startup information."
                           : "Fill in the details below to add a new startup."
                         }
                       </DialogDescription>
@@ -395,10 +398,10 @@ export default function AdminStartupsPage() {
                               <FormLabel>Startup Name</FormLabel>
                               <FormControl>
                                 <div className="relative group">
-                                  <Input 
-                                    placeholder="e.g., Innovatech Solutions" 
-                                    {...field} 
-                                    disabled={isSubmitting} 
+                                  <Input
+                                    placeholder="e.g., Innovatech Solutions"
+                                    {...field}
+                                    disabled={isSubmitting}
                                     className="bg-[#262626] border-[#333333] focus:border-indigo-500 focus:ring-indigo-500/20 rounded-lg pl-10 transition-all duration-300 group-hover:border-indigo-500/50"
                                     suppressHydrationWarning
                                   />
@@ -451,11 +454,11 @@ export default function AdminStartupsPage() {
                               <FormLabel>Description</FormLabel>
                               <FormControl>
                                 <div className="relative group">
-                                  <Textarea 
-                                    placeholder="Brief description of the startup..." 
-                                    {...field} 
-                                    rows={3} 
-                                    disabled={isSubmitting} 
+                                  <Textarea
+                                    placeholder="Brief description of the startup..."
+                                    {...field}
+                                    rows={3}
+                                    disabled={isSubmitting}
                                     className="bg-[#262626] border-[#333333] focus:border-indigo-500 focus:ring-indigo-500/20 rounded-lg pl-10 pt-3 transition-all duration-300 group-hover:border-indigo-500/50"
                                     suppressHydrationWarning
                                   />
@@ -465,7 +468,7 @@ export default function AdminStartupsPage() {
                                 </div>
                               </FormControl>
                               <FormMessage />
-                            </FormItem>                          )}
+                            </FormItem>)}
                         />
                         <FormField
                           control={form.control}
@@ -475,11 +478,11 @@ export default function AdminStartupsPage() {
                               <FormLabel>Website URL (Optional)</FormLabel>
                               <FormControl>
                                 <div className="relative group">
-                                  <Input 
-                                    placeholder="https://startupwebsite.com" 
-                                    {...field} 
-                                    value={field.value || ''} 
-                                    disabled={isSubmitting} 
+                                  <Input
+                                    placeholder="https://startupwebsite.com"
+                                    {...field}
+                                    value={field.value || ''}
+                                    disabled={isSubmitting}
                                     className="bg-[#262626] border-[#333333] focus:border-indigo-500 focus:ring-indigo-500/20 rounded-lg pl-10 transition-all duration-300 group-hover:border-indigo-500/50"
                                     suppressHydrationWarning
                                   />
@@ -493,19 +496,19 @@ export default function AdminStartupsPage() {
                           )}
                         />
                         <DialogFooter className="mt-6">
-                          <Button 
-                            type="button" 
-                            variant="outline" 
-                            onClick={() => { setIsFormDialogOpen(false); form.reset(); setLogoPreview(null); }} 
-                            disabled={isSubmitting} 
+                          <Button
+                            type="button"
+                            variant="outline"
+                            onClick={() => { setIsFormDialogOpen(false); form.reset(); setLogoPreview(null); }}
+                            disabled={isSubmitting}
                             className="border-[#333333] hover:border-indigo-500 text-gray-300"
                             suppressHydrationWarning
                           >
                             Cancel
                           </Button>
-                          <Button 
-                            type="submit" 
-                            disabled={isSubmitting} 
+                          <Button
+                            type="submit"
+                            disabled={isSubmitting}
                             className="relative overflow-hidden bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white shadow-lg shadow-indigo-600/20 transition-all duration-300"
                             suppressHydrationWarning
                           >
@@ -545,10 +548,10 @@ export default function AdminStartupsPage() {
               />
               <div className="absolute inset-y-0 right-0 pr-3 flex items-center">
                 {searchQuery ? (
-                  <button 
-                    type="button" 
-                    onClick={() => setSearchQuery('')} 
-                    className="text-gray-500 hover:text-red-400 transition-colors duration-300 focus:outline-none" 
+                  <button
+                    type="button"
+                    onClick={() => setSearchQuery('')}
+                    className="text-gray-500 hover:text-red-400 transition-colors duration-300 focus:outline-none"
                     suppressHydrationWarning
                   >
                     <X className="h-4 w-4" />
@@ -576,17 +579,17 @@ export default function AdminStartupsPage() {
                 ))}
               </div>
             ) : error ? (
-               <div className="bg-gradient-to-r from-red-900/20 to-red-900/10 border border-red-800/50 text-red-300 p-6 rounded-lg flex items-start space-x-4 shadow-lg">
+              <div className="bg-gradient-to-r from-red-900/20 to-red-900/10 border border-red-800/50 text-red-300 p-6 rounded-lg flex items-start space-x-4 shadow-lg">
                 <div className="bg-red-900/30 p-2 rounded-full">
                   <AlertCircle className="h-6 w-6 text-red-400" />
                 </div>
                 <div>
                   <p className="font-medium">Error Loading Startups</p>
                   <p className="text-sm text-red-400 mt-1">{error}</p>
-                   <Button 
-                    variant="outline" 
-                    size="sm" 
-                    className="mt-3 border-red-800 text-red-300 hover:bg-red-900/30 hover:text-red-200" 
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="mt-3 border-red-800 text-red-300 hover:bg-red-900/30 hover:text-red-200"
                     onClick={fetchStartups}
                     suppressHydrationWarning
                   >
@@ -628,13 +631,13 @@ export default function AdminStartupsPage() {
                     <TableBody>
                       <AnimatePresence>
                         {filteredStartups.map((startup) => (
-                          <motion.tr 
-                            key={startup.id} 
-                            variants={itemVariants} 
-                            initial="hidden" 
-                            animate="show" 
-                            exit={{ opacity: 0, x: -20 }} 
-                            className="hover:bg-gradient-to-r hover:from-[#242424] hover:to-[#1E1E1E] border-[#333333] transition-colors duration-300"                            whileHover={{ scale: 1.01 }}
+                          <motion.tr
+                            key={startup.id}
+                            variants={itemVariants}
+                            initial="hidden"
+                            animate="show"
+                            exit={{ opacity: 0, x: -20 }}
+                            className="hover:bg-gradient-to-r hover:from-[#242424] hover:to-[#1E1E1E] border-[#333333] transition-colors duration-300" whileHover={{ scale: 1.01 }}
                           >
                             <TableCell>
                               <Avatar className="h-10 w-10 rounded-md">
@@ -650,20 +653,20 @@ export default function AdminStartupsPage() {
                             <TableCell className="text-gray-400 text-xs max-w-sm truncate">{startup.description}</TableCell>
                             <TableCell className="text-right">
                               <div className="flex items-center justify-end space-x-2">
-                                <Button 
-                                  variant="ghost" 
-                                  size="icon" 
+                                <Button
+                                  variant="ghost"
+                                  size="icon"
                                   onClick={() => handleOpenFormDialog(startup)}
-                                  className="hover:text-indigo-400 text-gray-500 hover:bg-indigo-500/10 transition-colors duration-200" 
+                                  className="hover:text-indigo-400 text-gray-500 hover:bg-indigo-500/10 transition-colors duration-200"
                                   suppressHydrationWarning
                                 >
                                   <Edit className="h-4 w-4" />
                                 </Button>
-                                <Button 
-                                  variant="ghost" 
-                                  size="icon" 
+                                <Button
+                                  variant="ghost"
+                                  size="icon"
                                   onClick={() => handleDeleteClick(startup)}
-                                  className="hover:text-red-400 text-gray-500 hover:bg-red-500/10 transition-colors duration-200" 
+                                  className="hover:text-red-400 text-gray-500 hover:bg-red-500/10 transition-colors duration-200"
                                   suppressHydrationWarning
                                 >
                                   <Trash2 className="h-4 w-4" />
@@ -683,8 +686,8 @@ export default function AdminStartupsPage() {
                     </TableBody>
                   </Table>
                 ) : (
-                  <motion.div 
-                    variants={itemVariants} 
+                  <motion.div
+                    variants={itemVariants}
                     className="text-center py-12 bg-gradient-to-b from-[#1A1A1A] to-[#161616] rounded-xl border border-dashed border-[#333333] shadow-inner shadow-black/20"
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
@@ -705,9 +708,9 @@ export default function AdminStartupsPage() {
                       )}
                     </p>
                     {searchQuery && (
-                      <Button 
-                        onClick={() => setSearchQuery('')} 
-                        variant="outline" 
+                      <Button
+                        onClick={() => setSearchQuery('')}
+                        variant="outline"
                         className="mt-6 border-indigo-500/30 text-indigo-300 hover:bg-indigo-900/20"
                         suppressHydrationWarning
                       >
@@ -735,9 +738,9 @@ export default function AdminStartupsPage() {
           <Form {...form}>
             <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6 py-4 max-h-[60vh] overflow-y-auto pr-2">
               <FormField control={form.control} name="name" render={({ field }) => (
-                <FormItem><FormLabel>Startup Company Name</FormLabel><FormControl><Input placeholder="e.g., Innovatech" {...field} disabled={isSubmitting} className="bg-background focus:border-accent"/></FormControl><FormMessage /></FormItem>
-              )}/>
-              
+                <FormItem><FormLabel>Startup Company Name</FormLabel><FormControl><Input placeholder="e.g., Innovatech" {...field} disabled={isSubmitting} className="bg-background focus:border-accent" /></FormControl><FormMessage /></FormItem>
+              )} />
+
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <FormField control={form.control} name="funnelSource" render={({ field }) => (
                   <FormItem><FormLabel>Funnel Source</FormLabel><FormControl>
@@ -756,8 +759,8 @@ export default function AdminStartupsPage() {
                       </SelectContent>
                     </Select>
                   </FormControl><FormMessage /></FormItem>
-                )}/>
-                
+                )} />
+
                 <FormField control={form.control} name="session" render={({ field }) => (
                   <FormItem><FormLabel>Session</FormLabel><FormControl>
                     <Select onValueChange={field.onChange} value={field.value} disabled={isSubmitting}>
@@ -772,14 +775,14 @@ export default function AdminStartupsPage() {
                       </SelectContent>
                     </Select>
                   </FormControl><FormMessage /></FormItem>
-                )}/>
+                )} />
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <FormField control={form.control} name="monthYearOfIncubation" render={({ field }) => (
-                  <FormItem><FormLabel>Month Year of Incubation</FormLabel><FormControl><Input placeholder="e.g., January 2024" {...field} disabled={isSubmitting} className="bg-background focus:border-accent"/></FormControl><FormMessage /></FormItem>
-                )}/>
-                
+                  <FormItem><FormLabel>Month Year of Incubation</FormLabel><FormControl><Input placeholder="e.g., January 2024" {...field} disabled={isSubmitting} className="bg-background focus:border-accent" /></FormControl><FormMessage /></FormItem>
+                )} />
+
                 <FormField control={form.control} name="status" render={({ field }) => (
                   <FormItem><FormLabel>Status</FormLabel><FormControl>
                     <Select onValueChange={field.onChange} value={field.value} disabled={isSubmitting}>
@@ -796,7 +799,7 @@ export default function AdminStartupsPage() {
                       </SelectContent>
                     </Select>
                   </FormControl><FormMessage /></FormItem>
-                )}/>
+                )} />
               </div>
 
               <FormField control={form.control} name="legalStatus" render={({ field }) => (
@@ -816,48 +819,48 @@ export default function AdminStartupsPage() {
                     </SelectContent>
                   </Select>
                 </FormControl><FormMessage /></FormItem>
-              )}/>
+              )} />
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <FormField control={form.control} name="rknecEmailId" render={({ field }) => (
-                  <FormItem><FormLabel>RKNEC Email ID</FormLabel><FormControl><Input placeholder="example@rknec.edu" {...field} disabled={isSubmitting} className="bg-background focus:border-accent"/></FormControl><FormMessage /></FormItem>
-                )}/>
-                
+                  <FormItem><FormLabel>RKNEC Email ID</FormLabel><FormControl><Input placeholder="example@rknec.edu" {...field} disabled={isSubmitting} className="bg-background focus:border-accent" /></FormControl><FormMessage /></FormItem>
+                )} />
+
                 <FormField control={form.control} name="emailId" render={({ field }) => (
-                  <FormItem><FormLabel>Email ID</FormLabel><FormControl><Input placeholder="example@company.com" {...field} disabled={isSubmitting} className="bg-background focus:border-accent"/></FormControl><FormMessage /></FormItem>
-                )}/>
+                  <FormItem><FormLabel>Email ID</FormLabel><FormControl><Input placeholder="example@company.com" {...field} disabled={isSubmitting} className="bg-background focus:border-accent" /></FormControl><FormMessage /></FormItem>
+                )} />
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <FormField control={form.control} name="mobileNumber" render={({ field }) => (
-                  <FormItem><FormLabel>Mobile Number</FormLabel><FormControl><Input placeholder="+91 9876543210" {...field} disabled={isSubmitting} className="bg-background focus:border-accent"/></FormControl><FormMessage /></FormItem>
-                )}/>
-                
+                  <FormItem><FormLabel>Mobile Number</FormLabel><FormControl><Input placeholder="+91 9876543210" {...field} disabled={isSubmitting} className="bg-background focus:border-accent" /></FormControl><FormMessage /></FormItem>
+                )} />
+
                 <FormField control={form.control} name="websiteUrl" render={({ field }) => (
-                  <FormItem><FormLabel>Website URL (Optional)</FormLabel><FormControl><Input placeholder="https://startup.com" {...field} value={field.value || ''} disabled={isSubmitting} className="bg-background focus:border-accent"/></FormControl><FormMessage /></FormItem>
-                )}/>
+                  <FormItem><FormLabel>Website URL (Optional)</FormLabel><FormControl><Input placeholder="https://startup.com" {...field} value={field.value || ''} disabled={isSubmitting} className="bg-background focus:border-accent" /></FormControl><FormMessage /></FormItem>
+                )} />
               </div>
-              
+
               <FormField control={form.control} name="logoFile" render={({ field }) => (
                 <FormItem><FormLabel>Logo Upload (Optional)</FormLabel>
                   <FormControl><div className="flex items-center gap-4">
-                    <Input type="file" accept="image/*" onChange={handleLogoFileChange} disabled={isSubmitting} className="bg-background focus:border-accent file:text-accent file:font-semibold"/>
+                    <Input type="file" accept="image/*" onChange={handleLogoFileChange} disabled={isSubmitting} className="bg-background focus:border-accent file:text-accent file:font-semibold" />
                     {logoPreview && <Avatar className="h-16 w-16 rounded-md"><AvatarImage src={logoPreview} alt="Logo preview" className="object-contain" /><AvatarFallback><UploadCloud /></AvatarFallback></Avatar>}
                   </div></FormControl><FormMessage /><p className="text-xs text-muted-foreground mt-1">Max 5MB. If no file, provide Logo URL below.</p>
                 </FormItem>
-              )}/>
-              
+              )} />
+
               <FormField control={form.control} name="logoUrl" render={({ field }) => (
-                <FormItem><FormLabel>Logo URL {form.getValues('logoFile') ? '(Fallback if upload fails)' : ''}</FormLabel><FormControl><Input placeholder="https://example.com/logo.png" {...field} disabled={isSubmitting} className="bg-background focus:border-accent"/></FormControl><FormMessage /></FormItem>
-              )}/>
-                <FormField control={form.control} name="description" render={({ field }) => (
-                <FormItem><FormLabel>Description</FormLabel><FormControl><Textarea placeholder="Brief description of the startup..." {...field} rows={3} disabled={isSubmitting} className="bg-background focus:border-accent"/></FormControl><FormMessage /></FormItem>
-              )}/>
-              
+                <FormItem><FormLabel>Logo URL {form.getValues('logoFile') ? '(Fallback if upload fails)' : ''}</FormLabel><FormControl><Input placeholder="https://example.com/logo.png" {...field} disabled={isSubmitting} className="bg-background focus:border-accent" /></FormControl><FormMessage /></FormItem>
+              )} />
+              <FormField control={form.control} name="description" render={({ field }) => (
+                <FormItem><FormLabel>Description</FormLabel><FormControl><Textarea placeholder="Brief description of the startup..." {...field} rows={3} disabled={isSubmitting} className="bg-background focus:border-accent" /></FormControl><FormMessage /></FormItem>
+              )} />
+
               <DialogFooter className="mt-6">
                 <Button type="button" variant="outline" onClick={() => setIsFormDialogOpen(false)} disabled={isSubmitting} className="hover:border-accent">Cancel</Button>
                 <Button type="submit" disabled={isSubmitting} className="bg-accent hover:bg-accent/90 text-accent-foreground">
-                  {isSubmitting ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : (editingStartupData ? <Edit className="mr-2 h-4 w-4"/> : <PlusCircle className="mr-2 h-4 w-4" />)}
+                  {isSubmitting ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : (editingStartupData ? <Edit className="mr-2 h-4 w-4" /> : <PlusCircle className="mr-2 h-4 w-4" />)}
                   {editingStartupData ? "Update Startup" : "Add Startup"}
                 </Button>
               </DialogFooter>

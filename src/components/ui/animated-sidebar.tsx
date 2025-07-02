@@ -4,23 +4,23 @@ import { cn } from "@/lib/utils";
 import React, { useState, createContext, useContext } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { IconMenu2, IconX } from "@tabler/icons-react";
- 
+
 interface Links {
   label: string;
   href: string;
   icon: React.JSX.Element | React.ReactNode;
 }
- 
+
 interface SidebarContextProps {
   open: boolean;
   setOpen: React.Dispatch<React.SetStateAction<boolean>>;
   animate: boolean;
 }
- 
+
 const SidebarContext = createContext<SidebarContextProps | undefined>(
   undefined
 );
- 
+
 export const useSidebar = () => {
   const context = useContext(SidebarContext);
   if (!context) {
@@ -28,7 +28,7 @@ export const useSidebar = () => {
   }
   return context;
 };
- 
+
 export const SidebarProvider = ({
   children,
   open: openProp,
@@ -41,17 +41,17 @@ export const SidebarProvider = ({
   animate?: boolean;
 }) => {
   const [openState, setOpenState] = useState(false);
- 
+
   const open = openProp !== undefined ? openProp : openState;
   const setOpen = setOpenProp !== undefined ? setOpenProp : setOpenState;
- 
+
   return (
     <SidebarContext.Provider value={{ open, setOpen, animate }}>
       {children}
     </SidebarContext.Provider>
   );
 };
- 
+
 export const Sidebar = ({
   children,
   open,
@@ -69,7 +69,7 @@ export const Sidebar = ({
     </SidebarProvider>
   );
 };
- 
+
 export const SidebarBody = (props: React.ComponentProps<typeof motion.div>) => {
   return (
     <>
@@ -78,7 +78,7 @@ export const SidebarBody = (props: React.ComponentProps<typeof motion.div>) => {
     </>
   );
 };
- 
+
 export const DesktopSidebar = ({
   className,
   children,
@@ -104,7 +104,7 @@ export const DesktopSidebar = ({
     </>
   );
 };
- 
+
 export const MobileSidebar = ({
   className,
   children,
@@ -155,7 +155,7 @@ export const MobileSidebar = ({
     </>
   );
 };
- 
+
 export const SidebarLink = ({
   link,
   className,
@@ -177,7 +177,7 @@ export const SidebarLink = ({
       <span className="text-indigo-400 group-hover/sidebar:text-indigo-300 transition-colors">
         {link.icon}
       </span>
- 
+
       <motion.span
         animate={{
           display: animate ? (open ? "inline-block" : "none") : "inline-block",

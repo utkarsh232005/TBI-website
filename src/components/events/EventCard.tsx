@@ -62,28 +62,28 @@ export const EventCard = ({
         'overflow-hidden rounded-2xl bg-gray-900/50 border border-gray-800/50 hover:border-indigo-500/30 transition-colors duration-200',
         className
       )}
-    >      <div 
-        className="p-4 cursor-pointer flex items-center justify-between"
-        onClick={() => onToggleExpand(event.id)}
-      >
+    >      <div
+      className="p-4 cursor-pointer flex items-center justify-between"
+      onClick={() => onToggleExpand(event.id)}
+    >
         <div className="flex items-center gap-4">
           <div className="flex-shrink-0">
-            {event.imageUrl ? (              <div className="h-12 w-12 rounded-lg overflow-hidden border border-gray-700">
-                <img 
-                  src={processImageUrl(event.imageUrl, event.title.substring(0,3))} 
-                  alt={event.title}
-                  className="h-full w-full object-cover"
-                  onError={(e) => {
-                    // Fallback to default icon if image fails to load
-                    const target = e.target as HTMLImageElement;
-                    target.style.display = 'none';
-                    const parent = target.parentElement;
-                    if (parent) {
-                      parent.innerHTML = '<div class="h-12 w-12 rounded-lg bg-indigo-500/10 flex items-center justify-center text-indigo-400"><svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg></div>';
-                    }
-                  }}
-                />
-              </div>
+            {event.imageUrl ? (<div className="h-12 w-12 rounded-lg overflow-hidden border border-gray-700">
+              <img
+                src={processImageUrl(event.imageUrl, event.title.substring(0, 3))}
+                alt={event.title}
+                className="h-full w-full object-cover"
+                onError={(e) => {
+                  // Fallback to default icon if image fails to load
+                  const target = e.target as HTMLImageElement;
+                  target.style.display = 'none';
+                  const parent = target.parentElement;
+                  if (parent) {
+                    parent.innerHTML = '<div class="h-12 w-12 rounded-lg bg-indigo-500/10 flex items-center justify-center text-indigo-400"><svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg></div>';
+                  }
+                }}
+              />
+            </div>
             ) : (
               <div className="h-12 w-12 rounded-lg bg-indigo-500/10 flex items-center justify-center text-indigo-400">
                 <CalendarDays className="h-5 w-5" />
@@ -132,12 +132,12 @@ export const EventCard = ({
             className="overflow-hidden"
           >
             <div className="px-4 pb-4 pt-2 border-t border-gray-800/50">              <div className="prose prose-invert max-w-none text-sm text-gray-300">
-                <p>{event.description}</p>
-              </div>
-                {event.imageUrl && (
+              <p>{event.description}</p>
+            </div>
+              {event.imageUrl && (
                 <div className="mt-4">
-                  <img 
-                    src={processImageUrl(event.imageUrl, event.title)} 
+                  <img
+                    src={processImageUrl(event.imageUrl, event.title)}
                     alt={event.title}
                     className="w-full max-w-md h-48 object-cover rounded-lg border border-gray-700"
                     onError={(e) => {
@@ -164,18 +164,18 @@ export const EventCard = ({
                   </div>
                 </div>
               )}
-              
+
               <div className="mt-4 pt-4 border-t border-gray-800/50 flex flex-wrap items-center justify-between gap-3">
                 <div className="flex items-center gap-2">
                   <span className="text-xs text-gray-500">
-                    Created: {event.createdAt?.toDate 
+                    Created: {event.createdAt?.toDate
                       ? format(event.createdAt.toDate(), 'MMM d, yyyy')
-                      : event.createdAt?.seconds 
+                      : event.createdAt?.seconds
                         ? format(new Date(event.createdAt.seconds * 1000), 'MMM d, yyyy')
                         : 'N/A'}
                   </span>
                 </div>
-                
+
                 <div className="flex items-center gap-2">
                   <Button
                     variant="outline"
@@ -189,7 +189,7 @@ export const EventCard = ({
                     <Edit className="h-3.5 w-3.5 mr-1.5" />
                     Edit
                   </Button>
-                  
+
                   <Button
                     variant="outline"
                     size="sm"

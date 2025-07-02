@@ -8,7 +8,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Textarea } from "@/components/ui/textarea";
-import { 
+import {
   Dialog,
   DialogContent,
   DialogDescription,
@@ -26,10 +26,10 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
-import { 
-  CheckCircle, 
-  XCircle, 
-  MessageSquare, 
+import {
+  CheckCircle,
+  XCircle,
+  MessageSquare,
   Loader2,
   User,
   Mail,
@@ -38,10 +38,10 @@ import {
   HandHeart
 } from 'lucide-react';
 import { useToast } from "@/hooks/use-toast";
-import { 
+import {
   processMentorDecision,
   processMentorDecisionWithToken,
-  getMentorRequestByToken 
+  getMentorRequestByToken
 } from '@/app/actions/mentor-request-actions';
 import { doc, getDoc, query, where, collection, getDocs } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
@@ -77,7 +77,7 @@ function MentorRequestsContent() {
   useEffect(() => {
     const token = searchParams.get('token');
     const directAction = searchParams.get('action') as 'approve' | 'reject' | null;
-    
+
     if (token) {
       fetchRequest(token, directAction);
     } else {
@@ -106,14 +106,14 @@ function MentorRequestsContent() {
           portfolioUrl: userData.portfolioUrl,
         };
       }
-      
+
       // If not found in users collection, try submissions (onboarding data)
       const submissionsQuery = query(
         collection(db, 'submissions'),
         where('uid', '==', userId)
       );
       const submissionsSnapshot = await getDocs(submissionsQuery);
-      
+
       if (!submissionsSnapshot.empty) {
         const submissionData = submissionsSnapshot.docs[0].data();
         return {
@@ -129,7 +129,7 @@ function MentorRequestsContent() {
           portfolioUrl: submissionData.personalInfo?.portfolioWebsite,
         };
       }
-      
+
       return null;
     } catch (error) {
       console.error('Error fetching user profile details:', error);
@@ -140,7 +140,7 @@ function MentorRequestsContent() {
   const fetchRequest = async (tokenId: string, directAction?: 'approve' | 'reject' | null) => {
     try {
       const result = await getMentorRequestByToken(tokenId);
-      
+
       if (!result.success || !result.request) {
         setError(result.error || 'Request not found');
         return;
@@ -148,7 +148,7 @@ function MentorRequestsContent() {
 
       setRequest(result.request);
       setUserDetails(result.userDetails);
-      
+
       // If there's a direct action from email link, open the appropriate dialog
       if (directAction) {
         setTimeout(() => {
@@ -202,7 +202,7 @@ function MentorRequestsContent() {
           title: "Decision Recorded",
           description: result.message,
         });
-        
+
         // Update the request status locally
         setRequest(prev => prev ? {
           ...prev,
@@ -292,13 +292,13 @@ function MentorRequestsContent() {
           <CardHeader>
             <CardTitle className="flex items-center justify-between">
               <span>Student Information</span>
-              <Badge 
-                variant={request.status === 'mentor_approved' ? 'default' : 
-                        request.status === 'mentor_rejected' ? 'destructive' : 'secondary'}
+              <Badge
+                variant={request.status === 'mentor_approved' ? 'default' :
+                  request.status === 'mentor_rejected' ? 'destructive' : 'secondary'}
               >
                 {request.status === 'admin_approved' ? 'Awaiting Your Response' :
-                 request.status === 'mentor_approved' ? 'Approved' :
-                 request.status === 'mentor_rejected' ? 'Declined' : 'Processed'}
+                  request.status === 'mentor_approved' ? 'Approved' :
+                    request.status === 'mentor_rejected' ? 'Declined' : 'Processed'}
               </Badge>
             </CardTitle>
           </CardHeader>
@@ -326,41 +326,41 @@ function MentorRequestsContent() {
             {userDetails && (
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6 p-4 bg-muted/30 rounded-lg">
                 <h4 className="col-span-full font-semibold text-lg mb-2">Student Details</h4>
-                
+
                 {userDetails.phone && (
                   <div className="flex items-center space-x-2">
                     <span className="text-sm font-medium text-muted-foreground min-w-[80px]">Phone:</span>
                     <span className="text-sm">{userDetails.phone}</span>
                   </div>
                 )}
-                
+
                 {userDetails.college && (
                   <div className="flex items-center space-x-2">
                     <span className="text-sm font-medium text-muted-foreground min-w-[80px]">College:</span>
                     <span className="text-sm">{userDetails.college}</span>
                   </div>
                 )}
-                
+
                 {userDetails.course && (
                   <div className="flex items-center space-x-2">
                     <span className="text-sm font-medium text-muted-foreground min-w-[80px]">Course:</span>
                     <span className="text-sm">{userDetails.course}</span>
                   </div>
                 )}
-                
+
                 {userDetails.yearOfStudy && (
                   <div className="flex items-center space-x-2">
                     <span className="text-sm font-medium text-muted-foreground min-w-[80px]">Year:</span>
                     <span className="text-sm">{userDetails.yearOfStudy}</span>
                   </div>
                 )}
-                
+
                 {userDetails.linkedinUrl && (
                   <div className="flex items-center space-x-2">
                     <span className="text-sm font-medium text-muted-foreground min-w-[80px]">LinkedIn:</span>
-                    <a 
-                      href={userDetails.linkedinUrl} 
-                      target="_blank" 
+                    <a
+                      href={userDetails.linkedinUrl}
+                      target="_blank"
                       rel="noopener noreferrer"
                       className="text-sm text-blue-600 hover:text-blue-800 underline truncate"
                     >
@@ -368,13 +368,13 @@ function MentorRequestsContent() {
                     </a>
                   </div>
                 )}
-                
+
                 {userDetails.portfolioUrl && (
                   <div className="flex items-center space-x-2">
                     <span className="text-sm font-medium text-muted-foreground min-w-[80px]">Portfolio:</span>
-                    <a 
-                      href={userDetails.portfolioUrl} 
-                      target="_blank" 
+                    <a
+                      href={userDetails.portfolioUrl}
+                      target="_blank"
                       rel="noopener noreferrer"
                       className="text-sm text-blue-600 hover:text-blue-800 underline truncate"
                     >
@@ -382,7 +382,7 @@ function MentorRequestsContent() {
                     </a>
                   </div>
                 )}
-                
+
                 {userDetails.skills && userDetails.skills.length > 0 && (
                   <div className="col-span-full">
                     <span className="text-sm font-medium text-muted-foreground block mb-2">Skills:</span>
@@ -395,7 +395,7 @@ function MentorRequestsContent() {
                     </div>
                   </div>
                 )}
-                
+
                 {userDetails.bio && (
                   <div className="col-span-full">
                     <span className="text-sm font-medium text-muted-foreground block mb-2">About:</span>
@@ -438,10 +438,10 @@ function MentorRequestsContent() {
             </CardHeader>
             <CardContent>
               <p className="text-muted-foreground mb-6">
-                Would you like to mentor {request.userName}? Your decision will be final and 
+                Would you like to mentor {request.userName}? Your decision will be final and
                 the student will be notified of your response.
               </p>
-              
+
               <div className="flex space-x-4">
                 <Button
                   onClick={() => handleAction('approve')}
@@ -473,7 +473,7 @@ function MentorRequestsContent() {
                   <CheckCircle className="h-12 w-12 mx-auto mb-4" />
                   <h3 className="text-xl font-semibold mb-2">Mentorship Accepted!</h3>
                   <p className="text-muted-foreground">
-                    You've accepted {request.userName} as your mentee. They have been notified 
+                    You've accepted {request.userName} as your mentee. They have been notified
                     and can now contact you directly.
                   </p>
                 </div>
@@ -498,19 +498,19 @@ function MentorRequestsContent() {
                 {actionType === 'approve' ? 'Accept Mentorship' : 'Decline Request'}
               </DialogTitle>
               <DialogDescription>
-                {actionType === 'approve' 
+                {actionType === 'approve'
                   ? 'By accepting, you agree to mentor this student. They will be given your contact information.'
                   : 'The student will be notified that you are unable to take them on as a mentee at this time.'
                 }
               </DialogDescription>
             </DialogHeader>
-            
+
             <div className="space-y-4">
               <div className="bg-muted/50 p-4 rounded-lg">
                 <p><strong>Student:</strong> {request.userName}</p>
                 <p className="mt-2 text-sm">{request.requestMessage}</p>
               </div>
-              
+
               <div>
                 <label className="text-sm font-medium">
                   {actionType === 'approve' ? 'Welcome message (optional)' : 'Reason for declining (optional)'}
@@ -519,7 +519,7 @@ function MentorRequestsContent() {
                   value={notes}
                   onChange={(e) => setNotes(e.target.value)}
                   placeholder={
-                    actionType === 'approve' 
+                    actionType === 'approve'
                       ? 'Welcome! I look forward to working with you...'
                       : 'I appreciate your interest, but I am currently unable to take on new mentees...'
                   }
@@ -527,7 +527,7 @@ function MentorRequestsContent() {
                 />
               </div>
             </div>
-            
+
             <DialogFooter>
               <Button variant="outline" onClick={closeDialogs}>
                 Cancel
@@ -548,7 +548,7 @@ function MentorRequestsContent() {
             <AlertDialogHeader>
               <AlertDialogTitle>Confirm Your Decision</AlertDialogTitle>
               <AlertDialogDescription>
-                Are you sure you want to {actionType} this mentorship request? 
+                Are you sure you want to {actionType} this mentorship request?
                 This action cannot be undone and the student will be notified immediately.
               </AlertDialogDescription>
             </AlertDialogHeader>

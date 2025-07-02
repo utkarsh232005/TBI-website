@@ -1,17 +1,17 @@
 
-"use client"; // Add this if not present, for useState
+"use client";
 
-import { useState } from 'react'; // Import useState
+import { useState } from 'react';
 import MainNavbar from '@/components/ui/main-navbar';
 import Footer from '@/components/ui/footer';
 import HeroSection from '@/components/sections/hero-section';
-import AboutSection from '@/components/sections/about-section';
+import FeaturesSection from '@/components/sections/features-section';
+import RcoemAboutSection from '@/components/sections/rcoem-about-section';
+import TeamSection from '@/components/sections/team-section';
 import FeaturedStartupsSection from '@/components/sections/featured-startups-section';
-import ProgramDetailsSection from '@/components/sections/program-details-section';
-import TestimonialsSection from '@/components/sections/testimonials-section';
+import ModernTestimonialsSection from '@/components/sections/modern-testimonials-section';
 import RcoemSplashScreen from '@/components/sections/rcoem-splash-screen';
-// import ContactSection from '@/components/sections/contact-section'; // No longer directly rendered
-import ApplicationFormDialog from '@/components/ui/application-form-dialog'; // Import the new dialog
+import ApplicationFormDialog from '@/components/ui/application-form-dialog';
 
 export default function HomePage() {
   const [isApplicationFormOpen, setIsApplicationFormOpen] = useState(false);
@@ -40,10 +40,11 @@ export default function HomePage() {
           <MainNavbar onApplyClick={handleOpenApplicationForm} />
           <main className="flex-grow">
             <HeroSection onApplyClick={handleOpenApplicationForm} />
-            <AboutSection />
+            <FeaturesSection />
+            <RcoemAboutSection />
+            <TeamSection />
             <FeaturedStartupsSection />
-            <ProgramDetailsSection />
-            <TestimonialsSection />
+            <ModernTestimonialsSection />
           </main>
           <Footer />
           <ApplicationFormDialog 
@@ -59,12 +60,12 @@ export default function HomePage() {
     <div className="flex flex-col min-h-screen bg-background font-poppins">
       <MainNavbar onApplyClick={handleOpenApplicationForm} /> {/* Pass handler to Navbar */}
       <main className="flex-grow">
-        <HeroSection onApplyClick={handleOpenApplicationForm} /> {/* Pass handler to HeroSection */}
-        <AboutSection />
+        <HeroSection onApplyClick={handleOpenApplicationForm} />
+        <FeaturesSection />
+        <RcoemAboutSection />
+        <TeamSection />
         <FeaturedStartupsSection />
-        <ProgramDetailsSection />
-        <TestimonialsSection />
-        {/* ContactSection is no longer rendered here */}
+        <ModernTestimonialsSection />
       </main>
       <Footer />
       <ApplicationFormDialog 

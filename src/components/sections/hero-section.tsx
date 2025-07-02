@@ -101,47 +101,105 @@ export default function HeroSection({ onApplyClick }: HeroSectionProps) {
     <motion.section 
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
-      transition={{ duration: 0.5 }}
-      className="relative flex min-h-screen items-center justify-center overflow-hidden bg-background text-foreground pt-12 sm:pt-16"
+      transition={{ duration: 0.8 }}
+      className="relative flex min-h-screen items-center justify-center overflow-hidden bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 text-white pt-20"
     >
-      <div className="absolute bottom-0 left-0 right-0 h-1/3 bg-bottom-gradient-hero z-0" />
+      {/* Background Effects */}
+      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-purple-600/20 via-slate-900/50 to-black"></div>
+      <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-purple-500/10 rounded-full blur-3xl"></div>
+      <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-blue-500/10 rounded-full blur-3xl"></div>
       
-      <div 
-        className="relative z-10 mx-auto max-w-4xl p-4 text-center"
-      >
-        <p 
-          ref={taglineRef}
-          className="font-montserrat text-sm font-normal tracking-widest uppercase mb-8 opacity-0"
+      <div className="relative z-10 mx-auto max-w-6xl px-4 text-center">
+        <motion.div
+          initial={{ opacity: 0, y: 30 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.8, delay: 0.2 }}
+          className="mb-6"
         >
-          <span className="text-transparent bg-clip-text bg-gradient-to-r from-foreground to-accent"> {/* from-white to-purple */}
-            Your startup needs a kick
+          <span className="inline-flex items-center rounded-full bg-purple-600/20 px-6 py-2 text-sm font-medium text-purple-200 ring-1 ring-purple-600/30">
+            🚀 Transform Your Startup Journey
           </span>
-        </p>
-        <h1 
+        </motion.div>
+
+        <motion.h1 
           ref={headlineRef}
-          className="font-montserrat text-4xl font-normal text-foreground sm:text-5xl lg:text-6xl xl:text-7xl" 
+          initial={{ opacity: 0, y: 30 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.8, delay: 0.4 }}
+          className="font-bold text-5xl sm:text-6xl lg:text-7xl xl:text-8xl leading-tight mb-8"
         >
-          Connect & grow with your targeted customers
-        </h1>
-          <div 
+          <span className="block text-white">Build the</span>
+          <span className="block text-transparent bg-clip-text bg-gradient-to-r from-purple-400 via-pink-400 to-red-400">
+            Future
+          </span>
+          <span className="block text-white">of Innovation</span>
+        </motion.h1>
+
+        <motion.p
+          initial={{ opacity: 0, y: 30 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.8, delay: 0.6 }}
+          className="mx-auto max-w-3xl text-xl text-gray-300 leading-relaxed mb-12"
+        >
+          Join India's premier technology business incubator and transform your innovative ideas into successful startups. 
+          Get mentorship, funding, and resources to scale your business.
+        </motion.p>
+
+        <motion.div 
           ref={buttonsRef}
-          className="mt-12 flex flex-col items-center justify-center gap-5 sm:flex-row opacity-0"
+          initial={{ opacity: 0, y: 30 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.8, delay: 0.8 }}
+          className="flex flex-col sm:flex-row items-center justify-center gap-6"
         >
-          <div onClick={handleApplyForIncubationClick}>
-            <InteractiveHoverButton>Apply for the Incubation</InteractiveHoverButton>
+          <div onClick={handleApplyForIncubationClick} className="w-full sm:w-auto">
+            <Button
+              size="lg"
+              className="w-full sm:w-auto bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white font-semibold px-8 py-4 rounded-full text-lg shadow-2xl shadow-purple-500/25 transform transition-all duration-200 hover:scale-105"
+            >
+              Start Your Journey
+              <ArrowRight className="ml-2 h-5 w-5" />
+            </Button>
           </div>
 
           <Button
-            asChild
             variant="outline"
             size="lg"
-            className="inline-flex items-center justify-center w-full px-8 py-3 text-base font-normal text-foreground transition-all duration-200 bg-background border-border rounded-full sm:w-auto hover:border-accent group"
+            asChild
+            className="w-full sm:w-auto border-gray-300 text-gray-300 hover:bg-white hover:text-gray-900 font-semibold px-8 py-4 rounded-full text-lg transition-all duration-200 hover:scale-105"
           >
-            <a href="#startups">
+            <a href="#success-stories">
               See Success Stories
             </a>
           </Button>
-        </div>
+        </motion.div>
+
+        {/* Stats Section */}
+        <motion.div
+          initial={{ opacity: 0, y: 30 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.8, delay: 1.0 }}
+          className="mt-20 grid grid-cols-1 sm:grid-cols-3 gap-8 text-center"
+        >
+          <div className="space-y-2">
+            <div className="text-4xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-pink-400">
+              100+
+            </div>
+            <div className="text-gray-300">Startups Incubated</div>
+          </div>
+          <div className="space-y-2">
+            <div className="text-4xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-pink-400">
+              ₹50Cr+
+            </div>
+            <div className="text-gray-300">Funding Raised</div>
+          </div>
+          <div className="space-y-2">
+            <div className="text-4xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-pink-400">
+              50+
+            </div>
+            <div className="text-gray-300">Mentors Network</div>
+          </div>
+        </motion.div>
       </div>
       
       <CampusStatusDialog

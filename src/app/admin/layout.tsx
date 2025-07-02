@@ -4,7 +4,7 @@
 import * as React from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { 
+import {
   Sidebar,
   SidebarBody,
   DesktopSidebar,
@@ -13,10 +13,10 @@ import {
   useSidebar,
   SidebarProvider
 } from "@/components/ui/animated-sidebar";
-import { 
-  FileText, 
-  LogOut, 
-  Settings, 
+import {
+  FileText,
+  LogOut,
+  Settings,
   CalendarDays,
   UserCog,
   BarChart2,
@@ -50,7 +50,7 @@ function AdminLayoutContent({
 }) {
   const pathname = usePathname();
   const { open, setOpen } = useSidebar();
-  
+
   React.useEffect(() => {
     // Close sidebar on mobile when route changes
     if (window.innerWidth < 768) {
@@ -59,53 +59,53 @@ function AdminLayoutContent({
   }, [pathname, setOpen]);
 
   const navItems: NavItem[] = [
-    { 
-      href: "/admin/dashboard", 
-      label: "Dashboard", 
+    {
+      href: "/admin/dashboard",
+      label: "Dashboard",
       icon: <LayoutDashboard className="h-5 w-5" />,
-      disabled: false 
+      disabled: false
     },
-    { 
-      href: "/admin/submissions", 
-      label: "Submissions", 
+    {
+      href: "/admin/submissions",
+      label: "Submissions",
       icon: <FileCheck className="h-5 w-5" />,
-      disabled: false 
+      disabled: false
     },
-    { 
-      href: "/admin/mentors", 
-      label: "Mentors", 
+    {
+      href: "/admin/mentors",
+      label: "Mentors",
       icon: <Users className="h-5 w-5" />,
-      disabled: false 
+      disabled: false
     },
-    { 
-      href: "/admin/mentor-requests", 
-      label: "Mentor Requests", 
+    {
+      href: "/admin/mentor-requests",
+      label: "Mentor Requests",
       icon: <MessageSquare className="h-5 w-5" />,
-      disabled: false 
+      disabled: false
     },
-    { 
-      href: "/admin/events", 
-      label: "Events", 
+    {
+      href: "/admin/events",
+      label: "Events",
       icon: <CalendarDays className="h-5 w-5" />,
-      disabled: false 
+      disabled: false
     },
-    { 
+    {
       href: "/admin/startups", // Link to the startups management page
       label: "Add-startups",   // New label
       icon: <Rocket className="h-5 w-5" />, // Using Rocket icon
-      disabled: false 
+      disabled: false
     },
-    { 
+    {
       href: "/admin/analysis",
       label: "Analysis",
       icon: <BarChart2 className="h-5 w-5" />,
-      disabled: false 
+      disabled: false
     },
-    { 
-      href: "/admin/settings", 
-      label: "Settings", 
+    {
+      href: "/admin/settings",
+      label: "Settings",
       icon: <Settings className="h-5 w-5" />,
-      disabled: false 
+      disabled: false
     },
   ];
 
@@ -124,7 +124,7 @@ function AdminLayoutContent({
             <div className="flex items-center justify-between h-16 px-4 border-b border-neutral-800">
               <Link href="/admin/dashboard" className="flex items-center space-x-3 min-w-max">
                 <InnoNexusLogo className="h-8 w-8 text-white flex-shrink-0" />
-                <motion.span 
+                <motion.span
                   className="text-lg font-semibold whitespace-nowrap text-white"
                   animate={{
                     opacity: open ? 1 : 0,
@@ -146,8 +146,8 @@ function AdminLayoutContent({
                       className={cn(
                         'flex items-center justify-start gap-3 py-3 px-3 rounded-lg transition-colors duration-200',
                         'cursor-pointer',
-                        pathname === item.href 
-                          ? 'bg-indigo-900/50 text-white' 
+                        pathname === item.href
+                          ? 'bg-indigo-900/50 text-white'
                           : 'text-neutral-300 hover:bg-neutral-800/50 hover:text-white',
                         item.disabled && 'opacity-50 hover:bg-transparent hover:text-neutral-300',
                         'group/sidebar'
@@ -196,12 +196,12 @@ function AdminLayoutContent({
                 <div className="space-y-1 px-2">
                   {navItems.map((item) => (
                     <div key={`mobile-${item.href}`} className="group relative" title={item.disabled ? 'Coming soon' : ''}>
-                      <Link 
+                      <Link
                         href={item.disabled ? '#' : item.href}
                         className={cn(
                           "flex items-center px-3 py-3 rounded-lg text-sm font-medium transition-colors cursor-pointer",
-                          pathname === item.href 
-                            ? 'bg-indigo-900/50 text-white' 
+                          pathname === item.href
+                            ? 'bg-indigo-900/50 text-white'
                             : 'text-neutral-300 hover:bg-neutral-800/50 hover:text-white',
                           item.disabled && 'opacity-50 hover:bg-transparent hover:text-neutral-300'
                         )}
@@ -221,12 +221,12 @@ function AdminLayoutContent({
                   ))}
                 </div>
               </div>
-              
+
               <div className="p-4">
-                <Link 
-                  href="/" 
+                <Link
+                  href="/"
                   className="flex items-center px-3 py-2.5 rounded-lg text-sm font-medium text-neutral-300 hover:bg-neutral-800/50 hover:text-white transition-colors"
-                   onClick={handleMobileLinkClick} // Close mobile menu on link click
+                  onClick={handleMobileLinkClick} // Close mobile menu on link click
                 >
                   <Home className="h-5 w-5 mr-3" />
                   <span>Back to Home</span>
