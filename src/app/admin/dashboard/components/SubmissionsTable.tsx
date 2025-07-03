@@ -46,13 +46,13 @@ function IdeaCell({ idea, submissionId, status, temporaryUserId, temporaryPasswo
   const displayText = isExpanded ? idea : (shouldTruncate ? `${idea.substring(0, maxLength)}...` : idea);
 
   return (
-    <div className="text-sm text-neutral-200 max-w-md">
+    <div className="text-sm text-gray-700 max-w-md">
       <div className="mb-2 leading-relaxed">
-        <span className="text-neutral-100">{displayText || 'N/A'}</span>
+        <span className="text-gray-900 font-medium">{displayText || 'N/A'}</span>
         {shouldTruncate && (
           <button
             onClick={() => setIsExpanded(!isExpanded)}
-            className="ml-2 inline-flex items-center text-xs text-indigo-400 hover:text-indigo-300 transition-all duration-200 hover:bg-indigo-900/20 px-2 py-1 rounded-md"
+            className="ml-2 inline-flex items-center text-xs text-blue-600 hover:text-blue-800 transition-all duration-200 hover:bg-blue-100 px-2 py-1 rounded-md"
           >
             {isExpanded ? (
               <>
@@ -69,15 +69,15 @@ function IdeaCell({ idea, submissionId, status, temporaryUserId, temporaryPasswo
         )}
       </div>
       {status === 'accepted' && temporaryUserId && (
-        <div className="bg-emerald-950/30 border border-emerald-800/30 rounded-lg p-3 text-xs text-emerald-200 space-y-2">
-          <div className="font-medium text-emerald-100 mb-1">Login Credentials</div>
+        <div className="admin-badge-success p-3 text-xs space-y-2 w-full">
+          <div className="font-medium mb-1">Login Credentials</div>
           <div className="flex items-center gap-2">
-            <UserCircle className="h-3 w-3 text-emerald-400" />
-            <span className="font-mono bg-emerald-900/30 px-2 py-1 rounded text-emerald-100">{temporaryUserId}</span>
+            <UserCircle className="h-3 w-3 text-green-700" />
+            <span className="font-mono bg-green-100 px-2 py-1 rounded text-green-800">{temporaryUserId}</span>
           </div>
           <div className="flex items-center gap-2">
-            <KeyRound className="h-3 w-3 text-emerald-400" />
-            <span className="font-mono bg-emerald-900/30 px-2 py-1 rounded text-emerald-100">{temporaryPassword}</span>
+            <KeyRound className="h-3 w-3 text-green-700" />
+            <span className="font-mono bg-green-100 px-2 py-1 rounded text-green-800">{temporaryPassword}</span>
           </div>
         </div>
       )}
@@ -96,12 +96,12 @@ export function SubmissionsTable({
 }: SubmissionsTableProps) {
   if (isLoading && submissions.length === 0) {
     return (
-      <div className="flex items-center justify-center py-16 rounded-2xl bg-gradient-to-br from-neutral-900/50 via-neutral-800/30 to-neutral-900/50 border border-neutral-700/50">
+      <div className="flex items-center justify-center py-16 rounded-2xl admin-card">
         <div className="text-center space-y-4">
-          <Loader2 className="mx-auto h-12 w-12 animate-spin text-indigo-400" />
+          <Loader2 className="mx-auto h-12 w-12 animate-spin text-blue-600" />
           <div>
-            <h3 className="text-lg font-semibold text-neutral-100">Loading submissions</h3>
-            <p className="text-sm text-neutral-400 mt-1">Please wait while we fetch the data...</p>
+            <h3 className="text-lg font-semibold text-gray-900">Loading submissions</h3>
+            <p className="text-sm text-gray-600 mt-1">Please wait while we fetch the data...</p>
           </div>
         </div>
       </div>
@@ -110,19 +110,19 @@ export function SubmissionsTable({
 
   if (error) {
     return (
-      <div className="flex flex-col items-center justify-center py-16 rounded-2xl bg-gradient-to-br from-red-950/20 via-red-900/10 to-red-950/20 border border-red-800/30">
+      <div className="flex flex-col items-center justify-center py-16 rounded-2xl admin-card border-red-200">
         <div className="text-center space-y-4">
-          <div className="p-4 rounded-full bg-red-900/30 w-fit mx-auto">
-            <AlertCircle className="h-10 w-10 text-red-400" />
+          <div className="admin-icon admin-icon-red w-fit mx-auto">
+            <AlertCircle className="h-10 w-10" />
           </div>
           <div>
-            <h3 className="text-xl font-semibold text-red-100">Unable to load submissions</h3>
-            <p className="text-sm text-red-300 mt-2 max-w-md mx-auto leading-relaxed">{error}</p>
+            <h3 className="text-xl font-semibold text-red-700">Unable to load submissions</h3>
+            <p className="text-sm text-red-600 mt-2 max-w-md mx-auto leading-relaxed">{error}</p>
           </div>
           <Button 
             onClick={onRetry} 
             variant="outline" 
-            className="mt-6 border-red-500/40 text-red-300 hover:bg-red-900/30 hover:text-white hover:border-red-400 transition-all duration-200"
+            className="admin-btn admin-btn-secondary mt-6 border-red-300 text-red-700 hover:border-red-500"
           >
             <Loader2 className="h-4 w-4 mr-2" />
             Try Again
@@ -134,20 +134,20 @@ export function SubmissionsTable({
 
   if (submissions.length === 0) {
     return (
-      <div className="text-center py-20 rounded-2xl bg-gradient-to-br from-neutral-900/40 via-neutral-800/20 to-neutral-900/40 border border-dashed border-neutral-600/50">
+      <div className="text-center py-20 rounded-2xl admin-card border-dashed border-gray-200">
         <div className="space-y-6">
-          <div className="p-6 rounded-full bg-neutral-800/50 w-fit mx-auto">
-            <FileTextIcon className="h-16 w-16 text-neutral-400" />
+          <div className="admin-icon admin-icon-blue w-fit mx-auto p-6">
+            <FileTextIcon className="h-16 w-16" />
           </div>
           <div>
-            <h3 className="text-2xl font-semibold text-neutral-100 mb-2">No submissions yet</h3>
-            <p className="text-neutral-400 text-lg max-w-md mx-auto leading-relaxed">
+            <h3 className="text-2xl font-semibold text-gray-900 mb-2">No submissions yet</h3>
+            <p className="text-gray-600 text-lg max-w-md mx-auto leading-relaxed">
               Applications will appear here once users submit their startup ideas through the form
             </p>
           </div>
           <div className="pt-4">
-            <div className="inline-flex items-center px-4 py-2 rounded-full bg-neutral-800/30 text-sm text-neutral-400 border border-neutral-700/50">
-              <div className="w-2 h-2 bg-neutral-500 rounded-full mr-2"></div>
+            <div className="admin-badge admin-badge-neutral inline-flex items-center">
+              <div className="w-2 h-2 bg-blue-500 rounded-full mr-2"></div>
               Waiting for applications...
             </div>
           </div>
@@ -157,67 +157,67 @@ export function SubmissionsTable({
   }
 
   return (
-    <div className={`rounded-2xl border border-neutral-700/50 overflow-hidden bg-gradient-to-br from-neutral-900/60 via-neutral-800/40 to-neutral-900/60 backdrop-blur-sm shadow-2xl ${className}`}>
-      <div className="overflow-x-auto">
-        <table className="w-full">
-          <thead className="bg-gradient-to-r from-neutral-800/60 via-neutral-700/40 to-neutral-800/60 border-b border-neutral-600/50">
-            <tr>
-              <th className="px-6 py-4 text-left text-xs font-semibold text-neutral-200 uppercase tracking-wider">
+    <div className={`admin-card overflow-hidden glass-card glass-card-hover rounded-xl shadow-md border border-gray-200/40 ${className}`}>
+      <div className="overflow-x-auto admin-scrollbar">
+        <table className="admin-table w-full">
+          <thead>
+            <tr className="border-b border-gray-100">
+              <th className="p-4 text-left font-semibold text-gray-700">
                 <div className="flex items-center space-x-2">
-                  <UserCircle className="h-4 w-4 text-neutral-400" />
+                  <div className="p-1.5 rounded-md bg-blue-50">
+                    <UserCircle className="h-4 w-4 text-blue-600" />
+                  </div>
                   <span>Applicant</span>
                 </div>
               </th>
-              <th className="px-6 py-4 text-left text-xs font-semibold text-neutral-200 uppercase tracking-wider">Company</th>
-              <th className="px-6 py-4 text-left text-xs font-semibold text-neutral-200 uppercase tracking-wider">Domain</th>
-              <th className="px-6 py-4 text-left text-xs font-semibold text-neutral-200 uppercase tracking-wider">Startup Idea</th>
-              <th className="px-6 py-4 text-left text-xs font-semibold text-neutral-200 uppercase tracking-wider">Status</th>
-              <th className="px-6 py-4 text-left text-xs font-semibold text-neutral-200 uppercase tracking-wider">Submitted</th>
-              <th className="px-6 py-4 text-right text-xs font-semibold text-neutral-200 uppercase tracking-wider">Actions</th>
+              <th className="p-4 text-left font-semibold text-gray-700">Company</th>
+              <th className="p-4 text-left font-semibold text-gray-700">Domain</th>
+              <th className="p-4 text-left font-semibold text-gray-700">Startup Idea</th>
+              <th className="p-4 text-left font-semibold text-gray-700">Status</th>
+              <th className="p-4 text-left font-semibold text-gray-700">Submitted</th>
+              <th className="p-4 text-right font-semibold text-gray-700">Actions</th>
             </tr>
           </thead>
-          <tbody className="divide-y divide-neutral-700/30">
+          <tbody className="divide-y divide-gray-100">
             {submissions.map((submission, index) => (
               <tr 
                 key={submission.id} 
-                className={`
-                  hover:bg-gradient-to-r hover:from-neutral-800/30 hover:via-neutral-700/20 hover:to-neutral-800/30 
-                  transition-all duration-300 group
-                  ${index % 2 === 0 ? 'bg-neutral-800/10' : 'bg-neutral-900/20'}
-                `}
+                className="group transition-all duration-300 hover:bg-gradient-to-r hover:from-blue-50/30 hover:to-indigo-50/30"
               >
-                <td className="px-6 py-5">
+                <td className="p-5">
                   <SubmissionDetailsModal submission={submission}>
-                    <div className="flex items-center space-x-3 cursor-pointer hover:bg-neutral-800/20 -m-2 p-2 rounded-lg transition-colors">
-                      <div className="w-10 h-10 bg-gradient-to-br from-indigo-500/20 to-purple-500/20 rounded-full flex items-center justify-center border border-indigo-400/30">
-                        <span className="text-indigo-300 font-semibold text-sm">
+                    <div className="flex items-center space-x-3 cursor-pointer hover:bg-blue-100/30 -m-2 p-2 rounded-lg transition-colors">
+                      <div className="admin-icon admin-icon-blue w-10 h-10 text-lg font-bold flex items-center justify-center shadow-sm">
+                        <span>
                           {(submission.fullName || submission.name)?.charAt(0)?.toUpperCase() || 'U'}
                         </span>
                       </div>
                       <div className="flex-1 min-w-0">
-                        <div className="text-sm font-semibold text-neutral-100 group-hover:text-white transition-colors truncate">
+                        <div className="text-sm font-semibold text-gray-800 group-hover:text-gray-900 transition-colors truncate">
                           {submission.fullName || submission.name}
                         </div>
-                        <div className="text-xs text-neutral-400 truncate">
+                        <div className="text-xs text-gray-500 truncate">
                           {submission.companyEmail || submission.email}
                         </div>
                       </div>
-                      <Eye className="h-4 w-4 text-neutral-400 opacity-0 group-hover:opacity-100 transition-opacity" />
+                      <div className="bg-white/80 p-1 rounded-full shadow-sm opacity-0 group-hover:opacity-100 transition-all duration-300">
+                        <Eye className="h-4 w-4 text-blue-500" />
+                      </div>
                     </div>
                   </SubmissionDetailsModal>
                 </td>
                 <td className="px-6 py-5">
-                  <div className="text-sm text-neutral-300 group-hover:text-neutral-200">
+                  <div className="text-sm text-gray-700 group-hover:text-gray-900 font-medium">
                     {submission.companyName || 'N/A'}
                   </div>
                 </td>
                 <td className="px-6 py-5">
-                  <span className="inline-flex items-center px-3 py-1.5 rounded-full text-xs font-semibold bg-gradient-to-r from-blue-900/40 to-blue-800/40 text-blue-200 border border-blue-700/40 shadow-lg">
+                  <span className="inline-flex items-center px-3 py-1.5 rounded-full text-xs font-semibold bg-gradient-to-r from-blue-50 to-blue-100 text-blue-600 border border-blue-200/40 shadow-sm">
                     {submission.domain || 'N/A'}
                   </span>
                 </td>
                 <td className="px-6 py-5">
-                  <div className="text-sm text-neutral-200 max-w-xs">
+                  <div className="text-sm text-gray-700 max-w-xs group-hover:text-gray-900">
                     <div className="truncate">
                       {submission.idea || submission.startupIdea || 'N/A'}
                     </div>
@@ -238,7 +238,7 @@ export function SubmissionsTable({
                   </div>
                 </td>
                 <td className="px-6 py-5">
-                  <div className="text-sm text-neutral-400 group-hover:text-neutral-300">
+                  <div className="text-sm text-gray-500 group-hover:text-gray-700">
                     {formatDate(submission.submittedAt)}
                   </div>
                 </td>
@@ -248,7 +248,7 @@ export function SubmissionsTable({
                       <Button
                         variant="outline"
                         size="sm"
-                        className="border-indigo-500/40 text-indigo-300 hover:bg-indigo-900/30 hover:text-white"
+                        className="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-full text-sm font-medium transition-all duration-300 border bg-white h-9 px-4 border-blue-200 text-blue-600 hover:bg-blue-50 hover:text-blue-700 shadow-sm hover:shadow-md"
                       >
                         <Eye className="h-4 w-4 mr-1" />
                         View

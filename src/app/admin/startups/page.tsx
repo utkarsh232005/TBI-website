@@ -597,28 +597,28 @@ export default function AdminStartupsPage() {
             ) : (
               <motion.div className="overflow-x-auto" variants={container} initial="hidden" animate="show">
                 {filteredStartups.length > 0 ? (
-                  <Table className="border-[#333333]">
-                    <TableHeader className="bg-gradient-to-r from-[#242424] to-[#1E1E1E]">
-                      <TableRow className="border-[#333333] hover:bg-[#2A2A2A]">
-                        <TableHead className="w-[80px] text-indigo-300 font-medium">
+                  <Table className="border-gray-200/50 bg-white/90 backdrop-blur-xl rounded-lg shadow-lg">
+                    <TableHeader className="bg-gradient-to-r from-gray-50/80 to-gray-100/80 backdrop-blur-sm">
+                      <TableRow className="border-gray-200/50 hover:bg-blue-50/20">
+                        <TableHead className="w-[80px] text-gray-700 font-semibold">
                           <div className="flex items-center">
-                            <UploadCloud className="h-3.5 w-3.5 mr-2" />
+                            <UploadCloud className="h-3.5 w-3.5 mr-2 text-blue-600" />
                             <span>Logo</span>
                           </div>
                         </TableHead>
-                        <TableHead className="text-indigo-300 font-medium">
+                        <TableHead className="text-gray-700 font-semibold">
                           <div className="flex items-center">
-                            <Rocket className="h-3.5 w-3.5 mr-2" />
+                            <Rocket className="h-3.5 w-3.5 mr-2 text-indigo-600" />
                             <span>Name</span>
                           </div>
                         </TableHead>
-                        <TableHead className="text-indigo-300 font-medium">
+                        <TableHead className="text-gray-700 font-semibold">
                           <div className="flex items-center">
-                            <Info className="h-3.5 w-3.5 mr-2" />
+                            <Info className="h-3.5 w-3.5 mr-2 text-purple-600" />
                             <span>Description</span>
                           </div>
                         </TableHead>
-                        <TableHead className="text-right text-indigo-300 font-medium">
+                        <TableHead className="text-right text-gray-700 font-semibold">
                           <div className="flex items-center justify-end">
                             <span>Actions</span>
                           </div>
@@ -634,27 +634,28 @@ export default function AdminStartupsPage() {
                             initial="hidden" 
                             animate="show" 
                             exit={{ opacity: 0, x: -20 }} 
-                            className="hover:bg-gradient-to-r hover:from-[#242424] hover:to-[#1E1E1E] border-[#333333] transition-colors duration-300"                            whileHover={{ scale: 1.01 }}
+                            className="hover:bg-gradient-to-r hover:from-blue-50/30 hover:to-purple-50/30 border-gray-200/50 transition-all duration-300"
+                            whileHover={{ scale: 1.01 }}
                           >
                             <TableCell>
-                              <Avatar className="h-10 w-10 rounded-md">
+                              <Avatar className="h-10 w-10 rounded-md shadow-sm">
                                 {startup.logoUrl ? (
                                   <AvatarImage src={startup.logoUrl} alt={startup.name} className="object-contain" />
                                 ) : null}
-                                <AvatarFallback className="rounded-md bg-[#2A2A2A] text-indigo-300">
+                                <AvatarFallback className="rounded-md bg-gradient-to-r from-blue-100 to-indigo-100 text-indigo-600">
                                   {startup.name.substring(0, 2).toUpperCase()}
                                 </AvatarFallback>
                               </Avatar>
                             </TableCell>
-                            <TableCell className="font-medium text-gray-200">{startup.name}</TableCell>
-                            <TableCell className="text-gray-400 text-xs max-w-sm truncate">{startup.description}</TableCell>
+                            <TableCell className="font-medium text-gray-800">{startup.name}</TableCell>
+                            <TableCell className="text-gray-600 text-xs max-w-sm truncate">{startup.description}</TableCell>
                             <TableCell className="text-right">
                               <div className="flex items-center justify-end space-x-2">
                                 <Button 
                                   variant="ghost" 
                                   size="icon" 
                                   onClick={() => handleOpenFormDialog(startup)}
-                                  className="hover:text-indigo-400 text-gray-500 hover:bg-indigo-500/10 transition-colors duration-200" 
+                                  className="hover:text-indigo-600 text-gray-500 hover:bg-indigo-100/60 transition-all duration-200 rounded-full" 
                                   suppressHydrationWarning
                                 >
                                   <Edit className="h-4 w-4" />
@@ -663,7 +664,7 @@ export default function AdminStartupsPage() {
                                   variant="ghost" 
                                   size="icon" 
                                   onClick={() => handleDeleteClick(startup)}
-                                  className="hover:text-red-400 text-gray-500 hover:bg-red-500/10 transition-colors duration-200" 
+                                  className="hover:text-red-600 text-gray-500 hover:bg-red-100/60 transition-all duration-200 rounded-full" 
                                   suppressHydrationWarning
                                 >
                                   <Trash2 className="h-4 w-4" />

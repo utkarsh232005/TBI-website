@@ -252,30 +252,30 @@ export default function AdminMentorsPage() {
         animate="show"
         variants={container}
       >
-        <Card className="bg-gray-800 border-gray-700">
+        <Card className="bg-white/90 backdrop-blur-xl border border-gray-200/50 rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300">
           <CardHeader>
             <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-6">
               <div>
-                <h1 className="text-3xl font-bold bg-gradient-to-r from-indigo-400 to-purple-500 bg-clip-text text-transparent">
+                <h1 className="text-3xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
                   Mentors Management
                 </h1>
-                <p className="text-gray-400">
+                <p className="text-gray-600">
                   Manage and organize your team of expert mentors
                 </p>
               </div>
               <div>
                 <Dialog open={isCreateDialogOpen} onOpenChange={setIsCreateDialogOpen}>
                   <DialogTrigger asChild>
-                    <Button className="bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 transition-colors shadow-lg" suppressHydrationWarning>
+                    <Button className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white transition-all duration-300 shadow-md hover:shadow-lg border-0" suppressHydrationWarning>
                       <PlusCircle className="mr-2 h-4 w-4" /> Add New Mentor
                     </Button>
                   </DialogTrigger>
-                  <DialogContent className="sm:max-w-[600px] bg-gray-800 border-gray-700">
+                  <DialogContent className="sm:max-w-[600px] bg-white/95 backdrop-blur-xl border border-gray-200/50 shadow-lg">
                     <DialogHeader>
-                      <DialogTitle className="text-2xl font-bold bg-gradient-to-r from-indigo-200 to-purple-300 bg-clip-text text-transparent">
+                      <DialogTitle className="text-2xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
                         Add New Mentor
                       </DialogTitle>
-                      <DialogDescription className="text-gray-400">
+                      <DialogDescription className="text-gray-600">
                         Fill in the details below to add a new mentor to the platform.
                       </DialogDescription>
                     </DialogHeader>
@@ -444,12 +444,12 @@ export default function AdminMentorsPage() {
           <CardContent>
             <div className="relative mb-6">
               <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                <Search className="h-4 w-4 text-gray-400" />
+                <Search className="h-4 w-4 text-indigo-500" />
               </div>
               <Input
                 type="text"
                 placeholder="Search mentors by name, email, or expertise..."
-                className="pl-10 bg-gray-750 border-gray-700 focus:border-indigo-500 focus:ring-indigo-500"
+                className="pl-10 bg-white/80 border-gray-200/50 focus:border-blue-400 focus:ring-blue-300 shadow-sm rounded-lg"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 suppressHydrationWarning
@@ -469,12 +469,12 @@ export default function AdminMentorsPage() {
             {isLoading ? (
               <div className="space-y-4">
                 {[...Array(3)].map((_, i) => (
-                  <div key={i} className="p-4 rounded-lg bg-gray-800/50 border border-gray-700">
+                  <div key={i} className="p-4 rounded-lg bg-gray-50/80 border border-gray-200/50 backdrop-blur-sm shadow-sm">
                     <div className="flex items-center space-x-4">
-                      <Skeleton className="h-12 w-12 rounded-full" />
+                      <Skeleton className="h-12 w-12 rounded-full bg-gray-200/70" />
                       <div className="space-y-2 flex-1">
-                        <Skeleton className="h-4 w-3/4" />
-                        <Skeleton className="h-3 w-1/2" />
+                        <Skeleton className="h-4 w-3/4 bg-gray-200/70" />
+                        <Skeleton className="h-3 w-1/2 bg-gray-200/70" />
                       </div>
                     </div>
                   </div>

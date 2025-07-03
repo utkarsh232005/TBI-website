@@ -442,7 +442,7 @@ export function OnboardingPopup({ isOpen, onClose, onComplete, userUid }: Onboar
         onClose();
       }
     }}>
-      <DialogContent className="max-w-2xl bg-neutral-900 border-neutral-800 text-white relative overflow-hidden z-50"
+      <DialogContent className="max-w-2xl admin-card relative overflow-hidden z-50"
                      style={{ position: 'fixed', top: '50%', left: '50%', transform: 'translate(-50%, -50%)' }}
                      onPointerDownOutside={(e) => {
                        console.log('Pointer down outside, preventing close:', { allStepsCompleted, isCompleting });

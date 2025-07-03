@@ -14,25 +14,30 @@ export function KpiCard({
   value, 
   icon,
   description, 
-  colorClass = "text-indigo-400",
+  colorClass = "text-blue-600",
   className = ''
 }: KpiCardProps) {
   return (
-    <div className={`group p-6 bg-neutral-900 rounded-2xl border border-neutral-800 hover:border-indigo-500/30 transition-all duration-300 hover:shadow-lg hover:shadow-indigo-500/5 ${className}`}>
-      <div className="flex items-center justify-between">
-        <div className={`p-3 rounded-xl bg-neutral-800 border border-neutral-700/50 group-hover:border-indigo-500/30 transition-colors`}>
-          <div className={colorClass}>
+    <div className={`admin-card group cursor-pointer admin-float ${className}`}>
+      <div className="relative z-10 p-6">
+        <div className="flex items-center justify-between mb-4">
+          <div className={`admin-icon admin-icon-${colorClass.includes('indigo') ? 'blue' : 
+                          colorClass.includes('green') || colorClass.includes('emerald') ? 'green' : 
+                          colorClass.includes('amber') || colorClass.includes('yellow') ? 'amber' : 
+                          colorClass.includes('red') || colorClass.includes('rose') ? 'red' : 'blue'}`}>
             {icon}
           </div>
         </div>
+        <div>
+          <h3 className="text-sm font-medium uppercase tracking-wider text-muted-foreground">{title}</h3>
+          <p className="mt-2 text-3xl font-bold text-foreground">{value}</p>
+          {description && (
+            <p className="mt-2 text-sm font-medium text-muted-foreground">{description}</p>
+          )}
+        </div>
       </div>
-      <div className="mt-6">
-        <h3 className="text-sm font-medium text-neutral-400">{title}</h3>
-        <p className="mt-2 text-3xl font-bold text-white">{value}</p>
-        {description && (
-          <p className="mt-2 text-sm text-neutral-400">{description}</p>
-        )}
-      </div>
+      {/* Shimmer effect on hover */}
+      <div className="admin-shimmer absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-700 rounded-3xl"></div>
     </div>
   );
 }
