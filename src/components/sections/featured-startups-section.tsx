@@ -1,14 +1,11 @@
 "use client";
 
-import { Rocket, Loader2, AlertCircle } from 'lucide-react'; 
+import { Rocket, Loader2, AlertCircle, Building2, ExternalLink, Users, TrendingUp, Award } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { useEffect, useState } from 'react';
 import { db } from '@/lib/firebase';
 import { collection, query, orderBy, getDocs, Timestamp } from 'firebase/firestore';
-import { Skeleton } from '@/components/ui/skeleton';
-import { AuroraText } from "@/components/magicui/aurora-text";
 import { processImageUrl } from '@/lib/utils';
-import Marquee from "react-fast-marquee";
 import StartupModal from '@/components/ui/startup-modal';
 import { Startup } from '@/types/startup';
 
@@ -31,91 +28,161 @@ interface StartupDoc {
   updatedAt?: Timestamp;
 }
 
-// Skeleton for the header, adapted to use theme variables
-const SkeletonHeader = () => (
-  <div className="flex flex-1 w-full h-full min-h-[6rem] rounded-xl bg-gradient-to-br from-card to-secondary"></div>
-);
+// Professional startup logo component
+const StartupCard = ({ startup, onClick, index }: {
+  startup: StartupDoc;
+  onClick: () => void;
+  index: number;
+}) => {
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 30 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.5, delay: index * 0.1 }}
+      whileHover={{
+        y: -4,
+        scale: 1.1,
+        transition: { type: "spring", stiffness: 400, damping: 25 }
+      }}
+      className="group cursor-pointer relative"
+      onClick={onClick}
+    >
+      {/* Logo Image Only */}
+      <div className="relative w-full aspect-square">
+        <img
+          src={processImageUrl(startup.logoUrl, startup.name)}
+          alt={`${startup.name} logo`}
+          className="w-full h-full object-contain transition-all duration-300 group-hover:brightness-110"
+          onError={(e) => {
+            const target = e.target as HTMLImageElement;
+            target.src = `https://placehold.co/300x300/F8FAFC/64748B.png?text=${encodeURIComponent(startup.name.substring(0, 2))}`;
+          }}
+        />
 
-const sectionTitleVariants = {
-  hidden: { opacity: 0, y: 20 },
-  visible: { opacity: 1, y: 0, transition: { duration: 0.6, ease: "easeOut" } },
+        {/* Hover Overlay with Company Name */}
+        <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-all duration-300 flex items-end justify-center rounded-lg">
+          <div className="p-3 text-center">
+            <h3 className="text-white font-semibold text-sm mb-1">{startup.name}</h3>
+            <span className={`inline-block px-2 py-1 rounded-full text-xs font-medium ${startup.status.toLowerCase() === 'active'
+              ? 'bg-emerald-500 text-white'
+              : 'bg-blue-500 text-white'
+              }`}>
+              {startup.status}
+            </span>
+          </div>
+        </div>
+      </div>
+    </motion.div>
+  );
+};
+
+// Stats component
+const StatsSection = ({ startupCount }: { startupCount: number }) => {
+  const stats = [
+    { icon: Building2, label: "Featured Startups", value: startupCount, color: "blue" },
+    { icon: Users, label: "Active Entrepreneurs", value: "150+", color: "emerald" },
+    { icon: TrendingUp, label: "Growth Rate", value: "300%", color: "purple" },
+    { icon: Award, label: "Success Stories", value: "25+", color: "orange" }
+  ];
+
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.6, delay: 0.3 }}
+      className="grid grid-cols-2 md:grid-cols-4 gap-6 mb-16"
+    >
+      {stats.map((stat, index) => (
+        <motion.div
+          key={index}
+          initial={{ opacity: 0, scale: 0.9 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ duration: 0.5, delay: 0.4 + index * 0.1 }}
+          className="bg-white rounded-xl border border-gray-200 p-6 text-center hover:shadow-lg transition-all duration-300"
+        >
+          <div className={`w-12 h-12 mx-auto mb-3 rounded-lg flex items-center justify-center ${stat.color === 'blue' ? 'bg-blue-100' :
+            stat.color === 'emerald' ? 'bg-emerald-100' :
+              stat.color === 'purple' ? 'bg-purple-100' : 'bg-orange-100'
+            }`}>
+            <stat.icon className={`w-6 h-6 ${stat.color === 'blue' ? 'text-blue-600' :
+              stat.color === 'emerald' ? 'text-emerald-600' :
+                stat.color === 'purple' ? 'text-purple-600' : 'text-orange-600'
+              }`} />
+          </div>
+          <div className="text-2xl font-bold text-gray-900 mb-1">{stat.value}</div>
+          <div className="text-sm text-gray-500">{stat.label}</div>
+        </motion.div>
+      ))}
+    </motion.div>
+  );
 };
 
 export default function FeaturedStartupsSection() {
   const [startups, setStartups] = useState<StartupDoc[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [imagesLoaded, setImagesLoaded] = useState(false);
-  const [preloadedImages, setPreloadedImages] = useState<Set<string>>(new Set());
   const [selectedStartup, setSelectedStartup] = useState<Startup | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [visibleCount, setVisibleCount] = useState(12);
 
-  // Image preloading function
-  const preloadImage = (src: string): Promise<void> => {
-    return new Promise((resolve, reject) => {
-      const img = new Image();
-      img.onload = () => resolve();
-      img.onerror = () => reject();
-      img.src = src;
-    });
-  };
-
+  // Fetch startups from Firestore
   useEffect(() => {
     const fetchStartups = async () => {
-      setIsLoading(true);
-      setError(null);
       try {
-        const startupsCollection = collection(db, "startups");
-        const q = query(startupsCollection, orderBy("createdAt", "desc"));
-        const querySnapshot = await getDocs(q);
-        const fetchedStartups: StartupDoc[] = [];
+        setIsLoading(true);
+        setError(null);
+
+        const startupsQuery = query(
+          collection(db, 'startups'),
+          orderBy('createdAt', 'desc')
+        );
+
+        const querySnapshot = await getDocs(startupsQuery);
+        const startupsData: StartupDoc[] = [];
+
         querySnapshot.forEach((doc) => {
-          fetchedStartups.push({ id: doc.id, ...doc.data() } as StartupDoc);
-        });        setStartups(fetchedStartups);
-        
-        // Preload only non-base64 images
-        const imageUrls = fetchedStartups
-          .map(startup => processImageUrl(startup.logoUrl, startup.name.substring(0,3)))
-          .filter(url => !url.startsWith('data:image/')); // Skip base64 images
-
-        if (imageUrls.length > 0) {
-          try {
-            await Promise.allSettled(imageUrls.map(url => preloadImage(url)));
-            setPreloadedImages(new Set(imageUrls));
-            setImagesLoaded(true);
-          } catch (imgErr) {
-            console.warn("Some images failed to preload, but continuing anyway:", imgErr);
-            setImagesLoaded(true); // Still continue even if some images fail
+          const data = doc.data();
+          if (data.logoUrl && data.name) {
+            startupsData.push({
+              id: doc.id,
+              ...data,
+            } as StartupDoc);
           }
-        } else {
-          setImagesLoaded(true); // No images to preload
-        }
+        });
 
-      } catch (err: any) {
-        console.error("Error fetching startups for landing page: ", err);
-        setError("Failed to load featured startups. " + err.message);
+        setStartups(startupsData);
+      } catch (err) {
+        console.error('Error fetching startups:', err);
+        setError('Failed to load startups. Please try again later.');
       } finally {
-        // Only set loading to false after both data and images are ready
-        if (startups.length === 0) {
-          setIsLoading(false);
-        }
+        setIsLoading(false);
       }
     };
+
     fetchStartups();
   }, []);
-  // Set loading to false when both startups and images are ready
-  useEffect(() => {
-    if (startups.length > 0 && imagesLoaded) {
-      // Add a small delay to ensure smooth transition
-      const timer = setTimeout(() => {
-        setIsLoading(false);
-      }, 300);
-      return () => clearTimeout(timer);
-    }
-  }, [startups.length, imagesLoaded]);
-  // Modal handlers
+
   const handleStartupClick = (startup: StartupDoc) => {
-    setSelectedStartup(startup as Startup);
+    const startupForModal: Startup = {
+      id: startup.id,
+      name: startup.name,
+      logoUrl: startup.logoUrl,
+      description: startup.description,
+      websiteUrl: startup.websiteUrl,
+      dataAiHint: startup.dataAiHint,
+      createdAt: startup.createdAt,
+      funnelSource: startup.funnelSource,
+      session: startup.session,
+      monthYearOfIncubation: startup.monthYearOfIncubation,
+      status: startup.status,
+      legalStatus: startup.legalStatus,
+      rknecEmailId: startup.rknecEmailId,
+      emailId: startup.emailId,
+      mobileNumber: startup.mobileNumber,
+      updatedAt: startup.updatedAt,
+    };
+
+    setSelectedStartup(startupForModal);
     setIsModalOpen(true);
   };
 
@@ -123,105 +190,180 @@ export default function FeaturedStartupsSection() {
     setIsModalOpen(false);
     setSelectedStartup(null);
   };
+
+  const handleLoadMore = () => {
+    setVisibleCount(prev => Math.min(prev + 12, startups.length));
+  };
+
   return (
-    <motion.section 
-      id="startups" 
-      className="py-16 md:py-24 bg-background text-foreground"
-      initial="hidden"
-      whileInView="visible"
-      viewport={{ once: true, amount: 0.1 }}
+    <section
+      id="startups"
+      className="py-20 bg-gray-50"
     >
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-        <motion.div 
-          className="text-center mb-12 md:mb-16"
-          variants={sectionTitleVariants}
+
+        {/* Professional Header Section */}
+        <motion.div
+          initial={{ opacity: 0, y: 30 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.8 }}
+          viewport={{ once: true }}
+          className="text-center mb-16"
         >
-          <AuroraText>Featured Startups</AuroraText>
-          <p className="mt-4 max-w-2xl mx-auto text-lg text-muted-foreground dark:text-neutral-700 sm:text-xl">
-            Meet some of the innovative companies thriving in the RCEOM-TBI ecosystem.
-          </p>
+          {/* Badge */}
+          <motion.div
+            initial={{ opacity: 0, scale: 0.9 }}
+            whileInView={{ opacity: 1, scale: 1 }}
+            transition={{ delay: 0.1, duration: 0.5 }}
+            viewport={{ once: true }}
+            className="inline-flex items-center gap-2 px-4 py-2 bg-blue-100 text-blue-700 rounded-full text-sm font-medium mb-6 border border-blue-200"
+          >
+            <Building2 className="w-4 h-4" />
+            Innovation Ecosystem
+          </motion.div>
+
+          {/* Main Title */}
+          <motion.h2
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.2, duration: 0.6 }}
+            viewport={{ once: true }}
+            className="text-4xl md:text-5xl lg:text-6xl font-bold text-gray-900 mb-6 leading-tight"
+          >
+            Featured{' '}
+            <span className="relative">
+              <span className="relative z-10 bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+                Startups
+              </span>
+              <div className="absolute -bottom-2 left-0 right-0 h-3 bg-gradient-to-r from-blue-200 to-purple-200 opacity-60 rounded-full transform -rotate-1" />
+            </span>
+          </motion.h2>
+
+          {/* Subtitle */}
+          <motion.p
+            className="text-lg md:text-xl text-gray-600 max-w-4xl mx-auto leading-relaxed"
+            initial={{ opacity: 0 }}
+            whileInView={{ opacity: 1 }}
+            transition={{ delay: 0.4, duration: 0.8 }}
+            viewport={{ once: true }}
+          >
+            Discover innovative companies transforming industries through the{' '}
+            <span className="font-semibold text-blue-700">RCOEM-TBI ecosystem</span>.
+            Each startup represents excellence, innovation, and entrepreneurial spirit.
+          </motion.p>
         </motion.div>
 
-        {isLoading ? (          <motion.div
+        {/* Stats Section */}
+        {!isLoading && !error && startups.length > 0 && (
+          <StatsSection startupCount={startups.length} />
+        )}
+
+        {/* Loading State */}
+        {isLoading && (
+          <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
-            className="w-full space-y-12"
+            className="w-full py-16"
           >
-            {/* Marquee Loading Skeleton */}
-            <div className="relative w-full overflow-hidden rounded-2xl bg-card/50 border border-border/50">
-              <div className="flex animate-pulse space-x-6 py-8 px-4">
-                {[...Array(8)].map((_, index) => (
-                  <div
-                    key={index}
-                    className="flex-shrink-0 w-24 h-24 bg-muted rounded-xl animate-pulse"
-                  />
-                ))}
+            <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-6 mb-8">
+              {Array.from({ length: 12 }).map((_, index) => (
+                <div key={index} className="aspect-square animate-pulse">
+                  <div className="w-full h-full bg-gray-200 rounded-lg" />
+                </div>
+              ))}
+            </div>
+            <div className="flex justify-center items-center">
+              <div className="bg-white px-6 py-3 rounded-full shadow-md border border-gray-200">
+                <div className="flex items-center gap-3">
+                  <Loader2 className="h-5 w-5 animate-spin text-blue-600" />
+                  <span className="text-gray-700 font-medium">Loading featured startups...</span>
+                </div>
               </div>
             </div>
-            
-            {/* Loading text with subtle animation */}
-            <motion.div 
-              className="flex justify-center items-center mt-6"
-              animate={{ opacity: [0.5, 1, 0.5] }}
-              transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
-            >
-              <Loader2 className="h-5 w-5 animate-spin text-accent mr-2" />
-              <p className="text-muted-foreground">Loading featured startups...</p>
-            </motion.div>
           </motion.div>
-        ) : error ? (
-          <div className="text-center py-10 text-destructive">
-            <AlertCircle className="mx-auto h-12 w-12 mb-4" />
-            <p className="text-xl font-semibold">Could not load startups</p>
-            <p className="text-muted-foreground">{error}</p>
-          </div>
-        ) : startups.length === 0 ? (
-          <div className="text-center py-10">
-            <Rocket className="mx-auto h-12 w-12 text-muted-foreground mb-4" />
-            <p className="text-muted-foreground text-lg">
-              No featured startups to display at the moment.
-            </p>
-          </div>
-        ) : (          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1, transition: { duration: 0.6 } }}
-            className="w-full"
-          >            {/* Marquee Section */}
-            <div className="relative">
-              <div className="relative overflow-hidden">
-                <Marquee
-                  gradient={false}
-                  speed={40}
-                  pauseOnHover={true}
-                  className="py-8"
-                >                  {startups.map((startup, index) => (
-                    <motion.div
-                      key={`${startup.id}-marquee-${index}`}
-                      whileHover={{ scale: 1.1, y: -5 }}
-                      whileTap={{ scale: 0.95 }}
-                      className="mx-6 cursor-pointer"
-                      onClick={() => handleStartupClick(startup)}
-                    >
-                      <img
-                        src={processImageUrl(startup.logoUrl, startup.name)}
-                        alt={`${startup.name} logo`}
-                        className="w-24 h-24 md:w-28 md:h-28 object-contain transition-transform duration-300 hover:scale-110"
-                        onError={(e) => {
-                          const target = e.target as HTMLImageElement;
-                          target.src = `https://placehold.co/300x150/1A1A1A/FFFFFF.png?text=${encodeURIComponent(startup.name.substring(0, 3))}`;
-                        }}
-                      />
-                    </motion.div>
-                  ))}
-                </Marquee>
+        )}
+
+        {/* Error State */}
+        {error && (
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="text-center py-16"
+          >
+            <div className="bg-red-50 border border-red-200 rounded-2xl p-12 max-w-lg mx-auto">
+              <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-6">
+                <AlertCircle className="w-8 h-8 text-red-600" />
               </div>
-              
-              {/* Marquee Description */}
-              <div className="text-center mt-6">
-                <p className="text-sm text-muted-foreground">
-                  Click on any logo to learn more about the startup
+              <h3 className="text-xl font-bold text-red-800 mb-3">Unable to Load Startups</h3>
+              <p className="text-red-600 mb-6">{error}</p>
+              <button
+                onClick={() => window.location.reload()}
+                className="bg-red-600 hover:bg-red-700 text-white px-6 py-2 rounded-lg font-medium transition-colors"
+              >
+                Try Again
+              </button>
+            </div>
+          </motion.div>
+        )}
+
+        {/* Startups Grid */}
+        {!isLoading && !error && startups.length > 0 && (
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8 }}
+            className="space-y-8"
+          >
+            <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-6">
+              {startups.slice(0, visibleCount).map((startup, index) => (
+                <StartupCard
+                  key={startup.id}
+                  startup={startup}
+                  index={index}
+                  onClick={() => handleStartupClick(startup)}
+                />
+              ))}
+            </div>
+
+            {/* Load More Button */}
+            {visibleCount < startups.length && (
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ delay: 0.5 }}
+                className="text-center"
+              >
+                <button
+                  onClick={handleLoadMore}
+                  className="bg-blue-600 hover:bg-blue-700 text-white px-8 py-3 rounded-lg font-medium transition-colors inline-flex items-center gap-2"
+                >
+                  Load More Startups
+                  <TrendingUp className="w-4 h-4" />
+                </button>
+                <p className="text-gray-500 text-sm mt-3">
+                  Showing {visibleCount} of {startups.length} startups
                 </p>
+              </motion.div>
+            )}
+          </motion.div>
+        )}
+
+        {/* Empty State */}
+        {!isLoading && !error && startups.length === 0 && (
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="text-center py-20"
+          >
+            <div className="bg-white border border-gray-200 rounded-3xl p-16 max-w-lg mx-auto">
+              <div className="w-20 h-20 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-8">
+                <Rocket className="w-10 h-10 text-gray-400" />
               </div>
+              <h3 className="text-2xl font-bold text-gray-800 mb-4">Coming Soon</h3>
+              <p className="text-gray-600 text-lg leading-relaxed">
+                We're curating an impressive collection of startups from the RCOEM-TBI ecosystem.{' '}
+                <span className="font-medium text-blue-700">Stay tuned for groundbreaking innovations!</span>
+              </p>
             </div>
           </motion.div>
         )}
@@ -233,7 +375,7 @@ export default function FeaturedStartupsSection() {
         isOpen={isModalOpen}
         onClose={handleModalClose}
       />
-    </motion.section>
+    </section>
   );
 }
 

@@ -65,18 +65,16 @@ export default function EventsPage() {
             time: data.time,
             venue: data.venue,
             applyLink: data.applyLink,
-            imageUrl: data.imageUrl || `https://placehold.co/600x400/121212/7DF9FF.png?text=${encodeURIComponent(data.title.substring(0,10))}`, // Fallback placeholder
+            imageUrl: data.imageUrl || `https://placehold.co/600x400/121212/7DF9FF.png?text=${encodeURIComponent(data.title.substring(0, 10))}`, // Fallback placeholder
             createdAt: data.createdAt,
-            dataAiHint: `event ${data.title.toLowerCase().split(' ').slice(0,1).join('') || 'general'}` // Simple AI hint
+            dataAiHint: `event ${data.title.toLowerCase().split(' ').slice(0, 1).join('') || 'general'}` // Simple AI hint
           });
         });
         setEvents(fetchedEvents);
-      } catch (err: any)
-      {
+      } catch (err: any) {
         console.error("Error fetching events for public page: ", err);
         setError("Failed to load events. Please try again later. " + err.message);
-      } finally
-      {
+      } finally {
         setIsLoading(false);
       }
     };
@@ -141,7 +139,7 @@ export default function EventsPage() {
                   time: eventData.time,
                   location: eventData.venue,
                   description: eventData.description,
-                  imageUrl: eventData.imageUrl || `https://placehold.co/600x400/121212/7DF9FF.png?text=${encodeURIComponent(eventData.title.substring(0,10))}`,
+                  imageUrl: eventData.imageUrl || `https://placehold.co/600x400/121212/7DF9FF.png?text=${encodeURIComponent(eventData.title.substring(0, 10))}`,
                   dataAiHint: eventData.dataAiHint || 'event general',
                   detailsUrl: eventData.applyLink,
                 };

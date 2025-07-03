@@ -36,7 +36,7 @@ interface FirestoreSubmissionData {
   email: string;
   companyName?: string;
   idea: string;
-  submittedAt: any; 
+  submittedAt: any;
   campusStatus?: "campus" | "off-campus";
   status: "pending" | "accepted" | "rejected";
 }
@@ -67,7 +67,7 @@ export default function ContactForm() {
       setTimeout(() => {
         window.location.href = DUMMY_GOOGLE_FORM_LINK_FOR_OFF_CAMPUS;
       }, 3000);
-      return; 
+      return;
     }
 
     try {
@@ -85,22 +85,22 @@ export default function ContactForm() {
       if (campusStatusFromStorage === "campus") {
         dataForFirestore.campusStatus = campusStatusFromStorage;
       }
-      
+
       const docRef = await addDoc(collection(db, "contactSubmissions"), dataForFirestore);
-      
+
       toast({
         title: "Application Submitted!",
         description: "Thank you for your interest. We'll be in touch soon.",
-        variant: "default", 
+        variant: "default",
       });
-      form.reset(); 
+      form.reset();
       if (campusStatusFromStorage === "campus" && typeof window !== "undefined") {
-        localStorage.removeItem('applicantCampusStatus'); 
+        localStorage.removeItem('applicantCampusStatus');
       }
     } catch (e: any) {
       console.error("Error adding document to Firestore: ", e);
       let errorMessage = "There was an error submitting your application. Please try again.";
-       if (e instanceof Error && e.message) {
+      if (e instanceof Error && e.message) {
         errorMessage += ` Details: ${e.message}`;
       }
       toast({
@@ -121,8 +121,8 @@ export default function ContactForm() {
             <FormItem>
               <FormLabel className="text-foreground">Full Name</FormLabel>
               <FormControl>
-                <Input 
-                  placeholder="e.g. Ada Lovelace" {...field} 
+                <Input
+                  placeholder="e.g. Ada Lovelace" {...field}
                   className="bg-card border-border focus:border-accent focus:ring-accent"
                 />
               </FormControl>
@@ -137,9 +137,9 @@ export default function ContactForm() {
             <FormItem>
               <FormLabel className="text-foreground">Email Address</FormLabel>
               <FormControl>
-                <Input 
-                  type="email" 
-                  placeholder="e.g. ada@example.com" {...field} 
+                <Input
+                  type="email"
+                  placeholder="e.g. ada@example.com" {...field}
                   className="bg-card border-border focus:border-accent focus:ring-accent"
                 />
               </FormControl>
@@ -154,8 +154,8 @@ export default function ContactForm() {
             <FormItem>
               <FormLabel className="text-foreground">Company Name (Optional)</FormLabel>
               <FormControl>
-                <Input 
-                  placeholder="e.g. Tech Innovations Inc." {...field} 
+                <Input
+                  placeholder="e.g. Tech Innovations Inc." {...field}
                   className="bg-card border-border focus:border-accent focus:ring-accent"
                 />
               </FormControl>

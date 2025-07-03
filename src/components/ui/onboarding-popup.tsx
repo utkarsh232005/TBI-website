@@ -10,11 +10,11 @@ import { Textarea } from "@/components/ui/textarea";
 import { cn } from "@/lib/utils";
 import { useToast } from "@/hooks/use-toast";
 import { motion, AnimatePresence } from "framer-motion";
-import { 
-  Lock, 
-  User, 
-  Bell, 
-  Check, 
+import {
+  Lock,
+  User,
+  Bell,
+  Check,
   ChevronRight,
   ChevronLeft,
   Loader2,
@@ -48,14 +48,14 @@ interface OnboardingPopupProps {
 
 export function OnboardingPopup({ isOpen, onClose, onComplete, userUid }: OnboardingPopupProps) {
   const { toast } = useToast();
-  
+
   console.log('OnboardingPopup render:', { isOpen, userUid });
   const { firebaseUser, authReady } = useUser();
   const [currentStep, setCurrentStep] = React.useState(0);
   const [isLoading, setIsLoading] = React.useState(false);
   const [showSuccessAnimation, setShowSuccessAnimation] = React.useState(false);
   const [isCompleting, setIsCompleting] = React.useState(false);
-  
+
   const [steps, setSteps] = React.useState<OnboardingStep[]>([
     {
       id: 0,
@@ -102,7 +102,7 @@ export function OnboardingPopup({ isOpen, onClose, onComplete, userUid }: Onboar
   const allStepsCompleted = steps.every(step => step.completed);
 
   const completeStep = (stepId: number) => {
-    setSteps(prev => prev.map(step => 
+    setSteps(prev => prev.map(step =>
       step.id === stepId ? { ...step, completed: true } : step
     ));
   };
@@ -157,13 +157,13 @@ export function OnboardingPopup({ isOpen, onClose, onComplete, userUid }: Onboar
     setIsLoading(true);
     try {
       console.log('Attempting password update for user:', { uid: firebaseUser.uid, email: firebaseUser.email });
-      
+
       // Update password using client-side Firebase Auth
       const passwordResult = await updateUserPassword(
-        passwordForm.newPassword, 
+        passwordForm.newPassword,
         passwordForm.currentPassword
       );
-      
+
       if (!passwordResult.success) {
         toast({
           title: "Error",
@@ -172,14 +172,14 @@ export function OnboardingPopup({ isOpen, onClose, onComplete, userUid }: Onboar
         });
         return;
       }
-      
+
       // Mark password as changed in Firestore
       const firestoreResult = await markPasswordChanged(userUid);
-      
+
       if (!firestoreResult.success) {
         console.warn('Password updated but failed to record in Firestore:', firestoreResult.message);
       }
-      
+
       toast({
         title: "Success",
         description: "Password updated successfully!",
@@ -277,7 +277,7 @@ export function OnboardingPopup({ isOpen, onClose, onComplete, userUid }: Onboar
         });
         setNotificationPreferences({ enabled: enable });
         completeStep(2);
-        
+
         // Complete the entire onboarding process and close popup
         setTimeout(async () => {
           await handleComplete();
@@ -322,9 +322,9 @@ export function OnboardingPopup({ isOpen, onClose, onComplete, userUid }: Onboar
 
   const handleComplete = async () => {
     if (isCompleting) return; // Prevent multiple calls
-    
+
     setIsCompleting(true);
-    
+
     // Mark onboarding as completed in database
     try {
       if (userUid) {
@@ -332,16 +332,16 @@ export function OnboardingPopup({ isOpen, onClose, onComplete, userUid }: Onboar
         const result = await completeUserOnboarding(userUid);
         if (result.success) {
           console.log('Onboarding marked as completed in database');
-          
+
           // Show success animation
           setShowSuccessAnimation(true);
-          
+
           // Wait for animation to complete, then close modal
           setTimeout(() => {
             console.log('Animation complete, closing modal');
             setShowSuccessAnimation(false);
             setIsCompleting(false);
-            
+
             // Reset all form states for next user
             setCurrentStep(0);
             setPasswordForm({
@@ -359,17 +359,17 @@ export function OnboardingPopup({ isOpen, onClose, onComplete, userUid }: Onboar
             setNotificationPreferences({
               enabled: false,
             });
-            
+
             // Reset step completion states
             setSteps(prev => prev.map(step => ({ ...step, completed: false })));
-            
+
             // Call completion handlers after a short delay to ensure state is reset
             setTimeout(() => {
               onComplete();
               onClose();
             }, 100);
           }, 3500); // 3.5 seconds for the full animation experience
-          
+
           return;
         } else {
           console.error('Failed to complete onboarding:', result.message);
@@ -383,12 +383,12 @@ export function OnboardingPopup({ isOpen, onClose, onComplete, userUid }: Onboar
     } catch (error) {
       console.error('Error completing onboarding:', error);
       toast({
-        title: "Warning", 
+        title: "Warning",
         description: "Onboarding steps completed, but there was an issue saving to database.",
         variant: "destructive",
       });
     }
-    
+
     // If there was an error, still complete but without animation
     setIsCompleting(false);
     onComplete();
@@ -417,7 +417,7 @@ export function OnboardingPopup({ isOpen, onClose, onComplete, userUid }: Onboar
         onComplete();
         onClose();
       }, 4000); // 4 seconds fallback
-      
+
       return () => clearTimeout(forceCloseTimer);
     }
   }, [showSuccessAnimation, onComplete, onClose]);
@@ -427,21 +427,22 @@ export function OnboardingPopup({ isOpen, onClose, onComplete, userUid }: Onboar
       console.log('Dialog onOpenChange called:', { open, allStepsCompleted, isCompleting });
       // Allow closing if all steps are completed or if not showing the modal
       if (!open && (allStepsCompleted || !isCompleting)) {
-        console.log('Dialog onOpenChange: Closing modal', { 
-          allStepsCompleted, 
-          showSuccessAnimation, 
-          isCompleting 
+        console.log('Dialog onOpenChange: Closing modal', {
+          allStepsCompleted,
+          showSuccessAnimation,
+          isCompleting
         });
-        
+
         // Only reset animation state if it's still showing
         if (showSuccessAnimation) {
           setShowSuccessAnimation(false);
         }
-        
+
         onComplete();
         onClose();
       }
     }}>
+<<<<<<< HEAD
       <DialogContent className="max-w-2xl admin-card relative overflow-hidden z-50"
                      style={{ position: 'fixed', top: '50%', left: '50%', transform: 'translate(-50%, -50%)' }}
                      onPointerDownOutside={(e) => {
@@ -452,6 +453,18 @@ export function OnboardingPopup({ isOpen, onClose, onComplete, userUid }: Onboar
                        }
                      }}>
         
+=======
+      <DialogContent className="max-w-2xl bg-neutral-900 border-neutral-800 text-white relative overflow-hidden z-50"
+        style={{ position: 'fixed', top: '50%', left: '50%', transform: 'translate(-50%, -50%)' }}
+        onPointerDownOutside={(e) => {
+          console.log('Pointer down outside, preventing close:', { allStepsCompleted, isCompleting });
+          // Prevent closing by clicking outside only if steps are not completed and we're not completing
+          if (!allStepsCompleted && !isCompleting) {
+            e.preventDefault();
+          }
+        }}>
+
+>>>>>>> 6f0e30e831b149d75ca680327f8d8f7950a3d72f
         {/* Success Animation Overlay */}
         <AnimatePresence>
           {showSuccessAnimation && (
@@ -465,18 +478,18 @@ export function OnboardingPopup({ isOpen, onClose, onComplete, userUid }: Onboar
               <motion.div
                 initial={{ scale: 0, rotate: -180 }}
                 animate={{ scale: 1, rotate: 0 }}
-                transition={{ 
-                  type: "spring", 
-                  stiffness: 200, 
+                transition={{
+                  type: "spring",
+                  stiffness: 200,
                   damping: 15,
-                  delay: 0.2 
+                  delay: 0.2
                 }}
                 className="mb-6"
               >
                 <motion.div
                   initial={{ scale: 0 }}
                   animate={{ scale: [0, 1.2, 1] }}
-                  transition={{ 
+                  transition={{
                     duration: 0.6,
                     delay: 0.5,
                     times: [0, 0.7, 1]
@@ -506,19 +519,19 @@ export function OnboardingPopup({ isOpen, onClose, onComplete, userUid }: Onboar
               {[...Array(6)].map((_, i) => (
                 <motion.div
                   key={i}
-                  initial={{ 
-                    opacity: 0, 
+                  initial={{
+                    opacity: 0,
                     scale: 0,
                     x: 0,
                     y: 0
                   }}
-                  animate={{ 
-                    opacity: [0, 1, 0], 
+                  animate={{
+                    opacity: [0, 1, 0],
                     scale: [0, 1, 0.5],
                     x: Math.random() * 400 - 200,
                     y: Math.random() * 300 - 150
                   }}
-                  transition={{ 
+                  transition={{
                     duration: 2,
                     delay: 1 + i * 0.1,
                     ease: "easeOut"
@@ -555,8 +568,8 @@ export function OnboardingPopup({ isOpen, onClose, onComplete, userUid }: Onboar
                     step.completed
                       ? "bg-green-600 text-white"
                       : currentStep === index
-                      ? "bg-indigo-600 text-white"
-                      : "bg-neutral-700 text-neutral-400"
+                        ? "bg-indigo-600 text-white"
+                        : "bg-neutral-700 text-neutral-400"
                   )}
                 >
                   {step.completed ? (
@@ -565,7 +578,7 @@ export function OnboardingPopup({ isOpen, onClose, onComplete, userUid }: Onboar
                     step.icon
                   )}
                 </div>
-                
+
                 {/* Step Info */}
                 <div className="mt-2 text-center">
                   <div
@@ -574,8 +587,8 @@ export function OnboardingPopup({ isOpen, onClose, onComplete, userUid }: Onboar
                       step.completed
                         ? "text-green-400"
                         : currentStep === index
-                        ? "text-indigo-400"
-                        : "text-neutral-400"
+                          ? "text-indigo-400"
+                          : "text-neutral-400"
                     )}
                   >
                     {step.title}
@@ -606,7 +619,7 @@ export function OnboardingPopup({ isOpen, onClose, onComplete, userUid }: Onboar
           {currentStep === 0 && (
             <div className="space-y-4">
               <h3 className="text-lg font-semibold text-center">Change Your Password</h3>
-              
+
               {/* Authentication Status */}
               {!authReady && (
                 <div className="bg-yellow-900/30 border border-yellow-600/50 rounded-lg p-3 text-center">
@@ -616,21 +629,21 @@ export function OnboardingPopup({ isOpen, onClose, onComplete, userUid }: Onboar
                   </div>
                 </div>
               )}
-              
+
               {authReady && !firebaseUser && (
                 <div className="bg-red-900/30 border border-red-600/50 rounded-lg p-3 text-center">
                   <span className="text-red-200">Authentication error. Please refresh and try again.</span>
                 </div>
               )}
-              
+
               {authReady && firebaseUser && (
                 <div className="bg-green-900/30 border border-green-600/50 rounded-lg p-3 text-center">
                   <span className="text-green-200">✓ Authenticated as {firebaseUser.email}</span>
                 </div>
               )}
-              
+
               <form onSubmit={handlePasswordSubmit} className="space-y-4"
-                    style={{ opacity: authReady && firebaseUser ? 1 : 0.5 }}>
+                style={{ opacity: authReady && firebaseUser ? 1 : 0.5 }}>
                 <div>
                   <Label htmlFor="onboarding-currentPassword">Current Password</Label>
                   <Input
@@ -663,9 +676,9 @@ export function OnboardingPopup({ isOpen, onClose, onComplete, userUid }: Onboar
                     className="bg-neutral-800 border-neutral-700 text-white"
                     required
                   />
-                </div>                <Button type="submit" 
-                        className="w-full bg-indigo-600 hover:bg-indigo-700" 
-                        disabled={isLoading || !authReady || !firebaseUser}>
+                </div>                <Button type="submit"
+                  className="w-full bg-indigo-600 hover:bg-indigo-700"
+                  disabled={isLoading || !authReady || !firebaseUser}>
                   {isLoading ? (
                     <>
                       <Loader2 className="h-4 w-4 mr-2 animate-spin" />
@@ -758,7 +771,7 @@ export function OnboardingPopup({ isOpen, onClose, onComplete, userUid }: Onboar
                 <p className="text-neutral-300">
                   Would you like to receive email notifications about events, mentorship opportunities, and updates?
                 </p>
-                
+
                 <div className="flex items-center justify-center space-x-4 p-4 bg-neutral-800 rounded-lg">
                   <Bell className="h-5 w-5 text-indigo-400" />
                   <span>Enable Email Notifications</span>

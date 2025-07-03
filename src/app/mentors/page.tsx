@@ -2,7 +2,7 @@
 "use client";
 
 import { useEffect, useState } from 'react';
-import MentorCard, { type Mentor as PublicMentor } from '@/components/ui/mentor-card'; 
+import MentorCard, { type Mentor as PublicMentor } from '@/components/ui/mentor-card';
 import MainNavbar from '@/components/ui/main-navbar';
 import Footer from '@/components/ui/footer';
 import { motion } from 'framer-motion';
@@ -56,7 +56,7 @@ export default function MentorsPage() {
         const mentorsCollection = collection(db, "mentors");
         const q = query(mentorsCollection, orderBy("createdAt", "desc"));
         const querySnapshot = await getDocs(q);
-        const fetchedMentors: PublicMentor[] = [];        querySnapshot.forEach((doc) => {
+        const fetchedMentors: PublicMentor[] = []; querySnapshot.forEach((doc) => {
           const data = doc.data() as Omit<FirestoreMentor, 'id'>; // Cast to known Firestore structure
           fetchedMentors.push({
             id: doc.id,
@@ -65,11 +65,11 @@ export default function MentorsPage() {
             description: data.description,
             areaOfMentorship: data.expertise, // Map expertise to areaOfMentorship
             email: data.email,
-            avatarUrl: processImageUrl(data.profilePictureUrl || '', data.name.substring(0,2)),
+            avatarUrl: processImageUrl(data.profilePictureUrl || '', data.name.substring(0, 2)),
             // Using a default placeholder for background, as this is not in Firestore
             backgroundImageUrl: processImageUrl(
               '',
-              data.name.substring(0,1)
+              data.name.substring(0, 1)
             ),
             dataAiHintAvatar: `professional ${data.name.split(' ')[0].toLowerCase()}`,
             dataAiHintBackground: 'abstract tech design',
@@ -81,9 +81,9 @@ export default function MentorsPage() {
         console.error("Error fetching mentors for public page: ", err);
         let detailedError = "Failed to load mentors. Please try again later.";
         if (err.code === 'permission-denied' || (err.message && (err.message.toLowerCase().includes('permission-denied') || err.message.toLowerCase().includes('insufficient permissions')))) {
-            detailedError = "Failed to load mentors: Missing or insufficient Firestore permissions. Please check your Firestore security rules for the 'mentors' collection to allow reads.";
+          detailedError = "Failed to load mentors: Missing or insufficient Firestore permissions. Please check your Firestore security rules for the 'mentors' collection to allow reads.";
         } else if (err.message) {
-            detailedError += ` ${err.message}`;
+          detailedError += ` ${err.message}`;
         }
         setError(detailedError);
       } finally {
@@ -98,21 +98,21 @@ export default function MentorsPage() {
     <div className="flex flex-col min-h-screen bg-background font-poppins">
       <MainNavbar />
       <main className="flex-grow py-16 md:py-24">
-        <div className="container mx-auto px-4 sm:px-6 lg:px-8">          <motion.div 
-            className="text-center mb-12 md:mb-16"
-            initial="hidden"
-            animate="visible"
-            variants={pageTitleVariants}
+        <div className="container mx-auto px-4 sm:px-6 lg:px-8">          <motion.div
+          className="text-center mb-12 md:mb-16"
+          initial="hidden"
+          animate="visible"
+          variants={pageTitleVariants}
+        >
+          <AuroraText>Meet Our Mentors</AuroraText>
+          <motion.p
+            className="mt-4 max-w-2xl mx-auto text-lg text-muted-foreground sm:text-xl"
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0, transition: { duration: 0.5, delay: 0.2, ease: "easeOut" } }}
           >
-            <AuroraText>Meet Our Mentors</AuroraText>
-            <motion.p 
-              className="mt-4 max-w-2xl mx-auto text-lg text-muted-foreground sm:text-xl"
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0, transition: { duration: 0.5, delay: 0.2, ease: "easeOut"} }}
-            >
-              Guiding visionaries to success with expert mentorship and industry insights.
-            </motion.p>
-          </motion.div>
+            Guiding visionaries to success with expert mentorship and industry insights.
+          </motion.p>
+        </motion.div>
 
           {isLoading ? (
             <div className="flex justify-center items-center py-20">
@@ -132,7 +132,7 @@ export default function MentorsPage() {
               </p>
             </div>
           ) : (
-            <motion.div 
+            <motion.div
               className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 xl:gap-10"
               initial="hidden"
               whileInView="visible"
@@ -141,8 +141,8 @@ export default function MentorsPage() {
             >
               {mentors.map((mentor) => (
                 <motion.div key={mentor.id} variants={cardItemVariants}>
-                  <MentorCard 
-                    mentor={mentor} 
+                  <MentorCard
+                    mentor={mentor}
                     showSelectButton={false}
                   />
                 </motion.div>

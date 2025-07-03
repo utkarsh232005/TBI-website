@@ -37,16 +37,16 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
 
     console.log('Setting up Firebase Auth observer...');
     const unsubscribe = onAuthStateChanged(auth, async (firebaseUser) => {
-      console.log('Firebase Auth state changed:', { 
-        uid: firebaseUser?.uid, 
+      console.log('Firebase Auth state changed:', {
+        uid: firebaseUser?.uid,
         email: firebaseUser?.email,
         isAnonymous: firebaseUser?.isAnonymous,
         emailVerified: firebaseUser?.emailVerified
       });
-      
+
       setFirebaseUser(firebaseUser);
       setAuthReady(true);
-      
+
       if (firebaseUser) {
         console.log('Firebase user detected, creating/updating user object...');
         // If we have a Firebase user, try to get stored user data or create it
@@ -98,7 +98,7 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
         setUser(null);
         localStorage.removeItem('currentUser');
       }
-      
+
       setIsLoading(false);
     });
 

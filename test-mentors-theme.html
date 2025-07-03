@@ -1,0 +1,492 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Improved Mentors Admin Layout</title>
+    <style>
+        /* Import the admin theme styles */
+        :root {
+            --admin-primary: 221.2 83.2% 53.3%;
+            --admin-accent: 262.1 83.3% 57.8%;
+            --admin-shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+            --admin-shadow-xl: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
+            --admin-shadow-2xl: 0 25px 50px -12px rgb(0 0 0 / 0.25);
+            --foreground: 222.2 84% 4.9%;
+            --border: 214.3 31.8% 91.4%;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            line-height: 1.6;
+        }
+
+        .admin-theme {
+            background: linear-gradient(135deg, #f8fafc 0%, #e0f2fe 30%, #dbeafe 70%, #f0f9ff 100%);
+            min-height: 100vh;
+            color: hsl(var(--foreground));
+        }
+
+        .container {
+            width: 100%;
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 2rem 1rem;
+        }
+
+        .admin-card {
+            background: rgba(255, 255, 255, 0.98);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(226, 232, 240, 0.6);
+            border-radius: 1.5rem;
+            box-shadow: var(--admin-shadow-lg);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            margin-bottom: 2rem;
+        }
+
+        .admin-card:hover {
+            transform: translateY(-4px);
+            box-shadow: var(--admin-shadow-2xl);
+            border-color: hsl(var(--admin-primary) / 0.3);
+        }
+
+        .admin-btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            padding: 0.75rem 1.5rem;
+            border-radius: 1rem;
+            font-weight: 600;
+            font-size: 0.875rem;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: var(--admin-shadow-lg);
+            border: none;
+            cursor: pointer;
+        }
+
+        .admin-btn-primary {
+            background: linear-gradient(135deg, hsl(var(--admin-primary)) 0%, hsl(var(--admin-accent)) 100%);
+            color: white;
+        }
+
+        .admin-btn-secondary {
+            background: rgba(255, 255, 255, 0.9);
+            color: #374151;
+            border: 2px solid #e5e7eb;
+        }
+
+        .admin-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--admin-shadow-xl);
+        }
+
+        .admin-icon {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 3.5rem;
+            height: 3.5rem;
+            border-radius: 1.5rem;
+            font-size: 1.5rem;
+            font-weight: 700;
+            box-shadow: var(--admin-shadow-lg);
+            border: 2px solid;
+            transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .admin-icon-blue {
+            background: linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%);
+            color: #1d4ed8;
+            border-color: #93c5fd;
+        }
+
+        .admin-icon-green {
+            background: linear-gradient(135deg, #d1fae5 0%, #a7f3d0 100%);
+            color: #059669;
+            border-color: #6ee7b7;
+        }
+
+        .admin-icon:hover {
+            transform: scale(1.1) rotate(6deg);
+        }
+
+        .admin-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.5rem 1rem;
+            border-radius: 1rem;
+            font-weight: 700;
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            border: 2px solid;
+            box-shadow: var(--admin-shadow-lg);
+        }
+
+        .admin-badge-info {
+            background: linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%);
+            color: #1e40af;
+            border-color: #93c5fd;
+        }
+
+        .admin-badge-success {
+            background: linear-gradient(135deg, #d1fae5 0%, #a7f3d0 100%);
+            color: #059669;
+            border-color: #6ee7b7;
+        }
+
+        .mentor-card {
+            background: rgba(255, 255, 255, 0.98);
+            backdrop-filter: blur(20px);
+            border: 2px solid rgba(226, 232, 240, 0.6);
+            border-radius: 1.5rem;
+            box-shadow: var(--admin-shadow-lg);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .mentor-card:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--admin-shadow-xl);
+            border-color: #93c5fd;
+        }
+
+        .mentor-avatar {
+            width: 4rem;
+            height: 4rem;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 1.2rem;
+            border: 4px solid #dbeafe;
+            box-shadow: var(--admin-shadow-lg);
+            flex-shrink: 0;
+        }
+
+        .flex {
+            display: flex;
+        }
+
+        .flex-col {
+            flex-direction: column;
+        }
+
+        .items-center {
+            align-items: center;
+        }
+
+        .justify-between {
+            justify-content: space-between;
+        }
+
+        .gap-4 {
+            gap: 1rem;
+        }
+
+        .gap-6 {
+            gap: 1.5rem;
+        }
+
+        .space-x-4 > * + * {
+            margin-left: 1rem;
+        }
+
+        .space-y-2 > * + * {
+            margin-top: 0.5rem;
+        }
+
+        .text-xl {
+            font-size: 1.25rem;
+        }
+
+        .text-lg {
+            font-size: 1.125rem;
+        }
+
+        .text-3xl {
+            font-size: 1.875rem;
+        }
+
+        .font-bold {
+            font-weight: 700;
+        }
+
+        .font-medium {
+            font-weight: 500;
+        }
+
+        .text-gray-800 {
+            color: #1f2937;
+        }
+
+        .text-gray-600 {
+            color: #4b5563;
+        }
+
+        .text-blue-600 {
+            color: #2563eb;
+        }
+
+        .mb-4 {
+            margin-bottom: 1rem;
+        }
+
+        .mb-6 {
+            margin-bottom: 1.5rem;
+        }
+
+        .p-6 {
+            padding: 1.5rem;
+        }
+
+        .p-8 {
+            padding: 2rem;
+        }
+
+        .min-w-0 {
+            min-width: 0;
+        }
+
+        .flex-1 {
+            flex: 1 1 0%;
+        }
+
+        .flex-shrink-0 {
+            flex-shrink: 0;
+        }
+
+        .truncate {
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .break-words {
+            overflow-wrap: break-word;
+        }
+
+        .search-input {
+            width: 100%;
+            max-width: 24rem;
+            height: 3rem;
+            padding: 0 1rem 0 3rem;
+            border: 2px solid #e5e7eb;
+            border-radius: 0.75rem;
+            font-size: 1rem;
+            background: rgba(249, 250, 251, 0.5);
+            transition: all 0.3s ease;
+        }
+
+        .search-input:focus {
+            outline: none;
+            border-color: #3b82f6;
+            background: white;
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+        }
+
+        .grid {
+            display: grid;
+            gap: 1.5rem;
+        }
+
+        .grid-cols-1 {
+            grid-template-columns: repeat(1, minmax(0, 1fr));
+        }
+
+        @media (min-width: 768px) {
+            .md\\:grid-cols-2 {
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+            }
+        }
+
+        @media (min-width: 1024px) {
+            .lg\\:flex-row {
+                flex-direction: row;
+            }
+            
+            .lg\\:items-center {
+                align-items: center;
+            }
+            
+            .lg\\:mx-0 {
+                margin-left: 0;
+                margin-right: 0;
+            }
+        }
+
+        .responsive-header {
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+
+        @media (min-width: 1024px) {
+            .responsive-header {
+                flex-direction: row;
+                align-items: flex-start;
+                justify-content: space-between;
+            }
+        }
+
+        .contact-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 1rem;
+        }
+
+        @media (min-width: 768px) {
+            .contact-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="admin-theme">
+        <div class="container">
+            <!-- Header Section -->
+            <div class="admin-card">
+                <div class="p-6 p-8">
+                    <div class="responsive-header">
+                        <div class="flex-1 min-w-0">
+                            <div class="flex items-center gap-4 mb-4">
+                                <div class="admin-icon admin-icon-blue flex-shrink-0">
+                                    👥
+                                </div>
+                                <div class="min-w-0 flex-1">
+                                    <h1 class="text-3xl font-bold" style="background: linear-gradient(135deg, #2563eb, #8b5cf6, #2563eb); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;">
+                                        Mentors Management
+                                    </h1>
+                                </div>
+                            </div>
+                            <p class="text-lg text-gray-600 font-medium mb-4">
+                                Manage and organize your team of expert mentors
+                            </p>
+                            <div class="flex items-center gap-4">
+                                <span class="admin-badge admin-badge-info flex-shrink-0">
+                                    5 Mentors Total
+                                </span>
+                                <span class="admin-badge admin-badge-success flex-shrink-0">
+                                    2 Filtered
+                                </span>
+                            </div>
+                        </div>
+                        <div class="flex flex-col gap-3" style="min-width: fit-content;">
+                            <button class="admin-btn admin-btn-secondary">
+                                🔄 Refresh
+                            </button>
+                            <button class="admin-btn admin-btn-primary">
+                                ➕ Add New Mentor
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Search Section -->
+            <div class="admin-card">
+                <div class="p-6">
+                    <div style="position: relative; max-width: 24rem; margin: 0 auto;">
+                        <div style="position: absolute; left: 1rem; top: 50%; transform: translateY(-50%); color: #3b82f6;">
+                            🔍
+                        </div>
+                        <input type="text" placeholder="Search mentors by name, email, or expertise..." class="search-input">
+                    </div>
+                </div>
+            </div>
+
+            <!-- Mentors Content -->
+            <div class="admin-card">
+                <div class="p-6">
+                    <div class="flex items-center justify-between mb-6">
+                        <h2 class="text-xl font-bold text-gray-800">All Mentors</h2>
+                        <span class="admin-badge admin-badge-success">✨ 2 Results</span>
+                    </div>
+
+                    <!-- Sample Mentor Cards -->
+                    <div class="grid gap-6">
+                        <div class="mentor-card">
+                            <div class="flex flex-col gap-4" style="cursor: pointer;">
+                                <div class="flex items-center justify-between">
+                                    <div class="flex items-center space-x-4 min-w-0 flex-1">
+                                        <div style="position: relative;" class="flex-shrink-0">
+                                            <div class="mentor-avatar">UP</div>
+                                            <div class="admin-icon admin-icon-green" style="position: absolute; bottom: -0.25rem; right: -0.25rem; width: 1.5rem; height: 1.5rem; font-size: 0.75rem;">
+                                                ✓
+                                            </div>
+                                        </div>
+                                        <div class="min-w-0 flex-1">
+                                            <h3 class="text-xl font-bold text-gray-800 truncate">Utkarsh Patrikar</h3>
+                                            <p class="text-gray-600 font-medium truncate">Software Engineer</p>
+                                            <div class="flex items-center gap-2 mt-2">
+                                                <div class="admin-icon admin-icon-blue flex-shrink-0" style="width: 1.25rem; height: 1.25rem; font-size: 0.625rem;">
+                                                    🎯
+                                                </div>
+                                                <span class="text-gray-600 truncate">DevOps Engineering</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="flex items-center space-x-4 flex-shrink-0">
+                                        <div class="admin-badge admin-badge-info" style="max-width: 8rem;">
+                                            <span class="truncate">DevOps Engineering</span>
+                                        </div>
+                                        <div class="admin-icon admin-icon-blue flex-shrink-0" style="width: 2.5rem; height: 2.5rem;">
+                                            ⬇️
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="mentor-card">
+                            <div class="flex flex-col gap-4" style="cursor: pointer;">
+                                <div class="flex items-center justify-between">
+                                    <div class="flex items-center space-x-4 min-w-0 flex-1">
+                                        <div style="position: relative;" class="flex-shrink-0">
+                                            <div class="mentor-avatar">JS</div>
+                                            <div class="admin-icon admin-icon-green" style="position: absolute; bottom: -0.25rem; right: -0.25rem; width: 1.5rem; height: 1.5rem; font-size: 0.75rem;">
+                                                ✓
+                                            </div>
+                                        </div>
+                                        <div class="min-w-0 flex-1">
+                                            <h3 class="text-xl font-bold text-gray-800 truncate">Dr. Jane Smith</h3>
+                                            <p class="text-gray-600 font-medium truncate">Lead AI Researcher, TechCorp</p>
+                                            <div class="flex items-center gap-2 mt-2">
+                                                <div class="admin-icon admin-icon-blue flex-shrink-0" style="width: 1.25rem; height: 1.25rem; font-size: 0.625rem;">
+                                                    🎯
+                                                </div>
+                                                <span class="text-gray-600 truncate">Machine Learning & AI</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="flex items-center space-x-4 flex-shrink-0">
+                                        <div class="admin-badge admin-badge-info" style="max-width: 8rem;">
+                                            <span class="truncate">AI & ML</span>
+                                        </div>
+                                        <div class="admin-icon admin-icon-blue flex-shrink-0" style="width: 2.5rem; height: 2.5rem;">
+                                            ➡️
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

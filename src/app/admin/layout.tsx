@@ -4,8 +4,7 @@
 import * as React from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { AdminAuthProvider } from "@/contexts/AdminAuthContext";
-import { 
+import {
   Sidebar,
   SidebarBody,
   DesktopSidebar,
@@ -14,10 +13,10 @@ import {
   useSidebar,
   SidebarProvider
 } from "@/components/ui/animated-sidebar";
-import { 
-  FileText, 
-  LogOut, 
-  Settings, 
+import {
+  FileText,
+  LogOut,
+  Settings,
   CalendarDays,
   UserCog,
   BarChart2,
@@ -52,7 +51,7 @@ function AdminLayoutContent({
 }) {
   const pathname = usePathname();
   const { open, setOpen } = useSidebar();
-  
+
   React.useEffect(() => {
     // Close sidebar on mobile when route changes
     if (window.innerWidth < 768) {
@@ -61,59 +60,53 @@ function AdminLayoutContent({
   }, [pathname, setOpen]);
 
   const navItems: NavItem[] = [
-    { 
-      href: "/admin/dashboard", 
-      label: "Dashboard", 
+    {
+      href: "/admin/dashboard",
+      label: "Dashboard",
       icon: <LayoutDashboard className="h-5 w-5" />,
-      disabled: false 
+      disabled: false
     },
-    { 
-      href: "/admin/submissions", 
-      label: "Submissions", 
+    {
+      href: "/admin/submissions",
+      label: "Submissions",
       icon: <FileCheck className="h-5 w-5" />,
-      disabled: false 
+      disabled: false
     },
-    { 
-      href: "/admin/mentors", 
-      label: "Mentors", 
+    {
+      href: "/admin/mentors",
+      label: "Mentors",
       icon: <Users className="h-5 w-5" />,
-      disabled: false 
+      disabled: false
     },
-    { 
-      href: "/admin/mentor-requests", 
-      label: "Mentor Requests", 
+    {
+      href: "/admin/mentor-requests",
+      label: "Mentor Requests",
       icon: <MessageSquare className="h-5 w-5" />,
-      disabled: false 
+      disabled: false
     },
-    { 
-      href: "/admin/events", 
-      label: "Events", 
+    {
+      href: "/admin/events",
+      label: "Events",
       icon: <CalendarDays className="h-5 w-5" />,
-      disabled: false 
+      disabled: false
     },
-    { 
+    {
       href: "/admin/startups", // Link to the startups management page
       label: "Add-startups",   // New label
       icon: <Rocket className="h-5 w-5" />, // Using Rocket icon
-      disabled: false 
+      disabled: false
     },
-    { 
+    {
       href: "/admin/analysis",
       label: "Analysis",
       icon: <BarChart2 className="h-5 w-5" />,
-      disabled: false 
+      disabled: false
     },
-    { 
-      href: "/admin/evaluation",
-      label: "Evaluation",
-      icon: <ClipboardCheck className="h-5 w-5" />,
-      disabled: false 
-    },
-    { 
-      href: "/admin/settings", 
-      label: "Settings", 
+    {
+      href: "/admin/settings",
+      label: "Settings",
       icon: <Settings className="h-5 w-5" />,
-      disabled: false 
+      disabled: false
     },
   ];
 
@@ -136,30 +129,19 @@ function AdminLayoutContent({
         <SidebarBody>
           <DesktopSidebar>
             {/* Logo */}
-            <div className="flex items-center justify-center h-18 mb-6 relative">
-              <div className="absolute inset-0 bg-gradient-to-br from-white/96 via-blue-50/70 to-indigo-50/50 backdrop-blur-lg rounded-2xl border border-blue-200/40 shadow-lg">
-                <div className="absolute inset-0 bg-gradient-to-br from-blue-500/2 via-indigo-500/1 to-purple-500/2 rounded-2xl"></div>
-              </div>
-              <Link href="/admin/dashboard" className="flex items-center space-x-3 min-w-max relative z-10 p-4">
-                <div className="p-3 bg-gradient-to-br from-blue-500 via-indigo-600 to-purple-600 rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105 border border-blue-400/30 flex-shrink-0 relative overflow-hidden">
-                  <div className="absolute inset-0 shimmer-effect opacity-0 hover:opacity-100 transition-opacity duration-500 rounded-2xl"></div>
-                  <InnoNexusLogo className="h-7 w-7 text-white relative z-10" />
-                </div>
-                <motion.div 
-                  className="flex flex-col"
+            <div className="flex items-center justify-between h-16 px-4 border-b border-neutral-800">
+              <Link href="/admin/dashboard" className="flex items-center space-x-3 min-w-max">
+                <InnoNexusLogo className="h-8 w-8 text-white flex-shrink-0" />
+                <motion.span
+                  className="text-lg font-semibold whitespace-nowrap text-white"
                   animate={{
                     opacity: open ? 1 : 0,
                     display: open ? 'flex' : 'none'
                   }}
                   transition={{ duration: 0.2 }}
                 >
-                  <span className="text-lg font-bold bg-gradient-to-r from-slate-800 via-blue-800 to-indigo-800 bg-clip-text text-transparent leading-tight">
-                    Admin Panel
-                  </span>
-                  <span className="text-xs text-slate-500 font-medium">
-                    TBI Management
-                  </span>
-                </motion.div>
+                  Admin Panel
+                </motion.span>
               </Link>
             </div>
 
@@ -171,12 +153,13 @@ function AdminLayoutContent({
                     <a
                       href={item.disabled ? '#' : item.href}
                       className={cn(
-                        'flex items-center justify-start gap-3 py-3 px-3 rounded-xl transition-all duration-300',
-                        'cursor-pointer relative overflow-hidden group/nav backdrop-blur-sm border min-h-[48px]',
-                        pathname === item.href 
-                          ? 'bg-gradient-to-r from-blue-500/20 via-indigo-500/15 to-purple-500/20 text-blue-700 border-blue-400/60 shadow-lg scale-[1.02]' 
-                          : 'text-slate-600 hover:bg-gradient-to-r hover:from-blue-50/80 hover:via-indigo-50/60 hover:to-slate-50/40 hover:text-slate-800 hover:border-blue-300/40 hover:shadow-md border-transparent hover:scale-[1.02]',
-                        item.disabled && 'opacity-50 hover:bg-transparent hover:text-slate-600 hover:scale-100',
+                        'flex items-center justify-start gap-3 py-3 px-3 rounded-lg transition-colors duration-200',
+                        'cursor-pointer',
+                        pathname === item.href
+                          ? 'bg-indigo-900/50 text-white'
+                          : 'text-neutral-300 hover:bg-neutral-800/50 hover:text-white',
+                        item.disabled && 'opacity-50 hover:bg-transparent hover:text-neutral-300',
+                        'group/sidebar'
                       )}
                       onClick={(e) => {
                         if (item.disabled) {
@@ -274,14 +257,14 @@ function AdminLayoutContent({
                 <div className="space-y-2 px-3">
                   {navItems.map((item) => (
                     <div key={`mobile-${item.href}`} className="group relative" title={item.disabled ? 'Coming soon' : ''}>
-                      <Link 
+                      <Link
                         href={item.disabled ? '#' : item.href}
                         className={cn(
-                          "flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all duration-300 cursor-pointer border backdrop-blur-sm relative overflow-hidden min-h-[48px]",
-                          pathname === item.href 
-                            ? 'bg-gradient-to-r from-blue-500/15 via-indigo-500/12 to-purple-500/15 text-blue-700 border-blue-400/50 shadow-lg scale-[1.02]' 
-                            : 'text-slate-600 hover:bg-gradient-to-r hover:from-white/90 hover:via-blue-50/70 hover:to-indigo-50/50 hover:text-slate-800 hover:border-blue-300/40 hover:shadow-md border-transparent hover:scale-[1.02]',
-                          item.disabled && 'opacity-50 hover:bg-transparent hover:text-slate-600 hover:scale-100'
+                          "flex items-center px-3 py-3 rounded-lg text-sm font-medium transition-colors cursor-pointer",
+                          pathname === item.href
+                            ? 'bg-indigo-900/50 text-white'
+                            : 'text-neutral-300 hover:bg-neutral-800/50 hover:text-white',
+                          item.disabled && 'opacity-50 hover:bg-transparent hover:text-neutral-300'
                         )}
                         onClick={(e) => {
                           if (item.disabled) {
@@ -321,22 +304,16 @@ function AdminLayoutContent({
                   ))}
                 </div>
               </div>
-              
-              {/* Mobile Footer */}
-              <div className="p-3 mt-4">
-                <div className="relative">
-                  <div className="absolute inset-0 bg-gradient-to-br from-slate-100/90 to-blue-100/70 backdrop-blur-lg rounded-2xl border border-slate-200/50 shadow-md"></div>
-                  <Link
-                    href="/"
-                    onClick={handleMobileLinkClick}
-                    className="relative z-10 flex items-center gap-3 px-4 py-3 rounded-2xl text-sm font-medium text-slate-600 hover:text-slate-800 transition-all duration-300 hover:scale-[1.02] min-h-[48px]"
-                  >
-                    <div className="flex items-center justify-center w-10 h-10 rounded-lg bg-gradient-to-br from-slate-100/90 to-blue-100/70 border border-slate-200/50 group-hover:from-blue-100 group-hover:to-indigo-100 transition-all duration-300 shadow-sm hover:shadow-md">
-                      <Home className="h-5 w-5" />
-                    </div>
-                    <span>Back to Home</span>
-                  </Link>
-                </div>
+
+              <div className="p-4">
+                <Link
+                  href="/"
+                  className="flex items-center px-3 py-2.5 rounded-lg text-sm font-medium text-neutral-300 hover:bg-neutral-800/50 hover:text-white transition-colors"
+                  onClick={handleMobileLinkClick} // Close mobile menu on link click
+                >
+                  <Home className="h-5 w-5 mr-3" />
+                  <span>Back to Home</span>
+                </Link>
               </div>
             </div>
           </MobileSidebar>
@@ -398,12 +375,10 @@ export default function AdminLayout({
   children: React.ReactNode;
 }) {
   return (
-    <AdminAuthProvider>
-      <SidebarProvider>
-        <AdminLayoutContent>
-          {children}
-        </AdminLayoutContent>
-      </SidebarProvider>
-    </AdminAuthProvider>
+    <SidebarProvider>
+      <AdminLayoutContent>
+        {children}
+      </AdminLayoutContent>
+    </SidebarProvider>
   );
 }

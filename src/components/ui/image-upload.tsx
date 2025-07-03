@@ -55,9 +55,9 @@ export const ImageUploadComponent: React.FC<ImageUploadComponentProps> = ({
 
   const handleFileUpload = useCallback(async (files: FileList | null) => {
     if (!files || files.length === 0) return;
-    
+
     const file = files[0]; // For now, handle single file
-    
+
     setUploadState({
       isUploading: true,
       error: null,
@@ -66,7 +66,7 @@ export const ImageUploadComponent: React.FC<ImageUploadComponentProps> = ({
 
     try {
       const result = await uploadImage(file, options);
-      
+
       if (result.success && result.url) {
         onChange(result.url);
         onUploadComplete?.(result);
@@ -75,7 +75,7 @@ export const ImageUploadComponent: React.FC<ImageUploadComponentProps> = ({
           error: null,
           success: true,
         });
-        
+
         // Clear success state after 2 seconds
         setTimeout(() => {
           setUploadState(prev => ({ ...prev, success: false }));
@@ -107,9 +107,9 @@ export const ImageUploadComponent: React.FC<ImageUploadComponentProps> = ({
   const handleDrop = useCallback((event: React.DragEvent) => {
     event.preventDefault();
     setIsDragOver(false);
-    
+
     if (disabled) return;
-    
+
     handleFileUpload(event.dataTransfer.files);
   }, [disabled, handleFileUpload]);
 
@@ -163,7 +163,7 @@ export const ImageUploadComponent: React.FC<ImageUploadComponentProps> = ({
           disabled={disabled}
           multiple={maxFiles > 1}
         />
-        
+
         <div className="p-6 text-center">
           <AnimatePresence mode="wait">
             {uploadState.isUploading ? (
@@ -266,7 +266,7 @@ export const ImageUploadComponent: React.FC<ImageUploadComponentProps> = ({
                   target.src = 'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 24 24" fill="none" stroke="gray" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21,15 16,10 5,21"/></svg>';
                 }}
               />
-              
+
               {/* Remove button */}
               <Button
                 variant="destructive"
@@ -280,7 +280,7 @@ export const ImageUploadComponent: React.FC<ImageUploadComponentProps> = ({
                 <X className="h-4 w-4" />
               </Button>
             </div>
-            
+
             {/* Image info */}
             {isBase64 && (
               <div className="mt-2 text-xs text-muted-foreground">

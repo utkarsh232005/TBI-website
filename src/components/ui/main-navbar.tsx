@@ -58,12 +58,12 @@ export default function MainNavbar({ onApplyClick }: MainNavbarProps) {
               onMouseEnter={() => setHoveredItem(item.name)}
               onMouseLeave={() => setHoveredItem(null)}
               onClick={closeMobileMenu}
-              className="relative px-3 py-2 text-muted-foreground hover:text-accent transition-colors duration-200"
+              className="relative px-3 py-2 text-gray-300 hover:text-white transition-colors duration-200"
             >
               {hoveredItem === item.name && (
                 <motion.div
                   layoutId={`hovered-nav-${item.name}`}
-                  className="absolute inset-0 h-full w-full rounded-full bg-muted/30"
+                  className="absolute inset-0 h-full w-full rounded-full bg-purple-500/20"
                   transition={{ type: "spring", stiffness: 300, damping: 30 }}
                 />
               )}
@@ -71,7 +71,7 @@ export default function MainNavbar({ onApplyClick }: MainNavbarProps) {
             </Link>
           ))}
         </div>
-        
+
         {/* Action Items (Login, Theme Toggle) - Right Aligned */}
         <div className="flex items-center gap-2">
           {actionNavItems.map((item) => (
@@ -82,12 +82,12 @@ export default function MainNavbar({ onApplyClick }: MainNavbarProps) {
                 onMouseEnter={() => setHoveredItem(item.name)}
                 onMouseLeave={() => setHoveredItem(null)}
                 onClick={closeMobileMenu}
-                className="relative px-3 py-2 text-muted-foreground hover:text-accent transition-colors duration-200 text-sm font-normal"
+                className="relative px-3 py-2 text-gray-300 hover:text-white transition-colors duration-200 text-sm font-normal"
               >
                 {hoveredItem === item.name && (
                   <motion.div
                     layoutId={`hovered-action-${item.name}`}
-                    className="absolute inset-0 h-full w-full rounded-full bg-muted/30"
+                    className="absolute inset-0 h-full w-full rounded-full bg-purple-500/20"
                     transition={{ type: "spring", stiffness: 300, damping: 30 }}
                   />
                 )}
@@ -113,31 +113,31 @@ export default function MainNavbar({ onApplyClick }: MainNavbarProps) {
           isOpen={isMobileMenuOpen}
           onClose={closeMobileMenu}
         >
-          {mainNavLinks.map((item, idx) => ( 
+          {mainNavLinks.map((item, idx) => (
             <Link
               key={`mobile-link-${idx}`}
               href={item.link}
               onClick={closeMobileMenu}
-              className="block py-2 text-lg text-foreground hover:text-accent"
+              className="block py-2 text-lg text-gray-300 hover:text-white"
             >
               {item.name}
             </Link>
           ))}
-          <div className="flex w-full flex-col gap-4 pt-4 border-t border-border mt-4">
+          <div className="flex w-full flex-col gap-4 pt-4 border-t border-purple-500/30 mt-4">
             {actionNavItems.map((item) => item.link && (
               <NavbarButton
                 key={`mobile-action-${item.name}`}
-                as="a" 
+                as="a"
                 href={item.link}
                 onClick={closeMobileMenu}
                 variant="outline" // Keeps it distinct
-                className="w-full hover:border-accent hover:text-accent"
+                className="w-full hover:border-purple-400 hover:text-white border-purple-500/50 text-gray-300"
               >
                 {item.name}
               </NavbarButton>
             ))}
             <div className="flex justify-center pt-2">
-               {mounted && <ThemeToggleButton />}
+              {mounted && <ThemeToggleButton />}
             </div>
           </div>
         </MobileNavMenu>

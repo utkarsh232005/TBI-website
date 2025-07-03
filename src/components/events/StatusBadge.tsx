@@ -30,7 +30,7 @@ export const StatusBadge = ({ status, className }: StatusBadgeProps) => {
   const { label, className: statusClassName, icon } = statusConfig[status] || statusConfig.pending;
 
   return (
-    <Badge 
+    <Badge
       className={cn(
         'inline-flex items-center gap-1.5 rounded-full border px-2.5 py-1 text-xs font-medium',
         statusClassName,

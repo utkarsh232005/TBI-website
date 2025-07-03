@@ -4,23 +4,23 @@ import { cn } from "@/lib/utils";
 import React, { useState, createContext, useContext } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { IconMenu2, IconX } from "@tabler/icons-react";
- 
+
 interface Links {
   label: string;
   href: string;
   icon: React.JSX.Element | React.ReactNode;
 }
- 
+
 interface SidebarContextProps {
   open: boolean;
   setOpen: React.Dispatch<React.SetStateAction<boolean>>;
   animate: boolean;
 }
- 
+
 const SidebarContext = createContext<SidebarContextProps | undefined>(
   undefined
 );
- 
+
 export const useSidebar = () => {
   const context = useContext(SidebarContext);
   if (!context) {
@@ -28,7 +28,7 @@ export const useSidebar = () => {
   }
   return context;
 };
- 
+
 export const SidebarProvider = ({
   children,
   open: openProp,
@@ -41,17 +41,17 @@ export const SidebarProvider = ({
   animate?: boolean;
 }) => {
   const [openState, setOpenState] = useState(false);
- 
+
   const open = openProp !== undefined ? openProp : openState;
   const setOpen = setOpenProp !== undefined ? setOpenProp : setOpenState;
- 
+
   return (
     <SidebarContext.Provider value={{ open, setOpen, animate }}>
       {children}
     </SidebarContext.Provider>
   );
 };
- 
+
 export const Sidebar = ({
   children,
   open,
@@ -69,7 +69,7 @@ export const Sidebar = ({
     </SidebarProvider>
   );
 };
- 
+
 export const SidebarBody = (props: React.ComponentProps<typeof motion.div>) => {
   return (
     <>
@@ -78,7 +78,7 @@ export const SidebarBody = (props: React.ComponentProps<typeof motion.div>) => {
     </>
   );
 };
- 
+
 export const DesktopSidebar = ({
   className,
   children,
@@ -121,7 +121,7 @@ export const DesktopSidebar = ({
     </>
   );
 };
- 
+
 export const MobileSidebar = ({
   className,
   children,
@@ -185,7 +185,7 @@ export const MobileSidebar = ({
     </>
   );
 };
- 
+
 export const SidebarLink = ({
   link,
   className,
@@ -214,15 +214,10 @@ export const SidebarLink = ({
       )}
       {...props}
     >
-      <div className="flex items-center justify-center w-10 h-10 rounded-lg bg-gradient-to-br from-blue-100/90 to-indigo-100/80 group-hover/sidebar:from-blue-500/25 group-hover/sidebar:to-indigo-500/25 transition-all duration-300 shadow-sm group-hover/sidebar:shadow-md backdrop-blur-sm border border-blue-200/40 group-hover/sidebar:border-blue-400/60 flex-shrink-0 relative overflow-hidden">
-        {/* Subtle shimmer effect */}
-        <div className="absolute inset-0 shimmer-effect opacity-0 group-hover/sidebar:opacity-100 transition-opacity duration-500 rounded-lg"></div>
-        
-        <span className="text-blue-600 group-hover/sidebar:text-blue-700 transition-all duration-300 group-hover/sidebar:scale-105 flex items-center justify-center text-base font-medium relative z-10 group-hover/sidebar:rotate-1 transform">
-          {link.icon}
-        </span>
-      </div>
- 
+      <span className="text-indigo-400 group-hover/sidebar:text-indigo-300 transition-colors">
+        {link.icon}
+      </span>
+
       <motion.span
         animate={{
           display: animate ? (open ? "inline-block" : "none") : "inline-block",
