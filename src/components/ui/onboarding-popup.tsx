@@ -49,7 +49,7 @@ interface OnboardingPopupProps {
 export function OnboardingPopup({ isOpen, onClose, onComplete, userUid }: OnboardingPopupProps) {
   const { toast } = useToast();
 
-  console.log('OnboardingPopup render:', { isOpen, userUid });
+
   const { firebaseUser, authReady } = useUser();
   const [currentStep, setCurrentStep] = React.useState(0);
   const [isLoading, setIsLoading] = React.useState(false);
@@ -156,7 +156,7 @@ export function OnboardingPopup({ isOpen, onClose, onComplete, userUid }: Onboar
 
     setIsLoading(true);
     try {
-      console.log('Attempting password update for user:', { uid: firebaseUser.uid, email: firebaseUser.email });
+
 
       // Update password using client-side Firebase Auth
       const passwordResult = await updateUserPassword(
@@ -328,17 +328,17 @@ export function OnboardingPopup({ isOpen, onClose, onComplete, userUid }: Onboar
     // Mark onboarding as completed in database
     try {
       if (userUid) {
-        console.log('Completing onboarding for user:', userUid);
+  
         const result = await completeUserOnboarding(userUid);
         if (result.success) {
-          console.log('Onboarding marked as completed in database');
+
 
           // Show success animation
           setShowSuccessAnimation(true);
 
           // Wait for animation to complete, then close modal
           setTimeout(() => {
-            console.log('Animation complete, closing modal');
+    
             setShowSuccessAnimation(false);
             setIsCompleting(false);
 
@@ -411,7 +411,7 @@ export function OnboardingPopup({ isOpen, onClose, onComplete, userUid }: Onboar
   React.useEffect(() => {
     if (showSuccessAnimation) {
       const forceCloseTimer = setTimeout(() => {
-        console.log('Force closing modal after animation timeout');
+
         setShowSuccessAnimation(false);
         setIsCompleting(false);
         onComplete();
@@ -424,14 +424,10 @@ export function OnboardingPopup({ isOpen, onClose, onComplete, userUid }: Onboar
 
   return (
     <Dialog open={isOpen} onOpenChange={(open) => {
-      console.log('Dialog onOpenChange called:', { open, allStepsCompleted, isCompleting });
+
       // Allow closing if all steps are completed or if not showing the modal
       if (!open && (allStepsCompleted || !isCompleting)) {
-        console.log('Dialog onOpenChange: Closing modal', {
-          allStepsCompleted,
-          showSuccessAnimation,
-          isCompleting
-        });
+
 
         // Only reset animation state if it's still showing
         if (showSuccessAnimation) {
@@ -442,29 +438,15 @@ export function OnboardingPopup({ isOpen, onClose, onComplete, userUid }: Onboar
         onClose();
       }
     }}>
-<<<<<<< HEAD
       <DialogContent className="max-w-2xl admin-card relative overflow-hidden z-50"
                      style={{ position: 'fixed', top: '50%', left: '50%', transform: 'translate(-50%, -50%)' }}
                      onPointerDownOutside={(e) => {
-                       console.log('Pointer down outside, preventing close:', { allStepsCompleted, isCompleting });
+
                        // Prevent closing by clicking outside only if steps are not completed and we're not completing
                        if (!allStepsCompleted && !isCompleting) {
                          e.preventDefault();
                        }
                      }}>
-        
-=======
-      <DialogContent className="max-w-2xl bg-neutral-900 border-neutral-800 text-white relative overflow-hidden z-50"
-        style={{ position: 'fixed', top: '50%', left: '50%', transform: 'translate(-50%, -50%)' }}
-        onPointerDownOutside={(e) => {
-          console.log('Pointer down outside, preventing close:', { allStepsCompleted, isCompleting });
-          // Prevent closing by clicking outside only if steps are not completed and we're not completing
-          if (!allStepsCompleted && !isCompleting) {
-            e.preventDefault();
-          }
-        }}>
-
->>>>>>> 6f0e30e831b149d75ca680327f8d8f7950a3d72f
         {/* Success Animation Overlay */}
         <AnimatePresence>
           {showSuccessAnimation && (
