@@ -7,7 +7,6 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { StatusCard } from "@/components/ui/status-card";
 import { Textarea } from "@/components/ui/textarea";
 import { 
   Dialog,
@@ -37,8 +36,7 @@ import {
   RefreshCw,
   User,
   Mail,
-  Calendar,
-  AlertTriangle
+  Calendar
 } from 'lucide-react';
 import { useToast } from "@/hooks/use-toast";
 import { 
@@ -197,341 +195,268 @@ export default function AdminMentorRequestsPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 w-full flex flex-col items-center py-10 px-2">
-      <div className="w-full max-w-6xl mx-auto space-y-8">
-        <div className="bg-white rounded-2xl shadow-md border border-gray-200 overflow-hidden">
-          <div className="px-8 pt-8 pb-4 flex flex-col md:flex-row md:items-center md:justify-between gap-6">
-            <div>
-              <h1 className="text-2xl md:text-3xl font-bold text-gray-900 mb-1">Mentor Requests</h1>
-              <p className="text-sm text-gray-500">Review and process mentor selection requests from students</p>
-            </div>
-            <Button 
-              onClick={fetchRequests}
-              variant="outline"
-              className="bg-white border border-blue-200 text-blue-700 hover:bg-blue-50 hover:border-blue-300 focus:ring-2 focus:ring-blue-200 rounded-lg shadow-sm px-5 py-2 font-medium transition"
-            >
-              <RefreshCw className="mr-2 h-4 w-4" />
-              Refresh
-            </Button>
-          </div>
+    <div className="container mx-auto px-4 py-8">
+      <div className="flex justify-between items-center mb-8">
+        <div>
+          <h1 className="text-3xl font-bold">Mentor Requests</h1>
+          <p className="text-muted-foreground mt-2">
+            Review and process mentor selection requests from students
+          </p>
         </div>
-        {/* Stats */}
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-          <div className="bg-white rounded-xl shadow border border-gray-100 p-6 flex flex-col items-center">
-            <div className="bg-yellow-100 text-yellow-700 rounded-full w-10 h-10 flex items-center justify-center mb-2">
-              <Clock className="h-5 w-5" />
-            </div>
-            <div className="text-xs font-semibold text-gray-500 mb-1">PENDING</div>
-            <div className="text-2xl font-bold text-gray-900">{pendingRequests.length}</div>
-            <div className="text-xs text-gray-400">Awaiting review</div>
-          </div>
-          <div className="bg-white rounded-xl shadow border border-gray-100 p-6 flex flex-col items-center">
-            <div className="bg-green-100 text-green-700 rounded-full w-10 h-10 flex items-center justify-center mb-2">
-              <CheckCircle className="h-5 w-5" />
-            </div>
-            <div className="text-xs font-semibold text-gray-500 mb-1">APPROVED</div>
-            <div className="text-2xl font-bold text-gray-900">{requests.filter(r => r.status === 'admin_approved' || r.status === 'mentor_approved').length}</div>
-            <div className="text-xs text-gray-400">Applications</div>
-          </div>
-          <div className="bg-white rounded-xl shadow border border-gray-100 p-6 flex flex-col items-center">
-            <div className="bg-red-100 text-red-700 rounded-full w-10 h-10 flex items-center justify-center mb-2">
-              <XCircle className="h-5 w-5" />
-            </div>
-            <div className="text-xs font-semibold text-gray-500 mb-1">REJECTED</div>
-            <div className="text-2xl font-bold text-gray-900">{requests.filter(r => r.status === 'admin_rejected' || r.status === 'mentor_rejected').length}</div>
-            <div className="text-xs text-gray-400">Denied</div>
-          </div>
-          <div className="bg-white rounded-xl shadow border border-gray-100 p-6 flex flex-col items-center">
-            <div className="bg-blue-100 text-blue-700 rounded-full w-10 h-10 flex items-center justify-center mb-2">
-              <Users className="h-5 w-5" />
-            </div>
-            <div className="text-xs font-semibold text-gray-500 mb-1">TOTAL</div>
-            <div className="text-2xl font-bold text-gray-900">{requests.length}</div>
-            <div className="text-xs text-gray-400">All requests</div>
-          </div>
-        </div>
+        <Button onClick={fetchRequests} variant="outline" size="sm">
+          <RefreshCw className="mr-2 h-4 w-4" />
+          Refresh
+        </Button>
+      </div>
 
-        {/* Pending Requests */}
-        {pendingRequests.length > 0 && (
-          <div className="mb-8">
-            <div className="flex items-center gap-3 mb-5">
-              <div className="bg-yellow-100 text-yellow-700 border border-yellow-200 rounded-xl w-12 h-12 flex items-center justify-center shadow-sm">
-                <Clock className="h-6 w-6" />
+      {/* Stats */}
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
+        <Card>
+          <CardContent className="p-6">
+            <div className="flex items-center">
+              <Clock className="h-8 w-8 text-yellow-600" />
+              <div className="ml-4">
+                <p className="text-sm font-medium text-muted-foreground">Pending</p>
+                <p className="text-2xl font-bold">{pendingRequests.length}</p>
               </div>
-              <h2 className="text-2xl font-bold text-gray-900">
-                Pending Review ({pendingRequests.length})
-              </h2>
             </div>
-            <div className="grid gap-5">
-              {pendingRequests.map((request, index) => (
-                <div key={request.id}>
-                  <Card className="bg-white border border-yellow-100 rounded-xl shadow-sm hover:shadow-md hover:-translate-y-1 transition-all duration-300">
-                    <CardContent className="p-6">
-                      <div className="flex justify-between items-start mb-5">
-                        <div className="flex items-center gap-4">
-                          <Avatar className="h-14 w-14 ring-2 ring-yellow-100 shadow">
-                            <AvatarFallback className="bg-yellow-200 text-yellow-700 text-lg font-bold">
-                              {request.userName.split(' ').map(part => part[0]).join('').toUpperCase()}
-                            </AvatarFallback>
-                          </Avatar>
-                          <div>
-                            <h3 className="font-bold text-lg text-gray-900">{request.userName}</h3>
-                            <p className="text-xs font-medium text-gray-500 flex items-center gap-1.5 mt-1">
-                              <Mail className="h-3.5 w-3.5 text-yellow-600" />
-                              {request.userEmail}
-                            </p>
-                            <p className="text-xs flex items-center gap-1.5 text-gray-400 mt-1">
-                              <Calendar className="h-3.5 w-3.5 text-yellow-600" />
-                              {request.createdAt && format(request.createdAt, 'PPP')}
-                            </p>
-                          </div>
-                        </div>
-                        <Badge className={`${statusColors[request.status]} shadow-sm px-3 py-1.5 rounded-full font-semibold text-xs`}>
-                          {statusLabels[request.status]}
-                        </Badge>
-                      </div>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardContent className="p-6">
+            <div className="flex items-center">
+              <CheckCircle className="h-8 w-8 text-green-600" />
+              <div className="ml-4">
+                <p className="text-sm font-medium text-muted-foreground">Approved</p>
+                <p className="text-2xl font-bold">
+                  {requests.filter(r => r.status === 'admin_approved' || r.status === 'mentor_approved').length}
+                </p>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardContent className="p-6">
+            <div className="flex items-center">
+              <XCircle className="h-8 w-8 text-red-600" />
+              <div className="ml-4">
+                <p className="text-sm font-medium text-muted-foreground">Rejected</p>
+                <p className="text-2xl font-bold">
+                  {requests.filter(r => r.status === 'admin_rejected' || r.status === 'mentor_rejected').length}
+                </p>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardContent className="p-6">
+            <div className="flex items-center">
+              <Users className="h-8 w-8 text-blue-600" />
+              <div className="ml-4">
+                <p className="text-sm font-medium text-muted-foreground">Total</p>
+                <p className="text-2xl font-bold">{requests.length}</p>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
 
-                    <div className="bg-yellow-50 p-5 rounded-lg mb-5 border border-yellow-100 shadow-sm">
-                      <div className="flex items-center gap-2 mb-3">
-                        <div className="bg-yellow-100 text-yellow-700 border border-yellow-200 rounded-lg w-8 h-8 flex items-center justify-center shadow-sm">
-                          <Users className="h-4 w-4" />
-                        </div>
-                        <p className="font-semibold text-yellow-800">
-                          Wants to connect with: <span className="font-bold text-yellow-900">{request.mentorName}</span>
+      {/* Pending Requests */}
+      {pendingRequests.length > 0 && (
+        <div className="mb-8">
+          <h2 className="text-2xl font-semibold mb-4 text-yellow-600">
+            Pending Review ({pendingRequests.length})
+          </h2>
+          <div className="grid gap-4">
+            {pendingRequests.map((request) => (
+              <Card key={request.id} className="border-yellow-200">
+                <CardContent className="p-6">
+                  <div className="flex justify-between items-start mb-4">
+                    <div className="flex items-center space-x-4">
+                      <Avatar className="h-12 w-12">
+                        <AvatarFallback>
+                          <User className="h-6 w-6" />
+                        </AvatarFallback>
+                      </Avatar>
+                      <div>
+                        <h3 className="font-semibold text-lg">{request.userName}</h3>
+                        <p className="text-sm text-muted-foreground flex items-center">
+                          <Mail className="mr-1 h-3 w-3" />
+                          {request.userEmail}
+                        </p>
+                        <p className="text-xs text-muted-foreground flex items-center mt-1">
+                          <Calendar className="mr-1 h-3 w-3" />
+                          {request.createdAt && format(request.createdAt, 'PPP')}
                         </p>
                       </div>
-                      <div className="bg-white p-4 rounded border border-yellow-100">
-                        <div className="flex items-start gap-2">
-                          <MessageSquare className="h-4 w-4 text-yellow-600 mt-1 flex-shrink-0" />
-                          <p className="text-gray-700 italic">
-                            "{request.requestMessage}"
-                          </p>
-                        </div>
-                      </div>
                     </div>
+                    <Badge className={statusColors[request.status]}>
+                      {statusLabels[request.status]}
+                    </Badge>
+                  </div>
 
-                    <div className="flex flex-wrap sm:flex-nowrap gap-3">
-                      <Button
-                        onClick={() => handleAction(request, 'approve')}
-                        disabled={processingRequestId === request.id}
-                        className="bg-green-600 hover:bg-green-700 text-white border-0 transition-all duration-200 shadow-sm hover:shadow-md w-full sm:w-auto rounded-full"
-                      >
-                        {processingRequestId === request.id ? (
-                          <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                        ) : (
-                          <CheckCircle className="mr-2 h-5 w-5" />
-                        )}
-                        Approve & Forward
-                      </Button>
-                      <Button
-                        onClick={() => handleAction(request, 'reject')}
-                        disabled={processingRequestId === request.id}
-                        variant="outline"
-                        className="border-red-200 hover:border-red-400 bg-white hover:bg-red-50 text-red-700 hover:text-red-800 transition-all duration-200 w-full sm:w-auto rounded-full"
-                      >
-                        <XCircle className="mr-2 h-5 w-5" />
-                        Reject
-                      </Button>
-                    </div>
-                  </CardContent>
-                </Card>
-                </div>
-              ))}
-            </div>
-          </div>
-        )}
+                  <div className="bg-muted/50 p-4 rounded-lg mb-4">
+                    <p className="font-medium mb-2">Wants to connect with: {request.mentorName}</p>
+                    <p className="text-sm text-muted-foreground">
+                      <MessageSquare className="inline mr-1 h-3 w-3" />
+                      {request.requestMessage}
+                    </p>
+                  </div>
 
-        {/* Processed Requests */}
-        {processedRequests.length > 0 && (
-          <div className="mb-8">
-            <div className="flex items-center gap-3 mb-5">
-              <div className="bg-blue-100 text-blue-700 border border-blue-200 rounded-xl w-12 h-12 flex items-center justify-center shadow-sm">
-                <CheckCircle className="h-6 w-6" />
-              </div>
-              <h2 className="text-2xl font-bold text-gray-900">
-                Processed Requests ({processedRequests.length})
-              </h2>
-            </div>
-            <div className="grid gap-5">
-              {processedRequests.map((request, index) => (
-                <div key={request.id}>
-                  <Card className="bg-white border border-blue-100 rounded-xl shadow-sm hover:shadow-md transition-all duration-300">
-                    <CardContent className="p-6">
-                      <div className="flex justify-between items-start">
-                        <div className="flex items-center gap-4">
-                          <Avatar className="h-14 w-14 ring-2 ring-blue-100 shadow">
-                            <AvatarFallback className={`bg-blue-200 text-blue-700 text-lg font-bold`}>
-                              {request.userName.split(' ').map(part => part[0]).join('').toUpperCase()}
-                            </AvatarFallback>
-                          </Avatar>
-                          <div>
-                            <h3 className="font-bold text-lg text-gray-900">{request.userName}</h3>
-                            <p className="text-xs font-medium text-gray-500 flex items-center gap-1.5 mt-1">
-                              <span className="bg-blue-100 text-blue-600 w-5 h-5 rounded-full flex items-center justify-center text-xs shadow-sm">→</span>
-                              {request.mentorName}
-                            </p>
-                            <p className="text-xs flex items-center gap-1.5 text-gray-400 mt-1">
-                              <Calendar className="h-3 w-3 text-blue-500" />
-                              {request.adminProcessedAt && format(request.adminProcessedAt, 'PPP')}
-                            </p>
-                          </div>
-                        </div>
-                        <Badge className={`${statusColors[request.status]} shadow-sm px-3 py-1.5 rounded-full font-medium text-xs`}>
-                          {statusLabels[request.status]}
-                        </Badge>
-                      </div>
-                      {request.adminNotes && (
-                        <div className="mt-4 p-4 bg-blue-50 rounded-lg border border-blue-100 shadow-sm text-sm">
-                          <div className="flex items-center gap-2 mb-2">
-                            <div className="bg-blue-100 text-blue-700 border border-blue-200 rounded-lg w-7 h-7 flex items-center justify-center shadow-sm">
-                              <MessageSquare className="h-4 w-4" />
-                            </div>
-                            <p className="font-semibold text-blue-800">Admin Notes:</p>
-                          </div>
-                          <p className="text-gray-700 pl-9">{request.adminNotes}</p>
-                        </div>
+                  <div className="flex space-x-2">
+                    <Button
+                      onClick={() => handleAction(request, 'approve')}
+                      disabled={processingRequestId === request.id}
+                      className="bg-green-600 hover:bg-green-700"
+                    >
+                      {processingRequestId === request.id ? (
+                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                      ) : (
+                        <CheckCircle className="mr-2 h-4 w-4" />
                       )}
-                    </CardContent>
-                  </Card>
-                </div>
-              ))}
-            </div>
+                      Approve & Forward
+                    </Button>
+                    <Button
+                      onClick={() => handleAction(request, 'reject')}
+                      disabled={processingRequestId === request.id}
+                      variant="destructive"
+                    >
+                      <XCircle className="mr-2 h-4 w-4" />
+                      Reject
+                    </Button>
+                  </div>
+                </CardContent>
+              </Card>
+            ))}
           </div>
-        )}
+        </div>
+      )}
 
-        {requests.length === 0 && (
-          <div className="text-center py-16 bg-white border border-blue-100 rounded-2xl shadow-md">
-            <div className="bg-blue-100 text-blue-700 border border-blue-200 rounded-full w-24 h-24 flex items-center justify-center mx-auto mb-6 shadow-lg">
-              <Users className="h-12 w-12" />
-            </div>
-            <h3 className="text-2xl font-bold text-gray-700 mb-3">No mentor requests yet</h3>
-            <p className="text-lg text-gray-500 max-w-md mx-auto font-medium">
-              Requests will appear here when students submit mentor selection requests.
-            </p>
-          </div>
-        )}
-
-        {/* Action Dialog */}
-        <Dialog open={isDialogOpen} onOpenChange={closeDialogs}>
-          <DialogContent className="bg-white border border-gray-200 shadow-lg rounded-2xl max-w-lg">
-            <DialogHeader>
-              <DialogTitle className={`text-2xl font-bold ${actionType === 'approve' ? 'text-green-700' : 'text-red-700'} flex items-center gap-2`}>
-                <div className={`${actionType === 'approve' 
-                  ? 'bg-green-100 text-green-700 border-green-200' 
-                  : 'bg-red-100 text-red-700 border-red-200'} 
-                  border rounded-lg w-8 h-8 flex items-center justify-center shadow-sm`}>
-                  {actionType === 'approve' 
-                    ? <CheckCircle className="h-5 w-5" /> 
-                    : <XCircle className="h-5 w-5" />}
-                </div>
-                {actionType === 'approve' ? 'Approve' : 'Reject'} Mentor Request
-              </DialogTitle>
-              <DialogDescription className="text-gray-600">
-                {actionType === 'approve' 
-                  ? 'This will forward the request to the mentor for final approval.'
-                  : 'This will reject the request and notify the student.'
-                }
-              </DialogDescription>
-            </DialogHeader>
-            {selectedRequest && (
-              <div className="space-y-5">
-                <div className={`p-5 rounded-lg ${actionType === 'approve' 
-                  ? 'bg-green-50 border border-green-100' 
-                  : 'bg-red-50 border border-red-100'}`}>
-                  <div className="flex items-center gap-3 mb-3">
-                    <Avatar className="h-12 w-12 ring-2 ring-white shadow-sm">
-                      <AvatarFallback className={`${actionType === 'approve' 
-                        ? 'bg-green-200 text-green-700' 
-                        : 'bg-red-200 text-red-700'} text-md font-bold`}>
-                        {selectedRequest.userName.split(' ').map(part => part[0]).join('').toUpperCase()}
-                      </AvatarFallback>
-                    </Avatar>
-                    <div>
-                      <p className="font-bold text-gray-800">{selectedRequest.userName}</p>
-                      <div className="flex items-center gap-1.5 mt-0.5">
-                        <span className="text-gray-600">wants to connect with</span>
-                        <span className="font-semibold text-gray-800">{selectedRequest.mentorName}</span>
+      {/* Processed Requests */}
+      {processedRequests.length > 0 && (
+        <div>
+          <h2 className="text-2xl font-semibold mb-4">
+            Processed Requests ({processedRequests.length})
+          </h2>
+          <div className="grid gap-4">
+            {processedRequests.map((request) => (
+              <Card key={request.id} className="opacity-75">
+                <CardContent className="p-6">
+                  <div className="flex justify-between items-start">
+                    <div className="flex items-center space-x-4">
+                      <Avatar className="h-10 w-10">
+                        <AvatarFallback>
+                          <User className="h-5 w-5" />
+                        </AvatarFallback>
+                      </Avatar>
+                      <div>
+                        <h3 className="font-medium">{request.userName}</h3>
+                        <p className="text-sm text-muted-foreground">
+                          → {request.mentorName}
+                        </p>
+                        <p className="text-xs text-muted-foreground">
+                          {request.adminProcessedAt && format(request.adminProcessedAt, 'PPP')}
+                        </p>
                       </div>
                     </div>
+                    <Badge className={statusColors[request.status]}>
+                      {statusLabels[request.status]}
+                    </Badge>
                   </div>
-                  <div className="bg-white p-4 rounded border border-gray-100 mt-3">
-                    <p className="text-gray-700 italic">"{selectedRequest.requestMessage}"</p>
-                  </div>
-                </div>
-                <div>
-                  <div className="flex items-center gap-2 mb-2">
-                    <MessageSquare className={`h-4 w-4 ${actionType === 'approve' ? 'text-green-600' : 'text-red-600'}`} />
-                    <label className="font-semibold text-gray-800">
-                      {actionType === 'approve' ? 'Additional notes (optional)' : 'Rejection reason'}
-                    </label>
-                  </div>
-                  <Textarea
-                    value={notes}
-                    onChange={(e) => setNotes(e.target.value)}
-                    placeholder={
-                      actionType === 'approve' 
-                        ? 'Any additional notes for the mentor...'
-                        : 'Please provide a reason for rejection...'
-                    }
-                    className={`border ${actionType === 'approve' 
-                      ? 'focus:border-green-300 focus:ring-green-200' 
-                      : 'focus:border-red-300 focus:ring-red-200'} rounded-lg shadow-sm`}
-                  />
-                </div>
-              </div>
-            )}
-            <DialogFooter className="gap-2 sm:gap-0 mt-2">
-              <Button 
-                variant="outline" 
-                onClick={closeDialogs}
-                className="border-gray-200 hover:bg-gray-100 text-gray-700 transition-colors w-full sm:w-auto"
-              >
-                Cancel
-              </Button>
-              <Button
-                onClick={confirmAction}
-                className={`${actionType === 'approve'
-                  ? 'bg-green-600 hover:bg-green-700 text-white'
-                  : 'bg-red-600 hover:bg-red-700 text-white'} 
-                  border-0 transition-all duration-200 shadow-sm hover:shadow-md w-full sm:w-auto`}
-              >
-                {actionType === 'approve' ? 'Approve & Forward' : 'Reject Request'}
-              </Button>
-            </DialogFooter>
-          </DialogContent>
-        </Dialog>
+                  {request.adminNotes && (
+                    <div className="mt-3 p-3 bg-muted/30 rounded text-sm">
+                      <strong>Admin Notes:</strong> {request.adminNotes}
+                    </div>
+                  )}
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+        </div>
+      )}
 
-        {/* Confirmation Dialog */}
-        <AlertDialog open={isConfirmDialogOpen} onOpenChange={closeDialogs}>
-          <AlertDialogContent className="bg-white border border-gray-200 shadow-lg rounded-2xl">
-            <AlertDialogHeader>
-              <AlertDialogTitle className="text-xl font-bold flex items-center gap-2">
-                <div className="bg-yellow-100 text-yellow-700 border-yellow-200 border rounded-lg w-8 h-8 flex items-center justify-center shadow-sm">
-                  <AlertTriangle className="h-4 w-4" />
-                </div>
-                Confirm {actionType === 'approve' ? 'Approval' : 'Rejection'}
-              </AlertDialogTitle>
-              <AlertDialogDescription className="text-gray-600">
-                Are you sure you want to <span className={`font-medium ${actionType === 'approve' ? 'text-green-600' : 'text-red-600'}`}>{actionType}</span> this mentor request? This action cannot be undone.
-              </AlertDialogDescription>
-            </AlertDialogHeader>
-            <AlertDialogFooter className="gap-2 sm:gap-0">
-              <AlertDialogCancel className="border-gray-200 hover:bg-gray-100 text-gray-700 transition-colors font-medium">
-                Cancel
-              </AlertDialogCancel>
-              <AlertDialogAction 
-                onClick={processRequest}
-                className={`${actionType === 'approve'
-                  ? 'bg-green-600 hover:bg-green-700'
-                  : 'bg-red-600 hover:bg-red-700'} 
-                  text-white border-0 transition-all duration-200 shadow-sm hover:shadow-md font-medium`}
-              >
-                {actionType === 'approve' ? 'Yes, Approve' : 'Yes, Reject'}
-              </AlertDialogAction>
-            </AlertDialogFooter>
-          </AlertDialogContent>
-        </AlertDialog>
-      </div>
+      {requests.length === 0 && (
+        <div className="text-center py-12">
+          <Users className="mx-auto h-12 w-12 text-muted-foreground mb-4" />
+          <h3 className="text-lg font-medium mb-2">No mentor requests yet</h3>
+          <p className="text-muted-foreground">
+            Requests will appear here when students submit mentor selection requests.
+          </p>
+        </div>
+      )}
+
+      {/* Action Dialog */}
+      <Dialog open={isDialogOpen} onOpenChange={closeDialogs}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>
+              {actionType === 'approve' ? 'Approve' : 'Reject'} Mentor Request
+            </DialogTitle>
+            <DialogDescription>
+              {actionType === 'approve' 
+                ? 'This will forward the request to the mentor for final approval.'
+                : 'This will reject the request and notify the student.'
+              }
+            </DialogDescription>
+          </DialogHeader>
+          
+          {selectedRequest && (
+            <div className="space-y-4">
+              <div className="bg-muted/50 p-4 rounded-lg">
+                <p><strong>Student:</strong> {selectedRequest.userName}</p>
+                <p><strong>Mentor:</strong> {selectedRequest.mentorName}</p>
+                <p className="mt-2 text-sm">{selectedRequest.requestMessage}</p>
+              </div>
+              
+              <div>
+                <label className="text-sm font-medium">
+                  {actionType === 'approve' ? 'Additional notes (optional)' : 'Rejection reason'}
+                </label>
+                <Textarea
+                  value={notes}
+                  onChange={(e) => setNotes(e.target.value)}
+                  placeholder={
+                    actionType === 'approve' 
+                      ? 'Any additional notes for the mentor...'
+                      : 'Please provide a reason for rejection...'
+                  }
+                  className="mt-2"
+                />
+              </div>
+            </div>
+          )}
+          
+          <DialogFooter>
+            <Button variant="outline" onClick={closeDialogs}>
+              Cancel
+            </Button>
+            <Button
+              onClick={confirmAction}
+              variant={actionType === 'approve' ? 'default' : 'destructive'}
+            >
+              {actionType === 'approve' ? 'Approve & Forward' : 'Reject Request'}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Confirmation Dialog */}
+      <AlertDialog open={isConfirmDialogOpen} onOpenChange={closeDialogs}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Confirm Action</AlertDialogTitle>
+            <AlertDialogDescription>
+              Are you sure you want to {actionType} this mentor request? This action cannot be undone.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction onClick={processRequest}>
+              Confirm
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }

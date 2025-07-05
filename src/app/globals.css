@@ -1,124 +1,84 @@
-﻿/* Import Admin Typography System */
-@import '../styles/admin-typography-system.css';
-
-@tailwind base;
+﻿@tailwind base;
 @tailwind components;
 @tailwind utilities;
 
-@layer utilities {
-  .custom-scrollbar::-webkit-scrollbar {
-    width: 6px;
-  }
-  .custom-scrollbar::-webkit-scrollbar-track {
-    background: #f1f5f9;
-    border-radius: 100vh;
-  }
-  .custom-scrollbar::-webkit-scrollbar-thumb {
-    background: #cbd5e1;
-    border-radius: 100vh;
-  }
-  .custom-scrollbar::-webkit-scrollbar-thumb:hover {
-    background: #94a3b8;
-  }
-}
-
 @layer base {
   :root {
-    /* Enhanced Professional Light Theme Variables */
+    /* Light theme variables */
     --background: 0 0% 100%;
-    --foreground: 222.2 84% 4.9%;
+    --foreground: 0 0% 3.9%;
     --card: 0 0% 100%;
-    --card-foreground: 222.2 84% 4.9%;
+    --card-foreground: 0 0% 3.9%;
     --popover: 0 0% 100%;
-    --popover-foreground: 222.2 84% 4.9%;
-    --primary: 221.2 83.2% 53.3%;
-    --primary-foreground: 210 40% 98%;
-    --secondary: 210 40% 96%;
-    --secondary-foreground: 222.2 84% 4.9%;
-    --muted: 210 40% 96%;
-    --muted-foreground: 215.4 16.3% 46.9%;
-    --accent: 210 40% 96%;
-    --accent-foreground: 222.2 84% 4.9%;
+    --popover-foreground: 0 0% 3.9%;
+    --primary: 195 95% 45%;
+    --primary-foreground: 0 0% 98%;
+    --secondary: 0 0% 96.1%;
+    --secondary-foreground: 0 0% 9%;
+    --muted: 0 0% 96.1%;
+    --muted-foreground: 0 0% 45.1%;
+    --accent: 270 90% 55%;
+    --accent-foreground: 0 0% 98%;
     --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 210 40% 98%;
-    --border: 214.3 31.8% 91.4%;
-    --input: 214.3 31.8% 91.4%;
-    --ring: 221.2 83.2% 53.3%;
+    --destructive-foreground: 0 0% 98%;
+    --border: 0 0% 89.8%;
+    --input: 0 0% 89.8%;
+    --ring: 270 90% 55%;
     --radius: 0.75rem;
     --radius-md: calc(var(--radius) - 2px);
     --radius-lg: calc(var(--radius) - 4px);
-    --chart-1: 221.2 83.2% 53.3%;
-    --chart-2: 262.1 83.3% 57.8%;
-    --chart-3: 270 95.2% 75.3%;
-    --chart-4: 280 87.3% 68.6%;
-    --chart-5: 340 75% 55%;
-    
-    /* Enhanced Sidebar Variables for Professional Look */
+    --chart-1: 195 95% 45%;
+    --chart-2: 270 90% 60%;
+    --chart-3: 220 80% 65%;
+    --chart-4: 30 70% 55%;
+    --chart-5: 0 0% 50%;
     --sidebar-background: 0 0% 98%;
-    --sidebar-foreground: 222.2 84% 4.9%;
-    --sidebar-primary: 221.2 83.2% 53.3%;
-    --sidebar-primary-foreground: 210 40% 98%;
-    --sidebar-accent: 210 40% 94%;
-    --sidebar-accent-foreground: 222.2 84% 4.9%;
-    --sidebar-border: 214.3 31.8% 91.4%;
-    --sidebar-ring: 221.2 83.2% 53.3%;
-    
-    /* Professional Color Palette */
-    --admin-primary: 221.2 83.2% 53.3%;
-    --admin-primary-light: 214 95% 93%;
-    --admin-secondary: 210 40% 96%;
-    --admin-accent: 262.1 83.3% 57.8%;
-    --admin-success: 142.1 76.2% 36.3%;
-    --admin-warning: 32.6 94.6% 43.7%;
-    --admin-error: 0 84.2% 60.2%;
-    
-    /* Enhanced Spacing and Effects */
-    --admin-shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
-    --admin-shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
-    --admin-shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
-    --admin-shadow-xl: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
-    --admin-shadow-2xl: 0 25px 50px -12px rgb(0 0 0 / 0.25);
-    
-    /* Glassmorphism Effects */
-    --admin-glass-bg: rgba(255, 255, 255, 0.25);
-    --admin-glass-border: rgba(255, 255, 255, 0.18);
-    --admin-glass-blur: blur(20px);
+    --sidebar-foreground: 0 0% 9%;
+    --sidebar-primary: 195 95% 45%;
+    --sidebar-primary-foreground: 0 0% 98%;
+    --sidebar-accent: 0 0% 94%;
+    --sidebar-accent-foreground: 0 0% 9%;
+    --sidebar-border: 0 0% 90%;
+    --sidebar-ring: 270 90% 55%;
+    --color-approved: #10B981;
+    --color-pending: #F59E0B;
+    --color-rejected: #EF4444;
   }
 
   .dark {
-    /* Keep dark theme values but we'll primarily use light theme */
-    --background: 222.2 84% 4.9%;
-    --foreground: 210 40% 98%;
-    --card: 222.2 84% 4.9%;
-    --card-foreground: 210 40% 98%;
-    --popover: 222.2 84% 4.9%;
-    --popover-foreground: 210 40% 98%;
-    --primary: 217.2 91.2% 59.8%;
-    --primary-foreground: 222.2 84% 4.9%;
-    --secondary: 217.2 32.6% 17.5%;
-    --secondary-foreground: 210 40% 98%;
-    --muted: 217.2 32.6% 17.5%;
-    --muted-foreground: 215 20.2% 65.1%;
-    --accent: 217.2 32.6% 17.5%;
-    --accent-foreground: 210 40% 98%;
-    --destructive: 0 62.8% 30.6%;
-    --destructive-foreground: 210 40% 98%;
-    --border: 217.2 32.6% 17.5%;
-    --input: 217.2 32.6% 17.5%;
-    --ring: 224.3 76.3% 94.1%;
-    --chart-1: 220 70% 50%;
-    --chart-2: 160 60% 45%;
-    --chart-3: 30 80% 55%;
-    --chart-4: 280 65% 60%;
-    --chart-5: 340 75% 55%;
-    --sidebar-background: 222.2 84% 4.9%;
-    --sidebar-foreground: 210 40% 98%;
-    --sidebar-primary: 217.2 91.2% 59.8%;
-    --sidebar-primary-foreground: 222.2 84% 4.9%;
-    --sidebar-accent: 217.2 32.6% 17.5%;
-    --sidebar-accent-foreground: 210 40% 98%;
-    --sidebar-border: 217.2 32.6% 17.5%;
-    --sidebar-ring: 224.3 76.3% 94.1%;
+    --background: 0 0% 0%;
+    --foreground: 0 0% 100%;
+    --card: 0 0% 5%;
+    --card-foreground: 0 0% 100%;
+    --popover: 0 0% 3%;
+    --popover-foreground: 0 0% 100%;
+    --primary: 195 100% 75%;
+    --primary-foreground: 0 0% 0%;
+    --secondary: 0 0% 15%;
+    --secondary-foreground: 0 0% 95%;
+    --muted: 240 4% 15%;
+    --muted-foreground: 0 0% 80%;
+    --accent: 270 90% 65%;
+    --accent-foreground: 0 0% 100%;
+    --destructive: 0 70% 55%;
+    --destructive-foreground: 0 0% 100%;
+    --border: 0 0% 25%;
+    --input: 0 0% 25%;
+    --ring: 270 90% 65%;
+    --radius: 0.75rem;
+    --chart-1: 195 100% 75%;
+    --chart-2: 270 90% 65%;
+    --chart-3: 220 80% 70%;
+    --chart-4: 300 70% 60%;
+    --chart-5: 0 0% 60%;
+    --sidebar-background: 0 0% 3%;
+    --sidebar-foreground: 0 0% 100%;
+    --sidebar-primary: 195 100% 75%;
+    --sidebar-primary-foreground: 0 0% 0%;
+    --sidebar-accent: 0 0% 10%;
+    --sidebar-accent-foreground: 0 0% 100%;
+    --sidebar-border: 0 0% 12%;
+    --sidebar-ring: 270 90% 65%;
   }
 
   * {
@@ -155,42 +115,6 @@
 
 ::-webkit-scrollbar-thumb:hover {
   background-color: hsl(var(--muted-foreground) / 0.5);
-}
-
-/* Hide scrollbars for sidebar */
-.scrollbar-hide {
-  -ms-overflow-style: none;  /* Internet Explorer 10+ */
-  scrollbar-width: none;  /* Firefox */
-  overflow-y: auto;
-}
-
-.scrollbar-hide::-webkit-scrollbar {
-  display: none;  /* Safari and Chrome */
-  width: 0px;
-  background: transparent;
-}
-
-/* Sidebar specific scrollbar removal */
-.sidebar-scroll {
-  -webkit-overflow-scrolling: touch;
-  overflow-y: auto;
-  scrollbar-width: none;
-  -ms-overflow-style: none;
-}
-
-.sidebar-scroll::-webkit-scrollbar {
-  width: 0px;
-  height: 0px;
-  background: transparent;
-}
-
-.sidebar-scroll::-webkit-scrollbar-track {
-  background: transparent;
-}
-
-.sidebar-scroll::-webkit-scrollbar-thumb {
-  background: transparent;
-  border: none;
 }
 
 /* Ensure full-height containers */
@@ -272,396 +196,4 @@ main {
 .backdrop-blur-enhanced {
   backdrop-filter: blur(12px) saturate(180%);
   -webkit-backdrop-filter: blur(12px) saturate(180%);
-}
-
-/* Enhanced sidebar animations */
-.sidebar-shimmer {
-  position: relative;
-  overflow: hidden;
-}
-.sidebar-shimmer::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: -100%;
-  width: 100%;
-  height: 100%;
-  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.4), transparent);
-  transition: left 0.5s;
-}
-.sidebar-shimmer:hover::before {
-  left: 100%;
-}
-
-/* Shimmer effect for sidebar icons */
-.shimmer-effect {
-  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.6), transparent);
-  background-size: 200% 100%;
-  animation: shimmer-move 2s ease-in-out infinite;
-}
-
-@keyframes shimmer-move {
-  0% { background-position: -200% 0; }
-  100% { background-position: 200% 0; }
-}
-
-/* Sidebar pulse effect for visibility */
-.sidebar-pulse {
-  animation: sidebar-glow 3s ease-in-out infinite;
-}
-
-@keyframes sidebar-glow {
-  0%, 100% { 
-    box-shadow: 0 20px 40px rgba(0,0,0,0.06), 0 8px 16px rgba(59,130,246,0.08);
-  }
-  50% { 
-    box-shadow: 0 25px 50px rgba(0,0,0,0.08), 0 10px 20px rgba(59,130,246,0.12);
-  }
-}
-
-/* ===== PROFESSIONAL ADMIN THEME SYSTEM ===== */
-
-/* Global admin theme foundation */
-.admin-theme {
-  background: linear-gradient(135deg, #f8fafc 0%, #e0f2fe 30%, #dbeafe 70%, #f0f9ff 100%);
-  min-height: 100vh;
-  color: hsl(var(--foreground));
-}
-
-/* Professional card system */
-.admin-card {
-  background: rgba(255, 255, 255, 0.98);
-  backdrop-filter: blur(20px);
-  border: 1px solid rgba(226, 232, 240, 0.6);
-  border-radius: 1.5rem;
-  box-shadow: var(--admin-shadow-lg);
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-}
-
-.admin-card:hover {
-  transform: translateY(-4px);
-  box-shadow: var(--admin-shadow-2xl);
-  border-color: hsl(var(--admin-primary) / 0.3);
-}
-
-/* Enhanced glass morphism */
-.admin-glass {
-  background: var(--admin-glass-bg);
-  backdrop-filter: var(--admin-glass-blur);
-  border: 1px solid var(--admin-glass-border);
-  box-shadow: 0 8px 32px rgba(31, 38, 135, 0.15);
-}
-
-/* Professional button system */
-.admin-btn {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 0.5rem;
-  padding: 0.75rem 1.5rem;
-  border-radius: 1rem;
-  font-weight: 600;
-  font-size: 0.875rem;
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  box-shadow: var(--admin-shadow-md);
-}
-
-.admin-btn-primary {
-  background: linear-gradient(135deg, hsl(var(--admin-primary)) 0%, hsl(var(--admin-accent)) 100%);
-  color: white;
-  border: 2px solid transparent;
-}
-
-.admin-btn-primary:hover {
-  transform: translateY(-2px);
-  box-shadow: var(--admin-shadow-xl);
-  background: linear-gradient(135deg, hsl(var(--admin-primary) / 0.9) 0%, hsl(var(--admin-accent) / 0.9) 100%);
-}
-
-.admin-btn-secondary {
-  background: rgba(255, 255, 255, 0.9);
-  color: hsl(var(--foreground));
-  border: 2px solid hsl(var(--border));
-  backdrop-filter: blur(8px);
-}
-
-.admin-btn-secondary:hover {
-  transform: translateY(-2px);
-  background: rgba(255, 255, 255, 1);
-  border-color: hsl(var(--admin-primary) / 0.5);
-  box-shadow: var(--admin-shadow-xl);
-}
-
-/* Professional table system */
-.admin-table {
-  width: 100%;
-  border-collapse: collapse;
-  background: rgba(255, 255, 255, 0.98);
-  border-radius: 1rem;
-  overflow: hidden;
-  box-shadow: var(--admin-shadow-lg);
-}
-
-.admin-table th {
-  background: linear-gradient(135deg, rgba(249, 250, 251, 0.9) 0%, rgba(255, 255, 255, 0.8) 50%, rgba(239, 246, 255, 0.9) 100%);
-  backdrop-filter: blur(8px);
-  padding: 1.5rem;
-  text-align: left;
-  font-weight: 800;
-  font-size: 0.75rem;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-  color: hsl(var(--foreground));
-  border-bottom: 2px solid hsl(var(--border));
-}
-
-.admin-table td {
-  padding: 1.5rem;
-  border-bottom: 1px solid hsl(var(--border) / 0.5);
-  transition: all 0.3s ease;
-}
-
-.admin-table tr:hover td {
-  background: linear-gradient(135deg, rgba(239, 246, 255, 0.4) 0%, rgba(255, 255, 255, 0.3) 50%, rgba(224, 242, 254, 0.4) 100%);
-}
-
-/* Status badges */
-.admin-badge {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.5rem;
-  padding: 0.5rem 1rem;
-  border-radius: 1rem;
-  font-weight: 700;
-  font-size: 0.75rem;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-  border: 2px solid;
-  box-shadow: var(--admin-shadow-sm);
-  transition: all 0.3s ease;
-}
-
-.admin-badge:hover {
-  transform: translateY(-1px);
-  box-shadow: var(--admin-shadow-md);
-}
-
-.admin-badge-success {
-  background: linear-gradient(135deg, #d1fae5 0%, #a7f3d0 100%);
-  color: #059669;
-  border-color: #6ee7b7;
-}
-
-.admin-badge-warning {
-  background: linear-gradient(135deg, #fef3c7 0%, #fed7aa 100%);
-  color: #d97706;
-  border-color: #fbbf24;
-}
-
-.admin-badge-error {
-  background: linear-gradient(135deg, #fecaca 0%, #fca5a5 100%);
-  color: #dc2626;
-  border-color: #f87171;
-}
-
-.admin-badge-info {
-  background: linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%);
-  color: #1e40af;
-  border-color: #93c5fd;
-}
-
-.admin-badge-neutral {
-  background: linear-gradient(135deg, #e0e7ff 0%, #c7d2fe 100%);
-  color: #4338ca;
-  border-color: #a5b4fc;
-}
-
-/* Professional header system */
-.admin-header {
-  background: linear-gradient(135deg, rgba(239, 246, 255, 0.8) 0%, rgba(255, 255, 255, 0.9) 50%, rgba(224, 242, 254, 0.8) 100%);
-  backdrop-filter: blur(20px);
-  border: 1px solid rgba(226, 232, 240, 0.5);
-  border-radius: 1.5rem;
-  padding: 2rem;
-  margin-bottom: 2rem;
-}
-
-.admin-header h1 {
-  font-size: 3rem;
-  font-weight: 900;
-  margin-bottom: 1rem;
-  background: linear-gradient(135deg, #1e40af 0%, #4338ca 50%, #7c3aed 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-  letter-spacing: -0.025em;
-}
-
-.admin-header p {
-  font-size: 1.25rem;
-  font-weight: 600;
-  color: hsl(var(--muted-foreground));
-}
-
-/* Professional icon containers */
-.admin-icon {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 3.5rem;
-  height: 3.5rem;
-  border-radius: 1.5rem;
-  font-size: 1.5rem;
-  font-weight: 700;
-  box-shadow: var(--admin-shadow-lg);
-  border: 2px solid;
-  transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
-}
-
-.admin-icon:hover {
-  transform: scale(1.1) rotate(6deg);
-  box-shadow: var(--admin-shadow-xl);
-}
-
-.admin-icon-blue {
-  background: linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%);
-  color: #1d4ed8;
-  border-color: #93c5fd;
-}
-
-.admin-icon-green {
-  background: linear-gradient(135deg, #d1fae5 0%, #a7f3d0 100%);
-  color: #059669;
-  border-color: #6ee7b7;
-}
-
-.admin-icon-amber {
-  background: linear-gradient(135deg, #fef3c7 0%, #fed7aa 100%);
-  color: #d97706;
-  border-color: #fbbf24;
-}
-
-.admin-icon-red {
-  background: linear-gradient(135deg, #fecaca 0%, #fca5a5 100%);
-  color: #dc2626;
-  border-color: #f87171;
-}
-
-/* Professional animations */
-@keyframes admin-shimmer {
-  0% { background-position: -200px 0; }
-  100% { background-position: calc(200px + 100%) 0; }
-}
-
-.admin-shimmer {
-  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.4), transparent);
-  background-size: 200px 100%;
-  animation: admin-shimmer 2s infinite;
-}
-
-@keyframes admin-float {
-  0%, 100% { transform: translateY(0px); }
-  50% { transform: translateY(-8px); }
-}
-
-.admin-float {
-  animation: admin-float 3s ease-in-out infinite;
-}
-
-@keyframes admin-pulse-glow {
-  0%, 100% { box-shadow: 0 0 5px rgba(59, 130, 246, 0.5); }
-  50% { box-shadow: 0 0 20px rgba(59, 130, 246, 0.8), 0 0 30px rgba(59, 130, 246, 0.6); }
-}
-
-.admin-pulse-glow {
-  animation: admin-pulse-glow 2s ease-in-out infinite;
-}
-
-/* Professional layout utilities */
-.admin-container {
-  max-width: 1400px;
-  margin: 0 auto;
-  padding: 2rem;
-}
-
-.admin-grid {
-  display: grid;
-  gap: 2rem;
-}
-
-.admin-grid-auto {
-  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-}
-
-.admin-grid-2 {
-  grid-template-columns: repeat(2, 1fr);
-}
-
-.admin-grid-3 {
-  grid-template-columns: repeat(3, 1fr);
-}
-
-.admin-grid-4 {
-  grid-template-columns: repeat(4, 1fr);
-}
-
-/* Responsive design */
-@media (max-width: 768px) {
-  .admin-grid-2,
-  .admin-grid-3,
-  .admin-grid-4 {
-    grid-template-columns: 1fr;
-  }
-  
-  .admin-header h1 {
-    font-size: 2rem;
-  }
-  
-  .admin-btn {
-    padding: 0.5rem 1rem;
-    font-size: 0.75rem;
-  }
-  
-  .admin-table th,
-  .admin-table td {
-    padding: 1rem;
-  }
-}
-
-/* Accessibility improvements */
-.admin-focus:focus {
-  outline: 2px solid hsl(var(--admin-primary));
-  outline-offset: 2px;
-}
-
-.admin-sr-only {
-  position: absolute;
-  width: 1px;
-  height: 1px;
-  padding: 0;
-  margin: -1px;
-  overflow: hidden;
-  clip: rect(0, 0, 0, 0);
-  white-space: nowrap;
-  border: 0;
-}
-
-/* Professional scrollbar */
-.admin-scrollbar::-webkit-scrollbar {
-  width: 8px;
-  height: 8px;
-}
-
-.admin-scrollbar::-webkit-scrollbar-track {
-  background: rgba(0, 0, 0, 0.05);
-  border-radius: 4px;
-}
-
-.admin-scrollbar::-webkit-scrollbar-thumb {
-  background: hsl(var(--admin-primary) / 0.3);
-  border-radius: 4px;
-}
-
-.admin-scrollbar::-webkit-scrollbar-thumb:hover {
-  background: hsl(var(--admin-primary) / 0.5);
 }

@@ -14,17 +14,22 @@ import {
   SidebarProvider
 } from "@/components/ui/animated-sidebar";
 import {
+  FileText,
+  LogOut,
   Settings,
   CalendarDays,
+  UserCog,
   BarChart2,
   Home,
   Menu,
+  X,
+  ChevronLeft,
+  ChevronRight,
   Users,
   LayoutDashboard,
   FileCheck,
   MessageSquare,
-  Rocket,
-  ClipboardCheck
+  Rocket // Added Rocket icon
 } from "lucide-react";
 import { InnoNexusLogo } from "@/components/icons/innnexus-logo";
 import { motion } from "framer-motion";
@@ -97,12 +102,6 @@ function AdminLayoutContent({
       disabled: false
     },
     {
-      href: "/admin/evaluation",
-      label: "Evaluation",
-      icon: <ClipboardCheck className="h-5 w-5" />,
-      disabled: false
-    },
-    {
       href: "/admin/settings",
       label: "Settings",
       icon: <Settings className="h-5 w-5" />,
@@ -117,31 +116,29 @@ function AdminLayoutContent({
   };
 
   return (
-    <div className="flex h-screen bg-gray-50 text-gray-900 overflow-hidden admin-typography-system">
-      
+    <div className="flex h-screen bg-neutral-900 text-white overflow-hidden">
       <Sidebar>
         <SidebarBody>
           <DesktopSidebar>
             {/* Logo */}
-            <div className="flex items-center justify-between h-16 px-4 border-b border-gray-200">
+            <div className="flex items-center justify-between h-16 px-4 border-b border-neutral-800">
               <Link href="/admin/dashboard" className="flex items-center space-x-3 min-w-max">
-                <InnoNexusLogo className="h-8 w-8 text-blue-600 flex-shrink-0" />
+                <InnoNexusLogo className="h-8 w-8 text-white flex-shrink-0" />
                 <motion.span
-                  className="admin-heading-5 whitespace-nowrap"
+                  className="text-lg font-semibold whitespace-nowrap text-white"
                   animate={{
                     opacity: open ? 1 : 0,
-                    display: open ? 'flex' : 'none'
+                    display: open ? 'inline-block' : 'none'
                   }}
-                  transition={{ duration: 0.2 }}
                 >
                   Admin Panel
                 </motion.span>
               </Link>
             </div>
 
-            {/* Navigation - Remove scrollbar and perfect spacing */}
-            <nav className="flex-1 overflow-hidden">
-              <div className="space-y-2 h-full overflow-y-auto scrollbar-hide sidebar-scroll pr-1">
+            {/* Navigation */}
+            <nav className="flex-1 overflow-y-auto py-4">
+              <div className="space-y-1 px-2">
                 {navItems.map((item) => (
                   <div key={item.href} className="group relative" title={item.disabled ? 'Coming soon' : ''}>
                     <a
@@ -150,44 +147,26 @@ function AdminLayoutContent({
                         'flex items-center justify-start gap-3 py-3 px-3 rounded-lg transition-colors duration-200',
                         'cursor-pointer',
                         pathname === item.href
-                          ? 'bg-blue-50 text-blue-700 border border-blue-200'
-                          : 'text-gray-700 hover:bg-gray-100 hover:text-gray-900',
-                        item.disabled && 'opacity-50 hover:bg-transparent hover:text-gray-400',
+                          ? 'bg-indigo-900/50 text-white'
+                          : 'text-neutral-300 hover:bg-neutral-800/50 hover:text-white',
+                        item.disabled && 'opacity-50 hover:bg-transparent hover:text-neutral-300',
                         'group/sidebar'
                       )}
                       onClick={(e) => {
                         if (item.disabled) {
                           e.preventDefault();
-                        } else {
-                          handleMobileLinkClick();
                         }
                       }}
                     >
-                      {/* Active indicator */}
-                      {pathname === item.href && (
-                        <div className="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-6 bg-blue-600 rounded-r-full"></div>
-                      )}
-                      
-                      <div className={cn(
-                        'flex items-center justify-center w-10 h-10 rounded-lg transition-all duration-200 flex-shrink-0',
-                        pathname === item.href 
-                          ? 'bg-blue-100 text-blue-600' 
-                          : 'bg-gray-100 text-gray-600 group-hover:bg-gray-200 group-hover:text-gray-700'
-                      )}>
-                        <div className="flex items-center justify-center text-base">
-                          {item.icon}
-                        </div>
-                      </div>
-                      
+                      <span className="text-indigo-400 group-hover/sidebar:text-indigo-300 transition-colors">
+                        {item.icon}
+                      </span>
                       <motion.span
                         animate={{
                           display: 'inline-block',
                           opacity: 1
                         }}
-                        className={cn(
-                          "admin-nav-text transition-all duration-200 whitespace-pre inline-block !p-0 !m-0 relative z-10 min-w-0 flex-1",
-                          pathname === item.href ? 'admin-nav-text-active' : 'group-hover:admin-nav-text-active'
-                        )}
+                        className="text-sm group-hover/sidebar:translate-x-1 transition duration-150 whitespace-pre inline-block !p-0 !m-0"
                       >
                         {item.label}
                       </motion.span>
@@ -198,14 +177,14 @@ function AdminLayoutContent({
             </nav>
 
             {/* Footer */}
-            <div className="mt-4">
+            <div className="p-2">
               <SidebarLink
                 link={{
                   href: "/",
                   label: "Back to Home",
                   icon: <Home className="h-5 w-5" />
                 }}
-                className="text-gray-600 hover:text-gray-800"
+                className="text-neutral-300 hover:bg-neutral-800/50 hover:text-white"
               />
             </div>
           </DesktopSidebar>
@@ -213,62 +192,30 @@ function AdminLayoutContent({
           <MobileSidebar>
             {/* Mobile sidebar content */}
             <div className="flex flex-col h-full">
-              {/* Mobile Logo */}
-              <div className="mb-8 px-3">
-                <div className="flex items-center space-x-3 p-4 bg-white rounded-lg border border-gray-200 shadow-sm">
-                  <div className="p-3 bg-blue-100 rounded-lg">
-                    <InnoNexusLogo className="h-6 w-6 text-blue-600" />
-                  </div>
-                  <div className="flex flex-col">
-                    <span className="admin-heading-5">
-                      Admin Panel
-                    </span>
-                    <span className="admin-caption">
-                      TBI Management
-                    </span>
-                  </div>
-                </div>
-              </div>
-
-              <div className="flex-1 overflow-y-auto scrollbar-hide sidebar-scroll py-2">
-                <div className="space-y-2 px-3">
+              <div className="flex-1 overflow-y-auto py-4">
+                <div className="space-y-1 px-2">
                   {navItems.map((item) => (
                     <div key={`mobile-${item.href}`} className="group relative" title={item.disabled ? 'Coming soon' : ''}>
                       <Link
                         href={item.disabled ? '#' : item.href}
                         className={cn(
-                          "flex items-center px-3 py-3 rounded-lg admin-nav-text transition-colors cursor-pointer",
+                          "flex items-center px-3 py-3 rounded-lg text-sm font-medium transition-colors cursor-pointer",
                           pathname === item.href
-                            ? 'bg-blue-50 text-blue-700 border border-blue-200'
-                            : 'text-gray-700 hover:bg-gray-100 hover:text-gray-900',
-                          item.disabled && 'opacity-50 hover:bg-transparent hover:text-gray-400'
+                            ? 'bg-indigo-900/50 text-white'
+                            : 'text-neutral-300 hover:bg-neutral-800/50 hover:text-white',
+                          item.disabled && 'opacity-50 hover:bg-transparent hover:text-neutral-300'
                         )}
                         onClick={(e) => {
                           if (item.disabled) {
                             e.preventDefault();
                           }
-                          handleMobileLinkClick();
+                          handleMobileLinkClick(); // Close mobile menu on link click
                         }}
                       >
-                        {/* Active indicator */}
-                        {pathname === item.href && (
-                          <div className="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-6 bg-blue-600 rounded-r-full"></div>
-                        )}
-                        
-                        <div className={cn(
-                          'flex items-center justify-center w-10 h-10 rounded-lg transition-all duration-200 border',
-                          pathname === item.href 
-                            ? 'bg-blue-100 text-blue-600 border-blue-200' 
-                            : 'bg-gray-100 text-gray-600 border-gray-200 group-hover:bg-gray-200 group-hover:text-gray-700'
-                        )}>
-                          <div className="flex items-center justify-center text-base">
-                            {item.icon}
-                          </div>
-                        </div>
-                        
-                        <span className="relative z-10 min-w-0 flex-1">
-                          {item.label}
+                        <span className="flex-shrink-0 mr-3">
+                          {item.icon}
                         </span>
+                        <span>{item.label}</span>
                       </Link>
                     </div>
                   ))}
@@ -278,8 +225,8 @@ function AdminLayoutContent({
               <div className="p-4">
                 <Link
                   href="/"
-                  className="flex items-center px-3 py-2.5 rounded-lg admin-nav-text text-gray-600 hover:bg-gray-100 hover:text-gray-800 transition-colors"
-                  onClick={handleMobileLinkClick}
+                  className="flex items-center px-3 py-2.5 rounded-lg text-sm font-medium text-neutral-300 hover:bg-neutral-800/50 hover:text-white transition-colors"
+                  onClick={handleMobileLinkClick} // Close mobile menu on link click
                 >
                   <Home className="h-5 w-5 mr-3" />
                   <span>Back to Home</span>
@@ -293,43 +240,30 @@ function AdminLayoutContent({
       {/* Main Content */}
       <div className="flex-1 flex flex-col overflow-hidden">
         {/* Mobile header */}
-        <header className="md:hidden flex items-center justify-between h-16 px-3 bg-white border-b border-gray-200 shadow-sm">
-          <div className="flex items-center space-x-3">
-            <div className="p-2 rounded-lg bg-gray-100 border border-gray-200">
-              <button
-                onClick={() => setOpen(!open)}
-                className="text-gray-600 hover:text-gray-800 transition-colors duration-200"
-              >
-                <Menu className="h-5 w-5" />
-              </button>
-            </div>
-            <Link href="/admin/dashboard" className="flex items-center space-x-3">
-              <div className="p-2 bg-blue-100 rounded-lg">
-                <InnoNexusLogo className="h-5 w-5 text-blue-600" />
-              </div>
-              <div className="flex flex-col">
-                <span className="admin-body-small admin-font-semibold">
-                  Admin Panel
-                </span>
-                <span className="admin-caption">
-                  TBI Management
-                </span>
-              </div>
+        <header className="md:hidden flex items-center justify-between h-16 px-4 border-b border-neutral-800 bg-neutral-900/80 backdrop-blur-sm">
+          <div className="flex items-center space-x-2">
+            <button
+              onClick={() => setOpen(!open)}
+              className="p-2 rounded-md text-neutral-400 hover:text-white hover:bg-neutral-800/50 transition-colors"
+            >
+              <Menu className="h-5 w-5" />
+            </button>
+            <Link href="/admin/dashboard" className="flex items-center space-x-2">
+              <InnoNexusLogo className="h-8 w-8 text-white" />
+              <span className="text-lg font-semibold text-white">Admin</span>
             </Link>
           </div>
           <NotificationsPanel userId="admin@tbi.com" />
         </header>
 
         {/* Desktop header with notifications */}
-        <header className="hidden md:flex items-center justify-end h-16 px-3 bg-white border-b border-gray-200 shadow-sm">
+        <header className="hidden md:flex items-center justify-end h-16 px-6 border-b border-neutral-800 bg-neutral-900/80 backdrop-blur-sm">
           <NotificationsPanel userId="admin@tbi.com" />
         </header>
 
         {/* Page content */}
-        <main className="flex-1 overflow-y-auto p-3 md:p-4 bg-white">
-          <div className="max-w-7xl mx-auto">
-            {children}
-          </div>
+        <main className="flex-1 overflow-y-auto p-4 md:p-6 bg-neutral-900/50">
+          {children}
         </main>
       </div>
     </div>

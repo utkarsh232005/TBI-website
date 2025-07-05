@@ -88,8 +88,8 @@ export const DesktopSidebar = ({
   return (
     <motion.div
       className={cn(
-        "h-full px-4 py-6 hidden md:flex flex-col bg-white w-[280px] shrink-0",
-        "border-r border-gray-100 shadow-sm",
+        "h-full px-4 py-6 hidden md:flex flex-col bg-neutral-900 w-[280px] shrink-0",
+        "border-r border-neutral-800",
         className
       )}
       animate={{
@@ -114,16 +114,16 @@ export const MobileSidebar = ({
     <>
       <div
         className={cn(
-          "h-16 px-4 py-4 flex flex-row md:hidden items-center justify-between bg-white w-full border-b border-gray-100 shadow-sm"
+          "h-16 px-4 py-4 flex flex-row md:hidden items-center justify-between bg-neutral-900 w-full border-b border-neutral-800"
         )}
         {...props}
       >
         <div className="flex items-center gap-2">
           <IconMenu2
-            className="text-gray-700 h-6 w-6"
+            className="text-neutral-200 h-6 w-6"
             onClick={() => setOpen(!open)}
           />
-          <span className="text-gray-700 font-medium">Admin Panel</span>
+          <span className="text-neutral-200 font-medium">Admin Panel</span>
         </div>
       </div>
       <AnimatePresence>
@@ -136,13 +136,13 @@ export const MobileSidebar = ({
               duration: 0.3,
               ease: "easeInOut",
             }}
-            className="fixed h-full w-full inset-0 bg-white p-6 z-[100] flex flex-col"
+            className="fixed h-full w-full inset-0 bg-neutral-900 p-6 z-[100] flex flex-col"
           >
             <div className="flex justify-between items-center mb-8">
-              <h2 className="text-xl font-semibold text-gray-800">Menu</h2>
+              <h2 className="text-xl font-semibold text-white">Menu</h2>
               <button
                 onClick={() => setOpen(false)}
-                className="p-2 rounded-lg hover:bg-gray-100 text-gray-500 hover:text-gray-800 transition-colors"
+                className="p-2 rounded-lg hover:bg-neutral-800 text-neutral-400 hover:text-white transition-colors"
               >
                 <IconX className="h-5 w-5" />
               </button>
@@ -181,8 +181,8 @@ export const SidebarLink = ({
       className={cn(
         "flex items-center justify-start gap-3 group/sidebar py-3 px-3 rounded-xl transition-colors",
         isActive 
-          ? "bg-blue-50 text-blue-600 border border-blue-200" 
-          : "text-gray-600 hover:bg-gray-50 hover:text-gray-800",
+          ? "bg-indigo-600/20 text-indigo-400 border border-indigo-500/30" 
+          : "text-neutral-400 hover:bg-neutral-800 hover:text-neutral-200",
         link.disabled && "opacity-50 cursor-not-allowed",
         className
       )}
@@ -196,8 +196,8 @@ export const SidebarLink = ({
       <div className={cn(
         "flex items-center justify-center h-8 w-8 rounded-lg",
         isActive 
-          ? "bg-blue-100 text-blue-600" 
-          : "bg-gray-100 text-gray-600 group-hover/sidebar:bg-gray-200/80"
+          ? "bg-indigo-500/20 text-indigo-400" 
+          : "bg-neutral-800 text-neutral-400 group-hover/sidebar:bg-neutral-700/50"
       )}>
         {React.cloneElement(link.icon as React.ReactElement, {
           className: "h-4 w-4"
