@@ -89,17 +89,22 @@ export const DesktopSidebar = ({
     <>
       <motion.div
         className={cn(
-          "h-full px-4 py-4 hidden md:flex md:flex-col bg-neutral-900/90 backdrop-blur-sm border-r border-neutral-800 w-[300px] shrink-0 overflow-x-hidden",
+          "h-full hidden md:flex md:flex-col relative",
+          "bg-white border-r border-gray-200",
+          "shrink-0 overflow-hidden",
+          "shadow-sm",
           className
         )}
         animate={{
-          width: animate ? (open ? "300px" : "80px") : "300px",
+          width: animate ? (open ? "240px" : "80px") : "240px",
         }}
         onMouseEnter={() => setOpen(true)}
         onMouseLeave={() => setOpen(false)}
         {...props}
       >
-        {children}
+        <div className="relative z-10 h-full flex flex-col px-3 py-4">
+          {children as React.ReactNode}
+        </div>
       </motion.div>
     </>
   );
@@ -115,16 +120,22 @@ export const MobileSidebar = ({
     <>
       <div
         className={cn(
-          "h-16 px-4 py-4 flex flex-row md:hidden items-center justify-between bg-neutral-900/90 backdrop-blur-sm border-b border-neutral-800 w-full"
+          "h-16 px-4 py-3 flex flex-row md:hidden items-center justify-between",
+          "bg-white border-b border-gray-200",
+          "w-full shadow-sm",
+          "relative",
+          className
         )}
         {...props}
       >
         <div className="flex justify-end z-20 w-full">
-          <IconMenu2
-            className="text-white cursor-pointer hover:text-indigo-400 transition-colors"
-            onClick={() => setOpen(!open)}
-            size={24}
-          />
+          <div className="p-2.5 rounded-lg bg-gray-100 border border-gray-200 hover:bg-gray-200 transition-all duration-200">
+            <IconMenu2
+              className="text-gray-600 cursor-pointer hover:text-gray-800 transition-colors duration-200"
+              onClick={() => setOpen(!open)}
+              size={20}
+            />
+          </div>
         </div>
         <AnimatePresence>
           {open && (
@@ -137,17 +148,20 @@ export const MobileSidebar = ({
                 ease: "easeInOut",
               }}
               className={cn(
-                "fixed h-full w-full inset-0 bg-neutral-900/95 backdrop-blur-sm p-6 z-[100] flex flex-col justify-start pt-20",
-                className
+                "fixed h-full w-full inset-0 z-[100] flex flex-col justify-start",
+                "bg-white p-6 pt-20",
+                "shadow-lg"
               )}
             >
               <div
-                className="absolute right-6 top-6 z-50 text-white hover:text-indigo-400 cursor-pointer transition-colors"
+                className="absolute right-6 top-6 z-50 p-2.5 rounded-lg bg-gray-100 border border-gray-200 hover:bg-gray-200 transition-all duration-200 cursor-pointer"
                 onClick={() => setOpen(!open)}
               >
-                <IconX size={24} />
+                <IconX className="text-gray-600 hover:text-gray-800 transition-colors duration-200" size={20} />
               </div>
-              {children}
+              <div className="relative z-10">
+                {children}
+              </div>
             </motion.div>
           )}
         </AnimatePresence>
@@ -169,12 +183,17 @@ export const SidebarLink = ({
     <a
       href={link.href}
       className={cn(
-        "flex items-center justify-start gap-3 group/sidebar py-3 px-3 rounded-lg hover:bg-neutral-800/50 transition-colors duration-200",
+        "flex items-center justify-start gap-3 group/sidebar py-3 px-3 rounded-lg",
+        "relative transition-all duration-200",
+        "hover:bg-gray-50 hover:border-gray-300",
+        "border border-transparent",
+        "min-h-[44px]",
+        "group/link",
         className
       )}
       {...props}
     >
-      <span className="text-indigo-400 group-hover/sidebar:text-indigo-300 transition-colors">
+      <span className="text-gray-500 group-hover/sidebar:text-gray-700 transition-colors">
         {link.icon}
       </span>
 
@@ -183,7 +202,7 @@ export const SidebarLink = ({
           display: animate ? (open ? "inline-block" : "none") : "inline-block",
           opacity: animate ? (open ? 1 : 0) : 1,
         }}
-        className="text-neutral-200 text-sm group-hover/sidebar:translate-x-1 transition duration-150 whitespace-pre inline-block !p-0 !m-0"
+        className="text-gray-700 text-sm font-medium group-hover/sidebar:text-gray-900 transition-all duration-200 whitespace-pre inline-block !p-0 !m-0 min-w-0 flex-1"
       >
         {link.label}
       </motion.span>

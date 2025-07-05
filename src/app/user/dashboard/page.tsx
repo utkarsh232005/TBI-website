@@ -11,17 +11,7 @@ export default function UserDashboardPage() {
   const { user, firebaseUser, isLoading: userLoading, authReady } = useUser();
   const { userData, loading: authLoading, isOnboardingCompleted, refreshUserData } = useAuth();
 
-  // Debug logging
-  useEffect(() => {
-    console.log('Dashboard render state:', {
-      user: user ? { uid: user.uid, email: user.email } : null,
-      firebaseUser: firebaseUser ? { uid: firebaseUser.uid, email: firebaseUser.email } : null,
-      userLoading,
-      authReady,
-      authLoading,
-      userData: userData ? { uid: userData.uid, onboardingCompleted: userData.onboardingCompleted } : null
-    });
-  }, [user, firebaseUser, userLoading, authReady, authLoading, userData]);
+
 
   // Show loading while checking user authentication
   if (userLoading || authLoading || !authReady) {
@@ -48,9 +38,7 @@ export default function UserDashboardPage() {
           <p className="text-neutral-400 text-lg">
             Please log in to access your dashboard.
           </p>
-          <p className="text-xs text-neutral-500 mt-2">
-            Debug: authReady={authReady.toString()}, user={user ? 'exists' : 'null'}, firebaseUser={firebaseUser ? 'exists' : 'null'}
-          </p>
+
         </div>
       </div>
     );
