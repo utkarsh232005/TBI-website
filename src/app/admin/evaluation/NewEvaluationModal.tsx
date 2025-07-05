@@ -146,20 +146,9 @@ function NewEvaluationModal({ isOpen, onClose, onSubmit }: EvaluationModalProps)
     }
   };
 
-  // Debug logging for modal state changes
-  useEffect(() => {
-    if (isOpen) {
-      console.log("🎯 Evaluation Modal OPENED - Navigation Ready!");
-      console.log(`📍 Current Step: ${currentStep}/${totalSteps}`);
-    } else {
-      console.log("❌ Evaluation Modal CLOSED");
-    }
-  }, [isOpen]);
 
-  // Debug logging for step changes
-  useEffect(() => {
-    console.log(`📈 Step Changed: ${currentStep}/${totalSteps} | Valid: ${isStepValid(currentStep)}`);
-  }, [currentStep]);
+
+
 
   // Enhanced keyboard navigation (MUST be before early return)
   useEffect(() => {
@@ -182,33 +171,23 @@ function NewEvaluationModal({ isOpen, onClose, onSubmit }: EvaluationModalProps)
   if (!isOpen) return null;
 
   const handleNext = () => {
-    console.log(`🚀 Next button clicked! Current step: ${currentStep}, Total steps: ${totalSteps}`);
     if (currentStep < totalSteps) {
       // Check if current step is valid before proceeding
       if (isStepValid(currentStep)) {
-        console.log(`✅ Step ${currentStep} is valid, moving to step ${currentStep + 1}`);
         setCurrentStep(currentStep + 1);
       } else {
-        console.warn(`❌ Step ${currentStep} validation failed - missing required fields`);
         // You could add a toast notification here for better UX
       }
-    } else {
-      console.log(`⚠️ Already at final step (${totalSteps})`);
     }
   };
 
   const handlePrevious = () => {
-    console.log(`⬅️ Previous button clicked! Current step: ${currentStep}`);
     if (currentStep > 1) {
-      console.log(`✅ Moving from step ${currentStep} to step ${currentStep - 1}`);
       setCurrentStep(currentStep - 1);
-    } else {
-      console.log(`⚠️ Already at first step (1)`);
     }
   };
 
   const handleSubmit = () => {
-    console.log("🎯 Creating advanced evaluation round:", formData);
     onSubmit(formData);
     setCurrentStep(1);
     // Reset form to initial state
@@ -1238,240 +1217,83 @@ function NewEvaluationModal({ isOpen, onClose, onSubmit }: EvaluationModalProps)
   };
 
   return (
-    <div className="fixed inset-0 bg-black/30 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-      <div className="bg-white border border-gray-200 rounded-2xl w-full max-w-4xl max-h-[95vh] flex flex-col shadow-2xl">
-        {/* Header */}
-        <div className="flex-shrink-0 relative p-6 border-b border-gray-200 bg-gradient-to-r from-blue-50 to-indigo-50">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/30 backdrop-blur-sm">
+      <div className="relative w-full max-w-3xl h-[90vh] flex flex-col bg-white rounded-2xl shadow-2xl border border-gray-200 overflow-hidden">
+        {/* Close Button */}
+        <button
+          onClick={onClose}
+          className="absolute top-4 right-4 z-10 p-2 rounded-full bg-gray-100 hover:bg-gray-200 border border-gray-300 text-gray-500 hover:text-red-500 transition"
+          aria-label="Close modal"
+        >
+          <X className="h-6 w-6" />
+        </button>
+
+        {/* Stepper */}
+        <div className="px-8 pt-8 pb-4 border-b border-gray-100 bg-white">
           <div className="flex items-center justify-between">
-            <div>
-              <h2 className="text-2xl font-bold text-gray-900 mb-1">Create Evaluation Round</h2>
-              <p className="text-gray-600">Step {currentStep} of {totalSteps} • {stepConfig[currentStep - 1]?.description}</p>
-            </div>
-            <button 
-              onClick={onClose} 
-              className="group relative w-18 h-18 bg-gradient-to-br from-white via-slate-50/95 to-gray-100/90 hover:from-red-50/98 hover:via-rose-100/95 hover:to-pink-200/98 border-4 border-slate-300/80 hover:border-rose-400/90 rounded-full shadow-3xl hover:shadow-4xl hover:shadow-rose-600/40 transition-all duration-800 ease-out transform hover:scale-125 hover:rotate-[25deg] active:scale-85 active:rotate-[12deg] backdrop-blur-4xl overflow-hidden"
-              style={{
-                backdropFilter: 'blur(35px) saturate(250%) brightness(115%)',
-                background: `
-                  conic-gradient(from 0deg, rgba(255,255,255,0.98) 0%, rgba(248,250,252,0.95) 20%, rgba(241,245,249,0.98) 40%, rgba(226,232,240,0.95) 60%, rgba(203,213,225,0.98) 80%, rgba(255,255,255,0.95) 100%),
-                  radial-gradient(circle at 30% 30%, rgba(255,255,255,0.6) 0%, transparent 50%),
-                  linear-gradient(135deg, rgba(255,255,255,0.9) 0%, rgba(248,250,252,0.85) 100%)
-                `,
-                boxShadow: `
-                  0 35px 70px -15px rgba(0, 0, 0, 0.3), 
-                  inset 0 2px 0 rgba(255, 255, 255, 0.8), 
-                  inset 0 -2px 0 rgba(0, 0, 0, 0.05),
-                  0 0 0 2px rgba(255, 255, 255, 0.1),
-                  0 8px 32px rgba(0, 0, 0, 0.12)
-                `
-              }}
-              title="Close modal"
-            >
-              {/* Ultra-premium crystalline inner surface */}
-              <div className="absolute inset-1 bg-gradient-to-br from-white/90 via-slate-50/70 to-gray-100/50 rounded-full opacity-0 group-hover:opacity-100 transition-all duration-800 shadow-inner"></div>
-              <div className="absolute inset-2 bg-gradient-to-tl from-white/60 via-transparent to-slate-100/40 rounded-full opacity-90 group-hover:opacity-100 transition-all duration-800"></div>
-              
-              {/* Multi-layer quantum glow system */}
-              <div className="absolute -inset-1 bg-gradient-to-r from-rose-500/0 via-pink-500/0 to-red-500/0 group-hover:from-rose-500/50 group-hover:via-pink-500/60 group-hover:to-red-500/50 rounded-full blur-xl opacity-0 group-hover:opacity-100 transition-all duration-800 -z-10 animate-pulse"></div>
-              <div className="absolute -inset-2 bg-gradient-to-r from-rose-400/0 via-pink-400/0 to-red-400/0 group-hover:from-rose-400/35 group-hover:via-pink-400/45 group-hover:to-red-400/35 rounded-full blur-2xl opacity-0 group-hover:opacity-100 transition-all duration-900 -z-20"></div>
-              <div className="absolute -inset-3 bg-gradient-to-r from-rose-300/0 via-pink-300/0 to-red-300/0 group-hover:from-rose-300/25 group-hover:via-pink-300/35 group-hover:to-red-300/25 rounded-full blur-3xl opacity-0 group-hover:opacity-100 transition-all duration-1000 -z-30"></div>
-              
-              {/* Advanced diamond shimmer cascade */}
-              <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/40 to-transparent rounded-full opacity-0 group-hover:opacity-100 transform -skew-x-12 translate-x-full group-hover:translate-x-[-300%] transition-all duration-1000 ease-out"></div>
-              <div className="absolute inset-0 bg-gradient-to-r from-transparent via-blue-200/30 to-transparent rounded-full opacity-0 group-hover:opacity-100 transform -skew-x-12 translate-x-full group-hover:translate-x-[-300%] transition-all duration-1200 ease-out delay-150"></div>
-              <div className="absolute inset-0 bg-gradient-to-r from-transparent via-purple-200/20 to-transparent rounded-full opacity-0 group-hover:opacity-100 transform -skew-x-12 translate-x-full group-hover:translate-x-[-300%] transition-all duration-1400 ease-out delay-300"></div>
-              
-              {/* Layered depth shadow system */}
-              <div className="absolute inset-1.5 bg-gradient-to-tl from-slate-300/40 via-transparent to-slate-200/50 rounded-full"></div>
-              <div className="absolute inset-2.5 bg-gradient-to-br from-white/50 via-transparent to-gray-200/30 rounded-full"></div>
-              <div className="absolute inset-3.5 bg-gradient-to-tr from-slate-100/30 via-transparent to-white/40 rounded-full"></div>
-              
-              {/* Premium floating particles constellation */}
-              <div className="absolute inset-0 rounded-full opacity-0 group-hover:opacity-100 transition-all duration-800">
-                <div className="absolute top-3 left-4 w-1.5 h-1.5 bg-white/70 rounded-full animate-ping delay-100"></div>
-                <div className="absolute top-5 right-3 w-1 h-1 bg-rose-300/90 rounded-full animate-ping delay-300"></div>
-                <div className="absolute bottom-4 left-3 w-1 h-1 bg-pink-200/80 rounded-full animate-ping delay-500"></div>
-                <div className="absolute bottom-3 right-4 w-1.5 h-1.5 bg-white/60 rounded-full animate-ping delay-700"></div>
-                <div className="absolute top-1/2 left-2 w-0.5 h-0.5 bg-blue-200/70 rounded-full animate-ping delay-900"></div>
-                <div className="absolute top-1/2 right-2 w-0.5 h-0.5 bg-purple-200/60 rounded-full animate-ping delay-1100"></div>
-              </div>
-              
-              {/* Ultra-enhanced icon with liquid motion */}
-              <X className="h-8 w-8 text-slate-700 group-hover:text-rose-700 transition-all duration-800 relative z-40 transform group-hover:scale-150 group-hover:rotate-[360deg] drop-shadow-xl group-hover:drop-shadow-3xl filter group-hover:brightness-125 group-hover:contrast-150 group-hover:saturate-125" />
-              
-              {/* Morphing quantum background layers */}
-              <div className="absolute inset-0 rounded-full bg-gradient-to-br from-rose-500/0 via-pink-600/0 to-red-700/0 group-hover:from-rose-500/25 group-hover:via-pink-600/35 group-hover:to-red-700/30 transition-all duration-800 animate-pulse opacity-0 group-hover:opacity-100"></div>
-              <div className="absolute inset-1 rounded-full bg-gradient-to-tl from-rose-400/0 via-pink-500/0 to-red-600/0 group-hover:from-rose-400/20 group-hover:via-pink-500/30 group-hover:to-red-600/25 transition-all duration-900 animate-pulse opacity-0 group-hover:opacity-100"></div>
-              
-              {/* Prismatic quantum aura system */}
-              <div className="absolute -inset-4 bg-gradient-conic from-rose-300/0 via-pink-400/0 via-purple-300/0 via-blue-300/0 to-rose-300/0 group-hover:from-rose-300/40 group-hover:via-pink-400/50 group-hover:via-purple-300/45 group-hover:via-blue-300/35 group-hover:to-rose-300/40 rounded-full blur-3xl opacity-0 group-hover:opacity-100 transition-all duration-1200 -z-40 animate-spin-slow"></div>
-              
-              {/* Ultra-premium glass reflection */}
-              <div className="absolute inset-0 bg-gradient-to-tr from-white/30 via-transparent to-transparent rounded-full opacity-70 group-hover:opacity-100 transition-opacity duration-600"></div>
-              <div className="absolute inset-0 bg-gradient-to-bl from-transparent via-transparent to-white/20 rounded-full opacity-50 group-hover:opacity-80 transition-opacity duration-600"></div>
-              
-              {/* Holographic edge enhancement */}
-              <div className="absolute inset-0 rounded-full border border-white/40 group-hover:border-white/60 transition-all duration-600"></div>
-              <div className="absolute inset-1 rounded-full border border-white/20 group-hover:border-white/40 transition-all duration-600"></div>
-            </button>
-          </div>
-          
-          {/* Progress Bar */}
-          <div className="mt-6">
-            <div className="flex justify-between mb-2">
-              {stepConfig.map((step, index) => {
-                const StepIcon = step.icon;
-                const isActive = index + 1 === currentStep;
-                const isCompleted = index + 1 < currentStep;
-                
-                return (
-                  <div key={index} className="flex flex-col items-center">
-                    <div className={`w-10 h-10 rounded-full flex items-center justify-center border-2 transition-all duration-300 ${
-                      isActive 
-                        ? `bg-gradient-to-r ${step.color} border-transparent shadow-lg` 
-                        : isCompleted 
-                          ? 'bg-green-500 border-green-400 shadow-lg' 
-                          : 'bg-gray-100 border-gray-300'
-                    }`}>
-                      {isCompleted ? (
-                        <CheckCircle className="h-5 w-5 text-white" />
-                      ) : (
-                        <StepIcon className={`h-5 w-5 ${isActive ? 'text-white' : 'text-gray-500'}`} />
-                      )}
-                    </div>
-                    <span className={`text-xs mt-1 transition-colors duration-300 ${
-                      isActive ? 'text-gray-900 font-medium' : isCompleted ? 'text-green-600' : 'text-gray-500'
-                    }`}>
-                      {step.title}
-                    </span>
+            {stepConfig.map((step, idx) => {
+              const StepIcon = step.icon;
+              const isActive = idx + 1 === currentStep;
+              const isCompleted = idx + 1 < currentStep;
+              return (
+                <div key={idx} className="flex flex-col items-center flex-1">
+                  <div className={`w-9 h-9 flex items-center justify-center rounded-full border-2 transition-all duration-200 ${
+                    isActive
+                      ? 'bg-blue-600 border-blue-600 text-white shadow-md'
+                      : isCompleted
+                        ? 'bg-green-500 border-green-500 text-white shadow-md'
+                        : 'bg-gray-100 border-gray-300 text-gray-400'
+                  }`}>
+                    {isCompleted ? <CheckCircle className="h-5 w-5" /> : <StepIcon className="h-5 w-5" />}
                   </div>
-                );
-              })}
-            </div>
-            
-            <div className="w-full bg-gray-200 rounded-full h-1">
-              <div 
-                className="bg-gradient-to-r from-blue-500 to-indigo-600 h-1 rounded-full transition-all duration-500 shadow-lg"
-                style={{ width: `${(currentStep / totalSteps) * 100}%` }}
-              />
-            </div>
+                  <span className={`mt-1 text-xs ${isActive ? 'text-blue-700 font-semibold' : isCompleted ? 'text-green-600' : 'text-gray-500'}`}>{step.title}</span>
+                </div>
+              );
+            })}
+          </div>
+          <div className="w-full bg-gray-200 rounded-full h-1 mt-4">
+            <div
+              className="bg-blue-500 h-1 rounded-full transition-all duration-500"
+              style={{ width: `${(currentStep / totalSteps) * 100}%` }}
+            />
           </div>
         </div>
 
-        {/* Content */}
-        <div className="flex-1 p-6 overflow-y-auto min-h-0">
+        {/* Modal Content */}
+        <div className="flex-1 overflow-y-auto px-8 py-6 bg-white">
           {renderStep()}
         </div>
 
-        {/* Footer - Enhanced Navigation */}
-        <div className="flex-shrink-0 flex items-center justify-between p-6 border-t-2 border-blue-200 bg-gradient-to-r from-gray-50 to-blue-50 shadow-lg">
-          {/* Previous Button */}
+        {/* Footer Navigation */}
+        <div className="flex items-center justify-between px-8 py-4 border-t border-gray-100 bg-gray-50">
           <Button
             type="button"
             variant="outline"
             onClick={handlePrevious}
             disabled={currentStep === 1}
-            className={`group relative flex items-center gap-3 transition-all duration-300 px-8 py-4 text-lg font-medium rounded-xl ${
-              currentStep === 1 
-                ? 'bg-gray-100 border-2 border-gray-300 text-gray-400 cursor-not-allowed opacity-40' 
-                : 'bg-gradient-to-r from-white via-gray-50 to-white hover:from-blue-50 hover:via-blue-100 hover:to-blue-50 border-2 border-gray-300 hover:border-blue-400 text-gray-700 hover:text-blue-700 hover:scale-105 active:scale-95 shadow-lg hover:shadow-xl backdrop-blur-sm'
-            }`}
-            title={currentStep > 1 ? `Go back to step ${currentStep - 1}` : 'This is the first step'}
+            className="px-6 py-2 rounded-lg text-base disabled:opacity-40"
           >
-            {currentStep > 1 && (
-              <>
-                <div className="absolute inset-0 bg-gradient-to-r from-blue-500/0 to-indigo-500/0 group-hover:from-blue-500/10 group-hover:to-indigo-500/10 rounded-xl transition-all duration-300"></div>
-                <div className="absolute inset-0 bg-gradient-to-br from-white/40 to-transparent rounded-xl opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-              </>
-            )}
-            <ArrowLeft className={`h-5 w-5 transition-all duration-300 relative z-10 ${
-              currentStep > 1 ? 'group-hover:scale-110 group-hover:-translate-x-1' : ''
-            }`} />
-            <span className={`transition-all duration-300 relative z-10 ${
-              currentStep > 1 ? 'group-hover:translate-x-0.5' : ''
-            }`}>Previous</span>
+            <ArrowLeft className="h-5 w-5 mr-1" /> Previous
           </Button>
-
-          {/* Step Counter with Validation Status */}
-          <div className="flex items-center gap-3 text-sm">
-            <span className="text-gray-600">Step {currentStep} of {totalSteps}</span>
-            <div className="flex gap-1">
-              {Array.from({ length: totalSteps }, (_, i) => {
-                const stepNumber = i + 1;
-                const isComplete = stepNumber < currentStep;
-                const isCurrent = stepNumber === currentStep;
-                const isValid = isStepValid(stepNumber);
-                
-                return (
-                  <div
-                    key={i}
-                    className={`w-3 h-3 rounded-full transition-all duration-200 flex items-center justify-center ${
-                      isComplete 
-                        ? 'bg-green-500 shadow-sm' 
-                        : isCurrent 
-                          ? isValid 
-                            ? 'bg-blue-500 ring-2 ring-blue-300 ring-opacity-50' 
-                            : 'bg-yellow-500 animate-pulse ring-2 ring-yellow-300 ring-opacity-50'
-                          : 'bg-gray-400'
-                    }`}
-                    title={
-                      isComplete 
-                        ? `Step ${stepNumber}: Complete` 
-                        : isCurrent 
-                          ? isValid 
-                            ? `Step ${stepNumber}: Ready to continue` 
-                            : `Step ${stepNumber}: Please complete required fields`
-                          : `Step ${stepNumber}: Not reached`
-                    }
-                  >
-                    {isComplete && (
-                      <CheckCircle className="w-2 h-2 text-white" />
-                    )}
-                  </div>
-                );
-              })}
-            </div>
-            <span className={`text-xs ${isStepValid(currentStep) ? 'text-green-600' : 'text-yellow-600'}`}>
-              {isStepValid(currentStep) ? '✓ Ready' : '⚠ Complete required fields'}
-            </span>
+          <div className="flex items-center gap-2 text-sm text-gray-500">
+            Step {currentStep} of {totalSteps}
+            <span className={`ml-2 text-xs ${isStepValid(currentStep) ? 'text-green-600' : 'text-yellow-600'}`}>{isStepValid(currentStep) ? '✓ Ready' : '⚠ Required fields'}</span>
           </div>
-
-          {/* Next/Submit Button */}
           {currentStep === totalSteps ? (
             <Button
               onClick={handleSubmit}
               disabled={!formData.roundName.trim()}
-              className={`flex items-center gap-2 transition-all duration-200 px-8 py-4 text-lg font-medium ${
-                !formData.roundName.trim()
-                  ? 'bg-gray-300 text-gray-500 cursor-not-allowed opacity-50 border-gray-400'
-                  : 'bg-gradient-to-r from-green-500 to-emerald-500 hover:from-green-600 hover:to-emerald-600 hover:scale-105 active:scale-95 text-white border-0 shadow-xl shadow-green-500/25'
-              }`}
-              title={
-                !formData.roundName.trim() 
-                  ? 'Please enter a round name to create the evaluation round' 
-                  : 'Create the evaluation round'
-              }
+              className="px-6 py-2 rounded-lg text-base bg-green-600 hover:bg-green-700 text-white disabled:bg-gray-300 disabled:text-gray-500"
             >
-              <CheckCircle className="h-5 w-5" />
-              Create Round
+              <CheckCircle className="h-5 w-5 mr-1" /> Create Round
             </Button>
           ) : (
             <Button
               onClick={handleNext}
               disabled={!isStepValid(currentStep)}
-              className={`flex items-center gap-2 transition-all duration-200 px-8 py-4 text-lg font-medium ${
-                !isStepValid(currentStep) 
-                  ? 'bg-gray-300 text-gray-500 cursor-not-allowed opacity-50 animate-pulse border-gray-400' 
-                  : 'bg-gradient-to-r from-blue-500 to-indigo-600 hover:from-blue-600 hover:to-indigo-700 hover:scale-105 active:scale-95 text-white border-0 shadow-xl shadow-blue-500/25'
-              }`}
-              title={
-                !isStepValid(currentStep) 
-                  ? 'Please complete all required fields to continue' 
-                  : `Continue to step ${currentStep + 1}`
-              }
+              className="px-6 py-2 rounded-lg text-base bg-blue-600 hover:bg-blue-700 text-white disabled:bg-gray-300 disabled:text-gray-500"
             >
-              Next
-              <ArrowRight className="h-5 w-5" />
+              Next <ArrowRight className="h-5 w-5 ml-1" />
             </Button>
           )}
         </div>

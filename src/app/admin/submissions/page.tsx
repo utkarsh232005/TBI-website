@@ -150,7 +150,7 @@ function AdminSubmissionsContent() {
       return (
         <div className="flex items-center justify-center py-10 rounded-xl admin-card">
           <Loader2 className="mr-3 h-8 w-8 animate-spin text-blue-600" />
-          <span className="text-gray-700 font-medium">Loading {type} submissions...</span>
+          <span className="admin-body-small admin-font-medium">Loading {type} submissions...</span>
         </div>
       );
     }
@@ -159,8 +159,8 @@ function AdminSubmissionsContent() {
       return (
         <div className="flex flex-col items-center justify-center py-10 rounded-xl bg-rose-900/10 border border-rose-900/30">
           <AlertCircle className="h-10 w-10 text-rose-400 mb-3" />
-          <h3 className="text-lg font-semibold text-rose-100">Error loading data</h3>
-          <p className="text-sm text-rose-300 mt-1 mb-4 text-center max-w-md">{error}</p>
+          <h3 className="admin-heading-4 admin-text-error">Error loading data</h3>
+          <p className="admin-caption mt-1 mb-4 text-center max-w-md">{error}</p>
           <Button 
             onClick={fetchSubmissions} 
             variant="outline" 
@@ -190,8 +190,8 @@ function AdminSubmissionsContent() {
             </div>
             
             <div>
-              <h3 className="text-2xl font-bold text-gray-900 mb-3">No {type} submissions yet</h3>
-              <p className="text-gray-600 text-lg max-w-lg mx-auto leading-relaxed">
+              <h3 className="admin-heading-3 mb-3">No {type} submissions yet</h3>
+              <p className="admin-body-large max-w-lg mx-auto leading-relaxed">
                 {type === 'on-campus' 
                   ? 'On-campus applications will appear here once students submit their innovative startup ideas through the platform' 
                   : 'Off-campus applications will appear here once imported from external sources or submitted directly'
@@ -255,123 +255,86 @@ function AdminSubmissionsContent() {
   };
 
   return (
-    <div className="space-y-8">        <div className="admin-card overflow-hidden relative">
-          {/* Background gradient effect */}
-          <div className="absolute inset-0 bg-gradient-to-br from-blue-50/30 via-white/10 to-purple-50/20 rounded-3xl opacity-0 hover:opacity-100 transition-all duration-700"></div>
-          
-          <div className="admin-header relative">
-            {/* Top gradient line */}
-            <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-blue-500 via-purple-500 to-indigo-500 opacity-70"></div>
-            
-            <div className="flex flex-col sm:flex-row sm:justify-between items-start sm:items-center">
-              <div className="flex items-center gap-4">
-                {/* Enhanced icon */}
-                <div className="relative group">
-                  <div className="absolute -inset-1 bg-gradient-to-r from-blue-500/20 via-purple-500/20 to-indigo-500/20 rounded-xl blur opacity-50 group-hover:opacity-100 transition-all duration-500"></div>
-                  <div className="relative admin-icon admin-icon-blue group-hover:scale-110 transition-all duration-400 shadow-lg">
-                    <FileTextIcon className="h-5 w-5 group-hover:text-blue-700 transition-colors duration-300" />
-                  </div>
-                </div>
-                
-                <div>
-                  <h2 className="text-3xl font-black mb-1 bg-gradient-to-r from-blue-600 via-purple-600 to-indigo-600 bg-clip-text text-transparent">
-                    Submissions
-                  </h2>
-                  <p className="font-semibold text-lg text-muted-foreground">Review applications with enhanced interface</p>
-                </div>
+    <div className="w-full min-h-screen flex flex-col items-center bg-gray-50 py-10 px-2">
+      <div className="w-full max-w-6xl mx-auto space-y-8">
+        <div className="bg-white rounded-2xl shadow-md border border-gray-200 overflow-hidden relative">
+          <div className="px-8 pt-8 pb-4 border-b border-gray-100 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+            <div className="flex items-center gap-4">
+              <div className="bg-blue-100 rounded-full p-3 flex items-center justify-center">
+                <FileTextIcon className="h-6 w-6 text-blue-600" />
+              </div>
+              <div>
+                <h2 className="text-2xl font-bold text-gray-900 mb-1">Submissions</h2>
+                <p className="text-sm text-gray-500">Review applications with a clean, professional interface</p>
               </div>
             </div>
-            
-            {/* Enhanced action buttons */}
-            <div className="flex items-center justify-start gap-4 mb-6 mt-6">
+            <div className="flex gap-2">
               <Button 
                 onClick={fetchSubmissions} 
                 disabled={isLoading} 
-                className="group relative bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white font-semibold py-2.5 px-6 rounded-full border-0 shadow-lg shadow-blue-200/50 hover:shadow-xl hover:shadow-blue-300/50 transition-all duration-300 hover:scale-105 overflow-hidden"
+                className="bg-white border border-blue-200 text-blue-700 hover:bg-blue-50 hover:border-blue-300 focus:ring-2 focus:ring-blue-200 rounded-lg shadow-sm px-5 py-2 font-medium transition"
               >
-                {/* Button shine effect */}
-                <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent -skew-x-12 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-1000 ease-out"></div>
-                
-                <div className="relative flex items-center gap-2">
-                  <span className={`${isLoading ? 'animate-spin' : 'group-hover:rotate-180 transition-transform duration-500'}`}>
-                    {isLoading ? <Loader2 className="h-4 w-4"/> : <RefreshCw className="h-4 w-4"/>}
-                  </span>
-                  <span>Refresh</span>
-                </div>
+                {isLoading ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : <RefreshCw className="h-4 w-4 mr-2" />}
+                Refresh
               </Button>
-              
               <Button 
                 onClick={handleImportOffCampus}
                 disabled={isImporting}
-                className="group relative bg-gradient-to-r from-purple-500 to-purple-600 hover:from-purple-600 hover:to-purple-700 text-white font-semibold py-2.5 px-6 rounded-full border-0 shadow-lg shadow-purple-200/50 hover:shadow-xl hover:shadow-purple-300/50 transition-all duration-300 hover:scale-105 overflow-hidden"
+                className="bg-white border border-purple-200 text-purple-700 hover:bg-purple-50 hover:border-purple-300 focus:ring-2 focus:ring-purple-200 rounded-lg shadow-sm px-5 py-2 font-medium transition"
               >
-                {/* Button shine effect */}
-                <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent -skew-x-12 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-1000 ease-out"></div>
-                
-                <div className="relative flex items-center gap-2">
-                  {isImporting ? <Loader2 className="h-4 w-4 animate-spin"/> : <UploadCloud className="h-4 w-4 group-hover:scale-110 transition-transform duration-300"/>}
-                  <span>Import Off-Campus Data</span>
-                </div>
+                {isImporting ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : <UploadCloud className="h-4 w-4 mr-2" />}
+                Import Off-Campus Data
               </Button>
             </div>
           </div>
-
-        <div className="p-6">
-          <div className="flex items-center justify-start gap-4 mb-6">
-            <Button
-              variant={activeTab === 'on-campus' ? 'default' : 'outline'}
-              onClick={() => setActiveTab('on-campus')}
-              className={`group relative font-semibold py-3 px-8 rounded-full border-2 transition-all duration-300 hover:scale-105 overflow-hidden ${
-                activeTab === 'on-campus' 
-                  ? 'bg-gradient-to-r from-blue-500 to-indigo-600 text-white border-blue-500 shadow-lg shadow-blue-200/50' 
-                  : 'bg-white/80 text-blue-600 border-blue-300 hover:bg-blue-50 hover:border-blue-400 shadow-sm'
-              }`}
-            >
-              {/* Active tab shine effect */}
-              {activeTab === 'on-campus' && (
-                <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent -skew-x-12 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-1000 ease-out"></div>
-              )}
-              
-              <div className="relative flex items-center gap-2">
-                <Building className="h-4 w-4 group-hover:scale-110 transition-transform duration-300" />
-                <span>On-Campus Submissions</span>
-              </div>
-            </Button>
-            
-            <Button
-              variant={activeTab === 'off-campus' ? 'default' : 'outline'}
-              onClick={() => setActiveTab('off-campus')}
-              className={`group relative font-semibold py-3 px-8 rounded-full border-2 transition-all duration-300 hover:scale-105 overflow-hidden ${
-                activeTab === 'off-campus' 
-                  ? 'bg-gradient-to-r from-purple-500 to-pink-600 text-white border-purple-500 shadow-lg shadow-purple-200/50' 
-                  : 'bg-white/80 text-purple-600 border-purple-300 hover:bg-purple-50 hover:border-purple-400 shadow-sm'
-              }`}
-            >
-              {/* Active tab shine effect */}
-              {activeTab === 'off-campus' && (
-                <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent -skew-x-12 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-1000 ease-out"></div>
-              )}
-              
-              <div className="relative flex items-center gap-2">
-                <Landmark className="h-4 w-4 group-hover:scale-110 transition-transform duration-300" />
-                <span>Off-Campus Submissions</span>
-              </div>
-            </Button>
+          <div className="px-8 pt-6 pb-2">
+            <div className="flex gap-2 mb-6">
+              <button
+                type="button"
+                onClick={() => setActiveTab('on-campus')}
+                className={`px-5 py-2 rounded-lg font-semibold border transition focus:outline-none focus:ring-2 focus:ring-blue-200 ${
+                  activeTab === 'on-campus'
+                    ? 'bg-blue-600 text-white border-blue-600 shadow'
+                    : 'bg-white text-blue-700 border-blue-200 hover:bg-blue-50'
+                }`}
+                aria-current={activeTab === 'on-campus'}
+              >
+                <span className="inline-flex items-center gap-2">
+                  <Building className="h-4 w-4" />
+                  On-Campus
+                </span>
+              </button>
+              <button
+                type="button"
+                onClick={() => setActiveTab('off-campus')}
+                className={`px-5 py-2 rounded-lg font-semibold border transition focus:outline-none focus:ring-2 focus:ring-purple-200 ${
+                  activeTab === 'off-campus'
+                    ? 'bg-purple-600 text-white border-purple-600 shadow'
+                    : 'bg-white text-purple-700 border-purple-200 hover:bg-purple-50'
+                }`}
+                aria-current={activeTab === 'off-campus'}
+              >
+                <span className="inline-flex items-center gap-2">
+                  <Landmark className="h-4 w-4" />
+                  Off-Campus
+                </span>
+              </button>
+            </div>
+            {activeTab === 'on-campus' && (
+              <SubmissionsOverview type="on-campus" />
+            )}
+            {activeTab === 'off-campus' && (
+              <SubmissionsOverview type="off-campus" />
+            )}
           </div>
-          
-          {activeTab === 'on-campus' && (
-            <SubmissionsOverview type="on-campus" />
-          )}
-          {activeTab === 'off-campus' && (
-            <SubmissionsOverview type="off-campus" />
-          )}
         </div>
+        <SubmissionDetailModal
+          isOpen={isModalOpen}
+          onClose={handleCloseModal}
+          submission={selectedSubmission}
+        />
       </div>
-      <SubmissionDetailModal
-        isOpen={isModalOpen}
-        onClose={handleCloseModal}
-        submission={selectedSubmission}
-      />    </div>
+    </div>
   );
 }
 

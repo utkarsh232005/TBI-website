@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { Button } from "@/components/ui/button";
-import { FileTextIcon } from "lucide-react";
+import { FileTextIcon, TrendingUp, Users, Activity, BarChart3 } from "lucide-react";
 import { AlertCircle, Loader2, ThumbsUp, ThumbsDown, KeyRound, UserCircle, CheckCircle, XCircle, Clock, Landmark, Building, RefreshCw } from "lucide-react";
 import { db } from '@/lib/firebase';
 import { collection, getDocs, orderBy, query, Timestamp } from 'firebase/firestore';
@@ -85,194 +85,176 @@ export default function AdminDashboardPage() {
     }
   };
 
-  const getBadgeClasses = (status: Submission['status']) =>
-    status === 'accepted'
-      ? 'bg-teal-500/10 text-teal-400'
-      : status === 'rejected'
-        ? 'bg-rose-500/10 text-rose-400'
-        : 'bg-amber-500/10 text-amber-400';
+  const view = (submission: Submission) => {
+    // Handle viewing submission details instantly
+    console.log('Viewing submission details:', submission);
+    
+    // You can add additional logic here such as:
+    // - Opening a modal with submission details
+    // - Navigating to a detailed view page
+    // - Setting selected submission state
+    
+    // For now, we'll just log the submission data
+    // In a full implementation, you might want to:
+    // setSelectedSubmission(submission);
+    // setIsDetailsModalOpen(true);
+  };
 
-  const KpiCard = ({ title, value, Icon, description, className = '', iconBg, valueColor }: { title: string; value: number | string; Icon: React.ComponentType<{ className?: string }>; description?: string; className?: string; iconBg?: string; valueColor?: string }) => (
-    <div className={`admin-card group cursor-pointer admin-float ${className}`}>
-      <div className="relative z-10 p-6">
-        <div className="flex items-center justify-between mb-4">
-          <div className={`admin-icon ${
-            iconBg?.includes('indigo') || valueColor?.includes('indigo') ? 'admin-icon-blue' : 
-            iconBg?.includes('teal') || iconBg?.includes('green') || valueColor?.includes('teal') || valueColor?.includes('green') ? 'admin-icon-green' : 
-            iconBg?.includes('amber') || valueColor?.includes('amber') ? 'admin-icon-amber' : 
-            iconBg?.includes('rose') || valueColor?.includes('rose') ? 'admin-icon-red' : 'admin-icon-blue'
-          }`}>
-            <Icon className="h-5 w-5 group-hover:scale-110 transition-transform" />
-          </div>
-          <div className="admin-badge admin-badge-neutral">
-            +2.5%
-          </div>
+  // --- Typography utility classes (for inline use) ---
+  const heading1 = "text-3xl sm:text-4xl font-extrabold tracking-tight text-gray-900";
+  const heading2 = "text-xl sm:text-2xl font-bold text-gray-900";
+  const label = "text-sm font-semibold text-gray-700 tracking-wide uppercase";
+  const metricValue = "text-3xl font-bold text-gray-900";
+  const metricDesc = "text-xs text-gray-500 mt-1";
+  const cardBase = "bg-white rounded-2xl shadow-md border border-gray-100 flex flex-col justify-between p-6 min-h-[170px]";
+  const cardIcon = "flex items-center justify-center w-12 h-12 rounded-xl mb-4";
+  const cardTrend = "absolute top-4 right-4 px-2 py-0.5 rounded-full text-xs font-semibold bg-white/80 border border-gray-200";
+  const cardGrid = "grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6";
+  const section = "bg-white rounded-2xl shadow-md border border-gray-100 overflow-hidden";
+  const sectionHeader = "flex flex-col sm:flex-row sm:items-center sm:justify-between gap-6 p-8 border-b border-gray-50";
+  const sectionTitle = "flex items-center gap-4";
+  const sectionIcon = "w-12 h-12 bg-gradient-to-br from-blue-100 to-indigo-100 rounded-xl flex items-center justify-center shadow-sm";
+  const sectionStats = "flex items-center gap-3";
+  const statBox = "flex items-center gap-2 px-4 py-2 bg-gray-50 rounded-full border border-gray-100 text-gray-700 text-sm font-medium shadow-sm";
+  const statBoxBlue = "flex items-center gap-2 px-4 py-2 bg-blue-50 rounded-full border border-blue-100 text-blue-700 text-sm font-medium shadow-sm";
+  const mainBg = "min-h-screen bg-[#f7fafd]";
+  const mainWrap = "max-w-7xl mx-auto px-4 sm:px-8 py-8 space-y-10";
+  const btn = "rounded-full px-6 py-3 font-semibold text-white bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 shadow-sm hover:shadow-md border-0 focus:outline-none focus:ring-2 focus:ring-blue-200 transition";
+  const liveBtn = "flex items-center gap-2 px-4 py-2 bg-blue-50 rounded-full border border-blue-100 text-blue-700 text-sm font-medium shadow-sm hover:bg-blue-100 transition";
+
+  // --- MetricCard with unified layout ---
+  type MetricCardProps = {
+    title: string;
+    value: number | string;
+    icon: React.ComponentType<{ className?: string }>;
+    trend?: string;
+    description?: string;
+    color: 'blue' | 'green' | 'amber' | 'red';
+  };
+  const MetricCard = ({ title, value, icon: Icon, trend, description }: MetricCardProps) => {
+    return (
+      <div className={`${cardBase} relative border-gray-100`}>
+        <div className={`${cardIcon} bg-gray-100 text-gray-500`}>
+          <Icon className="w-6 h-6" />
         </div>
-        <div className="space-y-2">
-          <h3 className="text-sm font-medium uppercase tracking-wider text-muted-foreground">{title}</h3>
-          <p className={`text-2xl font-bold transition-all duration-300 group-hover:scale-105 ${
-            valueColor?.includes('indigo') ? 'text-blue-600' : 
-            valueColor?.includes('teal') || valueColor?.includes('green') ? 'text-green-600' : 
-            valueColor?.includes('amber') ? 'text-amber-600' : 
-            valueColor?.includes('rose') ? 'text-red-600' : 'text-gray-900'
-          }`}>
-            {value}
-          </p>
-          {description && (
-            <p className="text-xs font-medium text-muted-foreground flex items-center">
-              <span className="w-1.5 h-1.5 rounded-full bg-blue-400 mr-1.5"></span>
-              {description}
-            </p>
-          )}
+        {trend && (
+          <span className={`${cardTrend} text-gray-600 border-gray-200`}>{trend}</span>
+        )}
+        <div>
+          <div className={label}>{title}</div>
+          <div className={metricValue}>{value}</div>
+          {description && <div className={metricDesc}>{description}</div>}
         </div>
       </div>
-      {/* Shimmer effect on hover */}
-      <div className="admin-shimmer absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-700 rounded-3xl"></div>
-    </div>
-  );
-
-  // Custom card components for each KPI with specific styling
-  const TotalCard = () => (
-    <div className="admin-card cursor-pointer hover:border-blue-500/30 hover:shadow-blue-500/5">
-      <div className="relative z-10 p-6">
-        <div className="flex items-center justify-between mb-4">
-          <div className="admin-icon admin-icon-blue">
-            <FileTextIcon className="h-5 w-5" />
-          </div>
-          <div className="admin-badge admin-badge-neutral">
-            +2.5%
-          </div>
-        </div>
-        <div className="space-y-2">
-          <h3 className="text-sm font-medium uppercase tracking-wider text-muted-foreground">Total</h3>
-          <p className="text-2xl font-bold text-blue-600">
-            {kpiData.total}
-          </p>
-          <p className="text-xs font-medium text-muted-foreground flex items-center">
-            <span className="w-1.5 h-1.5 rounded-full bg-blue-400 mr-1.5"></span>
-            All received
-          </p>
-        </div>
-      </div>
-    </div>
-  );
-
-  const PendingCard = () => (
-    <div className="admin-card cursor-pointer hover:border-amber-500/30 hover:shadow-amber-500/5">
-      <div className="relative z-10 p-6">
-        <div className="flex items-center justify-between mb-4">
-          <div className="admin-icon admin-icon-amber">
-            <Clock className="h-5 w-5" />
-          </div>
-          <div className="admin-badge admin-badge-neutral">
-            +2.5%
-          </div>
-        </div>
-        <div className="space-y-2">
-          <h3 className="text-sm font-medium uppercase tracking-wider text-muted-foreground">Pending</h3>
-          <p className="text-2xl font-bold text-amber-600">
-            {kpiData.pending}
-          </p>
-          <p className="text-xs font-medium text-muted-foreground flex items-center">
-            <span className="w-1.5 h-1.5 rounded-full bg-blue-400 mr-1.5"></span>
-            Awaiting review
-          </p>
-        </div>
-      </div>
-    </div>
-  );
-
-  const AcceptedCard = () => (
-    <div className="admin-card cursor-pointer hover:border-teal-500/30 hover:shadow-teal-500/5">
-      <div className="relative z-10 p-6">
-        <div className="flex items-center justify-between mb-4">
-          <div className="admin-icon admin-icon-green">
-            <CheckCircle className="h-5 w-5" />
-          </div>
-          <div className="admin-badge admin-badge-neutral">
-            +2.5%
-          </div>
-        </div>
-        <div className="space-y-2">
-          <h3 className="text-sm font-medium uppercase tracking-wider text-muted-foreground">Accepted</h3>
-          <p className="text-2xl font-bold text-green-600">
-            {kpiData.accepted}
-          </p>
-          <p className="text-xs font-medium text-muted-foreground flex items-center">
-            <span className="w-1.5 h-1.5 rounded-full bg-blue-400 mr-1.5"></span>
-            Approved
-          </p>
-        </div>
-      </div>
-    </div>
-  );
-
-  const RejectedCard = () => (
-    <div className="admin-card cursor-pointer hover:border-rose-500/30 hover:shadow-rose-500/5">
-      <div className="relative z-10 p-6">
-        <div className="flex items-center justify-between mb-4">
-          <div className="admin-icon admin-icon-red">
-            <XCircle className="h-5 w-5" />
-          </div>
-          <div className="admin-badge admin-badge-neutral">
-            +2.5%
-          </div>
-        </div>
-        <div className="space-y-2">
-          <h3 className="text-sm font-medium uppercase tracking-wider text-muted-foreground">Rejected</h3>
-          <p className="text-2xl font-bold text-red-600">
-            {kpiData.rejected}
-          </p>
-          <p className="text-xs font-medium text-muted-foreground flex items-center">
-            <span className="w-1.5 h-1.5 rounded-full bg-blue-400 mr-1.5"></span>
-            Denied
-          </p>
-        </div>
-      </div>
-    </div>
-  );
+    );
+  };
 
   return (
-    <div className="space-y-8">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-          <TotalCard />
-          <PendingCard />
-          <AcceptedCard />
-          <RejectedCard />
-        </div>
-        <div className="admin-card overflow-hidden">
-          <div className="admin-header">
-            <div className="flex flex-col sm:flex-row sm:justify-between items-start sm:items-center">
-              <div className="flex items-center gap-4">
-                <div className="admin-icon admin-icon-blue">
-                  <FileTextIcon className="h-5 w-5" />
-                </div>
-                <div>
-                  <h2 className="text-3xl font-black mb-1">Submissions</h2>
-                  <p className="font-semibold text-lg text-muted-foreground">Review applications</p>
-                </div>
-              </div>
-              <Button 
-                onClick={fetchSubmissions} 
-                disabled={isLoading} 
-                className="admin-btn admin-btn-primary group mt-4 sm:mt-0"
+    <div className={mainBg}>
+      <div className={mainWrap}>
+        {/* Header Section */}
+        <div className={section + " flex flex-col gap-0"}>
+          <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-8 p-8">
+            <div className="space-y-3">
+              <h1 className={heading1}>
+                Dashboard Overview
+              </h1>
+              <p className="text-base text-gray-600 font-normal">
+                Monitor and manage your application submissions
+              </p>
+            </div>
+            <div className="flex items-center gap-4">
+              <button className={liveBtn.replace('text-blue-700', 'text-gray-700').replace('hover:bg-blue-100', 'hover:bg-gray-100').replace('border-blue-100', 'border-gray-200').replace('bg-blue-50', 'bg-gray-100')} type="button">
+                <span className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></span>
+                Live Updates
+              </button>
+              <Button
+                onClick={fetchSubmissions}
+                disabled={isLoading}
+                className={btn.replace('text-white', 'text-gray-900').replace('bg-gradient-to-r from-blue-600 to-indigo-600', 'bg-gray-200').replace('hover:from-blue-700 hover:to-indigo-700', 'hover:bg-gray-300')}
               >
-                <span className={`${isLoading ? 'animate-spin' : 'group-hover:rotate-180 transition-transform duration-500'}`}>
-                  {isLoading ? <Loader2 className="h-5 w-5"/> : <RefreshCw className="h-5 w-5"/>}
-                </span>
-                Refresh
+                {isLoading ? (
+                  <Loader2 className="w-5 h-5 animate-spin mr-2 text-gray-600" />
+                ) : (
+                  <RefreshCw className="w-5 h-5 mr-2 group-hover:rotate-180 transition-transform duration-500 text-gray-600" />
+                )}
+                Refresh Data
               </Button>
             </div>
           </div>
-          <SubmissionsTable
-            submissions={submissions}
-            processingAction={processingActionState}
-            onProcessAction={handleProcess}
-            isLoading={isLoading}
-            error={error}
-            onRetry={fetchSubmissions}
+        </div>
+
+        {/* KPI Grid */}
+        <div className={cardGrid}>
+          <MetricCard
+            title="Total Applications"
+            value={kpiData.total}
+            icon={FileTextIcon}
+            description="All submissions received"
+            color="blue"
+            trend="+12.5%"
+          />
+          <MetricCard
+            title="Pending Review"
+            value={kpiData.pending}
+            icon={Clock}
+            description="Awaiting evaluation"
+            color="amber"
+            trend="+8.3%"
+          />
+          <MetricCard
+            title="Approved"
+            value={kpiData.accepted}
+            icon={CheckCircle}
+            description="Successfully accepted"
+            color="green"
+            trend="+15.2%"
+          />
+          <MetricCard
+            title="Rejected"
+            value={kpiData.rejected}
+            icon={XCircle}
+            description="Not approved"
+            color="red"
+            trend="-5.1%"
           />
         </div>
+
+        {/* Submissions Table Section */}
+        <div className={section}>
+          <div className={sectionHeader}>
+            <div className={sectionTitle}>
+              <div className={sectionIcon.replace('bg-gradient-to-br from-blue-100 to-indigo-100', 'bg-gray-100 text-gray-500')}>
+                <BarChart3 className="w-6 h-6" />
+              </div>
+              <div>
+                <h2 className={heading2}>Application Management</h2>
+                <div className="text-sm text-gray-600 font-normal">Review and process submissions</div>
+              </div>
+            </div>
+            <div className={sectionStats}>
+              <div className={statBox.replace('text-blue-700', 'text-gray-700').replace('bg-blue-50', 'bg-gray-100').replace('border-blue-100', 'border-gray-200')}>
+                <Activity className="w-4 h-4 text-gray-600" />
+                {submissions.length} Total
+              </div>
+              <div className={statBoxBlue.replace('text-blue-700', 'text-gray-700').replace('bg-blue-50', 'bg-gray-100').replace('border-blue-100', 'border-gray-200')}>
+                <Users className="w-4 h-4 text-gray-600" />
+                {kpiData.pending} Pending
+              </div>
+            </div>
+          </div>
+          <div className="overflow-hidden">
+            <SubmissionsTable
+              submissions={submissions}
+              processingAction={processingActionState}
+              onProcessAction={handleProcess}
+              isLoading={isLoading}
+              error={error}
+              onRetry={fetchSubmissions}
+            />
+          </div>
+        </div>
+      </div>
     </div>
   );
 }

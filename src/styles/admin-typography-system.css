@@ -1,0 +1,437 @@
+/* Admin Panel Typography System - Minimalist & Refined */
+/* Production-level text styling with consistent visual hierarchy */
+
+:root {
+  /* Refined Color Palette for Typography */
+  --admin-text-primary: #1a202c;      /* Deep charcoal for primary text */
+  --admin-text-secondary: #4a5568;    /* Medium gray for secondary text */
+  --admin-text-tertiary: #718096;     /* Light gray for tertiary text */
+  --admin-text-muted: #a0aec0;        /* Muted gray for disabled/placeholder text */
+  --admin-text-inverse: #ffffff;      /* White text for dark backgrounds */
+  
+  /* Semantic Text Colors */
+  --admin-text-success: #2f855a;      /* Green for success states */
+  --admin-text-warning: #c05621;      /* Orange for warning states */
+  --admin-text-error: #c53030;        /* Red for error states */
+  --admin-text-info: #3182ce;         /* Blue for info states */
+  
+  /* Link Colors */
+  --admin-link-primary: #3182ce;      /* Primary link color */
+  --admin-link-hover: #2c5aa0;        /* Link hover state */
+  --admin-link-active: #1a365d;       /* Link active state */
+  
+  /* Typography Scale - Consistent Font Sizes */
+  --admin-text-xs: 0.75rem;           /* 12px - Captions, labels */
+  --admin-text-sm: 0.875rem;          /* 14px - Small body text */
+  --admin-text-base: 1rem;            /* 16px - Base body text */
+  --admin-text-lg: 1.125rem;          /* 18px - Large body text */
+  --admin-text-xl: 1.25rem;           /* 20px - Small headings */
+  --admin-text-2xl: 1.5rem;           /* 24px - Medium headings */
+  --admin-text-3xl: 1.875rem;         /* 30px - Large headings */
+  --admin-text-4xl: 2.25rem;          /* 36px - Extra large headings */
+  --admin-text-5xl: 3rem;             /* 48px - Hero headings */
+  
+  /* Font Weights - Consistent Hierarchy */
+  --admin-font-light: 300;
+  --admin-font-normal: 400;
+  --admin-font-medium: 500;
+  --admin-font-semibold: 600;
+  --admin-font-bold: 700;
+  --admin-font-extrabold: 800;
+  
+  /* Line Heights - Optimized for Readability */
+  --admin-leading-tight: 1.25;
+  --admin-leading-snug: 1.375;
+  --admin-leading-normal: 1.5;
+  --admin-leading-relaxed: 1.625;
+  --admin-leading-loose: 2;
+  
+  /* Letter Spacing */
+  --admin-tracking-tight: -0.025em;
+  --admin-tracking-normal: 0;
+  --admin-tracking-wide: 0.025em;
+  --admin-tracking-wider: 0.05em;
+  --admin-tracking-widest: 0.1em;
+}
+
+/* Base Typography Classes */
+.admin-text-xs {
+  font-size: var(--admin-text-xs);
+  line-height: var(--admin-leading-tight);
+  color: var(--admin-text-secondary);
+}
+
+.admin-text-sm {
+  font-size: var(--admin-text-sm);
+  line-height: var(--admin-leading-snug);
+  color: var(--admin-text-secondary);
+}
+
+.admin-text-base {
+  font-size: var(--admin-text-base);
+  line-height: var(--admin-leading-normal);
+  color: var(--admin-text-primary);
+}
+
+.admin-text-lg {
+  font-size: var(--admin-text-lg);
+  line-height: var(--admin-leading-relaxed);
+  color: var(--admin-text-primary);
+}
+
+.admin-text-xl {
+  font-size: var(--admin-text-xl);
+  line-height: var(--admin-leading-snug);
+  color: var(--admin-text-primary);
+  font-weight: var(--admin-font-semibold);
+}
+
+.admin-text-2xl {
+  font-size: var(--admin-text-2xl);
+  line-height: var(--admin-leading-tight);
+  color: var(--admin-text-primary);
+  font-weight: var(--admin-font-bold);
+}
+
+.admin-text-3xl {
+  font-size: var(--admin-text-3xl);
+  line-height: var(--admin-leading-tight);
+  color: var(--admin-text-primary);
+  font-weight: var(--admin-font-bold);
+}
+
+.admin-text-4xl {
+  font-size: var(--admin-text-4xl);
+  line-height: var(--admin-leading-tight);
+  color: var(--admin-text-primary);
+  font-weight: var(--admin-font-extrabold);
+}
+
+.admin-text-5xl {
+  font-size: var(--admin-text-5xl);
+  line-height: var(--admin-leading-tight);
+  color: var(--admin-text-primary);
+  font-weight: var(--admin-font-extrabold);
+}
+
+/* Font Weight Classes */
+.admin-font-light { font-weight: var(--admin-font-light); }
+.admin-font-normal { font-weight: var(--admin-font-normal); }
+.admin-font-medium { font-weight: var(--admin-font-medium); }
+.admin-font-semibold { font-weight: var(--admin-font-semibold); }
+.admin-font-bold { font-weight: var(--admin-font-bold); }
+.admin-font-extrabold { font-weight: var(--admin-font-extrabold); }
+
+/* Text Color Classes */
+.admin-text-primary { color: var(--admin-text-primary); }
+.admin-text-secondary { color: var(--admin-text-secondary); }
+.admin-text-tertiary { color: var(--admin-text-tertiary); }
+.admin-text-muted { color: var(--admin-text-muted); }
+.admin-text-inverse { color: var(--admin-text-inverse); }
+
+.admin-text-success { color: var(--admin-text-success); }
+.admin-text-warning { color: var(--admin-text-warning); }
+.admin-text-error { color: var(--admin-text-error); }
+.admin-text-info { color: var(--admin-text-info); }
+
+/* Link Styling */
+.admin-link {
+  color: var(--admin-link-primary);
+  text-decoration: none;
+  transition: color 0.2s ease-in-out;
+}
+
+.admin-link:hover {
+  color: var(--admin-link-hover);
+  text-decoration: underline;
+}
+
+.admin-link:active {
+  color: var(--admin-link-active);
+}
+
+/* Heading Hierarchy */
+.admin-heading-1 {
+  font-size: var(--admin-text-4xl);
+  font-weight: var(--admin-font-extrabold);
+  line-height: var(--admin-leading-tight);
+  color: var(--admin-text-primary);
+  letter-spacing: var(--admin-tracking-tight);
+  margin-bottom: 1rem;
+}
+
+.admin-heading-2 {
+  font-size: var(--admin-text-3xl);
+  font-weight: var(--admin-font-bold);
+  line-height: var(--admin-leading-tight);
+  color: var(--admin-text-primary);
+  letter-spacing: var(--admin-tracking-tight);
+  margin-bottom: 0.875rem;
+}
+
+.admin-heading-3 {
+  font-size: var(--admin-text-2xl);
+  font-weight: var(--admin-font-semibold);
+  line-height: var(--admin-leading-snug);
+  color: var(--admin-text-primary);
+  margin-bottom: 0.75rem;
+}
+
+.admin-heading-4 {
+  font-size: var(--admin-text-xl);
+  font-weight: var(--admin-font-semibold);
+  line-height: var(--admin-leading-snug);
+  color: var(--admin-text-primary);
+  margin-bottom: 0.625rem;
+}
+
+.admin-heading-5 {
+  font-size: var(--admin-text-lg);
+  font-weight: var(--admin-font-medium);
+  line-height: var(--admin-leading-relaxed);
+  color: var(--admin-text-primary);
+  margin-bottom: 0.5rem;
+}
+
+.admin-heading-6 {
+  font-size: var(--admin-text-base);
+  font-weight: var(--admin-font-medium);
+  line-height: var(--admin-leading-normal);
+  color: var(--admin-text-primary);
+  margin-bottom: 0.375rem;
+}
+
+/* Body Text Classes */
+.admin-body-large {
+  font-size: var(--admin-text-lg);
+  line-height: var(--admin-leading-relaxed);
+  color: var(--admin-text-primary);
+  font-weight: var(--admin-font-normal);
+}
+
+.admin-body {
+  font-size: var(--admin-text-base);
+  line-height: var(--admin-leading-normal);
+  color: var(--admin-text-primary);
+  font-weight: var(--admin-font-normal);
+}
+
+.admin-body-small {
+  font-size: var(--admin-text-sm);
+  line-height: var(--admin-leading-snug);
+  color: var(--admin-text-secondary);
+  font-weight: var(--admin-font-normal);
+}
+
+.admin-caption {
+  font-size: var(--admin-text-xs);
+  line-height: var(--admin-leading-tight);
+  color: var(--admin-text-tertiary);
+  font-weight: var(--admin-font-normal);
+}
+
+/* Label and Form Text */
+.admin-label {
+  font-size: var(--admin-text-sm);
+  font-weight: var(--admin-font-medium);
+  color: var(--admin-text-primary);
+  line-height: var(--admin-leading-snug);
+  margin-bottom: 0.25rem;
+}
+
+.admin-label-small {
+  font-size: var(--admin-text-xs);
+  font-weight: var(--admin-font-medium);
+  color: var(--admin-text-secondary);
+  line-height: var(--admin-leading-tight);
+  margin-bottom: 0.125rem;
+}
+
+.admin-input-text {
+  font-size: var(--admin-text-base);
+  line-height: var(--admin-leading-normal);
+  color: var(--admin-text-primary);
+  font-weight: var(--admin-font-normal);
+}
+
+.admin-input-text::placeholder {
+  color: var(--admin-text-muted);
+  font-weight: var(--admin-font-normal);
+}
+
+/* Button Text */
+.admin-btn-text {
+  font-size: var(--admin-text-sm);
+  font-weight: var(--admin-font-medium);
+  line-height: var(--admin-leading-tight);
+  letter-spacing: var(--admin-tracking-wide);
+}
+
+.admin-btn-text-large {
+  font-size: var(--admin-text-base);
+  font-weight: var(--admin-font-semibold);
+  line-height: var(--admin-leading-tight);
+  letter-spacing: var(--admin-tracking-wide);
+}
+
+/* Table Typography */
+.admin-table-header {
+  font-size: var(--admin-text-sm);
+  font-weight: var(--admin-font-semibold);
+  color: var(--admin-text-primary);
+  line-height: var(--admin-leading-tight);
+  letter-spacing: var(--admin-tracking-wide);
+  text-transform: uppercase;
+}
+
+.admin-table-cell {
+  font-size: var(--admin-text-sm);
+  color: var(--admin-text-secondary);
+  line-height: var(--admin-leading-snug);
+  font-weight: var(--admin-font-normal);
+}
+
+.admin-table-cell-primary {
+  font-size: var(--admin-text-sm);
+  color: var(--admin-text-primary);
+  line-height: var(--admin-leading-snug);
+  font-weight: var(--admin-font-medium);
+}
+
+/* Badge and Status Text */
+.admin-badge-text {
+  font-size: var(--admin-text-xs);
+  font-weight: var(--admin-font-medium);
+  line-height: var(--admin-leading-tight);
+  letter-spacing: var(--admin-tracking-wide);
+  text-transform: uppercase;
+}
+
+/* Card and Section Headers */
+.admin-card-title {
+  font-size: var(--admin-text-lg);
+  font-weight: var(--admin-font-semibold);
+  color: var(--admin-text-primary);
+  line-height: var(--admin-leading-snug);
+  margin-bottom: 0.5rem;
+}
+
+.admin-card-subtitle {
+  font-size: var(--admin-text-sm);
+  color: var(--admin-text-secondary);
+  line-height: var(--admin-leading-snug);
+  font-weight: var(--admin-font-normal);
+}
+
+.admin-section-title {
+  font-size: var(--admin-text-2xl);
+  font-weight: var(--admin-font-bold);
+  color: var(--admin-text-primary);
+  line-height: var(--admin-leading-tight);
+  margin-bottom: 1rem;
+}
+
+.admin-section-subtitle {
+  font-size: var(--admin-text-lg);
+  color: var(--admin-text-secondary);
+  line-height: var(--admin-leading-relaxed);
+  font-weight: var(--admin-font-normal);
+  margin-bottom: 1.5rem;
+}
+
+/* Navigation Text */
+.admin-nav-text {
+  font-size: var(--admin-text-sm);
+  font-weight: var(--admin-font-medium);
+  color: var(--admin-text-secondary);
+  line-height: var(--admin-leading-tight);
+  transition: color 0.2s ease-in-out;
+}
+
+.admin-nav-text:hover {
+  color: var(--admin-text-primary);
+}
+
+.admin-nav-text-active {
+  font-size: var(--admin-text-sm);
+  font-weight: var(--admin-font-semibold);
+  color: var(--admin-text-primary);
+  line-height: var(--admin-leading-tight);
+}
+
+/* Utility Classes */
+.admin-text-center { text-align: center; }
+.admin-text-left { text-align: left; }
+.admin-text-right { text-align: right; }
+.admin-text-justify { text-align: justify; }
+
+.admin-uppercase { text-transform: uppercase; }
+.admin-lowercase { text-transform: lowercase; }
+.admin-capitalize { text-transform: capitalize; }
+
+.admin-underline { text-decoration: underline; }
+.admin-line-through { text-decoration: line-through; }
+.admin-no-underline { text-decoration: none; }
+
+.admin-break-words { word-wrap: break-word; }
+.admin-break-all { word-break: break-all; }
+.admin-whitespace-nowrap { white-space: nowrap; }
+.admin-whitespace-pre { white-space: pre; }
+
+/* Responsive Typography */
+@media (max-width: 768px) {
+  .admin-heading-1 {
+    font-size: var(--admin-text-3xl);
+  }
+  
+  .admin-heading-2 {
+    font-size: var(--admin-text-2xl);
+  }
+  
+  .admin-heading-3 {
+    font-size: var(--admin-text-xl);
+  }
+  
+  .admin-section-title {
+    font-size: var(--admin-text-xl);
+  }
+  
+  .admin-section-subtitle {
+    font-size: var(--admin-text-base);
+  }
+}
+
+/* Print Styles */
+@media print {
+  .admin-text-primary,
+  .admin-text-secondary,
+  .admin-text-tertiary {
+    color: #000000 !important;
+  }
+  
+  .admin-text-muted {
+    color: #666666 !important;
+  }
+  
+  .admin-link {
+    color: #000000 !important;
+    text-decoration: underline !important;
+  }
+}
+
+/* High Contrast Mode Support */
+@media (prefers-contrast: high) {
+  :root {
+    --admin-text-primary: #000000;
+    --admin-text-secondary: #333333;
+    --admin-text-tertiary: #666666;
+    --admin-text-muted: #999999;
+  }
+}
+
+/* Reduced Motion Support */
+@media (prefers-reduced-motion: reduce) {
+  .admin-link {
+    transition: none;
+  }
+} 

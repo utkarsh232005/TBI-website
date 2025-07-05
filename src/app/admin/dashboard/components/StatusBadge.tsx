@@ -3,21 +3,21 @@ import { CheckCircle, XCircle, Clock } from "lucide-react";
 const statusConfig = {
   pending: { 
     icon: Clock, 
-    bg: 'bg-gradient-to-r from-amber-50 to-yellow-50', 
-    text: 'text-amber-600',
-    border: 'border-amber-100/40'
+    bg: 'bg-yellow-50', 
+    text: 'text-yellow-700',
+    border: 'border-yellow-200'
   },
   accepted: { 
     icon: CheckCircle, 
-    bg: 'bg-gradient-to-r from-green-50 to-emerald-50', 
-    text: 'text-green-600',
-    border: 'border-green-100/40'
+    bg: 'bg-emerald-50', 
+    text: 'text-emerald-700',
+    border: 'border-emerald-200'
   },
   rejected: { 
     icon: XCircle, 
-    bg: 'bg-gradient-to-r from-red-50 to-rose-50', 
-    text: 'text-red-600',
-    border: 'border-red-100/40'
+    bg: 'bg-rose-50', 
+    text: 'text-rose-700',
+    border: 'border-rose-200'
   }
 } as const;
 
@@ -35,12 +35,12 @@ export function StatusBadge({ status, showDate, className = '' }: StatusBadgePro
 
   return (
     <div className={`flex flex-col gap-1 ${className}`}>
-      <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${bg} ${text} border ${border} shadow-sm`}>
-        <Icon className="h-3 w-3 mr-1.5" />
+      <span className={`inline-flex items-center px-3 py-1.5 rounded-lg text-xs font-semibold ${bg} ${text} border ${border}`}>
+        <Icon className="h-3.5 w-3.5 mr-2" />
         {status.charAt(0).toUpperCase() + status.slice(1)}
       </span>
       {formattedDate && (
-        <span className="text-xs text-gray-500">
+        <span className="text-xs text-gray-400">
           {formattedDate}
         </span>
       )}

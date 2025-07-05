@@ -1,4 +1,7 @@
-﻿@tailwind base;
+﻿/* Import Admin Typography System */
+@import '../styles/admin-typography-system.css';
+
+@tailwind base;
 @tailwind components;
 @tailwind utilities;
 

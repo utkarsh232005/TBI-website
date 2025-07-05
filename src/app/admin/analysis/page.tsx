@@ -3,7 +3,7 @@ import React, { useState, useEffect, useMemo } from "react";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend, LabelList, Cell, RadialBarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis, RadialBar, PieChart, Pie } from "recharts";
 import { motion } from "framer-motion";
 import * as XLSX from 'xlsx';
-import { TrendingUp, Search, ExternalLink, Download, Filter, ChevronDown } from "lucide-react";
+import { TrendingUp, Search, ExternalLink, Download, Filter, ChevronDown, Upload, FileText, BarChart3, Plus } from "lucide-react";
 import {
   Card,
   CardContent,
@@ -969,424 +969,446 @@ const AnalysisPage = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 text-gray-900 p-6">
-      {/* Professional Header Section */}
-      <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-8 mb-8">
-        <div className="flex justify-between items-center">
-          <div>
-            <h1 className="text-3xl font-bold text-gray-900">Analytics Dashboard</h1>
-            <p className="text-lg text-gray-600 mt-2">Track and analyze startup performance metrics</p>
-          </div>
-          <div className="flex items-center space-x-4">
-            <Button
-              onClick={() => document.getElementById('excel-upload')?.click()}
-              className="bg-blue-600 hover:bg-blue-700 text-white font-medium py-3 px-6 rounded-lg shadow-sm transition-all duration-200 flex items-center justify-center gap-2"
-            >
-              <Download className="h-5 w-5" /> Upload Data
-            </Button>
-            <input
-              id="excel-upload"
-              type="file"
-              accept=".xlsx, .xls"
-              onChange={handleFileUpload}
-              className="hidden"
-            />
-            <Select value={selectedTemplate} onValueChange={(value) => {
-              setSelectedTemplate(value);
-              handleDownloadTemplate(value);
-            }}>
-              <SelectTrigger className="bg-green-600 hover:bg-green-700 text-white font-medium py-3 px-6 rounded-lg shadow-sm transition-all duration-200 flex items-center justify-center gap-2 border-0">
-                <Download className="h-5 w-5" />
-                <span>
-                  {selectedTemplate ?
-                    (selectedTemplate === "incubationSummary" ? "Incubation Summary" :
-                     selectedTemplate === "vcInvestment" ? "VC Investment" :
-                     selectedTemplate === "startupDetails" ? "Startup Details" : "Templates")
-                  : "Download Templates"}
-                </span>
-              </SelectTrigger>
-              <SelectContent className="bg-white border border-gray-200 shadow-lg">
-                <SelectItem value="incubationSummary">Incubation Summary</SelectItem>
-                <SelectItem value="vcInvestment">VC Investment Details</SelectItem>
-                <SelectItem value="startupDetails">Startup Details</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-        </div>
-      </div>
-
-      {/* Summary Section */}
-      <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 mb-8">
-        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
-          <div>
-            <h2 className="text-2xl font-bold text-gray-900">Performance Overview</h2>
-            <p className="text-gray-600 mt-2">Track and analyze startup metrics by category</p>
-          </div>
-          <div className="relative min-w-[250px]">
-            <select
-              value={selectedSummaryGraph}
-              onChange={(e) => setSelectedSummaryGraph(e.target.value)}
-              className="w-full appearance-none bg-white border border-gray-300 text-gray-900 py-3 pl-4 pr-12 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 font-medium"
-            >
-              {Object.keys(summaryBlocks || dummyData).map((key) => (
-                <option key={key} value={key}>
-                  {key.replace(/([A-Z])/g, ' $1').replace(/^./, (str) => str.toUpperCase())}
-                </option>
-              ))}
-            </select>
-            <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-4 text-gray-500">
-              <ChevronDown className="h-5 w-5" />
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* Summary Charts */} 
-      <motion.div
-        key={selectedSummaryGraph} // Key changes on graph selection to trigger re-animation
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5 }}
-        className="mb-8"
-      >
-        {selectedSummaryGraph === "" ? (
-          <Card className="bg-white border border-gray-200 shadow-sm">
-            <CardHeader>
-              <CardTitle className="text-xl font-semibold text-gray-900">Select a Category</CardTitle>
-              <CardDescription className="text-gray-600">Choose an option from the dropdown above to view analytics</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="h-[400px] flex items-center justify-center text-gray-500 text-lg">
-                No category selected.
+    <div className="min-h-screen bg-gray-50 py-8 px-4">
+      <div className="max-w-7xl mx-auto space-y-8">
+        {/* Enhanced Header & Creation Section */}
+        <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-8 mb-8">
+          <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-8">
+            <div className="flex items-center gap-3 mb-6 lg:mb-0">
+              <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-xl flex items-center justify-center shadow-lg">
+                <BarChart3 className="w-6 h-6 text-white" />
               </div>
-            </CardContent>
-          </Card>
-        ) : (
-          <Card className="bg-white border border-gray-200 shadow-sm">
-            <CardHeader>
-              <CardTitle className="text-xl font-semibold text-gray-900">
-                {selectedSummaryGraph.replace(/([A-Z])/g, ' $1').replace(/^./, (str) => str.toUpperCase())} Analytics
-              </CardTitle>
-              <CardDescription className="text-gray-600">Data visualization and insights</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <ResponsiveContainer width="100%" height={400}>
-                <BarChart
-                  layout="vertical"
-                  data={summaryBlocks ? summaryBlocks[selectedSummaryGraph] || [] : (dummyData as any)[selectedSummaryGraph.split(' -')[1]?.toLowerCase() || 'stages'] || []}
-                  margin={{
-                    top: 20,
-                    right: 30,
-                    left: 80,
-                    bottom: 20,
-                  }}
-                  barSize={32}
-                  barCategoryGap={8}
-                >
-                  <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
-                  <XAxis type="number" tick={{ fill: '#6b7280', fontSize: 12 }} axisLine={{ stroke: '#d1d5db' }} />
-                  <YAxis type="category" dataKey="label" tick={{ fill: '#6b7280', fontSize: 12 }} width={120} axisLine={{ stroke: '#d1d5db' }} />
-                  <Tooltip
-                    contentStyle={{ 
-                      background: 'white',
-                      borderRadius: 8,
-                      border: '1px solid #d1d5db',
-                      color: '#1f2937',
-                      fontSize: 14,
-                      boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)'
-                    }}
-                    itemStyle={{ color: '#1f2937', fontWeight: 500 }}
-                    formatter={(value: any) => [`${value} items`, 'Count']}
-                    cursor={{ fill: '#f3f4f6' }}
-                  />
-                  <Bar 
-                    dataKey="value" 
-                    fill="#4f46e5" 
-                    radius={[0, 6, 6, 0]}
-                  >
-                    {(summaryBlocks ? summaryBlocks[selectedSummaryGraph] || [] : (dummyData as any)[selectedSummaryGraph.split(' -')[1]?.toLowerCase() || 'stages'] || []).map((entry: { category: string }, index: number) => {
-                      const category = entry.category || 'Default';
-                      return (
-                        <Cell 
-                          key={`cell-${index}`} 
-                          fill={categoryColors[category] || '#4f46e5'}
-                        />
-                      );
-                    })}
-                  </Bar>
-                </BarChart>
-              </ResponsiveContainer>
-            </CardContent>
-          </Card>
-        )}
-      </motion.div>
-
-      {isLoading ? (
-        <div className="flex justify-center items-center h-64">
-          <div className="animate-spin rounded-full h-12 w-12 border-4 border-blue-500 border-t-transparent"></div>
-        </div>
-      ) : (
-        <>
-          {/* VC Investment Details Table */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.4, duration: 0.5 }}
-            className="mb-12"
-          >
-            <h2 className="text-2xl font-semibold text-gray-900 mb-6">VC Investment Details</h2>
-            <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
-              <table className="min-w-full">
-                <thead>
-                  <tr className="bg-gray-50 border-b border-gray-200">
-                    <th className="text-left py-4 px-6 text-gray-900 font-semibold text-sm uppercase tracking-wide">Startup Name</th>
-                    <th className="text-left py-4 px-6 text-gray-900 font-semibold text-sm uppercase tracking-wide">Amount</th>
-                    <th className="text-left py-4 px-6 text-gray-900 font-semibold text-sm uppercase tracking-wide">Organization</th>
-                    <th className="text-left py-4 px-6 text-gray-900 font-semibold text-sm uppercase tracking-wide">Investment Year</th>
-                    <th className="text-left py-4 px-6 text-gray-900 font-semibold text-sm uppercase tracking-wide">Proof Link</th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-gray-200">
-                  {vcData.map((investment, index) => (
-                    <tr key={investment.id} className={`${index % 2 === 0 ? 'bg-white' : 'bg-gray-50'} hover:bg-blue-50 transition-colors`}>
-                      <td className="py-4 px-6 text-gray-900 font-medium">
-                        {investment.startupName && investment.startupName.trim() !== '' ? investment.startupName : <span className="text-gray-400">—</span>}
-                      </td>
-                      <td className="py-4 px-6 text-blue-600 font-bold text-lg">
-                        {investment.amount > 0 ? formatAmount(investment.amount) : <span className="text-gray-400">—</span>}
-                      </td>
-                      <td className="py-4 px-6 text-gray-900">
-                        {investment.organization && investment.organization.trim() !== '' ? investment.organization : <span className="text-gray-400">—</span>}
-                      </td>
-                      <td className="py-4 px-6 text-gray-900">
-                        {investment.yearDisplay && investment.yearDisplay.trim() !== '' ? investment.yearDisplay : <span className="text-gray-400">—</span>}
-                      </td>
-                      <td className="py-4 px-6">
-                        {investment.proofLink && investment.proofLink.trim() !== '' ? (
-                          <a
-                            href={investment.proofLink}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="text-blue-600 hover:text-blue-800 transition-colors inline-flex items-center font-medium"
-                          >
-                            View Proof <ExternalLink className="ml-1 w-4 h-4" />
-                          </a>
-                        ) : (
-                          <span className="text-gray-400">—</span>
-                        )}
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
+              <div>
+                <h1 className="admin-heading-1">Startup Analysis Dashboard</h1>
+                <p className="admin-section-subtitle">Visualize, filter, and analyze startup performance and investments</p>
+              </div>
             </div>
-          </motion.div>
+            <div className="flex flex-col sm:flex-row gap-4 lg:flex-shrink-0 w-full lg:w-auto">
+              {/* Upload Data Section */}
+              <div className="flex flex-col gap-2 w-full sm:w-auto">
+                <Button
+                  onClick={() => document.getElementById('excel-upload')?.click()}
+                  className="bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white font-semibold py-3 px-6 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 flex items-center justify-center gap-3 w-full sm:w-auto"
+                >
+                  <Upload className="h-5 w-5" />
+                  Upload Data
+                </Button>
+                <input
+                  id="excel-upload"
+                  type="file"
+                  accept=".xlsx, .xls"
+                  onChange={handleFileUpload}
+                  className="hidden"
+                />
+              </div>
+              {/* Template Download Section */}
+              <div className="flex flex-col gap-2 w-full sm:w-auto">
+                <Select value={selectedTemplate} onValueChange={(value) => {
+                  setSelectedTemplate(value);
+                  handleDownloadTemplate(value);
+                }}>
+                  <SelectTrigger className="bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 text-white font-semibold py-3 px-6 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 flex items-center justify-center gap-3 w-full sm:w-auto border-0">
+                    <Download className="h-5 w-5" />
+                    <span>
+                      {selectedTemplate ?
+                        (selectedTemplate === "incubationSummary" ? "Incubation Summary" :
+                         selectedTemplate === "vcInvestment" ? "VC Investment" :
+                         selectedTemplate === "startupDetails" ? "Startup Details" : "Templates")
+                      : "Download Templates"}
+                    </span>
+                  </SelectTrigger>
+                  <SelectContent className="bg-white border border-gray-200 shadow-xl rounded-xl">
+                    <SelectItem value="incubationSummary" className="hover:bg-gray-50 rounded-lg">
+                      <div className="flex items-center gap-3">
+                        <FileText className="h-4 w-4 text-blue-600" />
+                        <span>Incubation Summary</span>
+                      </div>
+                    </SelectItem>
+                    <SelectItem value="vcInvestment" className="hover:bg-gray-50 rounded-lg">
+                      <div className="flex items-center gap-3">
+                        <FileText className="h-4 w-4 text-green-600" />
+                        <span>VC Investment Details</span>
+                      </div>
+                    </SelectItem>
+                    <SelectItem value="startupDetails" className="hover:bg-gray-50 rounded-lg">
+                      <div className="flex items-center gap-3">
+                        <FileText className="h-4 w-4 text-purple-600" />
+                        <span>Startup Details</span>
+                      </div>
+                    </SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
+          </div>
+        </div>
 
-          {/* Startup Details Table */}
-          {startupDetails.length > 0 && (
+        {/* Summary Section */}
+        <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-8">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-6 mb-6">
+            <div className="space-y-2">
+              <h2 className="admin-heading-3">Performance Overview</h2>
+              <p className="admin-body-small">Track and analyze startup metrics by category</p>
+            </div>
+            <div className="relative min-w-[280px]">
+              <select
+                value={selectedSummaryGraph}
+                onChange={(e) => setSelectedSummaryGraph(e.target.value)}
+                className="w-full appearance-none bg-white border border-gray-300 text-gray-900 py-3 pl-4 pr-12 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 font-medium shadow-sm"
+              >
+                {Object.keys(summaryBlocks || dummyData).map((key) => (
+                  <option key={key} value={key}>
+                    {key.replace(/([A-Z])/g, ' $1').replace(/^./, (str) => str.toUpperCase())}
+                  </option>
+                ))}
+              </select>
+              <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-4 text-gray-500">
+                <ChevronDown className="h-5 w-5" />
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Summary Charts */}
+        <motion.div
+          key={selectedSummaryGraph}
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5 }}
+          className="mb-8"
+        >
+          {selectedSummaryGraph === "" ? (
+            <Card className="bg-white border border-gray-200 shadow-sm rounded-2xl">
+              <CardHeader className="pb-6">
+                <CardTitle className="admin-heading-4">Select a Category</CardTitle>
+                <CardDescription className="admin-body-small">Choose an option from the dropdown above to view analytics</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="h-[400px] flex items-center justify-center text-gray-500 text-lg">
+                  No category selected.
+                </div>
+              </CardContent>
+            </Card>
+          ) : (
+            <Card className="bg-white border border-gray-200 shadow-sm rounded-2xl">
+              <CardHeader className="pb-6">
+                <CardTitle className="admin-heading-4">
+                  {selectedSummaryGraph.replace(/([A-Z])/g, ' $1').replace(/^./, (str) => str.toUpperCase())} Analytics
+                </CardTitle>
+                <CardDescription className="admin-body-small">Data visualization and insights</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <ResponsiveContainer width="100%" height={400}>
+                  <BarChart
+                    layout="vertical"
+                    data={summaryBlocks ? summaryBlocks[selectedSummaryGraph] || [] : (dummyData as any)[selectedSummaryGraph.split(' -')[1]?.toLowerCase() || 'stages'] || []}
+                    margin={{
+                      top: 20,
+                      right: 30,
+                      left: 80,
+                      bottom: 20,
+                    }}
+                    barSize={32}
+                    barCategoryGap={8}
+                  >
+                    <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
+                    <XAxis type="number" tick={{ fill: '#6b7280', fontSize: 12 }} axisLine={{ stroke: '#d1d5db' }} />
+                    <YAxis type="category" dataKey="label" tick={{ fill: '#6b7280', fontSize: 12 }} width={120} axisLine={{ stroke: '#d1d5db' }} />
+                    <Tooltip
+                      contentStyle={{ 
+                        background: 'white',
+                        borderRadius: 12,
+                        border: '1px solid #d1d5db',
+                        color: '#1f2937',
+                        fontSize: 14,
+                        boxShadow: '0 10px 25px -5px rgba(0, 0, 0, 0.1)'
+                      }}
+                      itemStyle={{ color: '#1f2937', fontWeight: 500 }}
+                      formatter={(value: any) => [`${value} items`, 'Count']}
+                      cursor={{ fill: '#f3f4f6' }}
+                    />
+                    <Bar 
+                      dataKey="value" 
+                      fill="#4f46e5" 
+                      radius={[0, 6, 6, 0]}
+                    >
+                      {(summaryBlocks ? summaryBlocks[selectedSummaryGraph] || [] : (dummyData as any)[selectedSummaryGraph.split(' -')[1]?.toLowerCase() || 'stages'] || []).map((entry: { category: string }, index: number) => {
+                        const category = entry.category || 'Default';
+                        return (
+                          <Cell 
+                            key={`cell-${index}`} 
+                            fill={categoryColors[category] || '#4f46e5'}
+                          />
+                        );
+                      })}
+                    </Bar>
+                  </BarChart>
+                </ResponsiveContainer>
+              </CardContent>
+            </Card>
+          )}
+        </motion.div>
+
+        {isLoading ? (
+          <div className="flex justify-center items-center h-64">
+            <div className="animate-spin rounded-full h-12 w-12 border-4 border-blue-500 border-t-transparent"></div>
+          </div>
+        ) : (
+          <>
+            {/* VC Investment Details Table */}
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.6, duration: 0.5 }}
+              transition={{ delay: 0.4, duration: 0.5 }}
               className="mb-12"
             >
-              <h2 className="text-2xl font-semibold text-gray-900 mb-6">Startup Details</h2>
-              
-              {/* Professional Filter Controls */}
-              <div className="mb-6 grid grid-cols-1 md:grid-cols-4 gap-4">
-                {/* Search Bar */}
-                <div className="relative">
-                  <input
-                    type="text"
-                    value={searchTerm}
-                    onChange={(e) => setSearchTerm(e.target.value)}
-                    placeholder="Search startups..."
-                    className="w-full p-3 pl-10 bg-white border border-gray-300 rounded-lg text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                  />
-                  <Search className="absolute left-3 top-3.5 h-5 w-5 text-gray-400" />
-                </div>
-
-                {/* Status Filter */}
-                <div className="relative">
-                  <select
-                    value={filterOptions.status}
-                    onChange={(e) => setFilterOptions(prev => ({ ...prev, status: e.target.value }))}
-                    className="w-full p-3 pl-10 bg-white border border-gray-300 rounded-lg text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 appearance-none"
-                  >
-                    {uniqueStatuses.map((status) => (
-                      <option key={status} value={status}>
-                        {status}
-                      </option>
-                    ))}
-                  </select>
-                  <Filter className="absolute left-3 top-3.5 h-5 w-5 text-gray-400" />
-                </div>
-
-                {/* Legal Status Filter */}
-                <div className="relative">
-                  <select
-                    value={filterOptions.legalStatus}
-                    onChange={(e) => setFilterOptions(prev => ({ ...prev, legalStatus: e.target.value }))}
-                    className="w-full p-3 pl-10 bg-white border border-gray-300 rounded-lg text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 appearance-none"
-                  >
-                    {uniqueLegalStatuses.map((status) => (
-                      <option key={status} value={status}>
-                        {status}
-                      </option>
-                    ))}
-                  </select>
-                  <Filter className="absolute left-3 top-3.5 h-5 w-5 text-gray-400" />
-                </div>
-
-                {/* Year Filter */}
-                <div className="relative">
-                  <select
-                    value={filterYear}
-                    onChange={(e) => setFilterYear(e.target.value === "all" ? "all" : parseInt(e.target.value, 10))}
-                    className="w-full p-3 pl-10 bg-white border border-gray-300 rounded-lg text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 appearance-none"
-                  >
-                    <option value="all">All Years</option>
-                    {availableYears.map(year => (
-                      <option key={year} value={year}>{year}</option>
-                    ))}
-                  </select>
-                  <Filter className="absolute left-3 top-2.5 h-5 w-5 text-gray-400" />
-                </div>
-
-                {/* Date Sort */}
-                <div className="relative">
-                  <select
-                    value={filterOptions.dateSort}
-                    onChange={(e) => setFilterOptions(prev => ({ ...prev, dateSort: e.target.value as 'asc' | 'desc' | 'none' }))}
-                    className="w-full p-3 pl-10 bg-white border border-gray-300 rounded-lg text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 appearance-none"
-                  >
-                    <option value="none">Sort by Date</option>
-                    <option value="asc">Oldest First</option>
-                    <option value="desc">Newest First</option>
-                  </select>
-                  <TrendingUp className="absolute left-3 top-3.5 h-5 w-5 text-gray-400" />
-                </div>
-              </div>
-
-              <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+              <h2 className="text-2xl font-semibold text-gray-900 mb-6">VC Investment Details</h2>
+              <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-x-auto">
                 <table className="min-w-full divide-y divide-gray-200">
                   <thead>
                     <tr className="bg-gray-50">
-                      <th className="text-left py-4 px-6 text-gray-900 font-semibold text-sm uppercase tracking-wide">Serial No.</th>
-                      <th className="text-left py-4 px-6 text-gray-900 font-semibold text-sm uppercase tracking-wide">Company Name</th>
-                      <th className="text-left py-4 px-6 text-gray-900 font-semibold text-sm uppercase tracking-wide">Incubation Date</th>
-                      <th className="text-left py-4 px-6 text-gray-900 font-semibold text-sm uppercase tracking-wide">Status</th>
-                      <th className="text-left py-4 px-6 text-gray-900 font-semibold text-sm uppercase tracking-wide">Legal Status</th>
+                      <th className="text-left py-4 px-6 text-gray-900 font-semibold text-sm uppercase tracking-wide">Startup Name</th>
+                      <th className="text-left py-4 px-6 text-gray-900 font-semibold text-sm uppercase tracking-wide">Amount</th>
+                      <th className="text-left py-4 px-6 text-gray-900 font-semibold text-sm uppercase tracking-wide">Organization</th>
+                      <th className="text-left py-4 px-6 text-gray-900 font-semibold text-sm uppercase tracking-wide">Investment Year</th>
+                      <th className="text-left py-4 px-6 text-gray-900 font-semibold text-sm uppercase tracking-wide">Proof Link</th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-gray-200">
-                    {filterAndGraphStartupDetails.length > 0 ? (
-                      filterAndGraphStartupDetails.map((detail, index) => (
-                        <tr key={index} className={`${index % 2 === 0 ? 'bg-white' : 'bg-gray-50'} hover:bg-blue-50 transition-colors`}>
-                          <td className="py-4 px-6 text-gray-900">
-                            {detail.serialNo && detail.serialNo.trim() !== 'N/A' ? detail.serialNo : <span className="text-gray-400">—</span>}
-                          </td>
-                          <td className="py-4 px-6 text-gray-900 font-medium">
-                            {detail.companyName && detail.companyName.trim() !== 'N/A' ? detail.companyName : <span className="text-gray-400">—</span>}
-                          </td>
-                          <td className="py-4 px-6 text-gray-600">
-                            {detail.incubationDate && detail.incubationDate.trim() !== 'N/A' ? detail.incubationDate : <span className="text-gray-400">—</span>}
-                          </td>
-                          <td className="py-4 px-6">
-                            {detail.status && detail.status.trim() !== 'N/A' ? (
-                              <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getStatusBadgeColors(detail.status)}`}>
-                                {detail.status}
-                              </span>
-                            ) : (
-                              <span className="text-gray-400">—</span>
-                            )}
-                          </td>
-                          <td className="py-4 px-6">
-                            {detail.legalStatus && detail.legalStatus.trim() !== 'N/A' ? (
-                              <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getLegalStatusBadgeColors(detail.legalStatus)}`}>
-                                {detail.legalStatus}
-                              </span>
-                            ) : (
-                              <span className="text-gray-400">—</span>
-                            )}
-                          </td>
-                        </tr>
-                      ))
-                    ) : (
-                      <tr>
-                        <td colSpan={5} className="py-8 text-center text-gray-500">No startup details found matching the filters.</td>
+                    {vcData.map((investment, index) => (
+                      <tr key={investment.id} className={`${index % 2 === 0 ? 'bg-white' : 'bg-gray-50'} hover:bg-blue-50 transition-colors`}>
+                        <td className="py-4 px-6 text-gray-900 font-medium">
+                          {investment.startupName && investment.startupName.trim() !== '' ? investment.startupName : <span className="text-gray-400">—</span>}
+                        </td>
+                        <td className="py-4 px-6 text-blue-600 font-bold text-lg">
+                          {investment.amount > 0 ? formatAmount(investment.amount) : <span className="text-gray-400">—</span>}
+                        </td>
+                        <td className="py-4 px-6 text-gray-900">
+                          {investment.organization && investment.organization.trim() !== '' ? investment.organization : <span className="text-gray-400">—</span>}
+                        </td>
+                        <td className="py-4 px-6 text-gray-900">
+                          {investment.yearDisplay && investment.yearDisplay.trim() !== '' ? investment.yearDisplay : <span className="text-gray-400">—</span>}
+                        </td>
+                        <td className="py-4 px-6">
+                          {investment.proofLink && investment.proofLink.trim() !== '' ? (
+                            <a
+                              href={investment.proofLink}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="text-blue-600 hover:text-blue-800 transition-colors inline-flex items-center font-medium"
+                            >
+                              View Proof <ExternalLink className="ml-1 w-4 h-4" />
+                            </a>
+                          ) : (
+                            <span className="text-gray-400">—</span>
+                          )}
+                        </td>
                       </tr>
-                    )}
+                    ))}
                   </tbody>
                 </table>
               </div>
             </motion.div>
-          )}
 
-          {/* Professional Modal */}
-          {selectedStartup && (
-            <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4 z-50">
+            {/* Startup Details Table */}
+            {startupDetails.length > 0 && (
               <motion.div
-                initial={{ opacity: 0, scale: 0.95 }}
-                animate={{ opacity: 1, scale: 1 }}
-                exit={{ opacity: 0, scale: 0.95 }}
-                className="w-full max-w-2xl"
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.6, duration: 0.5 }}
+                className="mb-12"
               >
-                <Card className="bg-white border border-gray-200 shadow-xl">
-                  <CardHeader>
-                    <CardTitle className="text-2xl font-bold text-gray-900">{selectedStartup.startupName}</CardTitle>
-                    <CardDescription className="text-gray-600">
-                      <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium mr-2 ${getStatusBadgeColors(selectedStartup.stage)}`}>
-                        {selectedStartup.stage}
-                      </span>
-                      {selectedStartup.sector}
-                    </CardDescription>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="space-y-6">
-                      <div>
-                        <h3 className="text-sm font-medium text-gray-600 mb-2">Investment Details</h3>
-                        <p className="text-3xl font-bold text-blue-600">
-                          {formatAmount(selectedStartup.amount)}
-                        </p>
-                      </div>
-                      <div>
-                        <h3 className="text-sm font-medium text-gray-600 mb-2">Organization</h3>
-                        <p className="text-gray-900">{selectedStartup.organization || ''}</p>
-                      </div>
-                      <div>
-                        <h3 className="text-sm font-medium text-gray-600 mb-2">Description</h3>
-                        <p className="text-gray-700 leading-relaxed">{selectedStartup.description || ''}</p>
-                      </div>
-                      {selectedStartup.proofLink && (
-                        <div>
-                          <h3 className="text-sm font-medium text-gray-600 mb-2">Proof Link</h3>
-                          <a
-                            href={selectedStartup.proofLink}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="inline-flex items-center gap-2 text-blue-600 hover:text-blue-800 transition-colors"
-                          >
-                            View Proof <ExternalLink className="h-4 w-4" />
-                          </a>
-                        </div>
-                      )}
-                    </div>
-                  </CardContent>
-                  <CardFooter className="border-t border-gray-200">
-                    <button
-                      onClick={() => setSelectedStartup(null)}
-                      className="ml-auto px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-900 rounded-lg transition-colors"
+                <h2 className="text-2xl font-semibold text-gray-900 mb-6">Startup Details</h2>
+                <div className="mb-6 grid grid-cols-1 md:grid-cols-5 gap-4">
+                  {/* Search Bar */}
+                  <div className="relative">
+                    <input
+                      type="text"
+                      value={searchTerm}
+                      onChange={(e) => setSearchTerm(e.target.value)}
+                      placeholder="Search startups..."
+                      className="w-full p-3 pl-10 bg-white border border-gray-300 rounded-lg text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    />
+                    <Search className="absolute left-3 top-3.5 h-5 w-5 text-gray-400" />
+                  </div>
+                  {/* Status Filter */}
+                  <div className="relative">
+                    <select
+                      value={filterOptions.status}
+                      onChange={(e) => setFilterOptions(prev => ({ ...prev, status: e.target.value }))}
+                      className="w-full p-3 pl-10 bg-white border border-gray-300 rounded-lg text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 appearance-none"
                     >
-                      Close
-                    </button>
-                  </CardFooter>
-                </Card>
+                      {uniqueStatuses.map((status) => (
+                        <option key={status} value={status}>
+                          {status}
+                        </option>
+                      ))}
+                    </select>
+                    <Filter className="absolute left-3 top-3.5 h-5 w-5 text-gray-400" />
+                  </div>
+                  {/* Legal Status Filter */}
+                  <div className="relative">
+                    <select
+                      value={filterOptions.legalStatus}
+                      onChange={(e) => setFilterOptions(prev => ({ ...prev, legalStatus: e.target.value }))}
+                      className="w-full p-3 pl-10 bg-white border border-gray-300 rounded-lg text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 appearance-none"
+                    >
+                      {uniqueLegalStatuses.map((status) => (
+                        <option key={status} value={status}>
+                          {status}
+                        </option>
+                      ))}
+                    </select>
+                    <Filter className="absolute left-3 top-3.5 h-5 w-5 text-gray-400" />
+                  </div>
+                  {/* Year Filter */}
+                  <div className="relative">
+                    <select
+                      value={filterYear}
+                      onChange={(e) => setFilterYear(e.target.value === "all" ? "all" : parseInt(e.target.value, 10))}
+                      className="w-full p-3 pl-10 bg-white border border-gray-300 rounded-lg text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 appearance-none"
+                    >
+                      <option value="all">All Years</option>
+                      {availableYears.map(year => (
+                        <option key={year} value={year}>{year}</option>
+                      ))}
+                    </select>
+                    <Filter className="absolute left-3 top-2.5 h-5 w-5 text-gray-400" />
+                  </div>
+                  {/* Date Sort */}
+                  <div className="relative">
+                    <select
+                      value={filterOptions.dateSort}
+                      onChange={(e) => setFilterOptions(prev => ({ ...prev, dateSort: e.target.value as 'asc' | 'desc' | 'none' }))}
+                      className="w-full p-3 pl-10 bg-white border border-gray-300 rounded-lg text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 appearance-none"
+                    >
+                      <option value="none">Sort by Date</option>
+                      <option value="asc">Oldest First</option>
+                      <option value="desc">Newest First</option>
+                    </select>
+                    <TrendingUp className="absolute left-3 top-3.5 h-5 w-5 text-gray-400" />
+                  </div>
+                </div>
+                <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-x-auto">
+                  <table className="min-w-full divide-y divide-gray-200">
+                    <thead>
+                      <tr className="bg-gray-50">
+                        <th className="text-left py-4 px-6 text-gray-900 font-semibold text-sm uppercase tracking-wide">Serial No.</th>
+                        <th className="text-left py-4 px-6 text-gray-900 font-semibold text-sm uppercase tracking-wide">Company Name</th>
+                        <th className="text-left py-4 px-6 text-gray-900 font-semibold text-sm uppercase tracking-wide">Incubation Date</th>
+                        <th className="text-left py-4 px-6 text-gray-900 font-semibold text-sm uppercase tracking-wide">Status</th>
+                        <th className="text-left py-4 px-6 text-gray-900 font-semibold text-sm uppercase tracking-wide">Legal Status</th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-gray-200">
+                      {filterAndGraphStartupDetails.length > 0 ? (
+                        filterAndGraphStartupDetails.map((detail, index) => (
+                          <tr key={index} className={`${index % 2 === 0 ? 'bg-white' : 'bg-gray-50'} hover:bg-blue-50 transition-colors`}>
+                            <td className="py-4 px-6 text-gray-900">
+                              {detail.serialNo && detail.serialNo.trim() !== 'N/A' ? detail.serialNo : <span className="text-gray-400">—</span>}
+                            </td>
+                            <td className="py-4 px-6 text-gray-900 font-medium">
+                              {detail.companyName && detail.companyName.trim() !== 'N/A' ? detail.companyName : <span className="text-gray-400">—</span>}
+                            </td>
+                            <td className="py-4 px-6 text-gray-600">
+                              {detail.incubationDate && detail.incubationDate.trim() !== 'N/A' ? detail.incubationDate : <span className="text-gray-400">—</span>}
+                            </td>
+                            <td className="py-4 px-6">
+                              {detail.status && detail.status.trim() !== 'N/A' ? (
+                                <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getStatusBadgeColors(detail.status)}`}>
+                                  {detail.status}
+                                </span>
+                              ) : (
+                                <span className="text-gray-400">—</span>
+                              )}
+                            </td>
+                            <td className="py-4 px-6">
+                              {detail.legalStatus && detail.legalStatus.trim() !== 'N/A' ? (
+                                <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getLegalStatusBadgeColors(detail.legalStatus)}`}>
+                                  {detail.legalStatus}
+                                </span>
+                              ) : (
+                                <span className="text-gray-400">—</span>
+                              )}
+                            </td>
+                          </tr>
+                        ))
+                      ) : (
+                        <tr>
+                          <td colSpan={5} className="py-8 text-center text-gray-500">No startup details found matching the filters.</td>
+                        </tr>
+                      )}
+                    </tbody>
+                  </table>
+                </div>
               </motion.div>
-            </div>
-          )}
-        </>
-      )}
+            )}
+
+            {/* Professional Modal */}
+            {selectedStartup && (
+              <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4 z-50">
+                <motion.div
+                  initial={{ opacity: 0, scale: 0.95 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  exit={{ opacity: 0, scale: 0.95 }}
+                  className="w-full max-w-2xl"
+                >
+                  <Card className="bg-white border border-gray-200 shadow-xl">
+                    <CardHeader>
+                      <CardTitle className="text-2xl font-bold text-gray-900">{selectedStartup.startupName}</CardTitle>
+                      <CardDescription className="text-gray-600">
+                        <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium mr-2 ${getStatusBadgeColors(selectedStartup.stage)}`}>
+                          {selectedStartup.stage}
+                        </span>
+                        {selectedStartup.sector}
+                      </CardDescription>
+                    </CardHeader>
+                    <CardContent>
+                      <div className="space-y-6">
+                        <div>
+                          <h3 className="text-sm font-medium text-gray-600 mb-2">Investment Details</h3>
+                          <p className="text-3xl font-bold text-blue-600">
+                            {formatAmount(selectedStartup.amount)}
+                          </p>
+                        </div>
+                        <div>
+                          <h3 className="text-sm font-medium text-gray-600 mb-2">Organization</h3>
+                          <p className="text-gray-900">{selectedStartup.organization || ''}</p>
+                        </div>
+                        <div>
+                          <h3 className="text-sm font-medium text-gray-600 mb-2">Description</h3>
+                          <p className="text-gray-700 leading-relaxed">{selectedStartup.description || ''}</p>
+                        </div>
+                        {selectedStartup.proofLink && (
+                          <div>
+                            <h3 className="text-sm font-medium text-gray-600 mb-2">Proof Link</h3>
+                            <a
+                              href={selectedStartup.proofLink}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="inline-flex items-center gap-2 text-blue-600 hover:text-blue-800 transition-colors"
+                            >
+                              View Proof <ExternalLink className="h-4 w-4" />
+                            </a>
+                          </div>
+                        )}
+                      </div>
+                    </CardContent>
+                    <CardFooter className="border-t border-gray-200">
+                      <button
+                        onClick={() => setSelectedStartup(null)}
+                        className="ml-auto px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-900 rounded-lg transition-colors"
+                      >
+                        Close
+                      </button>
+                    </CardFooter>
+                  </Card>
+                </motion.div>
+              </div>
+            )}
+          </>
+        )}
+      </div>
     </div>
   );
 };

@@ -57,38 +57,27 @@ export function OnCampusSubmissionCard({
   };
 
   return (
-    <div className="group relative w-full h-full">      
-      {/* Main card */}
-      <Card className="relative h-full bg-white border-2 border-blue-100/50 shadow-lg hover:shadow-xl hover:border-blue-200/70 transition-all duration-300 ease-out rounded-2xl overflow-hidden">
-        
-        {/* Header */}
-        <CardHeader className="pb-4 relative overflow-hidden">
-          
-          <div className="relative flex items-start justify-between">
+    <div className="w-full h-full">
+      <Card className="relative h-full bg-white border border-blue-100 shadow-sm hover:shadow-md transition rounded-xl overflow-hidden">
+        <CardHeader className="pb-4">
+          <div className="flex items-center justify-between">
             <div className="flex items-center gap-4">
-              {/* Avatar */}
-              <div className="relative">
-                <div className="relative w-12 h-12 bg-gradient-to-br from-blue-500/15 via-purple-500/10 to-indigo-500/15 rounded-full flex items-center justify-center border-2 border-white/70 shadow-lg backdrop-blur-sm">
-                  <span className="text-blue-700 font-bold text-lg">
-                    {submission.name?.charAt(0)?.toUpperCase() || 'U'}
-                  </span>
-                </div>
+              <div className="w-12 h-12 bg-blue-50 rounded-full flex items-center justify-center border border-blue-100">
+                <span className="text-blue-700 font-bold text-lg">
+                  {submission.name?.charAt(0)?.toUpperCase() || 'U'}
+                </span>
               </div>
-              
-              {/* Name and email */}
               <div className="flex-1 min-w-0">
-                <CardTitle className="text-lg font-bold text-gray-800 truncate">
+                <CardTitle className="text-base font-semibold text-gray-900 truncate">
                   {submission.name}
                 </CardTitle>
-                <CardDescription className="text-sm text-gray-600 truncate">
+                <CardDescription className="text-xs text-gray-500 truncate">
                   {submission.email}
                 </CardDescription>
               </div>
             </div>
-            
-            {/* Status indicator */}
-            <div className="relative">
-              <div className={`px-3 py-1.5 rounded-full text-xs font-bold border shadow-sm backdrop-blur-sm ${getStatusBadgeClasses(submission.status)}`}>
+            <div>
+              <div className={`px-3 py-1.5 rounded-full text-xs font-semibold border ${getStatusBadgeClasses(submission.status)}`}>
                 <div className="flex items-center gap-1.5">
                   {getStatusIcon(submission.status)}
                   <span className="capitalize">{submission.status}</span>
@@ -97,13 +86,10 @@ export function OnCampusSubmissionCard({
             </div>
           </div>
         </CardHeader>
-        
-        {/* Content */}
-        <CardContent className="flex-grow flex flex-col justify-between relative">
-          {/* Info grid */}
+        <CardContent className="flex-grow flex flex-col justify-between">
           <div className="space-y-3 mb-6">
-            <div className="flex items-center gap-3 p-3 rounded-xl bg-blue-50/50 border border-blue-100/50 hover:bg-blue-50 hover:border-blue-200 transition-all duration-300 hover:shadow-md">
-              <div className="p-2 bg-blue-100 rounded-lg">
+            <div className="flex items-center gap-3 p-3 rounded-lg bg-blue-50 border border-blue-100">
+              <div className="p-2 bg-blue-100 rounded-md">
                 <User className="h-4 w-4 text-blue-600" />
               </div>
               <div className="flex-1 min-w-0">
@@ -113,9 +99,8 @@ export function OnCampusSubmissionCard({
                 </div>
               </div>
             </div>
-            
-            <div className="flex items-center gap-3 p-3 rounded-xl bg-purple-50/50 border border-purple-100/50 hover:bg-purple-50 hover:border-purple-200 transition-all duration-300 hover:shadow-md">
-              <div className="p-2 bg-purple-100 rounded-lg">
+            <div className="flex items-center gap-3 p-3 rounded-lg bg-purple-50 border border-purple-100">
+              <div className="p-2 bg-purple-100 rounded-md">
                 <Mail className="h-4 w-4 text-purple-600" />
               </div>
               <div className="flex-1 min-w-0">
@@ -125,10 +110,9 @@ export function OnCampusSubmissionCard({
                 </div>
               </div>
             </div>
-            
             {submission.phone && (
-              <div className="flex items-center gap-3 p-3 rounded-xl bg-green-50/50 border border-green-100/50 hover:bg-green-50 hover:border-green-200 transition-all duration-300 hover:shadow-md">
-                <div className="p-2 bg-green-100 rounded-lg">
+              <div className="flex items-center gap-3 p-3 rounded-lg bg-green-50 border border-green-100">
+                <div className="p-2 bg-green-100 rounded-md">
                   <Phone className="h-4 w-4 text-green-600" />
                 </div>
                 <div className="flex-1 min-w-0">
@@ -139,27 +123,22 @@ export function OnCampusSubmissionCard({
                 </div>
               </div>
             )}
-            
             {submission.campus && (
-              <div className="flex items-center gap-3 p-3 rounded-xl bg-orange-50/50 border border-orange-100/50 hover:bg-orange-50 hover:border-orange-200 transition-all duration-300 hover:shadow-md">
-                <div className="p-2 bg-orange-100 rounded-lg">
+              <div className="flex items-center gap-3 p-3 rounded-lg bg-orange-50 border border-orange-100">
+                <div className="p-2 bg-orange-100 rounded-md">
                   <Landmark className="h-4 w-4 text-orange-600" />
                 </div>
                 <div className="flex-1 min-w-0">
                   <div className="text-xs font-medium text-orange-600 uppercase tracking-wide">Campus</div>
-                  <Badge className={`text-xs font-bold border shadow-sm ${getCampusBadgeClasses(submission.campusStatus)}`}>
-                    {submission.campus}
-                  </Badge>
+                  <Badge className={`text-xs font-bold border ${getCampusBadgeClasses(submission.campusStatus)}`}>{submission.campus}</Badge>
                 </div>
               </div>
             )}
           </div>
-          
-          {/* Action button */}
-          <div className="relative">
+          <div>
             <Button 
               onClick={() => onViewDetails(submission)}
-              className="w-full bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white font-semibold py-3 px-4 rounded-xl border-0 shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105"
+              className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded-lg shadow-sm transition"
             >
               <div className="flex items-center justify-center gap-2">
                 <Eye className="h-4 w-4" />
@@ -169,7 +148,6 @@ export function OnCampusSubmissionCard({
             </Button>
           </div>
         </CardContent>
-        
       </Card>
     </div>
   );

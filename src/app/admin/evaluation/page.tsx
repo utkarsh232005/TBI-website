@@ -49,16 +49,16 @@ const safeFormat = (date: Date | string, formatStr: string) => {
 
 // Toast notification component
 const Toast = ({ message, type, onClose }: { message: string; type: 'success' | 'error' | 'info'; onClose: () => void }) => (
-  <div className={`fixed top-4 right-4 z-50 p-4 rounded-lg shadow-xl border ${
+  <div className={`fixed top-4 right-4 z-50 p-4 rounded-lg shadow-lg border ${
     type === 'success' ? 'bg-green-50 border-green-200 text-green-800' :
     type === 'error' ? 'bg-red-50 border-red-200 text-red-800' :
     'bg-blue-50 border-blue-200 text-blue-800'
-  } backdrop-blur-sm animate-in slide-in-from-right-5`}>
+  }`}>
     <div className="flex items-center gap-3">
       <span>{message}</span>
       <button 
         onClick={onClose} 
-        className="w-6 h-6 bg-white hover:bg-gray-50 border border-gray-200 hover:border-gray-300 rounded shadow-sm hover:shadow-md transition-all duration-200 flex items-center justify-center"
+        className="w-6 h-6 bg-white hover:bg-gray-50 border border-gray-200 hover:border-gray-300 rounded shadow-sm transition-all duration-200 flex items-center justify-center"
         title="Close notification"
       >
         <X className="w-4 h-4 text-gray-500 hover:text-gray-700" />
@@ -90,44 +90,42 @@ const ConfirmDialog = ({
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 bg-black/30 backdrop-blur-sm flex items-center justify-center z-50">
-      <div className="bg-white border border-gray-200 rounded-2xl p-6 max-w-md mx-4 shadow-2xl">
+    <div className="fixed inset-0 bg-black/30 flex items-center justify-center z-50">
+      <div className="bg-white border border-gray-200 rounded-lg p-6 max-w-md mx-4 shadow-lg">
         <div className="flex items-center gap-3 mb-4">
           {variant === "danger" && <AlertCircle className="w-6 h-6 text-red-500" />}
           {variant === "warning" && <AlertCircle className="w-6 h-6 text-amber-500" />}
           {variant === "info" && <Clock className="w-6 h-6 text-blue-500" />}
-          <h3 className="text-xl font-semibold text-gray-900">{title}</h3>
+          <h3 className="admin-heading-4">{title}</h3>
         </div>
-        <p className="text-gray-600 mb-6">{message}</p>
+        <p className="admin-body-small mb-6">{message}</p>
         <div className="flex gap-3 justify-end">
           <Button 
             variant="outline" 
             onClick={onCancel} 
-            className="group relative border-2 border-gray-300 text-gray-700 hover:border-gray-400 hover:bg-gray-50 transition-all duration-300 px-6 py-2.5 font-medium rounded-xl shadow-sm hover:shadow-md backdrop-blur-sm"
+            className="border-gray-300 text-gray-700 hover:border-gray-400 hover:bg-gray-50 px-6 py-2.5 font-medium rounded-lg transition-all duration-200"
           >
             <div className="flex items-center gap-2">
-              <svg className="w-4 h-4 transition-transform duration-300 group-hover:scale-110" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
               </svg>
-              <span className="transition-transform duration-300 group-hover:translate-x-0.5">{cancelText}</span>
+              <span>{cancelText}</span>
             </div>
-            <div className="absolute inset-0 rounded-xl bg-gradient-to-r from-gray-50/0 to-gray-100/0 group-hover:from-gray-50/50 group-hover:to-gray-100/50 transition-all duration-300"></div>
           </Button>
           <Button 
             onClick={onConfirm} 
-            className={`group relative ${
-              variant === "danger" ? "bg-gradient-to-r from-red-600 to-red-700 hover:from-red-700 hover:to-red-800 shadow-lg hover:shadow-red-500/25" :
-              variant === "warning" ? "bg-gradient-to-r from-amber-600 to-amber-700 hover:from-amber-700 hover:to-amber-800 shadow-lg hover:shadow-amber-500/25" :
-              "bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 shadow-lg hover:shadow-blue-500/25"
-            } text-white px-6 py-2.5 font-medium rounded-xl transition-all duration-300 hover:scale-105 border-0`}
+            className={`${
+              variant === "danger" ? "bg-red-600 hover:bg-red-700" :
+              variant === "warning" ? "bg-amber-600 hover:bg-amber-700" :
+              "bg-blue-600 hover:bg-blue-700"
+            } text-white px-6 py-2.5 font-medium rounded-lg transition-all duration-200`}
           >
             <div className="flex items-center gap-2">
-              {variant === "danger" && <AlertCircle className="w-4 h-4 transition-transform duration-300 group-hover:scale-110" />}
-              {variant === "warning" && <AlertCircle className="w-4 h-4 transition-transform duration-300 group-hover:scale-110" />}
-              {variant === "info" && <CheckCircle className="w-4 h-4 transition-transform duration-300 group-hover:scale-110" />}
-              <span className="transition-transform duration-300 group-hover:translate-x-0.5">{confirmText}</span>
+              {variant === "danger" && <AlertCircle className="w-4 h-4" />}
+              {variant === "warning" && <AlertCircle className="w-4 h-4" />}
+              {variant === "info" && <CheckCircle className="w-4 h-4" />}
+              <span>{confirmText}</span>
             </div>
-            <div className="absolute inset-0 rounded-xl bg-white/0 group-hover:bg-white/10 transition-all duration-300"></div>
           </Button>
         </div>
       </div>
@@ -144,13 +142,13 @@ const ViewRoundModal = ({ round, isOpen, onClose }: {
   if (!isOpen || !round) return null;
 
   return (
-    <div className="fixed inset-0 bg-black/30 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-      <div className="bg-white border border-gray-200 rounded-2xl max-w-4xl w-full max-h-[95vh] flex flex-col shadow-2xl">
+    <div className="fixed inset-0 bg-black/30 flex items-center justify-center z-50 p-4">
+      <div className="bg-white border border-gray-200 rounded-lg max-w-4xl w-full max-h-[95vh] flex flex-col shadow-lg">
         {/* Header - Fixed */}
         <div className="flex-shrink-0 flex items-center justify-between p-6 border-b border-gray-200">
           <div className="min-w-0 flex-1">
-            <h2 className="text-2xl font-bold text-gray-900 truncate">{round.roundName}</h2>
-            <p className="text-gray-600 text-sm mt-1 line-clamp-2">{round.description || 'No description provided'}</p>
+            <h2 className="admin-heading-3 truncate">{round.roundName}</h2>
+            <p className="admin-caption mt-1 line-clamp-2">{round.description || 'No description provided'}</p>
           </div>
           <button 
             onClick={onClose} 
@@ -167,13 +165,13 @@ const ViewRoundModal = ({ round, isOpen, onClose }: {
             {/* Basic Info */}
             <div className="space-y-4">
               <div>
-                <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
+                <h3 className="admin-heading-5 mb-4 flex items-center gap-2">
                   <div className="w-1 h-6 bg-blue-500 rounded-full"></div>
                   Basic Information
                 </h3>
                 <div className="space-y-3">
                   <div className="bg-gray-50 rounded-lg p-4 border border-gray-200">
-                    <label className="text-sm text-gray-600 block mb-2 font-medium">Phase</label>
+                    <label className="admin-label">Phase</label>
                     <Badge className={`${
                       round.phase === 'Application' ? 'bg-blue-100 text-blue-800 border-blue-200' :
                       round.phase === 'Screening' ? 'bg-amber-100 text-amber-800 border-amber-200' :
@@ -187,7 +185,7 @@ const ViewRoundModal = ({ round, isOpen, onClose }: {
                   </div>
                   
                   <div className="bg-gray-50 rounded-lg p-4 border border-gray-200">
-                    <label className="text-sm text-gray-600 block mb-2 font-medium">Status</label>
+                    <label className="admin-label">Status</label>
                     <div className="flex items-center gap-2">
                       {round.status === 'Active' && <Activity className="w-4 h-4 text-green-600 flex-shrink-0" />}
                       {round.status === 'Completed' && <CheckCircle className="w-4 h-4 text-blue-600 flex-shrink-0" />}
@@ -247,11 +245,11 @@ const ViewRoundModal = ({ round, isOpen, onClose }: {
                 </h3>
                 <div className="space-y-3">
                   <div className="grid grid-cols-2 gap-3">
-                    <div className="bg-gradient-to-br from-purple-50 to-purple-100 rounded-lg p-4 text-center border border-purple-200">
+                    <div className="bg-purple-50 rounded-lg p-4 text-center border border-purple-200">
                       <label className="text-sm text-purple-700 block mb-2 font-medium">Max Score</label>
                       <p className="text-2xl font-bold text-purple-800">{round.maxScore}</p>
                     </div>
-                    <div className="bg-gradient-to-br from-indigo-50 to-indigo-100 rounded-lg p-4 text-center border border-indigo-200">
+                    <div className="bg-indigo-50 rounded-lg p-4 text-center border border-indigo-200">
                       <label className="text-sm text-indigo-700 block mb-2 font-medium">Min Score</label>
                       <p className="text-2xl font-bold text-indigo-800">{round.minimumScore}</p>
                     </div>
@@ -307,22 +305,22 @@ const ViewRoundModal = ({ round, isOpen, onClose }: {
                   Current Metrics
                 </h3>
                 <div className="grid grid-cols-2 gap-3">
-                  <div className="bg-gradient-to-br from-blue-50 to-blue-100 rounded-xl p-4 text-center border border-blue-200 hover:border-blue-300 transition-colors">
+                  <div className="bg-blue-50 rounded-lg p-4 text-center border border-blue-200">
                     <div className="text-3xl font-bold text-blue-700 mb-1">{round.submissionCount || 0}</div>
                     <div className="text-blue-600 text-sm font-medium">Submissions</div>
                     <div className="text-xs text-blue-500 mt-1">Total received</div>
                   </div>
-                  <div className="bg-gradient-to-br from-purple-50 to-purple-100 rounded-xl p-4 text-center border border-purple-200 hover:border-purple-300 transition-colors">
+                  <div className="bg-purple-50 rounded-lg p-4 text-center border border-purple-200">
                     <div className="text-3xl font-bold text-purple-700 mb-1">{round.evaluatorCount || 0}</div>
                     <div className="text-purple-600 text-sm font-medium">Evaluators</div>
                     <div className="text-xs text-purple-500 mt-1">Active reviewers</div>
                   </div>
-                  <div className="bg-gradient-to-br from-green-50 to-green-100 rounded-xl p-4 text-center border border-green-200 hover:border-green-300 transition-colors">
+                  <div className="bg-green-50 rounded-lg p-4 text-center border border-green-200">
                     <div className="text-3xl font-bold text-green-700 mb-1">{round.criteriaCount || 0}</div>
                     <div className="text-green-600 text-sm font-medium">Criteria</div>
                     <div className="text-xs text-green-500 mt-1">Evaluation points</div>
                   </div>
-                  <div className="bg-gradient-to-br from-amber-50 to-amber-100 rounded-xl p-4 text-center border border-amber-200 hover:border-amber-300 transition-colors">
+                  <div className="bg-amber-50 rounded-lg p-4 text-center border border-amber-200">
                     <div className="text-3xl font-bold text-amber-700 mb-1">
                       {round.averageScore ? round.averageScore.toFixed(1) : '0.0'}
                     </div>
@@ -345,7 +343,7 @@ const ViewRoundModal = ({ round, isOpen, onClose }: {
                     {round.allowedSubmissionTypes.map((type, index) => (
                       <Badge 
                         key={index} 
-                        className="bg-gradient-to-r from-amber-100 to-amber-200 text-amber-800 border-amber-300 px-3 py-1.5 text-sm font-medium hover:from-amber-200 hover:to-amber-300 transition-all cursor-default border"
+                        className="bg-amber-100 text-amber-800 border-amber-200 px-3 py-1.5 text-sm font-medium border"
                       >
                         {type.replace('_', ' ').replace(/\b\w/g, l => l.toUpperCase())}
                       </Badge>
@@ -1130,9 +1128,9 @@ export default function EvaluationPage() {
   // Render loading state
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100 flex items-center justify-center">
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-600 mx-auto mb-4"></div>
           <p className="text-gray-700 text-lg">Loading evaluation rounds...</p>
         </div>
       </div>
@@ -1140,24 +1138,22 @@ export default function EvaluationPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100 p-6">
+    <div className="min-h-screen bg-gray-50 p-6">
       <div className="max-w-7xl mx-auto space-y-8">
         {/* Header Section */}
         <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6">
           <div className="space-y-2">
-            <h1 className="text-4xl font-bold bg-gradient-to-r from-blue-600 via-purple-600 to-indigo-600 bg-clip-text text-transparent">
+            <h1 className="text-3xl font-bold text-gray-900">
               Evaluation Rounds
             </h1>
-            <div className="space-y-1">
-              <p className="text-gray-600 text-lg">
-                Manage and monitor your startup evaluation processes
-              </p>
-            </div>
+            <p className="text-gray-600 text-lg">
+              Manage and monitor your startup evaluation processes
+            </p>
           </div>
           
           <Button
             onClick={() => setIsModalOpen(true)}
-            className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white px-6 py-3 rounded-xl transition-all duration-300 hover:scale-105 shadow-lg hover:shadow-blue-500/25"
+            className="bg-indigo-600 hover:bg-indigo-700 text-white px-6 py-3 rounded-lg transition-all duration-200 shadow-sm hover:shadow-md"
           >
             <Plus className="w-5 h-5 mr-2" />
             Create New Round
@@ -1166,7 +1162,7 @@ export default function EvaluationPage() {
 
         {/* Error Display */}
         {error && (
-          <div className="bg-red-50 border border-red-200 rounded-xl p-4 flex items-center gap-3">
+          <div className="bg-red-50 border border-red-200 rounded-lg p-4 flex items-center gap-3">
             <AlertCircle className="w-5 h-5 text-red-600" />
             <p className="text-red-800">{error}</p>
             <Button
@@ -1182,84 +1178,84 @@ export default function EvaluationPage() {
 
         {/* Stats Cards */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-          <div className="group bg-white/80 backdrop-blur-xl border border-blue-200/50 rounded-2xl p-6 hover:scale-105 transition-all duration-300 shadow-lg hover:shadow-blue-200/50 hover:bg-white">
+          <div className="bg-white border border-gray-200 rounded-lg p-6 shadow-sm hover:shadow-md transition-all duration-200">
             <div className="flex items-center justify-between mb-4">
-              <div className="p-3 bg-gradient-to-br from-blue-100 to-blue-200 rounded-xl group-hover:shadow-lg transition-all duration-300">
+              <div className="p-3 bg-blue-100 rounded-lg">
                 <Target className="w-6 h-6 text-blue-600" />
               </div>
-              <Badge className="bg-gradient-to-r from-blue-100 to-blue-200 text-blue-800 border-blue-300/50 border shadow-sm">
+              <Badge className="bg-blue-100 text-blue-800 border-blue-200 border">
                 Total
               </Badge>
             </div>
             <div className="space-y-1">
-              <p className="text-3xl font-bold text-gray-900 group-hover:text-blue-900 transition-colors">{stats.total}</p>
+              <p className="text-3xl font-bold text-gray-900">{stats.total}</p>
               <p className="text-blue-600 text-sm font-medium">Evaluation Rounds</p>
             </div>
           </div>
 
-          <div className="group bg-white/80 backdrop-blur-xl border border-green-200/50 rounded-2xl p-6 hover:scale-105 transition-all duration-300 shadow-lg hover:shadow-green-200/50 hover:bg-white">
+          <div className="bg-white border border-gray-200 rounded-lg p-6 shadow-sm hover:shadow-md transition-all duration-200">
             <div className="flex items-center justify-between mb-4">
-              <div className="p-3 bg-gradient-to-br from-green-100 to-green-200 rounded-xl group-hover:shadow-lg transition-all duration-300">
+              <div className="p-3 bg-green-100 rounded-lg">
                 <Activity className="w-6 h-6 text-green-600" />
               </div>
-              <Badge className="bg-gradient-to-r from-green-100 to-green-200 text-green-800 border-green-300/50 border shadow-sm">
+              <Badge className="bg-green-100 text-green-800 border-green-200 border">
                 Live
               </Badge>
             </div>
             <div className="space-y-1">
-              <p className="text-3xl font-bold text-gray-900 group-hover:text-green-900 transition-colors">{stats.active}</p>
+              <p className="text-3xl font-bold text-gray-900">{stats.active}</p>
               <p className="text-green-600 text-sm font-medium">Active Rounds</p>
             </div>
           </div>
 
-          <div className="group bg-white/80 backdrop-blur-xl border border-purple-200/50 rounded-2xl p-6 hover:scale-105 transition-all duration-300 shadow-lg hover:shadow-purple-200/50 hover:bg-white">
+          <div className="bg-white border border-gray-200 rounded-lg p-6 shadow-sm hover:shadow-md transition-all duration-200">
             <div className="flex items-center justify-between mb-4">
-              <div className="p-3 bg-gradient-to-br from-purple-100 to-purple-200 rounded-xl group-hover:shadow-lg transition-all duration-300">
+              <div className="p-3 bg-purple-100 rounded-lg">
                 <CheckCircle className="w-6 h-6 text-purple-600" />
               </div>
-              <Badge className="bg-gradient-to-r from-purple-100 to-purple-200 text-purple-800 border-purple-300/50 border shadow-sm">
+              <Badge className="bg-purple-100 text-purple-800 border-purple-200 border">
                 Done
               </Badge>
             </div>
             <div className="space-y-1">
-              <p className="text-3xl font-bold text-gray-900 group-hover:text-purple-900 transition-colors">{stats.completed}</p>
+              <p className="text-3xl font-bold text-gray-900">{stats.completed}</p>
               <p className="text-purple-600 text-sm font-medium">Completed</p>
             </div>
           </div>
 
-          <div className="group bg-white/80 backdrop-blur-xl border border-amber-200/50 rounded-2xl p-6 hover:scale-105 transition-all duration-300 shadow-lg hover:shadow-amber-200/50 hover:bg-white">
+          <div className="bg-white border border-gray-200 rounded-lg p-6 shadow-sm hover:shadow-md transition-all duration-200">
             <div className="flex items-center justify-between mb-4">
-              <div className="p-3 bg-gradient-to-br from-amber-100 to-amber-200 rounded-xl group-hover:shadow-lg transition-all duration-300">
+              <div className="p-3 bg-amber-100 rounded-lg">
                 <TrendingUp className="w-6 h-6 text-amber-600" />
               </div>
-              <Badge className="bg-gradient-to-r from-amber-100 to-amber-200 text-amber-800 border-amber-300/50 border shadow-sm">
+              <Badge className="bg-amber-100 text-amber-800 border-amber-200 border">
                 Avg
               </Badge>
             </div>
             <div className="space-y-1">
-              <p className="text-3xl font-bold text-gray-900 group-hover:text-amber-900 transition-colors">{stats.avgScore.toFixed(1)}</p>
+              <p className="text-3xl font-bold text-gray-900">{stats.avgScore.toFixed(1)}</p>
               <p className="text-amber-600 text-sm font-medium">Average Score</p>
             </div>
           </div>
         </div>
 
         {/* Filters and Search */}
-        <div className="bg-white/90 backdrop-blur-xl border border-gray-200/50 rounded-2xl p-6 shadow-lg hover:shadow-xl transition-all duration-300">
+        <div className="bg-white border border-gray-200 rounded-lg p-6 shadow-sm">
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-            <div className="relative group">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5 group-focus-within:text-blue-500 transition-colors" />
+            <div className="relative">
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
               <Input
                 placeholder="Search rounds..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="pl-10 bg-white/80 border-gray-300 text-gray-900 placeholder-gray-500 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 rounded-xl shadow-sm hover:shadow-md transition-all duration-200 focus:bg-white"
+                className="pl-10 bg-gray-50 border-gray-300 text-gray-900 placeholder-gray-500 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-100 rounded-lg"
               />
             </div>
 
             <select
               value={statusFilter}
               onChange={(e) => setStatusFilter(e.target.value)}
-              className="bg-white/80 border border-gray-300 text-gray-900 rounded-xl px-3 py-2 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 focus:outline-none shadow-sm hover:shadow-md transition-all duration-200 focus:bg-white"
+              className="bg-gray-50 border border-gray-300 text-gray-900 rounded-lg px-3 py-2 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-100 focus:outline-none"
             >
               <option value="all">All Statuses</option>
               <option value="Draft">Draft</option>
@@ -1271,7 +1267,7 @@ export default function EvaluationPage() {
             <select
               value={phaseFilter}
               onChange={(e) => setPhaseFilter(e.target.value)}
-              className="bg-white/80 border border-gray-300 text-gray-900 rounded-xl px-3 py-2 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 focus:outline-none shadow-sm hover:shadow-md transition-all duration-200 focus:bg-white"
+              className="bg-gray-50 border border-gray-300 text-gray-900 rounded-lg px-3 py-2 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-100 focus:outline-none"
             >
               <option value="all">All Phases</option>
               <option value="Application">Application</option>
@@ -1285,11 +1281,11 @@ export default function EvaluationPage() {
         </div>
 
         {/* Evaluation Rounds Table */}
-        <div className="bg-white/90 backdrop-blur-xl border border-gray-200/50 rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300">
+        <div className="bg-white border border-gray-200 rounded-lg shadow-sm">
           <div className="overflow-x-auto">
-            <table className="w-full relative">
+            <table className="w-full">
               <thead>
-                <tr className="bg-gradient-to-r from-gray-50/80 to-gray-100/80 border-b border-gray-200/50 backdrop-blur-sm">
+                <tr className="bg-gray-50 border-b border-gray-200">
                   <th className="text-left py-4 px-6 text-gray-700 font-semibold">Round Details</th>
                   <th className="text-left py-4 px-6 text-gray-700 font-semibold">Phase & Status</th>
                   <th className="text-left py-4 px-6 text-gray-700 font-semibold">Schedule</th>
@@ -1311,7 +1307,7 @@ export default function EvaluationPage() {
                   filteredRounds.map((round) => (
                     <tr 
                       key={round.id} 
-                      className="border-b border-gray-200/50 hover:bg-gradient-to-r hover:from-blue-50/30 hover:to-purple-50/30 transition-all duration-200 group"
+                      className="border-b border-gray-100 hover:bg-gray-50 transition-all duration-200"
                     >
                       {/* Round Details */}
                       <td className="py-6 px-6">
@@ -1383,11 +1379,11 @@ export default function EvaluationPage() {
                       {/* Metrics */}
                       <td className="py-6 px-6 min-w-[140px]">
                         <div className="space-y-2">
-                          <div className="bg-gradient-to-br from-blue-50 to-blue-100 border border-blue-200/50 rounded-lg p-2 text-center shadow-sm hover:shadow-md transition-all duration-200">
+                          <div className="bg-blue-50 border border-blue-200 rounded-lg p-2 text-center">
                             <div className="text-blue-600 font-semibold text-sm">{round.submissionCount || 0}</div>
                             <div className="text-blue-500 text-xs">Submissions</div>
                           </div>
-                          <div className="bg-gradient-to-br from-purple-50 to-purple-100 border border-purple-200/50 rounded-lg p-2 text-center shadow-sm hover:shadow-md transition-all duration-200">
+                          <div className="bg-purple-50 border border-purple-200 rounded-lg p-2 text-center">
                             <div className="text-purple-600 font-semibold text-sm">{round.evaluatorCount || 0}</div>
                             <div className="text-purple-500 text-xs">Evaluators</div>
                           </div>
@@ -1409,9 +1405,9 @@ export default function EvaluationPage() {
                                 </span>
                                 <span className="text-gray-500 text-sm">/ {round.maxScore}</span>
                               </div>
-                              <div className="w-full bg-gradient-to-r from-gray-200 to-gray-300 rounded-full h-2.5 shadow-inner">
+                              <div className="w-full bg-gray-200 rounded-full h-2">
                                 <div 
-                                  className="bg-gradient-to-r from-green-400 via-blue-500 to-purple-600 h-2.5 rounded-full transition-all duration-500 shadow-sm"
+                                  className="bg-indigo-600 h-2 rounded-full transition-all duration-500"
                                   style={{ width: `${(round.averageScore / round.maxScore) * 100}%` }}
                                 ></div>
                               </div>
@@ -1429,7 +1425,7 @@ export default function EvaluationPage() {
                             size="sm"
                             onClick={() => handleViewRound(round)}
                             title="View Details"
-                            className="bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white rounded-lg px-3 py-2 transition-all duration-200 hover:scale-110 shadow-lg hover:shadow-blue-500/30 border border-blue-300/20"
+                            className="bg-blue-600 hover:bg-blue-700 text-white rounded-lg px-3 py-2 transition-all duration-200 shadow-sm"
                           >
                             <Eye className="w-4 h-4" />
                           </Button>
@@ -1438,7 +1434,7 @@ export default function EvaluationPage() {
                             size="sm"
                             onClick={() => handleEditRound(round)}
                             title="Edit Round"
-                            className="bg-gradient-to-r from-emerald-500 to-green-600 hover:from-emerald-600 hover:to-green-700 text-white rounded-lg px-3 py-2 transition-all duration-200 hover:scale-110 shadow-lg hover:shadow-green-500/30 border border-green-300/20"
+                            className="bg-green-600 hover:bg-green-700 text-white rounded-lg px-3 py-2 transition-all duration-200 shadow-sm"
                           >
                             <Edit className="w-4 h-4" />
                           </Button>
@@ -1450,44 +1446,44 @@ export default function EvaluationPage() {
                               title="More Actions"
                               className={`${
                                 showMoreActions === round.id
-                                  ? 'bg-gradient-to-r from-gray-400 to-gray-500 shadow-lg'
-                                  : 'bg-gradient-to-r from-gray-500 to-gray-600 hover:from-gray-600 hover:to-gray-700 shadow-lg hover:shadow-gray-500/30'
-                              } text-white rounded-lg px-3 py-2 transition-all duration-200 hover:scale-110 border border-gray-300/20`}
+                                  ? 'bg-gray-400 shadow-sm'
+                                  : 'bg-gray-600 hover:bg-gray-700 shadow-sm'
+                              } text-white rounded-lg px-3 py-2 transition-all duration-200`}
                             >
                               <MoreHorizontal className="w-4 h-4" />
                             </Button>
 
                             {showMoreActions === round.id && (
-                              <div className="absolute right-0 top-full mt-2 w-52 bg-white/95 backdrop-blur-xl border border-gray-200/50 rounded-xl shadow-2xl z-10 overflow-hidden animate-in slide-in-from-top-2">
+                              <div className="absolute right-0 top-full mt-2 w-52 bg-white border border-gray-200 rounded-lg shadow-lg z-10 overflow-hidden">
                                 <div className="py-2">
                                   <button
                                     onClick={() => handleDuplicateRound(round)}
-                                    className="w-full text-left px-4 py-3 text-gray-700 hover:bg-gradient-to-r hover:from-blue-50 hover:to-blue-100 hover:text-blue-700 transition-all duration-200 flex items-center gap-3 group"
+                                    className="w-full text-left px-4 py-3 text-gray-700 hover:bg-blue-50 hover:text-blue-700 transition-all duration-200 flex items-center gap-3"
                                   >
-                                    <Copy className="w-4 h-4 group-hover:text-blue-600 transition-colors group-hover:scale-110" />
-                                    <span className="group-hover:font-medium transition-all">Duplicate</span>
+                                    <Copy className="w-4 h-4" />
+                                    <span>Duplicate</span>
                                   </button>
                                   <button
                                     onClick={() => handleArchiveRound(round)}
-                                    className="w-full text-left px-4 py-3 text-gray-700 hover:bg-gradient-to-r hover:from-amber-50 hover:to-yellow-100 hover:text-amber-700 transition-all duration-200 flex items-center gap-3 group"
+                                    className="w-full text-left px-4 py-3 text-gray-700 hover:bg-amber-50 hover:text-amber-700 transition-all duration-200 flex items-center gap-3"
                                   >
-                                    <Archive className="w-4 h-4 group-hover:text-amber-600 transition-colors group-hover:scale-110" />
-                                    <span className="group-hover:font-medium transition-all">Archive</span>
+                                    <Archive className="w-4 h-4" />
+                                    <span>Archive</span>
                                   </button>
                                   <button
                                     onClick={() => handleExportRound(round)}
-                                    className="w-full text-left px-4 py-3 text-gray-700 hover:bg-gradient-to-r hover:from-green-50 hover:to-emerald-100 hover:text-green-700 transition-all duration-200 flex items-center gap-3 group"
+                                    className="w-full text-left px-4 py-3 text-gray-700 hover:bg-green-50 hover:text-green-700 transition-all duration-200 flex items-center gap-3"
                                   >
-                                    <Download className="w-4 h-4 group-hover:text-green-600 transition-colors group-hover:scale-110" />
-                                    <span className="group-hover:font-medium transition-all">Export</span>
+                                    <Download className="w-4 h-4" />
+                                    <span>Export</span>
                                   </button>
-                                  <div className="border-t border-gray-200/60 my-2"></div>
+                                  <div className="border-t border-gray-200 my-2"></div>
                                   <button
                                     onClick={() => handleDeleteRound(round.id)}
-                                    className="w-full text-left px-4 py-3 text-red-600 hover:bg-gradient-to-r hover:from-red-50 hover:to-red-100 hover:text-red-700 transition-all duration-200 flex items-center gap-3 group"
+                                    className="w-full text-left px-4 py-3 text-red-600 hover:bg-red-50 hover:text-red-700 transition-all duration-200 flex items-center gap-3"
                                   >
-                                    <Trash2 className="w-4 h-4 group-hover:text-red-700 transition-colors group-hover:scale-110" />
-                                    <span className="group-hover:font-medium transition-all">Delete</span>
+                                    <Trash2 className="w-4 h-4" />
+                                    <span>Delete</span>
                                   </button>
                                 </div>
                               </div>

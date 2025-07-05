@@ -250,249 +250,223 @@ export default function AdminMentorsPage() {
 
   return (
     <>
-      <div className="admin-theme min-h-screen bg-gradient-to-br from-blue-50 via-white to-indigo-50">
-        <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-          <motion.div
-            initial="hidden"
-            animate="show"
-            variants={container}
-            className="space-y-6"
-          >
+      <div className="min-h-screen bg-gray-50 w-full flex flex-col items-center py-10 px-2">
+        <div className="w-full max-w-6xl mx-auto space-y-8">
           {/* Header Section */}
-          <div className="bg-white/90 backdrop-blur-xl border border-gray-200/50 rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300">
-            <div className="p-6 sm:p-8">
-              <div className="flex flex-col lg:flex-row lg:items-start lg:justify-between gap-6">
-                <div className="flex-1 min-w-0">
-                  <div className="flex items-center gap-4 mb-4">
-                    <div className="admin-icon admin-icon-blue flex-shrink-0">
-                      <Users className="h-6 w-6" />
-                    </div>
-                    <div className="min-w-0 flex-1">
-                      <h1 className="text-3xl sm:text-4xl font-bold bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 bg-clip-text text-transparent leading-tight">
-                        Mentors Management
-                      </h1>
-                    </div>
-                  </div>
-                  <p className="text-lg text-gray-600 font-medium mb-4 leading-relaxed">
-                    Manage and organize your team of expert mentors
-                  </p>
-                  <div className="flex flex-wrap items-center gap-3">
-                    <span className="bg-blue-100/80 text-blue-700 border border-blue-200/50 hover:bg-blue-200/70 px-3 py-1.5 rounded-full font-semibold text-xs flex items-center">
-                      <Users className="h-3.5 w-3.5 mr-1.5" />
-                      {mentors.length} {mentors.length === 1 ? 'Mentor' : 'Mentors'} Total
-                    </span>
-                    {filteredMentors.length !== mentors.length && (
-                      <span className="bg-green-100/80 text-green-700 border border-green-200/50 hover:bg-green-200/70 px-3 py-1.5 rounded-full font-semibold text-xs flex items-center">
-                        <Search className="h-3.5 w-3.5 mr-1.5" />
-                        {filteredMentors.length} Filtered
-                      </span>
-                    )}
-                  </div>
+          <div className="bg-white rounded-2xl shadow-md border border-gray-200 overflow-hidden">
+            <div className="px-8 pt-8 pb-4 flex flex-col md:flex-row md:items-center md:justify-between gap-6">
+              <div className="flex items-center gap-4">
+                <div className="bg-blue-100 rounded-full p-3 flex items-center justify-center">
+                  <Users className="h-6 w-6 text-blue-600" />
                 </div>
-                <div className="flex flex-col sm:flex-row gap-3 lg:flex-shrink-0">
-                  <Button 
-                    variant="outline" 
-                    onClick={fetchMentors}
-                    className="border-gray-200/70 hover:border-blue-300/70 bg-white/80 hover:bg-blue-50/50 text-gray-700 hover:text-blue-700 transition-all duration-300 shadow-sm w-full sm:w-auto"
-                    suppressHydrationWarning
-                  >
-                    <RefreshCw className="mr-2 h-4 w-4" />
-                    Refresh
-                  </Button>
-                  <Dialog open={isCreateDialogOpen} onOpenChange={setIsCreateDialogOpen}>
-                    <DialogTrigger asChild>
-                      <Button className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white transition-all duration-300 shadow-md hover:shadow-lg border-0 w-full sm:w-auto" suppressHydrationWarning>
-                        <PlusCircle className="mr-2 h-5 w-5" /> Add New Mentor
-                      </Button>
-                    </DialogTrigger>
-                    <DialogContent className="sm:max-w-[600px] bg-white/95 backdrop-blur-xl border border-gray-200/50 shadow-lg rounded-2xl">
-                      <DialogHeader>
-                        <DialogTitle className="text-2xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent flex items-center gap-2">
-                          <div className="bg-gradient-to-r from-blue-100 to-indigo-100 text-blue-700 border border-blue-200 rounded-lg w-10 h-10 flex items-center justify-center shadow-sm">
-                            👨‍🏫
-                          </div>
-                          Add New Mentor
-                        </DialogTitle>
-                        <DialogDescription className="text-gray-600">
-                          Fill in the details below to add a new mentor to the platform.
-                        </DialogDescription>
-                      </DialogHeader>
-                      <Form {...form}>
-                        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4 py-4 max-h-[70vh] overflow-y-auto pr-2 pl-3">
-                        <FormField
-                          control={form.control}
-                          name="name"
-                          render={({ field }) => (
-                            <FormItem>
-                              <FormLabel>Full Name</FormLabel>
-                              <FormControl>
-                                <Input placeholder="e.g., Dr. Jane Doe" {...field} disabled={isSubmitting} suppressHydrationWarning />
-                              </FormControl>
-                              <FormMessage />
-                            </FormItem>
-                          )}
-                        />
-                        <FormField
-                          control={form.control}
-                          name="designation"
-                          render={({ field }) => (
-                            <FormItem>
-                              <FormLabel>Designation</FormLabel>
-                              <FormControl>
-                                <Input placeholder="e.g., Lead Innovator, Acme Corp" {...field} disabled={isSubmitting} suppressHydrationWarning />
-                              </FormControl>
-                              <FormMessage />
-                            </FormItem>
-                          )}
-                        />
-                        <FormField
-                          control={form.control}
-                          name="expertise"
-                          render={({ field }) => (
-                            <FormItem>
-                              <FormLabel>Area of Expertise/Mentorship</FormLabel>
-                              <FormControl>
-                                <Input placeholder="e.g., AI & Machine Learning" {...field} disabled={isSubmitting} suppressHydrationWarning />
-                              </FormControl>
-                              <FormMessage />
-                            </FormItem>
-                          )}
-                        />
-                        <FormField
-                          control={form.control}
-                          name="description"
-                          render={({ field }) => (
-                            <FormItem>
-                              <FormLabel>Description / Bio</FormLabel>
-                              <FormControl>
-                                <Textarea
-                                  placeholder="Brief description of the mentor's background and experience..."
-                                  {...field}
-                                  rows={4}
-                                  disabled={isSubmitting}
-                                  suppressHydrationWarning
-                                />
-                              </FormControl>
-                              <FormMessage />
-                            </FormItem>
-                          )}
-                        />
-                        <FormField
-                          control={form.control}
-                          name="email"
-                          render={({ field }) => (
-                            <FormItem>
-                              <FormLabel>Email Address</FormLabel>
-                              <FormControl>
-                                <Input
-                                  type="email"
-                                  placeholder="mentor@example.com"
-                                  {...field}
-                                  disabled={isSubmitting}
-                                  suppressHydrationWarning
-                                />
-                              </FormControl>
-                              <FormMessage />
-                            </FormItem>
-                          )}
-                        />                        <FormField
-                          control={form.control}
-                          name="profilePictureUrl"
-                          render={({ field }) => (
-                            <FormItem>
-                              <FormLabel>Profile Picture</FormLabel>
-                              <FormControl>
-                                <ImageUploadComponent
-                                  value={field.value}
-                                  onChange={(imageUrl) => {
-                                    field.onChange(imageUrl || '');
-                                  }}
-                                  placeholder="Upload profile picture or enter URL"
-                                  options={{
-                                    maxSizeBytes: 3 * 1024 * 1024, // 3MB
-                                    allowedTypes: ['image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'image/webp'],
-                                    quality: 0.8,
-                                    maxWidth: 500,
-                                    maxHeight: 500,
-                                  }}
-                                  onUploadComplete={(result) => {
-                                    if (result.success) {
-                                      console.log('Profile picture uploaded successfully:', result.metadata);
-                                    }
-                                  }}
-                                  previewClassName="w-24 h-24 rounded-full"
-                                />
-                              </FormControl>
-                              <FormMessage />
-                            </FormItem>
-                          )}
-                        />
-                        <FormField
-                          control={form.control}
-                          name="linkedinUrl"
-                          render={({ field }) => (
-                            <FormItem>
-                              <FormLabel>LinkedIn Profile URL (Optional)</FormLabel>
-                              <FormControl>
-                                <Input
-                                  placeholder="https://linkedin.com/in/username"
-                                  {...field}
-                                  value={field.value || ''}
-                                  disabled={isSubmitting}
-                                  suppressHydrationWarning
-                                />
-                              </FormControl>
-                              <FormMessage />
-                            </FormItem>
-                          )}
-                        />
-                        <DialogFooter className="mt-6">
-                          <Button
-                            type="button"
-                            variant="outline"
-                            onClick={() => setIsCreateDialogOpen(false)}
-                            disabled={isSubmitting}
-                            className="border-gray-200/70 hover:border-blue-300/70 bg-white/80 hover:bg-blue-50/50 text-gray-700 hover:text-blue-700 transition-all duration-300"
-                            suppressHydrationWarning
-                          >
-                            Cancel
-                          </Button>
-                          <Button
-                            type="submit"
-                            disabled={isSubmitting}
-                            className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white transition-all duration-300 shadow-md hover:shadow-lg border-0"
-                            suppressHydrationWarning
-                          >
-                            {isSubmitting ? (
-                              <>
-                                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                                Adding...
-                              </>
-                            ) : (
-                              'Add Mentor'
-                            )}
-                          </Button>
-                        </DialogFooter>
-                      </form>
-                      </Form>
-                    </DialogContent>
-                  </Dialog>
+                <div>
+                  <h1 className="admin-heading-2 mb-1">Mentors Management</h1>
+                  <p className="admin-caption">Manage and organize your team of expert mentors</p>
                 </div>
+              </div>
+              <div className="flex flex-col sm:flex-row gap-3 md:flex-shrink-0">
+                <Button 
+                  variant="outline" 
+                  onClick={fetchMentors}
+                  className="bg-white border border-blue-200 text-blue-700 hover:bg-blue-50 hover:border-blue-300 focus:ring-2 focus:ring-blue-200 rounded-lg shadow-sm px-5 py-2 font-medium transition"
+                  suppressHydrationWarning
+                >
+                  <RefreshCw className="mr-2 h-4 w-4" />
+                  Refresh
+                </Button>
+                <Dialog open={isCreateDialogOpen} onOpenChange={setIsCreateDialogOpen}>
+                  <DialogTrigger asChild>
+                    <Button className="bg-blue-600 hover:bg-blue-700 text-white rounded-lg shadow px-5 py-2 font-medium transition w-full sm:w-auto" suppressHydrationWarning>
+                      <PlusCircle className="mr-2 h-5 w-5" /> Add New Mentor
+                    </Button>
+                  </DialogTrigger>
+                  <DialogContent className="sm:max-w-[600px] bg-white/95 backdrop-blur-xl border border-gray-200/50 shadow-lg rounded-2xl">
+                    <DialogHeader>
+                      <DialogTitle className="admin-heading-3 bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent flex items-center gap-2">
+                        <div className="bg-gradient-to-r from-blue-100 to-indigo-100 text-blue-700 border border-blue-200 rounded-lg w-10 h-10 flex items-center justify-center shadow-sm">
+                          👨‍🏫
+                        </div>
+                        Add New Mentor
+                      </DialogTitle>
+                      <DialogDescription className="admin-body-small">
+                        Fill in the details below to add a new mentor to the platform.
+                      </DialogDescription>
+                    </DialogHeader>
+                    <Form {...form}>
+                      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4 py-4 max-h-[70vh] overflow-y-auto pr-2 pl-3">
+                      <FormField
+                        control={form.control}
+                        name="name"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Full Name</FormLabel>
+                            <FormControl>
+                              <Input placeholder="e.g., Dr. Jane Doe" {...field} disabled={isSubmitting} suppressHydrationWarning />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                      <FormField
+                        control={form.control}
+                        name="designation"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Designation</FormLabel>
+                            <FormControl>
+                              <Input placeholder="e.g., Lead Innovator, Acme Corp" {...field} disabled={isSubmitting} suppressHydrationWarning />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                      <FormField
+                        control={form.control}
+                        name="expertise"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Area of Expertise/Mentorship</FormLabel>
+                            <FormControl>
+                              <Input placeholder="e.g., AI & Machine Learning" {...field} disabled={isSubmitting} suppressHydrationWarning />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                      <FormField
+                        control={form.control}
+                        name="description"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Description / Bio</FormLabel>
+                            <FormControl>
+                              <Textarea
+                                placeholder="Brief description of the mentor's background and experience..."
+                                {...field}
+                                rows={4}
+                                disabled={isSubmitting}
+                                suppressHydrationWarning
+                              />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                      <FormField
+                        control={form.control}
+                        name="email"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Email Address</FormLabel>
+                            <FormControl>
+                              <Input
+                                type="email"
+                                placeholder="mentor@example.com"
+                                {...field}
+                                disabled={isSubmitting}
+                                suppressHydrationWarning
+                              />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />                        <FormField
+                        control={form.control}
+                        name="profilePictureUrl"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Profile Picture</FormLabel>
+                            <FormControl>
+                              <ImageUploadComponent
+                                value={field.value}
+                                onChange={(imageUrl) => {
+                                  field.onChange(imageUrl || '');
+                                }}
+                                placeholder="Upload profile picture or enter URL"
+                                options={{
+                                  maxSizeBytes: 3 * 1024 * 1024, // 3MB
+                                  allowedTypes: ['image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'image/webp'],
+                                  quality: 0.8,
+                                  maxWidth: 500,
+                                  maxHeight: 500,
+                                }}
+                                onUploadComplete={(result) => {
+                                  if (result.success) {
+                            
+                                  }
+                                }}
+                                previewClassName="w-24 h-24 rounded-full"
+                              />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                      <FormField
+                        control={form.control}
+                        name="linkedinUrl"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>LinkedIn Profile URL (Optional)</FormLabel>
+                            <FormControl>
+                              <Input
+                                placeholder="https://linkedin.com/in/username"
+                                {...field}
+                                value={field.value || ''}
+                                disabled={isSubmitting}
+                                suppressHydrationWarning
+                              />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                      <DialogFooter className="mt-6">
+                        <Button
+                          type="button"
+                          variant="outline"
+                          onClick={() => setIsCreateDialogOpen(false)}
+                          disabled={isSubmitting}
+                          className="border-gray-200/70 hover:border-blue-300/70 bg-white/80 hover:bg-blue-50/50 text-gray-700 hover:text-blue-700 transition-all duration-300"
+                          suppressHydrationWarning
+                        >
+                          Cancel
+                        </Button>
+                        <Button
+                          type="submit"
+                          disabled={isSubmitting}
+                          className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white transition-all duration-300 shadow-md hover:shadow-lg border-0"
+                          suppressHydrationWarning
+                        >
+                          {isSubmitting ? (
+                            <>
+                              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                              Adding...
+                            </>
+                          ) : (
+                            'Add Mentor'
+                          )}
+                        </Button>
+                      </DialogFooter>
+                    </form>
+                    </Form>
+                  </DialogContent>
+                </Dialog>
               </div>
             </div>
           </div>
 
           {/* Search Section */}
-          <div className="bg-white/90 backdrop-blur-xl border border-gray-200/50 rounded-2xl shadow-md hover:shadow-lg transition-all duration-300">
+          <div className="bg-white rounded-2xl shadow border border-gray-200">
             <div className="p-6">
-              <div className="relative max-w-md mx-auto lg:mx-0">
+              <div className="relative max-w-md mx-auto md:mx-0">
                 <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                  <Search className="h-5 w-5 text-indigo-500" />
+                  <Search className="h-5 w-5 text-blue-500" />
                 </div>
                 <Input
                   type="text"
                   placeholder="Search mentors by name, email, or expertise..."
-                  className="pl-12 h-12 text-base border-gray-200/50 focus:border-blue-400 focus:ring-blue-300 shadow-sm rounded-xl bg-white/80 focus:bg-white transition-all duration-300 w-full"
+                  className="pl-12 h-12 text-base border-gray-200 focus:border-blue-400 focus:ring-blue-300 shadow-sm rounded-xl bg-white focus:bg-white transition-all duration-300 w-full"
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                   suppressHydrationWarning
@@ -501,7 +475,7 @@ export default function AdminMentorsPage() {
                   <button
                     type="button"
                     onClick={() => setSearchQuery('')}
-                    className="absolute inset-y-0 right-0 pr-4 flex items-center hover:bg-gray-100/60 rounded-r-xl transition-colors"
+                    className="absolute inset-y-0 right-0 pr-4 flex items-center hover:bg-gray-100 rounded-r-xl transition-colors"
                     suppressHydrationWarning
                   >
                     <X className="h-5 w-5 text-gray-400 hover:text-gray-600" />
@@ -709,7 +683,7 @@ export default function AdminMentorsPage() {
                                             className="hover:text-amber-600 text-gray-500 hover:bg-amber-100/60 transition-all duration-200 rounded-full border border-gray-200 hover:border-amber-300"
                                             onClick={(e) => {
                                               e.stopPropagation();
-                                              // TODO: Implement edit functionality
+                                          
                                               toast({
                                                 title: "Edit functionality coming soon",
                                                 description: "The ability to edit mentors will be available in the next update.",
@@ -774,7 +748,6 @@ export default function AdminMentorsPage() {
               )}
             </div>
           </div>
-          </motion.div>
         </div>
       </div>
     </>

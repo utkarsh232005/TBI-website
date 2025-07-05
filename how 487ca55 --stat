@@ -1,0 +1,25 @@
+[33mcommit 487ca5556e61343818055db7225e918b69179225[m[33m ([m[1;32mbackup-before-reset[m[33m)[m
+Author: Mayank Ninawe <ninawemh@rknec.edu>
+Date:   Wed Jul 2 13:47:52 2025 +0530
+
+    Evaluation page
+
+dynamic-import-complete-guide.tsx
+firestore.rules
+refresh-dev.bat
+src/app/admin/evaluation/NewEvaluationModal.tsx
+src/app/admin/evaluation/page.tsx
+src/app/admin/firestore-test/page.tsx
+src/app/admin/layout.tsx
+src/app/admin/layout_backup.tsx
+src/app/admin/layout_new.tsx
+src/app/evaluation/page.tsx
+src/app/globals.css
+src/components/FirestoreConnectionTest.tsx
+src/components/NoSSR.tsx
+src/components/ui/animated-sidebar.tsx
+src/contexts/AdminAuthContext.tsx
+switch-evaluation-version.bat
+switch-evaluation-version.sh
+test-modal-component.tsx
+test-modal.js
