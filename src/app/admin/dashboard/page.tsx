@@ -3,11 +3,9 @@
 
 import { useEffect, useState } from 'react';
 import { Button } from "@/components/ui/button";
-import { FileTextIcon } from "lucide-react";
-import { AlertCircle, Loader2, ThumbsUp, ThumbsDown, KeyRound, UserCircle, CheckCircle, XCircle, Clock, Landmark, Building, RefreshCw } from "lucide-react";
+import { AlertCircle, Loader2, CheckCircle, XCircle, Clock, RefreshCw, FileTextIcon } from "lucide-react";
 import { db } from '@/lib/firebase';
 import { collection, getDocs, orderBy, query, Timestamp } from 'firebase/firestore';
-import { format } from 'date-fns';
 import { useToast } from "@/hooks/use-toast";
 import { processApplicationAction } from '@/app/actions/admin-actions';
 import { SubmissionsTable } from './components/SubmissionsTable';
