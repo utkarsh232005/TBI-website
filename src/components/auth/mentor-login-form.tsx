@@ -57,25 +57,25 @@ export default function MentorLoginForm({ onForgotPassword }: { onForgotPassword
       const userCredential = await signInWithEmailAndPassword(auth, values.email, values.password);
       const firebaseUser = userCredential.user;
 
-      // After successful Firebase Auth sign-in, check if they are a mentor
-      const mentorDocRef = doc(db, 'mentors', firebaseUser.uid);
-      const mentorDoc = await getDoc(mentorDocRef);
+      // After successful Firebase Auth sign-in, check their role in the 'users' collection
+      const userDocRef = doc(db, 'users', firebaseUser.uid);
+      const userDoc = await getDoc(userDocRef);
 
-      if (!mentorDoc.exists()) {
+      if (!userDoc.exists() || userDoc.data()?.role !== 'mentor') {
         await auth.signOut(); // Sign out if not a mentor
         toast({
-          title: "Login Failed",
-          description: "This account does not have mentor privileges.",
+          title: "Access Denied",
+          description: "This account does not have mentor privileges. Please log in as a user or contact an admin.",
           variant: "destructive",
         });
         return;
       }
 
-      const mentorData = mentorDoc.data();
+      const userData = userDoc.data();
       const userForContext = {
         uid: firebaseUser.uid,
         email: firebaseUser.email || values.email,
-        name: mentorData.name || 'Mentor',
+        name: userData.name || 'Mentor',
       };
       setCurrentUser(userForContext);
 
