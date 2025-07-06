@@ -12,7 +12,7 @@ import { OffCampusSubmissionCard } from './components/OffCampusSubmissionCard';
 import { Submission } from '@/types/Submission';
 import { useSearchParams } from 'next/navigation';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { SubmissionDetailsModal } from './components/SubmissionDetailsModal';
+import SubmissionDetailModal from './components/SubmissionDetailModal';
 
 interface ProcessingActionState {
   id: string;
@@ -174,7 +174,7 @@ function AdminSubmissionsContent() {
         </TabsContent>
       </Tabs>
       
-      <SubmissionDetailsModal
+      <SubmissionDetailModal
         submission={selectedSubmission}
         isOpen={!!selectedSubmission}
         onClose={() => setSelectedSubmission(null)}
