@@ -253,13 +253,10 @@ function AdminLayoutContent({
               <span className="text-lg font-semibold text-white">Admin</span>
             </Link>
           </div>
-          <NotificationsPanel userId="admin@tbi.com" />
         </header>
 
-        {/* Desktop header with notifications */}
-        <header className="hidden md:flex items-center justify-end h-16 px-6 border-b border-neutral-800 bg-neutral-900/80 backdrop-blur-sm">
-          <NotificationsPanel userId="admin@tbi.com" />
-        </header>
+        {/* Floating Notifications Panel */}
+        <NotificationsPanel userId="admin@tbi.com" />
 
         {/* Page content */}
         <main className="flex-1 overflow-y-auto p-4 md:p-6 bg-neutral-900/50">

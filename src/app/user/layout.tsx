@@ -291,17 +291,12 @@ function UserLayoutContent({
               <span className="text-lg font-semibold text-white">Portal</span>
             </Link>
           </div>
-          {user?.uid && (
-            <NotificationsPanel userId={user.uid} />
-          )}
         </header>
 
-        {/* Desktop header with notifications */}
-        <header className="hidden md:flex items-center justify-end h-16 px-6 border-b border-neutral-800 bg-neutral-900/80 backdrop-blur-sm">
-          {user?.uid && (
-            <NotificationsPanel userId={user.uid} />
-          )}
-        </header>
+        {/* Floating Notifications Panel */}
+        {user?.uid && (
+          <NotificationsPanel userId={user.uid} />
+        )}
 
         {/* Page content */}
         <main className="flex-1 overflow-y-auto p-4 md:p-6 bg-neutral-900/50">
