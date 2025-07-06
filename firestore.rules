@@ -18,6 +18,15 @@ service cloud.firestore {
       // Allow updates only for onboarding-related fields and admin processing
       allow update: if isValidOnboardingUpdate(resource, request) || isAdminUpdate(request);
     }
+
+    // Rules for offCampusApplications
+    match /offCampusApplications/{submissionId} {
+      allow read: if true;
+      allow create: if true;
+      // This update rule is intentionally permissive for development.
+      // In production, this should be restricted to an admin role.
+      allow update: if true;
+    }
     
     // Helper functions for contactSubmissions rules
     function isValidOnboardingUpdate(existingData, incomingRequest) {
@@ -92,13 +101,6 @@ service cloud.firestore {
       return isStatusUpdate || isCredentialAssignment;
     }
 
-    // Rules for offCampusApplications
-    match /offCampusApplications/{submissionId} {
-      allow read: if true; 
-      allow create: if true; 
-      allow update: if true; // SHOULD BE RESTRICTED TO ADMINS
-    }
-
     // Rules for events
     match /events/{eventId} {
       allow read: if true;    // Allows anyone to read events for the public page
@@ -108,26 +110,19 @@ service cloud.firestore {
       allow delete: if true; // Placeholder: No one can delete events yet
     }
     
-    // ** SECURED MENTOR RULES **
+    // DEVELOPMENT-FRIENDLY MENTOR RULES
     match /mentors/{mentorId} {
-      // Allow anyone to read public mentor profiles.
-      allow read: if true;
-      // Deny any client-side writes. Creation/updates must go through server actions.
-      allow write: if false;
+      allow read: if true; // Allows anyone to read mentors for the public page
+      // Allow writes for admin panel actions (development setting)
+      allow write: if true;
     }
     
     // Rules for startups
     match /startups/{startupId} {
       allow read: if true; // Allows anyone to read startups for the public page
       allow create: if true; // WARNING: DEVELOPMENT ONLY. Allows anyone to create.
-                                            // In production, ensure your backend action is admin-only,
-                                            // or if admin uses Firebase Auth: if request.auth.token.isAdmin == true;
       allow update: if true; // WARNING: DEVELOPMENT ONLY. Allows anyone to update.
-                                             // In production, ensure your backend action is admin-only.
-                                             // Or, if admin uses Firebase Auth: if request.auth.token.isAdmin == true;
       allow delete: if true; // WARNING: DEVELOPMENT ONLY. Allows anyone to delete.
-                                             // In production, ensure your backend action is admin-only.
-                                             // Or, if admin uses Firebase Auth: if request.auth.token.isAdmin == true;
     }
 
     // PRODUCTION SECURITY RECOMMENDATIONS:
@@ -136,53 +131,27 @@ service cloud.firestore {
     // 3. Limit emailTokens access to server-side operations only
     // 4. Add rate limiting for token generation
     
-    // Example production rules (currently using permissive dev rules):
-    // match /mentorRequests/{requestId} {
-    //   allow read: if request.auth != null;
-    //   allow create: if request.auth != null && isValidUser(request.auth.uid);
-    //   allow update: if request.auth != null && (isOwner(resource, request.auth.uid) || isAdmin(request.auth.uid));
-    // }
-    //
-    // match /emailTokens/{tokenId} {
-    //   allow read, write: if false; // Server-side only access
-    // }
-
-    // ** SECURED MENTOR REQUEST RULES **
+    // DEVELOPMENT RULES for mentor requests (More permissive for testing)
     match /mentorRequests/{requestId} {
-      // Allow authenticated users to create requests.
-      allow create: if request.auth != null;
-      
-      // Allow a user to read their own requests, and a mentor to read requests sent to them.
-      // Admin access should be handled via server-side logic.
-      allow read: if request.auth != null && 
-                    (request.auth.uid == resource.data.userId || request.auth.token.email == resource.data.mentorEmail);
-      
-      // Deny client-side updates. Must use server actions.
-      allow update: if false;
-      
-      // Deny client-side deletes. Must use server actions.
-      allow delete: if false;
+      allow create: if true;
+      allow read: if true;
+      allow update: if true;
+      allow delete: if true;
     }
 
     // DEVELOPMENT RULES for notifications (More permissive for testing)
     match /notifications/{notificationId} {
-      // Allow anyone to create notifications (for development/testing)
       allow create: if true;
-      
-      // Allow anyone to read notifications (for development/testing)
       allow read: if true;
-      
-      // Allow anyone to update notifications (for development/testing)
       allow update: if true;
-      
-      // Allow anyone to delete notifications (for development/testing)
       allow delete: if true;
     }
 
-    // ** SECURED USER RULES **
+    // DEVELOPMENT-FRIENDLY USER RULES
     match /users/{userId} {
-      // A user can read and write to their own document.
-      allow read, write: if request.auth.uid == userId;
+      allow read: if true;
+      // Allow writes for admin panel actions creating mentor users (development setting)
+      allow write: if true;
     }
 
     match /submissions/{submissionId} {
