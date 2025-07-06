@@ -1,8 +1,9 @@
+
 import { NextRequest, NextResponse } from 'next/server';
 import { db } from '@/lib/firebase';
 import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
 import { CampusStatus } from '@/types/Submission';
-import { DOMAIN_OPTIONS, SECTOR_OPTIONS, LEGAL_STATUS_OPTIONS } from '@/lib/validation/dropdown-constants';
+import { DOMAIN_OPTIONS, SECTOR_OPTIONS } from '@/lib/validation/dropdown-constants';
 
 export async function POST(request: NextRequest) {
   try {
@@ -14,14 +15,13 @@ export async function POST(request: NextRequest) {
     // Validate required fields
     const requiredFields = [
       'fullName', 'natureOfInquiry', 'companyName', 'companyEmail', 
-      'founderNames', 'founderBio', 'startupIdea', 'targetAudience', 
-      'uniqueness', 'currentStage', 'domain', 'sector', 'legalStatus', 'attachmentBase64'
+      'founderNames', 'founderBio', 'startupIdea', 'uniqueness', 'domain', 'sector'
     ];
     
     console.log('Starting field validation...');
     for (const field of requiredFields) {
       if (!body[field]) {
-        console.log(`Missing field: ${field}`);
+        console.log(`Missing required field: ${field}`);
         return NextResponse.json(
           { message: `Missing required field: ${field}` },
           { status: 400 }
@@ -47,14 +47,6 @@ export async function POST(request: NextRequest) {
       );
     }
     
-    if (!LEGAL_STATUS_OPTIONS.includes(body.legalStatus)) {
-      console.log(`Invalid legal status: ${body.legalStatus}`);
-      return NextResponse.json(
-        { message: `Invalid legal status value. Must be one of: ${LEGAL_STATUS_OPTIONS.join(', ')}` },
-        { status: 400 }
-      );
-    }
-    
     console.log('Dropdown validation passed');
     console.log('Saving to Firebase Firestore...');
 
@@ -70,17 +62,18 @@ export async function POST(request: NextRequest) {
       portfolioUrl: body.portfolioUrl || '',
       teamInfo: body.teamInfo || '',
       startupIdea: body.startupIdea,
-      targetAudience: body.targetAudience,
       problemSolving: body.problemSolving || '',
       uniqueness: body.uniqueness,
-      currentStage: body.currentStage,
       
       // New dropdown fields
       domain: body.domain,
       sector: body.sector,
-      legalStatus: body.legalStatus,
       
-      attachmentBase64: body.attachmentBase64,
+      // Add dummy data for removed fields
+      targetAudience: body.targetAudience || 'Not provided',
+      currentStage: body.currentStage || 'Ideation',
+      legalStatus: body.legalStatus || 'Not registered',
+      attachmentBase64: body.attachmentBase64 || '',
       attachmentName: body.attachmentName || '',
       
       // Legacy field mappings for backward compatibility
