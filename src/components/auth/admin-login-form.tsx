@@ -83,7 +83,7 @@ export default function AdminLoginForm({ onForgotPassword }: { onForgotPassword?
         toast({
           title: "Login Failed",
           description: result.message || "An unknown error occurred.",
-          variant: "destructive",
+          variant: "warning",
         });
       }
     } catch (error: any) {

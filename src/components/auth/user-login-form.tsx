@@ -120,13 +120,14 @@ export default function UserLoginForm({ onForgotPassword }: { onForgotPassword?:
     } catch (error: any) {
       console.error("Error during user login:", error);
 
-      // Handle specific Firebase Auth errors
-      let errorMessage = "An unexpected error occurred.";
+      let errorMessage = "An unexpected error occurred. Please try again.";
+      let toastVariant: 'warning' | 'destructive' = "destructive";
 
-      if (error.code === 'auth/user-not-found' || error.code === 'auth/wrong-password') {
-        errorMessage = "Invalid email or password.";
+      if (error.code === 'auth/user-not-found' || error.code === 'auth/wrong-password' || error.code === 'auth/invalid-credential') {
+        errorMessage = "Invalid email or password. Please check your credentials and try again.";
+        toastVariant = "warning";
       } else if (error.code === 'auth/user-disabled') {
-        errorMessage = "This account has been disabled.";
+        errorMessage = "This account has been disabled. Please contact support.";
       } else if (error.code === 'auth/too-many-requests') {
         errorMessage = "Too many failed login attempts. Please try again later.";
       } else if (error.message) {
@@ -136,7 +137,7 @@ export default function UserLoginForm({ onForgotPassword }: { onForgotPassword?:
       toast({
         title: "Login Failed",
         description: errorMessage,
-        variant: "destructive",
+        variant: toastVariant,
       });
     } finally {
       setIsLoading(false);
