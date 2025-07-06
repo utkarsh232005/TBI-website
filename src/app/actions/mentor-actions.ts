@@ -1,10 +1,12 @@
+
 // src/app/actions/mentor-actions.ts
 'use server';
 
 import { z } from 'zod';
-import { db } from '@/lib/firebase';
-import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
+import { db, auth } from '@/lib/firebase';
+import { collection, addDoc, serverTimestamp, doc, setDoc } from 'firebase/firestore';
 import { revalidatePath } from 'next/cache';
+import { createUserWithEmailAndPassword } from 'firebase/auth';
 
 // Schema matches the form validation schema in the page component
 const mentorFormSchema = z.object({
@@ -15,6 +17,7 @@ const mentorFormSchema = z.object({
   profilePictureUrl: z.string().url().optional().or(z.literal('')),
   linkedinUrl: z.string().url().optional().or(z.literal('')),
   email: z.string().email(),
+  password: z.string().min(6, "Password must be at least 6 characters"),
 });
 
 export type MentorFormValues = z.infer<typeof mentorFormSchema>;
@@ -33,39 +36,56 @@ export async function createMentorAction(values: MentorFormValues): Promise<Crea
       return { success: false, message: "Invalid input data for mentor. " + JSON.stringify(validatedValues.error.flatten().fieldErrors) };
     }
     
-    const { name, designation, expertise, description, profilePictureUrl, linkedinUrl, email } = validatedValues.data;
+    const { name, designation, expertise, description, profilePictureUrl, linkedinUrl, email, password } = validatedValues.data;
 
+    // Create Firebase Auth user for the mentor
+    const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+    const firebaseUser = userCredential.user;
+    
+    // Data to be stored in 'mentors' collection, now using UID as document ID
     const mentorData = {
+      uid: firebaseUser.uid,
       name,
       designation,
       expertise,
       description,
-      profilePictureUrl: profilePictureUrl || `https://placehold.co/100x100/7DF9FF/121212.png?text=${encodeURIComponent(name.substring(0,2))}`, // Default placeholder if empty
+      profilePictureUrl: profilePictureUrl || `https://placehold.co/100x100/7DF9FF/121212.png?text=${encodeURIComponent(name.substring(0,2))}`,
       linkedinUrl: linkedinUrl || null,
       email,
       createdAt: serverTimestamp(),
       updatedAt: serverTimestamp(),
     };
 
-    const docRef = await addDoc(collection(db, "mentors"), mentorData);
+    // Data for the 'users' collection to handle roles
+    const userData = {
+        uid: firebaseUser.uid,
+        email,
+        name,
+        role: 'mentor',
+        status: 'active',
+        createdAt: serverTimestamp(),
+        updatedAt: serverTimestamp(),
+    };
+
+    // Use setDoc to specify the document ID as the user's UID
+    await setDoc(doc(db, "mentors", firebaseUser.uid), mentorData);
+    await setDoc(doc(db, "users", firebaseUser.uid), userData);
     
     revalidatePath('/admin/mentors');
-    revalidatePath('/mentors'); // Revalidate public mentors page
+    revalidatePath('/mentors');
 
-    return { success: true, mentorId: docRef.id, message: "Mentor added successfully." };
+    return { success: true, mentorId: firebaseUser.uid, message: "Mentor added and account created successfully." };
 
   } catch (error: any) {
     console.error("Error in createMentorAction: ", error);
     let errorMessage = "Failed to add mentor.";
-    if (error.code === 'permission-denied') {
-        errorMessage = "Permission denied. Check Firestore rules for 'mentors' collection.";
+    if (error.code === 'auth/email-already-in-use') {
+        errorMessage = "This email is already registered. Please use a different email.";
+    } else if (error.code === 'permission-denied') {
+        errorMessage = "Permission denied. Check Firestore rules for 'mentors' and 'users' collections.";
     } else if (error.message) {
         errorMessage = error.message;
     }
     return { success: false, message: errorMessage };
   }
 }
-
-// Placeholder for future actions
-// export async function updateMentorAction(mentorId: string, values: Partial<MentorFormValues>): Promise<any> {}
-// export async function deleteMentorAction(mentorId: string): Promise<any> {}

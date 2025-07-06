@@ -1,7 +1,8 @@
+
 // src/app/admin/mentors/page.tsx
 "use client";
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -25,7 +26,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Users, PlusCircle, Loader2, AlertCircle, Edit, Trash2, Search, X, ChevronDown, ChevronUp, Mail, Linkedin, Briefcase, ExternalLink, RefreshCw } from "lucide-react";
+import { Users, PlusCircle, Loader2, AlertCircle, Edit, Trash2, Search, X, ChevronDown, ChevronUp, Mail, Linkedin, Briefcase, ExternalLink, RefreshCw, Lock } from "lucide-react";
 import { motion, AnimatePresence, Variants } from "framer-motion";
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
@@ -75,6 +76,7 @@ const mentorFormSchema = z.object({
   profilePictureUrl: z.string().optional(),
   linkedinUrl: z.string().url({ message: "Please enter a valid LinkedIn URL." }).optional().or(z.literal('')),
   email: z.string().email({ message: "Please enter a valid email address." }),
+  password: z.string().min(6, { message: "Password must be at least 6 characters." }),
 });
 
 export type MentorFormValues = z.infer<typeof mentorFormSchema>;
@@ -121,6 +123,7 @@ export default function AdminMentorsPage() {
       profilePictureUrl: "",
       linkedinUrl: "",
       email: "",
+      password: "",
     },
   });
 
@@ -276,7 +279,7 @@ export default function AdminMentorsPage() {
                         Add New Mentor
                       </DialogTitle>
                       <DialogDescription className="text-gray-400">
-                        Fill in the details below to add a new mentor to the platform.
+                        Fill in the details below to add a new mentor and create their login account.
                       </DialogDescription>
                     </DialogHeader>
                     <Form {...form}>
@@ -344,7 +347,7 @@ export default function AdminMentorsPage() {
                           name="email"
                           render={({ field }) => (
                             <FormItem>
-                              <FormLabel>Email Address</FormLabel>
+                              <FormLabel>Email Address (for login)</FormLabel>
                               <FormControl>
                                 <Input
                                   type="email"
@@ -357,7 +360,27 @@ export default function AdminMentorsPage() {
                               <FormMessage />
                             </FormItem>
                           )}
-                        />                        <FormField
+                        />
+                        <FormField
+                          control={form.control}
+                          name="password"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel>Set Temporary Password</FormLabel>
+                              <FormControl>
+                                <Input
+                                  type="password"
+                                  placeholder="Enter a secure temporary password"
+                                  {...field}
+                                  disabled={isSubmitting}
+                                  suppressHydrationWarning
+                                />
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+                        <FormField
                           control={form.control}
                           name="profilePictureUrl"
                           render={({ field }) => (

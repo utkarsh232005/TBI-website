@@ -4,11 +4,12 @@
 import { useState } from 'react';
 import AdminLoginForm from "@/components/auth/admin-login-form";
 import UserLoginForm from "@/components/auth/user-login-form";
+import MentorLoginForm from "@/components/auth/mentor-login-form"; // Import the new mentor form
 import { InnoNexusLogo } from "@/components/icons/innnexus-logo";
 import { PasswordResetDialog } from "@/components/ui/password-reset-dialog";
 import Link from "next/link";
 import { motion } from "framer-motion";
-import { Users, Shield } from "lucide-react";
+import { Users, Shield, UserCheck } from "lucide-react"; // Import a new icon for mentor
 import {
   InteractiveLoginTabs,
   InteractiveLoginTabsList,
@@ -84,13 +85,20 @@ export default function LoginPage() {
           className="w-full max-w-md"
         >
           <InteractiveLoginTabs defaultValue="user" className="w-full">
-            <InteractiveLoginTabsList className="grid w-full grid-cols-2 mb-6">
+            <InteractiveLoginTabsList className="grid w-full grid-cols-3 mb-6">
               <InteractiveLoginTabsTrigger
                 value="user"
                 variant="user"
                 icon={<Users className="h-4 w-4" />}
               >
                 User
+              </InteractiveLoginTabsTrigger>
+              <InteractiveLoginTabsTrigger
+                value="mentor"
+                variant="user" // Using user variant styles for mentor
+                icon={<UserCheck className="h-4 w-4" />}
+              >
+                Mentor
               </InteractiveLoginTabsTrigger>
               <InteractiveLoginTabsTrigger
                 value="admin"
@@ -102,6 +110,9 @@ export default function LoginPage() {
             </InteractiveLoginTabsList>
             <InteractiveLoginTabsContent value="user">
               <UserLoginForm onForgotPassword={() => setIsPasswordResetOpen(true)} />
+            </InteractiveLoginTabsContent>
+            <InteractiveLoginTabsContent value="mentor">
+              <MentorLoginForm onForgotPassword={() => setIsPasswordResetOpen(true)} />
             </InteractiveLoginTabsContent>
             <InteractiveLoginTabsContent value="admin">
               <AdminLoginForm onForgotPassword={() => setIsPasswordResetOpen(true)} />
