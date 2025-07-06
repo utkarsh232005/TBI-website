@@ -1,213 +1,98 @@
 rules_version = '2';
+
 service cloud.firestore {
   match /databases/{database}/documents {
-    // Allows reading the specific admin credentials document
-    match /admin_config/main_credentials {
-      allow read: if true; // Allows any authenticated or unauthenticated client to read
-      allow write: if request.auth != null; // Example: only allow authenticated users to write (you'd restrict this to admins)
+
+    // Helper functions
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function isOwner(userId) {
+      return request.auth.uid == userId;
+    }
+
+    function getRole(userId) {
+      return get(/databases/$(database)/documents/users/$(userId)).data.role;
     }
     
-    // Rules for contactSubmissions (User Onboarding & Application Data)
+    function isAdmin() {
+      return isSignedIn() && getRole(request.auth.uid) == 'admin';
+    }
+
+    function isMentor() {
+      return isSignedIn() && getRole(request.auth.uid) == 'mentor';
+    }
+
+    function isUser() {
+      return isSignedIn() && getRole(request.auth.uid) == 'user';
+    }
+
+    // --- Collection Rules ---
+
+    // Admin configuration can be read by anyone for login, but only written by your backend.
+    match /admin_config/{docId} {
+      allow read: if true;
+      allow write: if false; // Should only be updatable from a secure backend/admin SDK
+    }
+    
+    // Application submissions can be created by anyone, but only read/updated by your backend.
     match /contactSubmissions/{submissionId} {
-      // Allow anyone to read all submissions (for admin dashboard)
-      allow read: if true; 
-      
-      // Allow anyone to create new submissions (for application forms)
-      allow create: if true; 
-      
-      // Allow updates only for onboarding-related fields and admin processing
-      allow update: if isValidOnboardingUpdate(resource, request) || isAdminUpdate(request);
-    }
-    
-    // Helper functions for contactSubmissions rules
-    function isValidOnboardingUpdate(existingData, incomingRequest) {
-      let existingDoc = existingData.data;
-      let incomingDoc = incomingRequest.resource.data;
-      
-      // Check if this is an accepted user updating their own onboarding data
-      return existingDoc.status == 'accepted' &&
-             // Only allow updates to onboarding-related fields
-             incomingDoc.keys().hasAll(['name', 'email', 'status']) &&
-             // Ensure core fields remain unchanged
-             incomingDoc.email == existingDoc.email &&
-             incomingDoc.status == existingDoc.status &&
-             // Allow these onboarding fields to be added/updated
-             isOnboardingFieldsOnly(incomingDoc) &&
-             // Validate specific field requirements
-             isValidOnboardingData(incomingDoc);
-    }
-    
-    function isOnboardingFieldsOnly(incomingDoc) {
-      // Define allowed onboarding fields that can be updated
-      let allowedFields = [
-        'name', 'email', 'status', 'temporaryUserId', 'temporaryPassword',
-        'firstName', 'lastName', 'phone', 'bio', 'linkedin',
-        'notificationPreferences', 'onboardingProgress', 'onboardingCompleted',
-        'onboardingCompletedAt', 'passwordUpdatedAt', 'profileUpdatedAt',
-        'submittedAt', 'campusStatus', 'companyName', 'idea'
-      ];
-      
-      // Check that only allowed fields are being modified
-      return incomingDoc.keys().hasOnly(allowedFields);
-    }
-    
-    function isValidOnboardingData(incomingDoc) {
-      // Validate password requirements
-      let passwordValid = !incomingDoc.keys().hasAny(['temporaryPassword']) ||
-                         (incomingDoc.temporaryPassword is string && 
-                          incomingDoc.temporaryPassword.size() >= 6);
-      
-      // Validate profile requirements
-      let profileValid = !incomingDoc.keys().hasAny(['firstName', 'lastName']) ||
-                        (incomingDoc.firstName is string && 
-                         incomingDoc.firstName.size() > 0 &&
-                         incomingDoc.lastName is string && 
-                         incomingDoc.lastName.size() > 0);
-      
-      // Validate LinkedIn URL format (if provided)
-      let linkedinValid = !incomingDoc.keys().hasAny(['linkedin']) ||
-                         incomingDoc.linkedin == '' ||
-                         incomingDoc.linkedin.matches('https://.*linkedin.com/.*') ||
-                         incomingDoc.linkedin.matches('https://.*linkedin.com/in/.*');
-      
-      // Validate notification preferences structure
-      let notificationValid = !incomingDoc.keys().hasAny(['notificationPreferences']) ||
-                             (incomingDoc.notificationPreferences.keys().hasAll(['emailNotifications']) &&
-                              incomingDoc.notificationPreferences.emailNotifications is bool);
-      
-      return passwordValid && profileValid && linkedinValid && notificationValid;
-    }
-    
-    function isAdminUpdate(incomingRequest) {
-      // Allow admin operations for application processing
-      // This covers accept/reject operations and credential assignment
-      let isStatusUpdate = incomingRequest.resource.data.keys().hasAny([
-        'status', 'processedByAdminAt'
-      ]);
-      
-      let isCredentialAssignment = incomingRequest.resource.data.keys().hasAny([
-        'temporaryUserId', 'temporaryPassword'
-      ]) && incomingRequest.resource.data.status == 'accepted';
-      
-      return isStatusUpdate || isCredentialAssignment;
+      allow read: if false;
+      allow update: if false;
+      allow delete: if false;
+      allow create: if true; // Anyone can submit the form
     }
 
-    // Rules for offCampusApplications
     match /offCampusApplications/{submissionId} {
-      allow read: if true; 
-      allow create: if true; 
-      allow update: if true; // SHOULD BE RESTRICTED TO ADMINS
+      allow read: if false;
+      allow update: if false;
+      allow delete: if false;
+      allow create: if true; // Anyone can submit the form
     }
 
-    // Rules for events
-    match /events/{eventId} {
-      allow read: if true;    // Allows anyone to read events for the public page
-      allow create: if true;  // WARNING: DEVELOPMENT ONLY - Allows anyone to create events.
-                              // Secure this for production (e.g., if request.auth.token.isAdmin == true;)
-      allow update: if true; // Placeholder: No one can update events yet
-      allow delete: if true; // Placeholder: No one can delete events yet
-    }
-    
-    match /mentors/{mentorId} {
-      allow read: if true; // Allows anyone to read mentors for the public page
-      allow create: if true; 
-      allow update: if true; // Placeholder: No one can update events yet
-      allow delete: if true;
-      // EXAMPLE: Allow anyone to write for dev. MUST be restricted to admin.
-      // update, delete will be needed later
-    }
-    
-    // Rules for startups
-    match /startups/{startupId} {
-      allow read: if true; // Allows anyone to read startups for the public page
-      allow create: if true; // WARNING: DEVELOPMENT ONLY. Allows anyone to create.
-                                            // In production, ensure your backend action is admin-only,
-                                            // or if admin uses Firebase Auth: if request.auth.token.isAdmin == true;
-      allow update: if true; // WARNING: DEVELOPMENT ONLY. Allows anyone to update.
-                                             // In production, ensure your backend action is admin-only.
-                                             // Or, if admin uses Firebase Auth: if request.auth.token.isAdmin == true;
-      allow delete: if true; // WARNING: DEVELOPMENT ONLY. Allows anyone to delete.
-                                             // In production, ensure your backend action is admin-only.
-                                             // Or, if admin uses Firebase Auth: if request.auth.token.isAdmin == true;
-    }
-
-    // PRODUCTION SECURITY RECOMMENDATIONS:
-    // 1. Implement proper authentication checks
-    // 2. Restrict mentorRequests write access to authenticated users only
-    // 3. Limit emailTokens access to server-side operations only
-    // 4. Add rate limiting for token generation
-    
-    // Example production rules (currently using permissive dev rules):
-    // match /mentorRequests/{requestId} {
-    //   allow read: if request.auth != null;
-    //   allow create: if request.auth != null && isValidUser(request.auth.uid);
-    //   allow update: if request.auth != null && (isOwner(resource, request.auth.uid) || isAdmin(request.auth.uid));
-    // }
-    //
-    // match /emailTokens/{tokenId} {
-    //   allow read, write: if false; // Server-side only access
-    // }
-
-    // DEVELOPMENT RULES for mentor requests (More permissive for testing)
-    // NOTE: These rules are permissive for development/testing purposes.
-    // In production, you should implement proper authentication checks.
-    match /mentorRequests/{requestId} {
-      // Allow anyone to create mentor requests (for development/testing)
-      allow create: if true;
-      
-      // Allow anyone to read mentor requests (for development/testing)
-      allow read: if true;
-      
-      // Allow anyone to update mentor requests (for development/testing)
-      allow update: if true;
-      
-      // Allow anyone to delete mentor requests (for development/testing)
-      allow delete: if true;
-    }
-
-    // DEVELOPMENT RULES for notifications (More permissive for testing)
-    match /notifications/{notificationId} {
-      // Allow anyone to create notifications (for development/testing)
-      allow create: if true;
-      
-      // Allow anyone to read notifications (for development/testing)
-      allow read: if true;
-      
-      // Allow anyone to update notifications (for development/testing)
-      allow update: if true;
-      
-      // Allow anyone to delete notifications (for development/testing)
-      allow delete: if true;
-    }
-
-    // Enhanced rules for user profile collections
+    // Users can only read/write their own data.
     match /users/{userId} {
-      allow read: if true; // Allow reading for now, restrict in production
-      allow write: if true; // Allow writing for now, restrict in production
+      allow read, update: if isOwner(userId);
+      // Deny public creation/deletion of user documents. This is handled by your backend.
+      allow create, delete: if false; 
     }
-
-    match /submissions/{submissionId} {
+    
+    // Public collections can be read by anyone. Writes are blocked from the client.
+    match /startups/{startupId} {
       allow read: if true;
-      allow write: if true;
+      allow write: if false; // Admin actions only
     }
 
-    // DEVELOPMENT RULES for email tokens
+    match /events/{eventId} {
+      allow read: if true;
+      allow write: if false; // Admin actions only
+    }
+
+    // Mentors can be read by anyone, but only written to by the backend.
+    match /mentors/{mentorId} {
+      allow read: if true;
+      allow write: if false; // Admin actions only
+    }
+
+    // Mentor Requests: Secure access based on role
+    match /mentorRequests/{requestId} {
+      allow create: if isUser(); // Only users can create requests
+      allow read: if isOwner(resource.data.userId) || isOwner(resource.data.mentorId) || isAdmin(); // User, Mentor, or Admin can read
+      allow update: if isOwner(resource.data.mentorId) || isAdmin(); // Mentor or Admin can update (e.g., status)
+      allow delete: if isAdmin(); // Only Admin can delete
+    }
+
+    // Notifications: Users can only access their own notifications.
+    match /notifications/{notificationId} {
+      allow read, update, delete: if isOwner(resource.data.userId);
+      // Creation should be handled by secure backend functions.
+      allow create: if false; 
+    }
+
+    // Email Tokens: Should only be accessible by the server. Lock down client access.
     match /emailTokens/{tokenId} {
-      allow read: if true;
-      allow write: if true;
-      allow delete: if true;
+      allow read, write, delete: if false;
     }
-
-    // Rules for evaluation_rounds collection
-    match /evaluation_rounds/{docId} {
-      allow read, write: if true; // Allow all access for admin panel functionality
-    }
-
-    // Rules for notifications collection (used by evaluation feature)
-    match /notifications/{docId} {
-      allow read, write: if true; // Allow all access for admin panel functionality
-    }
-
-    // Add other rules for other collections if needed
   }
 }
