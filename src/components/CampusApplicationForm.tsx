@@ -57,14 +57,11 @@ export default function CampusApplicationForm() {
     setIsSubmitting(true);
 
     try {
-      // Manually add dummy values for fields that are required by the backend but removed from the form
+      const campusStatus = typeof window !== 'undefined' ? localStorage.getItem('applicantCampusStatus') : 'campus';
+
       const submissionData = {
         ...formData,
-        targetAudience: "Not provided",
-        currentStage: "Ideation",
-        legalStatus: "Not registered",
-        attachmentBase64: "data:text/plain;base64,bm9uZQ==", // base64 for "none"
-        attachmentName: "none.txt"
+        campusStatus: campusStatus,
       };
 
       const response = await fetch('/api/contact-submissions', {
@@ -125,7 +122,7 @@ export default function CampusApplicationForm() {
           <div className="w-2 h-8 bg-gradient-to-b from-blue-400 to-purple-500 rounded-full"></div>
           <div>
             <h2 className="text-2xl font-bold text-white bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent">
-              Campus Incubation Application
+              Incubation Application
             </h2>
             <p className="text-neutral-400 text-sm mt-1">
               Join our innovation ecosystem and transform your startup vision into reality

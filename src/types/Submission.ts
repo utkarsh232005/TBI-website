@@ -1,3 +1,4 @@
+
 import { Timestamp } from 'firebase/firestore';
 
 export type SubmissionStatus = 'pending' | 'accepted' | 'rejected';
@@ -5,55 +6,63 @@ export type CampusStatus = 'campus' | 'off-campus' | undefined;
 
 export interface Submission {
   id: string;
-  name: string;
-  email: string;
-  phone?: string;
-  linkedin?: string;
-  course?: string;
-  yearOfStudy?: string;
-  campus?: string;
-  companyName?: string;
-  startupName?: string;
-  idea?: string;
-  startupIdea?: string;
-  message?: string;
-  campusStatus?: CampusStatus;
-  submittedAt: Date | Timestamp | string;
-  status: SubmissionStatus;
-  temporaryUserId?: string;
-  temporaryPassword?: string;
-  processedByAdminAt?: Date | Timestamp | string;
-  source?: 'campus' | 'off-campus';
+  name: string; // From fullName
+  email: string; // From companyEmail
   
-  // New fields from CampusApplicationForm
+  // All possible fields from both forms
   fullName?: string;
+  phone?: string;
   natureOfInquiry?: string;
+  companyName?: string;
   companyEmail?: string;
   founderNames?: string;
   founderBio?: string;
-  portfolioUrl?: string;
-  linkedinUrl?: string;
+  portfolioUrl?: string; // Also for LinkedIn
   teamInfo?: string;
-  targetAudience?: string;
+  startupIdea?: string;
   problemSolving?: string;
   uniqueness?: string;
-  currentStage?: string;
+  
+  // Dropdown fields
+  domain?: string;
+  sector?: string;
+  
+  // Legacy or simplified fields
+  idea?: string; // From startupIdea
+  
+  // Metadata
+  campusStatus?: CampusStatus;
+  submittedAt: Date | Timestamp | string;
+  status: SubmissionStatus;
+  
+  // Post-processing fields
+  temporaryUserId?: string; // For login credentials before user logs in
+  temporaryPassword?: string;
+  firebaseUid?: string; // The final Firebase Auth UID
+  processedByAdminAt?: Date | Timestamp | string;
+  
+  // Off-campus import specific fields
+  source?: 'campus' | 'off-campus'; // Potentially from import logic
   developmentStage?: string;
   businessCategory?: string;
   contactInfo?: string;
-  
-  // Import tracking fields
   sourceRow?: number;
   importedAt?: Date | Timestamp | string;
   formSubmittedAt?: string;
+  linkedinUrl?: string;
   
-  // New dropdown fields
-  domain?: string;
-  sector?: string;
+  // Deprecated fields that might still be in old documents
+  targetAudience?: string;
+  currentStage?: string;
   legalStatus?: string;
-  
   attachmentBase64?: string;
   attachmentName?: string;
+  campus?: string;
+  yearOfStudy?: string;
+  course?: string;
+  linkedin?: string;
+  startupName?: string;
+  message?: string;
 }
 
 export interface ProcessingActionState {

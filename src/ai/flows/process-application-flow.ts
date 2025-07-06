@@ -15,6 +15,7 @@ import { db, auth } from '@/lib/firebase';
 import { doc, updateDoc, serverTimestamp, getDoc, setDoc, collection, addDoc } from 'firebase/firestore';
 import { createUserWithEmailAndPassword, signOut } from 'firebase/auth';
 import { Resend } from 'resend';
+import { Submission } from '@/types/Submission';
 
 // Helper function to generate a simple random string
 const generateRandomString = (length: number = 8) => {
@@ -26,6 +27,7 @@ const ProcessApplicationInputSchema = z.object({
   action: z.enum(['accept', 'reject']).describe('The action to take: "accept" or "reject".'),
   applicantName: z.string().describe("The name of the applicant."),
   applicantEmail: z.string().email().describe("The email of the applicant to send notification to."),
+  campusStatus: z.enum(['campus', 'off-campus']).optional().describe('The campus status of the applicant.'),
 });
 export type ProcessApplicationInput = z.infer<typeof ProcessApplicationInputSchema>;
 
@@ -63,7 +65,6 @@ async function sendEmailNotification(to: string, subject: string, body: string):
   const resend = new Resend(process.env.RESEND_API_KEY);
 
   try {
-    // Use the configured FROM email address from environment variables
     const fromEmail = process.env.RESEND_FROM_EMAIL || 'TBI Platform <onboarding@resend.dev>';
     
     console.log("Attempting to send email:");
@@ -75,7 +76,7 @@ async function sendEmailNotification(to: string, subject: string, body: string):
       from: fromEmail, 
       to: [to],
       subject: subject,
-      text: body, // For HTML emails, use 'html: "<strong>your html content</strong>"'
+      text: body,
     });
 
     if (error) {
@@ -100,15 +101,17 @@ const processApplicationFlow = ai.defineFlow(
     outputSchema: ProcessApplicationOutputSchema,
   },
   async (input) => {
-    const { submissionId, action, applicantName, applicantEmail } = input;
-    const submissionRef = doc(db, 'contactSubmissions', submissionId);
+    const { submissionId, action, applicantName, applicantEmail, campusStatus } = input;
+    
+    const collectionName = campusStatus === 'off-campus' ? 'offCampusApplications' : 'contactSubmissions';
+    const submissionRef = doc(db, collectionName, submissionId);
 
     try {
       const submissionSnap = await getDoc(submissionRef);
       if (!submissionSnap.exists()) {
-        return { status: 'error' as const, message: `Submission with ID ${submissionId} not found.` };
+        return { status: 'error' as const, message: `Submission with ID ${submissionId} not found in ${collectionName}.` };
       }
-      const submissionData = submissionSnap.data();
+      const submissionData = submissionSnap.data() as Submission;
       if (submissionData.status !== 'pending') {
          return { status: 'error' as const, message: `Submission ${submissionId} has already been processed (status: ${submissionData.status}).` };
       }
@@ -122,18 +125,13 @@ const processApplicationFlow = ai.defineFlow(
       let temporaryPassword: string | undefined = undefined;
 
       if (action === 'accept') {
-        // Generate a temporary password for the user
         temporaryPassword = generateRandomString(10);
         
         try {
-          // Create Firebase Auth user with email and temporary password
           const userCredential = await createUserWithEmailAndPassword(auth, applicantEmail, temporaryPassword);
           const firebaseUser = userCredential.user;
-          
-          // Immediately sign out to prevent session conflicts
           await signOut(auth);
           
-          // Create user document in the users collection
           const userDoc = {
             email: applicantEmail,
             name: applicantName,
@@ -148,34 +146,24 @@ const processApplicationFlow = ai.defineFlow(
               notificationsConfigured: false,
               completed: false,
             },
-            notificationPreferences: {
-              emailNotifications: true,
-            },
+            notificationPreferences: { emailNotifications: true },
             createdAt: serverTimestamp(),
             updatedAt: serverTimestamp(),
           };
           
-          // Store user document in users collection with UID as document ID
           await setDoc(doc(db, 'users', firebaseUser.uid), userDoc);
           
-          // Update submission document to link with Firebase Auth UID
           updateData.status = 'accepted';
           updateData.firebaseUid = firebaseUser.uid;
-          // Remove plain text credentials from submission
-          delete updateData.temporaryUserId;
-          delete updateData.temporaryPassword;
 
           emailSubject = 'Congratulations! Your RCEOM-TBI Application has been Accepted!';
           emailBody = `Dear ${applicantName},\n\nWe are thrilled to inform you that your application to RCEOM-TBI has been accepted!\n\nWe were very impressed with your idea and believe in its potential. Here are your login credentials to access our portal:\n\nEmail: ${applicantEmail}\nTemporary Password: ${temporaryPassword}\n\nPlease keep these safe and change your password after your first login. We will be in touch shortly with the next steps.\n\nWelcome to RCEOM-TBI!\n\nBest regards,\nThe RCEOM-TBI Team`;
           
-          temporaryUserId = firebaseUser.uid; // Store UID for response
+          temporaryUserId = firebaseUser.uid;
           
         } catch (authError: any) {
           console.error('Error creating Firebase Auth user:', authError);
-          return { 
-            status: 'error' as const, 
-            message: `Failed to create user account: ${authError.message}` 
-          };
+          return { status: 'error' as const, message: `Failed to create user account: ${authError.message}` };
         }
       } else { // action === 'reject'
         updateData.status = 'rejected';
@@ -197,7 +185,7 @@ const processApplicationFlow = ai.defineFlow(
           sent: emailResult.success,
           sendError: emailResult.error,
         },
-        firebaseUid: temporaryUserId, // This is actually the Firebase UID now
+        firebaseUid: temporaryUserId,
         temporaryPassword: temporaryPassword,
       };
 

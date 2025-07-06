@@ -1,3 +1,4 @@
+
 import { FileTextIcon, Loader2, AlertCircle, UserCircle, KeyRound, ChevronDown, ChevronUp, Eye } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Submission, SubmissionStatus, CampusStatus } from "@/types/Submission";
@@ -12,7 +13,7 @@ import { SubmissionDetailsModal } from './SubmissionDetailsModal';
 interface SubmissionsTableProps {
   submissions: Submission[];
   processingAction: { id: string; type: 'accept' | 'reject' } | null;
-  onProcessAction: (id: string, action: 'accept' | 'reject', name: string, email: string) => void;
+  onProcessAction: (id: string, action: 'accept' | 'reject', name: string, email: string, campusStatus: Submission['campusStatus']) => void;
   isLoading?: boolean;
   error?: string | null;
   onRetry: () => void;
@@ -31,59 +32,6 @@ const formatDate = (date: Date | string | Timestamp | undefined) => {
     return 'Invalid Date';
   }
 };
-
-// Component for expandable idea cell
-function IdeaCell({ idea, submissionId, status, temporaryUserId, temporaryPassword }: {
-  idea: string;
-  submissionId: string;
-  status: string;
-  temporaryUserId?: string;
-  temporaryPassword?: string;
-}) {
-  const [isExpanded, setIsExpanded] = useState(false);
-  const maxLength = 120;
-  const shouldTruncate = idea && idea.length > maxLength;
-  const displayText = isExpanded ? idea : (shouldTruncate ? `${idea.substring(0, maxLength)}...` : idea);
-
-  return (
-    <div className="text-sm text-neutral-200 max-w-md">
-      <div className="mb-2 leading-relaxed">
-        <span className="text-neutral-100">{displayText || 'N/A'}</span>
-        {shouldTruncate && (
-          <button
-            onClick={() => setIsExpanded(!isExpanded)}
-            className="ml-2 inline-flex items-center text-xs text-indigo-400 hover:text-indigo-300 transition-all duration-200 hover:bg-indigo-900/20 px-2 py-1 rounded-md"
-          >
-            {isExpanded ? (
-              <>
-                <ChevronUp className="h-3 w-3 mr-1" />
-                Less
-              </>
-            ) : (
-              <>
-                <ChevronDown className="h-3 w-3 mr-1" />
-                More
-              </>
-            )}
-          </button>
-        )}
-      </div>
-      {status === 'accepted' && temporaryUserId && (
-        <div className="bg-emerald-950/30 border border-emerald-800/30 rounded-lg p-3 text-xs text-emerald-200 space-y-2">
-          <div className="font-medium text-emerald-100 mb-1">Login Credentials</div>
-          <div className="flex items-center gap-2">
-            <UserCircle className="h-3 w-3 text-emerald-400" />
-            <span className="font-mono bg-emerald-900/30 px-2 py-1 rounded text-emerald-100">{temporaryUserId}</span>
-          </div>
-          <div className="flex items-center gap-2">
-            <KeyRound className="h-3 w-3 text-emerald-400" />
-            <span className="font-mono bg-emerald-900/30 px-2 py-1 rounded text-emerald-100">{temporaryPassword}</span>
-          </div>
-        </div>
-      )}
-    </div>
-  );
-}
 
 export function SubmissionsTable({
   submissions,
@@ -262,13 +210,15 @@ export function SubmissionsTable({
                         submission.id, 
                         'accept', 
                         submission.name, 
-                        submission.email
+                        submission.email,
+                        submission.campusStatus
                       )}
                       onReject={() => onProcessAction(
                         submission.id, 
                         'reject', 
                         submission.name, 
-                        submission.email
+                        submission.email,
+                        submission.campusStatus
                       )}
                     />
                   </div>

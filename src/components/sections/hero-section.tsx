@@ -10,10 +10,6 @@ import { useTheme } from 'next-themes'; // Keep for potential theme-specific log
 import { motion } from 'framer-motion';
 import { InteractiveHoverButton } from "@/components/magicui/interactive-hover-button";
 
-
-
-const DUMMY_GOOGLE_FORM_LINK = 'https://docs.google.com/forms/d/1WNPpTVLahffQ_n3rdDbnsVFjcXrKqslVFyk4Lmib2uo/viewform?edit_requested=true';
-
 interface HeroSectionProps {
   onApplyClick?: () => void;
 }
@@ -83,17 +79,12 @@ export default function HeroSection({ onApplyClick }: HeroSectionProps) {
       localStorage.setItem('applicantCampusStatus', status);
     }
     setShowCampusDialog(false);
-
-    if (status === "off-campus") {
-      // DUMMY_GOOGLE_FORM_LINK: This is a placeholder.
-      window.location.href = DUMMY_GOOGLE_FORM_LINK; 
-      return;
-    }
     
+    // Always open the application dialog, regardless of status
     if (onApplyClick) {
       onApplyClick();
     } else {
-      console.warn("onApplyClick not provided to HeroSection for campus applicants.");
+      console.warn("onApplyClick handler not provided to HeroSection.");
     }
   };
 
