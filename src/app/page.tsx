@@ -16,15 +16,11 @@ import ApplicationFormDialog from '@/components/ui/application-form-dialog';
 export default function HomePage() {
   const [isApplicationFormOpen, setIsApplicationFormOpen] = useState(false);
   const [showMainContent, setShowMainContent] = useState(false);
+  
   const handleOpenApplicationForm = () => {
-    // Ensure off-campus users are still handled correctly if they reach here.
-    const campusStatusFromStorage = typeof window !== "undefined" ? localStorage.getItem('applicantCampusStatus') as "campus" | "off-campus" | null : null;
-    if (campusStatusFromStorage === "off-campus") {
-      // This case should ideally be handled before calling this, 
-      // e.g. in HeroSection, but as a fallback:
-      window.location.href = 'https://docs.google.com/forms/d/1WNPpTVLahffQ_n3rdDbnsVFjcXrKqslVFyk4Lmib2uo/viewform?edit_requested=true';
-      return;
-    }
+    // This function now simply opens the unified application form dialog.
+    // The distinction between campus and off-campus is handled by the
+    // CampusStatusDialog and the form submission logic.
     setIsApplicationFormOpen(true);
   };
 
