@@ -14,7 +14,11 @@ import { Resend } from 'resend';
 // In a larger app, this would be in a shared lib/email.ts file.
 async function sendEmailNotification(to: string, subject: string, body: string, htmlBody?: string): Promise<{ success: boolean; message: string; error?: string }> {
   if (!process.env.RESEND_API_KEY) {
-    console.error("RESEND_API_KEY not found in environment variables.");
+    console.error("**********************************************************************************");
+    console.error("ERROR: RESEND_API_KEY not found in environment variables.");
+    console.error("Email sending is DISABLED. The email below is a simulation logged to the console.");
+    console.error("To enable real email sending, set RESEND_API_KEY in your .env file and restart the server.");
+    console.error("**********************************************************************************");
     console.log("------ SIMULATING EMAIL SENDING (RESEND_API_KEY missing) ------");
     console.log("To:", to);
     console.log("Subject:", subject);
@@ -23,7 +27,7 @@ async function sendEmailNotification(to: string, subject: string, body: string, 
       console.log("HTML Body:\n", htmlBody);
     }
     console.log("-----------------------------------------------------------");
-    return { success: false, message: "Email sending disabled: RESEND_API_KEY not found.", error: "RESEND_API_KEY_MISSING" };
+    return { success: false, message: "Email sending disabled: RESEND_API_KEY not found. Logged to console.", error: "RESEND_API_KEY_MISSING" };
   }
 
   const resend = new Resend(process.env.RESEND_API_KEY);
