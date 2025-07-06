@@ -4,7 +4,7 @@
 import { z } from 'zod';
 import { db, auth } from '@/lib/firebase';
 import { doc, getDoc, collection, query, where, getDocs, QuerySnapshot, DocumentData } from 'firebase/firestore';
-import { signInWithEmailAndPassword, signOut } from 'firebase/auth';
+import { signInWithEmailAndPassword, signOut, sendPasswordResetEmail } from 'firebase/auth';
 
 // --- Admin Credentials ---
 const AdminLoginFormSchema = z.object({
@@ -188,6 +188,49 @@ export async function verifyUserCredentials(
     return {
       success: false,
       message: `An unexpected error occurred during user login: ${errorMessage}`,
+    };
+  }
+}
+
+// Password Reset Schema
+const PasswordResetSchema = z.object({
+  email: z.string().email('Please enter a valid email address'),
+});
+
+export interface PasswordResetResponse {
+  success: boolean;
+  message: string;
+}
+
+export async function resetPassword(email: string): Promise<PasswordResetResponse> {
+  try {
+    // Validate email format
+    const validatedEmail = PasswordResetSchema.parse({ email });
+    
+    await sendPasswordResetEmail(auth, validatedEmail.email);
+    
+    return {
+      success: true,
+      message: 'Password reset email sent successfully. Please check your inbox and spam folder.'
+    };
+  } catch (error: any) {
+    console.error('Password reset error:', error);
+    
+    let message = 'Failed to send password reset email. Please try again.';
+    
+    if (error.code === 'auth/user-not-found') {
+      message = 'No account found with this email address.';
+    } else if (error.code === 'auth/invalid-email') {
+      message = 'Please enter a valid email address.';
+    } else if (error.code === 'auth/too-many-requests') {
+      message = 'Too many reset attempts. Please try again later.';
+    } else if (error instanceof z.ZodError) {
+      message = error.errors[0]?.message || 'Please enter a valid email address.';
+    }
+    
+    return {
+      success: false,
+      message
     };
   }
 }
