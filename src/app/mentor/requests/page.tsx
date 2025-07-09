@@ -11,12 +11,13 @@ import {
   Clock, 
   CheckCircle, 
   XCircle, 
+  MessageSquare, 
   Loader2,
   RefreshCw,
   User,
   Mail,
   Calendar,
-  MessageSquare,
+  Users,
   ArrowRight
 } from 'lucide-react';
 import { useToast } from "@/hooks/use-toast";
