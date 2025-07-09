@@ -559,7 +559,14 @@ export async function getApprovedMentees(mentorEmail: string): Promise<{ success
     return { success: true, mentees };
   } catch (error: any) {
     console.error("Error fetching approved mentees:", error);
-    return { success: false, error: "Failed to fetch mentees." };
+    // Provide a more specific error message for easier debugging
+    let errorMessage = "Failed to fetch mentees.";
+    if (error.code === 'failed-precondition') {
+        errorMessage = "Database query requires a specific index. The link to create it should be in your browser's developer console. You can also deploy it by running 'firebase deploy --only firestore:indexes' in your terminal.";
+    } else if (error.code === 'permission-denied') {
+        errorMessage = "Permission denied. Please check your Firestore security rules for the 'mentorRequests' collection.";
+    }
+    return { success: false, error: errorMessage };
   }
 }
 
