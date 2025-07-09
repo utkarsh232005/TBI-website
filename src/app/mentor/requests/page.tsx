@@ -110,18 +110,13 @@ export default function MentorRequestsPage() {
       </div>
 
       {requests.length === 0 ? (
-        <Card className="text-center py-12">
+        <Card className="text-center py-12 bg-white">
           <CardContent>
-            <Users className="mx-auto h-12 w-12 text-muted-foreground mb-4" />
-            <h3 className="text-lg font-medium mb-2">No mentor requests yet</h3>
-            <p className="text-muted-foreground mb-6">
-              Start by browsing our mentors and selecting one that matches your goals.
+            <Users className="mx-auto h-12 w-12 text-gray-400 mb-4" />
+            <h3 className="text-lg font-medium mb-2 text-gray-800">No mentor requests yet</h3>
+            <p className="text-gray-500 mb-6">
+              When a student requests your mentorship, it will appear here.
             </p>
-            <Button asChild>
-              <Link href="/mentors">
-                Browse Available Mentors
-              </Link>
-            </Button>
           </CardContent>
         </Card>
       ) : (

@@ -92,7 +92,7 @@ function MentorLayoutContent({
       {/* Desktop Sidebar */}
       <aside className="hidden md:flex flex-col w-64 bg-white border-r border-gray-200">
         <div className="flex items-center justify-center h-16 border-b border-gray-200">
-           <InnoNexusLogo className="h-8 w-8 text-gray-800" text="Mentor" />
+           <InnoNexusLogo className="h-8 w-8 text-gray-800" text="Mentor Panel" />
         </div>
         <nav className="flex-1 overflow-y-auto py-4 px-4">
           <ul className="space-y-1">

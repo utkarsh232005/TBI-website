@@ -120,7 +120,7 @@ export default function MentorDashboardPage() {
 
         {/* Stats Cards */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          <Card>
+          <Card className="bg-white border border-gray-200 shadow-sm">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium">Pending Response</CardTitle>
               <MessageSquare className="h-5 w-5 text-blue-600" />
@@ -131,7 +131,7 @@ export default function MentorDashboardPage() {
             </CardContent>
           </Card>
           
-          <Card>
+          <Card className="bg-white border border-gray-200 shadow-sm">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium">Active Mentees</CardTitle>
               <Users className="h-5 w-5 text-green-600" />
@@ -142,7 +142,7 @@ export default function MentorDashboardPage() {
             </CardContent>
           </Card>
           
-          <Card>
+          <Card className="bg-white border border-gray-200 shadow-sm">
              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium">Total Requests</CardTitle>
                <Users className="h-5 w-5 text-gray-500" />
@@ -165,7 +165,7 @@ export default function MentorDashboardPage() {
                     ))}
                 </div>
             ) : (
-                <Card>
+                <Card className="bg-white border border-gray-200 shadow-sm">
                     <CardContent className="p-6 text-center text-gray-500">
                         <CheckCircle className="h-10 w-10 mx-auto mb-3 text-green-500"/>
                         <p>All caught up! No requests are waiting for your response.</p>
@@ -179,7 +179,7 @@ export default function MentorDashboardPage() {
 
 function RequestCard({ request }: { request: MentorRequest }) {
   return (
-    <Card className="hover:shadow-lg transition-shadow border-l-4 border-blue-500">
+    <Card className="bg-white hover:shadow-lg transition-shadow border-l-4 border-blue-500">
       <CardContent className="p-4 flex items-center justify-between">
         <div className="flex items-center space-x-4">
           <Avatar className="h-12 w-12">
