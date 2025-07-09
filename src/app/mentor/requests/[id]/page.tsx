@@ -60,7 +60,10 @@ export default function MentorRequestDetailPage() {
         setIsLoading(false);
       }
     };
-    fetchRequest();
+
+    if(user) {
+        fetchRequest();
+    }
   }, [requestId, user]);
 
   const handleDecision = async (action: 'approve' | 'reject') => {

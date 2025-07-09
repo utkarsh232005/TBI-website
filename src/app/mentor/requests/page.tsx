@@ -29,7 +29,7 @@ import { useUser } from '@/contexts/user-context';
 import Link from 'next/link';
 import { cn } from '@/lib/utils';
 
-const statusConfig = {
+const statusConfig: { [key: string]: { label: string; color: string; icon: React.ReactNode } } = {
   pending: { label: 'Under Review', color: 'bg-gray-100 text-gray-800 border-gray-200', icon: <Clock /> },
   admin_approved: { label: 'Awaiting Your Response', color: 'bg-blue-100 text-blue-800 border-blue-200', icon: <ArrowRight /> },
   admin_rejected: { label: 'Not Approved by Admin', color: 'bg-red-100 text-red-800 border-red-200', icon: <XCircle /> },
@@ -83,7 +83,9 @@ export default function MentorRequestsPage() {
   };
 
   useEffect(() => {
-    fetchMentorRequests();
+    if (user) {
+      fetchMentorRequests();
+    }
   }, [user]);
 
   if (isLoading) {
