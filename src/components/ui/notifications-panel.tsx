@@ -3,8 +3,6 @@
 
 import { useState } from 'react';
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -14,13 +12,10 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { 
   Bell, 
-  BellRing, 
   CheckCircle, 
   XCircle, 
   Users, 
-  MoreVertical,
-  Check,
-  Trash2
+  Check
 } from 'lucide-react';
 import { useNotifications } from '@/hooks/useNotifications';
 import { formatDistanceToNow } from 'date-fns';
@@ -42,20 +37,7 @@ const getNotificationIcon = (type: NotificationData['type']) => {
     case 'mentor_decision':
       return <Users className="h-4 w-4 text-blue-500" />;
     default:
-      return <Bell className="h-4 w-4 text-muted-foreground" />;
-  }
-};
-
-const getNotificationColor = (type: NotificationData['type']) => {
-  switch (type) {
-    case 'mentor_request_approved':
-      return 'border-l-green-500';
-    case 'mentor_request_rejected':
-      return 'border-l-red-500';
-    case 'mentor_decision':
-      return 'border-l-blue-500';
-    default:
-      return 'border-l-border';
+      return <Bell className="h-4 w-4 text-gray-500" />;
   }
 };
 
@@ -65,8 +47,8 @@ export default function NotificationsPanel({ userId, className }: NotificationsP
 
   if (isLoading) {
     return (
-      <div className={cn("fixed top-6 right-6 z-50", className)}>
-        <Button variant="outline" size="icon" disabled className="rounded-full h-12 w-12 bg-background/50 backdrop-blur-sm shadow-lg">
+      <div className={cn("fixed top-4 right-4 z-50 md:relative md:top-0 md:right-0", className)}>
+        <Button variant="ghost" size="icon" disabled className="h-10 w-10 rounded-full">
           <Bell className="h-5 w-5" />
         </Button>
       </div>
@@ -74,46 +56,42 @@ export default function NotificationsPanel({ userId, className }: NotificationsP
   }
 
   return (
-    <div className={cn("fixed top-6 right-6 z-50", className)}>
+    <div className={cn("fixed top-4 right-4 z-50 md:relative md:top-0 md:right-0", className)}>
       <DropdownMenu open={isOpen} onOpenChange={setIsOpen}>
         <DropdownMenuTrigger asChild>
           <motion.div
             whileHover={{ scale: 1.1 }}
             whileTap={{ scale: 0.95 }}
           >
-            <Button variant="outline" size="icon" className="relative h-12 w-12 rounded-full bg-background/50 backdrop-blur-lg border-border/50 shadow-lg hover:bg-accent/10 hover:border-accent/30 transition-all duration-200">
-              {unreadCount > 0 ? (
-                <BellRing className="h-5 w-5 text-accent" />
-              ) : (
-                <Bell className="h-5 w-5" />
-              )}
+            <Button variant="ghost" size="icon" className="relative h-10 w-10 rounded-full text-gray-500 hover:bg-gray-100 hover:text-gray-900">
+              <Bell className="h-5 w-5" />
               {unreadCount > 0 && (
                 <motion.div
                   initial={{ scale: 0 }}
                   animate={{ scale: 1 }}
                   transition={{ type: 'spring', stiffness: 500, damping: 20 }}
-                  className="absolute -top-1 -right-1 h-5 w-5 rounded-full bg-red-600 text-white text-xs flex items-center justify-center border-2 border-background"
+                  className="absolute top-1 right-1 flex h-4 w-4 items-center justify-center rounded-full bg-red-500 text-[10px] font-bold text-white"
                 >
                   {unreadCount > 9 ? '9+' : unreadCount}
                 </motion.div>
               )}
+              <span className="sr-only">Toggle notifications</span>
             </Button>
           </motion.div>
         </DropdownMenuTrigger>
         <DropdownMenuContent 
           align="end" 
-          className="w-80 md:w-96 max-h-[70vh] bg-background/80 backdrop-blur-xl border-border/50 shadow-2xl"
-          side="bottom"
+          className="w-80 md:w-96 max-h-[70vh] bg-white shadow-xl border border-gray-200 rounded-lg"
           sideOffset={10}
         >
-          <div className="flex items-center justify-between p-3 border-b border-border/50">
-            <h3 className="font-semibold text-foreground">Notifications</h3>
+          <div className="flex items-center justify-between p-3 border-b border-gray-200">
+            <h3 className="font-semibold text-gray-900">Notifications</h3>
             {unreadCount > 0 && (
               <Button 
                 variant="ghost" 
                 size="sm" 
                 onClick={markAllAsRead}
-                className="text-xs h-auto p-1 text-muted-foreground hover:text-foreground"
+                className="text-xs h-auto p-1 text-gray-500 hover:text-gray-900"
               >
                 <Check className="h-3 w-3 mr-1" />
                 Mark all read
@@ -122,7 +100,7 @@ export default function NotificationsPanel({ userId, className }: NotificationsP
           </div>
 
           {notifications.length === 0 ? (
-            <div className="p-6 text-center text-muted-foreground">
+            <div className="p-6 text-center text-gray-500">
               <Bell className="h-10 w-10 mx-auto mb-3 opacity-50" />
               <p className="text-sm">No notifications yet</p>
             </div>
@@ -158,28 +136,23 @@ function NotificationItem({ notification, onMarkAsRead }: NotificationItemProps)
   return (
     <DropdownMenuItem
       className={cn(
-        "flex flex-col items-start p-3 cursor-pointer hover:bg-muted/50 border-l-4 transition-colors focus:bg-accent/20",
-        !notification.read ? "bg-accent/10 border-accent" : "border-transparent",
+        "flex flex-col items-start p-3 cursor-pointer focus:bg-gray-100",
+        !notification.read && "bg-blue-50",
       )}
       onClick={handleClick}
     >
       <div className="flex items-start space-x-3 w-full">
-        <div className="flex-shrink-0 mt-0.5">
+        <div className="flex-shrink-0 mt-1">
           {getNotificationIcon(notification.type)}
         </div>
         <div className="flex-1 min-w-0">
-          <p className="text-sm font-medium truncate text-foreground">
+          <p className="text-sm font-medium truncate text-gray-900">
             {notification.title}
           </p>
-          <p className="text-xs text-muted-foreground mt-1 leading-relaxed">
+          <p className="text-xs text-gray-600 mt-1 leading-relaxed">
             {notification.message}
           </p>
-          {notification.mentorName && (
-            <p className="text-xs text-muted-foreground mt-1">
-              Mentor: {notification.mentorName}
-            </p>
-          )}
-          <p className="text-xs text-muted-foreground mt-2">
+          <p className="text-xs text-gray-500 mt-2">
             {formatDistanceToNow(notification.createdAt.toDate(), { addSuffix: true })}
           </p>
         </div>

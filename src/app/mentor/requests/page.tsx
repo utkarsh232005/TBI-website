@@ -103,7 +103,7 @@ export default function MentorRequestsPage() {
             Review and respond to requests from aspiring mentees.
           </p>
         </div>
-        <Button onClick={fetchMentorRequests} variant="outline" size="sm" disabled={isLoading}>
+        <Button onClick={fetchMentorRequests} variant="ghost" size="sm" disabled={isLoading} className="text-gray-500 hover:bg-gray-100 hover:text-gray-900">
           <RefreshCw className={`mr-2 h-4 w-4 ${isLoading ? 'animate-spin' : ''}`} />
           Refresh
         </Button>
