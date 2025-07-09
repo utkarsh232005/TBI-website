@@ -1,6 +1,7 @@
 // src/app/mentor/requests/page.tsx
 "use client";
 
+import * as React from "react";
 import { useState, useEffect } from 'react';
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -108,13 +109,18 @@ export default function MentorRequestsPage() {
       </div>
 
       {requests.length === 0 ? (
-        <Card className="bg-white">
-          <CardContent className="p-12 text-center">
-            <MessageSquare className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-            <h3 className="text-xl font-semibold text-gray-800 mb-2">No Mentorship Requests</h3>
-            <p className="text-gray-500">
-              You haven't received any mentorship requests yet.
+        <Card className="text-center py-12">
+          <CardContent>
+            <Users className="mx-auto h-12 w-12 text-muted-foreground mb-4" />
+            <h3 className="text-lg font-medium mb-2">No mentor requests yet</h3>
+            <p className="text-muted-foreground mb-6">
+              Start by browsing our mentors and selecting one that matches your goals.
             </p>
+            <Button asChild>
+              <Link href="/mentors">
+                Browse Available Mentors
+              </Link>
+            </Button>
           </CardContent>
         </Card>
       ) : (
@@ -132,7 +138,7 @@ export default function MentorRequestsPage() {
                         <div className="flex-1">
                           <h3 className="font-semibold text-lg text-gray-900">{request.userName}</h3>
                           <p className="text-sm text-gray-500 flex items-center mt-1">
-                            <Mail className="mr-1.5 h-3 w-3" />
+                            <Mail className="mr-1 h-3 w-3" />
                             {request.userEmail}
                           </p>
                         </div>
