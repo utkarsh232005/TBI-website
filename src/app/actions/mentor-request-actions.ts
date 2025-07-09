@@ -24,6 +24,7 @@ import type {
   MentorDecisionAction,
   NotificationData
 } from '@/types/mentor-request';
+import { getUserData } from './user-actions';
 
 // Validation schemas
 const mentorRequestSchema = z.object({
@@ -527,5 +528,68 @@ export async function getUserMentorRequests(userId: string): Promise<MentorReque
       console.error("Failed precondition: mentorRequests collection might not exist or index might be missing");
     }
     return [];
+  }
+}
+
+// Get approved mentees for a mentor
+export async function getApprovedMentees(mentorEmail: string): Promise<{ success: boolean; mentees?: MentorRequest[]; error?: string }> {
+  try {
+    const q = query(
+      collection(db, 'mentorRequests'),
+      where('mentorEmail', '==', mentorEmail),
+      where('status', '==', 'mentor_approved'),
+      orderBy('mentorProcessedAt', 'desc')
+    );
+    
+    const querySnapshot = await getDocs(q);
+    const mentees: MentorRequest[] = [];
+    
+    querySnapshot.forEach((doc) => {
+      const data = doc.data();
+      mentees.push({
+        id: doc.id,
+        ...data,
+        createdAt: data.createdAt?.toDate() || new Date(),
+        updatedAt: data.updatedAt?.toDate() || new Date(),
+        adminProcessedAt: data.adminProcessedAt?.toDate(),
+        mentorProcessedAt: data.mentorProcessedAt?.toDate(),
+      } as MentorRequest);
+    });
+    
+    return { success: true, mentees };
+  } catch (error: any) {
+    console.error("Error fetching approved mentees:", error);
+    return { success: false, error: "Failed to fetch mentees." };
+  }
+}
+
+// Get a specific mentee's profile if the mentor is authorized
+export async function getMenteeProfile(menteeUserId: string, mentorEmail: string): Promise<any> {
+  try {
+    // Security Check: Verify there's an approved mentorship relationship
+    const q = query(
+      collection(db, 'mentorRequests'),
+      where('userId', '==', menteeUserId),
+      where('mentorEmail', '==', mentorEmail),
+      where('status', '==', 'mentor_approved')
+    );
+
+    const snapshot = await getDocs(q);
+    if (snapshot.empty) {
+      return { success: false, message: "Unauthorized: You are not the mentor for this user." };
+    }
+
+    // If authorized, fetch the user's full profile data
+    const userProfileData = await getUserData(menteeUserId);
+
+    if (!userProfileData.success) {
+      return { success: false, message: "Could not retrieve mentee profile." };
+    }
+
+    return userProfileData;
+
+  } catch (error: any) {
+    console.error("Error getting mentee profile:", error);
+    return { success: false, message: "An unexpected error occurred." };
   }
 }
