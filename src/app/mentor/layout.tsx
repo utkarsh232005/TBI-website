@@ -1,4 +1,3 @@
-
 // src/app/mentor/layout.tsx
 "use client";
 
@@ -6,31 +5,22 @@ import * as React from "react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import {
-  Sidebar,
-  SidebarBody,
-  DesktopSidebar,
-  MobileSidebar,
-  useSidebar,
-  SidebarProvider
-} from "@/components/ui/animated-sidebar";
-import {
   LayoutDashboard,
   Users,
-  Settings,
-  LogOut,
-  Home,
-  Menu,
-  User,
   MessageSquare,
   ClipboardCheck,
+  User,
+  LogOut,
+  Menu,
+  X,
 } from "lucide-react";
-import NotificationsPanel from "@/components/ui/notifications-panel";
-import { InnoNexusLogo } from "@/components/icons/innnexus-logo";
-import { motion } from "framer-motion";
-import { cn } from "@/lib/utils";
 import { useUser } from "@/contexts/user-context";
 import { clearUserSession } from "@/lib/client-utils";
 import { logoutUser } from "@/app/actions/auth-actions";
+import { InnoNexusLogo } from "@/components/icons/innnexus-logo";
+import { motion, AnimatePresence } from "framer-motion";
+import { cn } from "@/lib/utils";
+import NotificationsPanel from "@/components/ui/notifications-panel";
 
 interface NavItem {
   href: string;
@@ -46,45 +36,42 @@ function MentorLayoutContent({
 }) {
   const pathname = usePathname();
   const router = useRouter();
-  const { open, setOpen } = useSidebar();
   const { user } = useUser();
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = React.useState(false);
 
   React.useEffect(() => {
-    if (typeof window !== 'undefined' && window.innerWidth < 768) {
-      setOpen(false);
+    if (isMobileMenuOpen) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = 'auto';
     }
-  }, [pathname, setOpen]);
+  }, [isMobileMenuOpen]);
 
   const navItems: NavItem[] = [
     {
       href: "/mentor/dashboard",
       label: "Dashboard",
       icon: <LayoutDashboard className="h-5 w-5" />,
-      disabled: false
     },
     {
       href: "/mentor/requests",
       label: "Requests",
       icon: <MessageSquare className="h-5 w-5" />,
-      disabled: false
     },
     {
       href: "/mentor/my-mentees",
       label: "My Mentees",
       icon: <Users className="h-5 w-5" />,
-      disabled: false
     },
     {
       href: "/mentor/evaluation",
       label: "Evaluation",
       icon: <ClipboardCheck className="h-5 w-5" />,
-      disabled: false
     },
     {
       href: "/mentor/profile",
       label: "Profile",
       icon: <User className="h-5 w-5" />,
-      disabled: false
     },
   ];
 
@@ -92,9 +79,6 @@ function MentorLayoutContent({
     try {
       await logoutUser();
       clearUserSession();
-      if (typeof window !== 'undefined' && window.innerWidth < 768) {
-        setOpen(false);
-      }
       router.push('/login');
     } catch (error) {
       console.error('Error during logout:', error);
@@ -103,154 +87,100 @@ function MentorLayoutContent({
     }
   };
 
-  const handleMobileLinkClick = () => {
-    if (typeof window !== 'undefined' && window.innerWidth < 768) {
-      setOpen(false);
-    }
-  };
-
-
   return (
-    <div className="flex h-screen bg-neutral-900 text-white overflow-hidden">
-      <Sidebar>
-        <SidebarBody>
-          <DesktopSidebar>
-            <div className="flex items-center justify-between h-16 px-4 border-b border-neutral-800">
-              <Link href="/mentor/dashboard" className="flex items-center space-x-3 min-w-max">
-                <InnoNexusLogo className="h-8 w-8 text-white flex-shrink-0" text="TBI" />
-                <motion.span
-                  className="text-lg font-semibold whitespace-nowrap text-white"
-                  animate={{
-                    opacity: open ? 1 : 0,
-                    display: open ? 'inline-block' : 'none'
-                  }}
+    <div className="flex h-screen bg-gray-50 text-gray-800">
+      {/* Desktop Sidebar */}
+      <aside className="hidden md:flex flex-col w-64 bg-white border-r border-gray-200">
+        <div className="flex items-center justify-center h-16 border-b border-gray-200">
+           <InnoNexusLogo className="h-8 w-8 text-gray-800" text="Mentor" />
+        </div>
+        <nav className="flex-1 overflow-y-auto py-4 px-4">
+          <ul className="space-y-1">
+            {navItems.map((item) => (
+              <li key={item.href}>
+                <Link
+                  href={item.disabled ? '#' : item.href}
+                  className={cn(
+                    'flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors',
+                    pathname === item.href
+                      ? 'bg-blue-100 text-blue-700'
+                      : 'text-gray-600 hover:bg-gray-100 hover:text-gray-900',
+                    item.disabled && 'opacity-50 cursor-not-allowed'
+                  )}
                 >
-                  Mentor Portal
-                </motion.span>
-              </Link>
-            </div>
-            <nav className="flex-1 overflow-y-auto py-4">
-              <div className="space-y-1 px-2">
+                  {item.icon}
+                  {item.label}
+                </Link>
+              </li>
+            ))}
+          </ul>
+        </nav>
+        <div className="p-4 border-t border-gray-200">
+          <button
+            onClick={handleLogout}
+            className="flex items-center w-full gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-red-600 hover:bg-red-50 transition-colors"
+          >
+            <LogOut className="h-5 w-5" />
+            Logout
+          </button>
+        </div>
+      </aside>
+
+      {/* Main Content */}
+      <div className="flex-1 flex flex-col overflow-hidden">
+        {/* Mobile Header */}
+        <header className="md:hidden flex items-center justify-between h-16 px-4 border-b border-gray-200 bg-white">
+          <Link href="/mentor/dashboard" className="flex items-center space-x-2">
+            <InnoNexusLogo className="h-8 w-8 text-gray-800" text="Mentor" />
+          </Link>
+          <button onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)} className="p-2">
+            {isMobileMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
+          </button>
+        </header>
+
+        {/* Mobile Menu */}
+        <AnimatePresence>
+          {isMobileMenuOpen && (
+            <motion.nav
+              initial={{ opacity: 0, y: -20 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -20 }}
+              className="md:hidden absolute top-16 left-0 w-full bg-white border-b border-gray-200 p-4 z-40"
+            >
+              <ul className="space-y-2">
                 {navItems.map((item) => (
-                  <div key={item.href} className="group relative" title={item.disabled ? 'Coming soon' : ''}>
+                  <li key={`mobile-${item.href}`}>
                     <Link
                       href={item.disabled ? '#' : item.href}
+                      onClick={() => setIsMobileMenuOpen(false)}
                       className={cn(
-                        'flex items-center justify-start gap-3 py-3 px-3 rounded-lg transition-colors duration-200',
-                        'cursor-pointer',
-                        pathname === item.href
-                          ? 'bg-indigo-900/50 text-white'
-                          : 'text-neutral-300 hover:bg-neutral-800/50 hover:text-white',
-                        item.disabled && 'opacity-50 hover:bg-transparent hover:text-neutral-300 cursor-not-allowed',
-                        'group/sidebar'
+                        'flex items-center gap-3 px-3 py-2.5 rounded-lg text-base font-medium transition-colors',
+                        pathname === item.href ? 'bg-blue-100 text-blue-700' : 'text-gray-600 hover:bg-gray-100',
+                        item.disabled && 'opacity-50 cursor-not-allowed'
                       )}
-                      onClick={(e) => {
-                        if (item.disabled) e.preventDefault();
-                      }}
                     >
-                      <span className="text-indigo-400 group-hover/sidebar:text-indigo-300 transition-colors">
-                        {item.icon}
-                      </span>
-                      <motion.span
-                        animate={{
-                          display: 'inline-block',
-                          opacity: 1
-                        }}
-                        className="text-sm group-hover/sidebar:translate-x-1 transition duration-150 whitespace-pre inline-block !p-0 !m-0"
-                      >
-                        {item.label}
-                      </motion.span>
+                      {item.icon}
+                      {item.label}
                     </Link>
-                  </div>
+                  </li>
                 ))}
+              </ul>
+              <div className="mt-4 pt-4 border-t border-gray-200">
+                 <button
+                    onClick={handleLogout}
+                    className="flex items-center w-full gap-3 px-3 py-2.5 rounded-lg text-base font-medium text-red-600 hover:bg-red-50 transition-colors"
+                  >
+                    <LogOut className="h-5 w-5" />
+                    Logout
+                  </button>
               </div>
-            </nav>
-            <div className="p-2 border-t border-neutral-800 space-y-1">
-              <button
-                onClick={handleLogout}
-                className={cn(
-                  'flex items-center justify-start gap-3 py-3 px-3 rounded-lg transition-colors duration-200 w-full',
-                  'text-neutral-300 hover:bg-rose-800/50 hover:text-white',
-                  'group/sidebar'
-                )}
-              >
-                <span className="text-rose-400 group-hover/sidebar:text-rose-300 transition-colors">
-                  <LogOut className="h-5 w-5" />
-                </span>
-                <motion.span
-                  animate={{
-                    display: 'inline-block',
-                    opacity: 1
-                  }}
-                  className="text-sm group-hover/sidebar:translate-x-1 transition duration-150 whitespace-pre inline-block !p-0 !m-0"
-                >
-                  Logout
-                </motion.span>
-              </button>
-            </div>
-          </DesktopSidebar>
-
-          <MobileSidebar>
-            <div className="flex flex-col h-full">
-              <div className="flex-1 overflow-y-auto py-4">
-                <div className="space-y-1 px-2">
-                  {navItems.map((item) => (
-                    <div key={`mobile-${item.href}`} className="group relative" title={item.disabled ? 'Coming soon' : ''}>
-                      <Link
-                        href={item.disabled ? '#' : item.href}
-                        className={cn(
-                          "flex items-center px-3 py-3 rounded-lg text-base font-medium transition-colors cursor-pointer",
-                          pathname === item.href
-                            ? 'bg-indigo-900/50 text-white'
-                            : 'text-neutral-300 hover:bg-neutral-800/50 hover:text-white',
-                          item.disabled && 'opacity-50 hover:bg-transparent hover:text-neutral-300 cursor-not-allowed'
-                        )}
-                        onClick={(e) => {
-                          if (item.disabled) e.preventDefault();
-                          handleMobileLinkClick();
-                        }}
-                      >
-                        <span className="flex-shrink-0 mr-3">
-                          {item.icon}
-                        </span>
-                        <span>{item.label}</span>
-                      </Link>
-                    </div>
-                  ))}
-                </div>
-              </div>
-              <div className="p-4 border-t border-neutral-800 space-y-2">
-                <button
-                  onClick={handleLogout}
-                  className="flex items-center px-3 py-2.5 rounded-lg text-base font-medium text-neutral-300 hover:bg-rose-800/50 hover:text-white transition-colors w-full"
-                >
-                  <LogOut className="h-5 w-5 mr-3 text-rose-400" />
-                  <span>Logout</span>
-                </button>
-              </div>
-            </div>
-          </MobileSidebar>
-        </SidebarBody>
-      </Sidebar>
-      <div className="flex-1 flex flex-col overflow-hidden">
-        <header className="md:hidden flex items-center justify-between h-16 px-4 border-b border-neutral-800 bg-neutral-900/80 backdrop-blur-sm">
-          <div className="flex items-center space-x-2">
-            <button
-              onClick={() => setOpen(!open)}
-              className="p-2 rounded-md text-neutral-400 hover:text-white hover:bg-neutral-800/50 transition-colors"
-            >
-              <Menu className="h-5 w-5" />
-            </button>
-            <Link href="/mentor/dashboard" className="flex items-center space-x-2">
-              <InnoNexusLogo className="h-8 w-8 text-white" text="TBI" />
-              <span className="text-lg font-semibold text-white">Mentor</span>
-            </Link>
-          </div>
-        </header>
+            </motion.nav>
+          )}
+        </AnimatePresence>
 
         {user?.email && <NotificationsPanel userId={user.email} />}
 
-        <main className="flex-1 overflow-y-auto p-4 md:p-6 bg-neutral-900/50">
+        <main className="flex-1 overflow-y-auto p-4 md:p-8 bg-gray-100">
           {children}
         </main>
       </div>
@@ -264,10 +194,8 @@ export default function MentorLayout({
   children: React.ReactNode;
 }) {
   return (
-    <SidebarProvider>
       <MentorLayoutContent>
         {children}
       </MentorLayoutContent>
-    </SidebarProvider>
   );
 }

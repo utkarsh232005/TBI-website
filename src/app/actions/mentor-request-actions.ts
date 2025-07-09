@@ -638,16 +638,15 @@ The TBI Team`;
 
 // 3. Mentor makes final decision
 export async function processMentorDecision(
-  action: MentorDecisionAction
+  action: MentorDecisionAction,
+  mentorEmail: string // Added for security
 ): Promise<{ success: boolean; message: string }> {
   try {
-    // Validate action data
     const validatedAction = mentorDecisionSchema.safeParse(action);
     if (!validatedAction.success) {
       return { success: false, message: "Invalid action data" };
     }
 
-    // Get the request
     const requestDoc = await getDoc(doc(db, 'mentorRequests', action.requestId));
     if (!requestDoc.exists()) {
       return { success: false, message: "Request not found" };
@@ -655,13 +654,16 @@ export async function processMentorDecision(
 
     const requestData = requestDoc.data() as MentorRequest;
 
+    if (requestData.mentorEmail !== mentorEmail) {
+      return { success: false, message: "Unauthorized: You are not the assigned mentor for this request." };
+    }
+
     if (requestData.status !== 'admin_approved') {
       return { success: false, message: "Request is not in a state to be processed by mentor" };
     }
 
     const newStatus = action.action === 'approve' ? 'mentor_approved' : 'mentor_rejected';
 
-    // Update request status
     await updateDoc(doc(db, 'mentorRequests', action.requestId), {
       status: newStatus,
       mentorNotes: action.notes || '',
@@ -670,79 +672,22 @@ export async function processMentorDecision(
     });
 
     if (action.action === 'approve') {
-      // Send success email to user
-      const successEmailBody = `Dear ${requestData.userName},
-
-Great news! ${requestData.mentorName} has accepted your mentorship request.
-
-You can now reach out to your mentor directly at: ${requestData.mentorEmail}
-
-${action.notes ? `Mentor's message: ${action.notes}` : ''}
-
-We're excited to see your mentorship journey begin!
-
-Best regards,
-The TBI Team`;
-
-      await sendEmailNotification(
-        requestData.userEmail,
-        "Mentorship Request Approved!",
-        successEmailBody
-      );
-
-      // Create notification for user
-      await createNotification({
-        userId: requestData.userId,
-        type: 'mentor_request_approved',
-        title: 'Mentorship Approved!',
-        message: `${requestData.mentorName} has accepted your mentorship request`,
-        mentorId: requestData.mentorId,
-        mentorName: requestData.mentorName,
-        requestId: action.requestId,
-        read: false,
-      });
-
+      const successEmailBody = `Dear ${requestData.userName},\n\nGreat news! ${requestData.mentorName} has accepted your mentorship request.\n\nYou can now reach out to your mentor directly at: ${requestData.mentorEmail}\n\n${action.notes ? `Mentor's message: ${action.notes}` : ''}\n\nWe're excited to see your mentorship journey begin!\n\nBest regards,\nThe TBI Team`;
+      await sendEmailNotification(requestData.userEmail, "Mentorship Request Approved!", successEmailBody);
+      await createNotification({ userId: requestData.userId, type: 'mentor_request_approved', title: 'Mentorship Approved!', message: `${requestData.mentorName} has accepted your mentorship request`, mentorId: requestData.mentorId, mentorName: requestData.mentorName, requestId: action.requestId, read: false });
     } else {
-      // Send rejection email to user
-      const rejectionEmailBody = `Dear ${requestData.userName},
-
-Thank you for your interest in connecting with ${requestData.mentorName}.
-
-After consideration, ${requestData.mentorName} is unable to take on new mentees at this time.
-
-${action.notes ? `Mentor's message: ${action.notes}` : ''}
-
-We encourage you to explore other mentors available on our platform.
-
-Best regards,
-The TBI Team`;
-
-      await sendEmailNotification(
-        requestData.userEmail,
-        "Update on Your Mentorship Request",
-        rejectionEmailBody
-      );
-
-      // Create notification for user
-      await createNotification({
-        userId: requestData.userId,
-        type: 'mentor_request_rejected',
-        title: 'Mentorship Request Update',
-        message: `${requestData.mentorName} was unable to accept your mentorship request`,
-        mentorId: requestData.mentorId,
-        mentorName: requestData.mentorName,
-        requestId: action.requestId,
-        read: false,
-      });
+      const rejectionEmailBody = `Dear ${requestData.userName},\n\nThank you for your interest in connecting with ${requestData.mentorName}.\n\nAfter consideration, ${requestData.mentorName} is unable to take on new mentees at this time.\n\n${action.notes ? `Mentor's message: ${action.notes}` : ''}\n\nWe encourage you to explore other mentors available on our platform.\n\nBest regards,\nThe TBI Team`;
+      await sendEmailNotification(requestData.userEmail, "Update on Your Mentorship Request", rejectionEmailBody);
+      await createNotification({ userId: requestData.userId, type: 'mentor_request_rejected', title: 'Mentorship Request Update', message: `${requestData.mentorName} was unable to accept your mentorship request`, mentorId: requestData.mentorId, mentorName: requestData.mentorName, requestId: action.requestId, read: false });
     }
+
+    revalidatePath('/mentor/requests');
+    revalidatePath(`/mentor/requests/${action.requestId}`);
 
     return { 
       success: true, 
-      message: action.action === 'approve' 
-        ? "Mentorship request approved! User has been notified." 
-        : "Mentorship request declined. User has been notified." 
+      message: action.action === 'approve' ? "Mentorship request approved! User has been notified." : "Mentorship request declined. User has been notified." 
     };
-
   } catch (error: any) {
     console.error("Error processing mentor decision:", error);
     return { success: false, message: "Failed to process mentor decision" };
@@ -765,12 +710,10 @@ export async function getAdminMentorRequests(): Promise<MentorRequest[]> {
       requests.push({
         id: doc.id,
         ...data,
-        // Convert Firestore Timestamps to Date objects for Next.js compatibility
         createdAt: data.createdAt?.toDate() || new Date(),
         updatedAt: data.updatedAt?.toDate() || new Date(),
         adminProcessedAt: data.adminProcessedAt?.toDate() || undefined,
         mentorProcessedAt: data.mentorProcessedAt?.toDate() || undefined,
-        // Ensure required fields exist with defaults
         status: data.status || 'pending',
         userId: data.userId || '',
         mentorId: data.mentorId || '',
@@ -784,7 +727,6 @@ export async function getAdminMentorRequests(): Promise<MentorRequest[]> {
     return requests;
   } catch (error: any) {
     console.error("Error fetching mentor requests:", error);
-    // Handle specific Firestore errors
     if (error.code === 'permission-denied') {
       console.error("Permission denied: Check Firestore rules for mentorRequests collection");
     } else if (error.code === 'failed-precondition') {
@@ -801,19 +743,16 @@ export async function processMentorDecisionWithToken(
   notes?: string
 ): Promise<{ success: boolean; message: string; requestId?: string }> {
   try {
-    // Verify the email token
     const { valid, token: emailToken, error } = await verifyEmailToken(tokenId);
     
     if (!valid || !emailToken) {
       return { success: false, message: error || 'Invalid or expired token' };
     }
 
-    // Check if token action matches requested action (if token has specific action)
     if (emailToken.action && emailToken.action !== action) {
       return { success: false, message: 'Token action mismatch' };
     }
 
-    // Get the request
     const requestDoc = await getDoc(doc(db, 'mentorRequests', emailToken.requestId));
     if (!requestDoc.exists()) {
       return { success: false, message: "Request not found" };
@@ -821,7 +760,6 @@ export async function processMentorDecisionWithToken(
 
     const requestData = requestDoc.data() as MentorRequest;
 
-    // Verify mentor email matches
     if (requestData.mentorEmail !== emailToken.mentorEmail) {
       return { success: false, message: "Token mentor mismatch" };
     }
@@ -832,10 +770,8 @@ export async function processMentorDecisionWithToken(
 
     const newStatus = action === 'approve' ? 'mentor_approved' : 'mentor_rejected';
 
-    // Mark token as used
     await markTokenAsUsed(tokenId);
 
-    // Update request status
     await updateDoc(doc(db, 'mentorRequests', emailToken.requestId), {
       status: newStatus,
       mentorNotes: notes || '',
@@ -843,7 +779,6 @@ export async function processMentorDecisionWithToken(
       updatedAt: serverTimestamp(),
     });
 
-    // Create notification for user
     await createNotification({
       userId: requestData.userId,
       type: action === 'approve' ? 'mentor_request_approved' : 'mentor_request_rejected',
@@ -855,28 +790,9 @@ export async function processMentorDecisionWithToken(
       read: false,
     });
 
-    // Send email notification to user
     const userEmailBody = action === 'approve' 
-      ? `Great news! ${requestData.mentorName} has accepted your mentorship request.
-
-We will connect you with your mentor shortly via email. You can also reach out to them directly at: ${requestData.mentorEmail}
-
-${notes ? `Mentor's message: ${notes}` : ''}
-
-Welcome to your mentorship journey!
-
-Best regards,
-The TBI Team`
-      : `Thank you for your interest in connecting with ${requestData.mentorName}.
-
-Unfortunately, they are unable to take on new mentees at this time.
-
-${notes ? `Mentor's message: ${notes}` : ''}
-
-We encourage you to explore other mentors who might be available to guide you on your journey.
-
-Best regards,
-The TBI Team`;
+      ? `Great news! ${requestData.mentorName} has accepted your mentorship request.\n\nWe will connect you with your mentor shortly via email. You can also reach out to them directly at: ${requestData.mentorEmail}\n\n${notes ? `Mentor's message: ${notes}` : ''}\n\nWelcome to your mentorship journey!\n\nBest regards,\nThe TBI Team`
+      : `Thank you for your interest in connecting with ${requestData.mentorName}.\n\nUnfortunately, they are unable to take on new mentees at this time.\n\n${notes ? `Mentor's message: ${notes}` : ''}\n\nWe encourage you to explore other mentors who might be available to guide you on your journey.\n\nBest regards,\nThe TBI Team`;
 
     await sendEmailNotification(
       requestData.userEmail,
@@ -896,7 +812,6 @@ The TBI Team`;
         : "Mentorship request declined",
       requestId: emailToken.requestId
     };
-
   } catch (error: any) {
     console.error("Error processing mentor decision with token:", error);
     return { success: false, message: "Failed to process decision" };
@@ -908,14 +823,12 @@ export async function getMentorRequestByToken(
   tokenId: string
 ): Promise<{ success: boolean; request?: MentorRequest; userDetails?: any; error?: string }> {
   try {
-    // Verify the email token
     const { valid, token: emailToken, error } = await verifyEmailToken(tokenId);
     
     if (!valid || !emailToken) {
       return { success: false, error: error || 'Invalid or expired token' };
     }
 
-    // Get the request
     const requestDoc = await getDoc(doc(db, 'mentorRequests', emailToken.requestId));
     if (!requestDoc.exists()) {
       return { success: false, error: "Request not found" };
@@ -925,14 +838,12 @@ export async function getMentorRequestByToken(
     const requestData = { 
       id: requestDoc.id, 
       ...data,
-      // Convert Firestore Timestamps to Date objects for Next.js compatibility
       createdAt: data.createdAt?.toDate() || new Date(),
       updatedAt: data.updatedAt?.toDate() || new Date(),
       adminProcessedAt: data.adminProcessedAt?.toDate() || undefined,
       mentorProcessedAt: data.mentorProcessedAt?.toDate() || undefined,
     } as MentorRequest;
 
-    // Verify mentor email matches
     if (requestData.mentorEmail !== emailToken.mentorEmail) {
       return { success: false, error: "Token mentor mismatch" };
     }
@@ -941,7 +852,6 @@ export async function getMentorRequestByToken(
       return { success: false, error: "This request is not available for processing" };
     }
 
-    // Get detailed user information
     const userProfile = await getUserProfileDetails(requestData.userId);
     
     return { 
@@ -952,10 +862,51 @@ export async function getMentorRequestByToken(
         email: requestData.userEmail,
       }
     };
-
   } catch (error: any) {
     console.error("Error getting mentor request by token:", error);
     return { success: false, error: "Failed to load request" };
+  }
+}
+
+// Get mentor request by ID for a specific mentor
+export async function getMentorRequestForMentor(
+  requestId: string,
+  mentorEmail: string
+): Promise<{ success: boolean; request?: MentorRequest; userDetails?: any; error?: string }> {
+  try {
+    const requestDoc = await getDoc(doc(db, 'mentorRequests', requestId));
+    
+    if (!requestDoc.exists()) {
+      return { success: false, error: "Request not found." };
+    }
+
+    const data = requestDoc.data();
+    if (data.mentorEmail !== mentorEmail) {
+      return { success: false, error: "You are not authorized to view this request." };
+    }
+
+    const requestData = { 
+      id: requestDoc.id, 
+      ...data,
+      createdAt: data.createdAt?.toDate() || new Date(),
+      updatedAt: data.updatedAt?.toDate() || new Date(),
+      adminProcessedAt: data.adminProcessedAt?.toDate(),
+      mentorProcessedAt: data.mentorProcessedAt?.toDate(),
+    } as MentorRequest;
+
+    const userProfile = await getUserProfileDetails(requestData.userId);
+    
+    return { 
+      success: true, 
+      request: requestData,
+      userDetails: userProfile || {
+        name: requestData.userName,
+        email: requestData.userEmail,
+      }
+    };
+  } catch (error: any) {
+    console.error("Error fetching request for mentor:", error);
+    return { success: false, error: "An unexpected error occurred while fetching the request." };
   }
 }
 
@@ -976,12 +927,10 @@ export async function getUserMentorRequests(userId: string): Promise<MentorReque
       requests.push({
         id: doc.id,
         ...data,
-        // Convert Firestore Timestamps to Date objects for Next.js compatibility
         createdAt: data.createdAt?.toDate() || new Date(),
         updatedAt: data.updatedAt?.toDate() || new Date(),
         adminProcessedAt: data.adminProcessedAt?.toDate() || undefined,
         mentorProcessedAt: data.mentorProcessedAt?.toDate() || undefined,
-        // Ensure required fields exist with defaults
         status: data.status || 'pending',
         userId: data.userId || userId,
         mentorId: data.mentorId || '',
@@ -995,7 +944,6 @@ export async function getUserMentorRequests(userId: string): Promise<MentorReque
     return requests;
   } catch (error: any) {
     console.error("Error fetching user mentor requests:", error);
-    // Handle specific Firestore errors
     if (error.code === 'permission-denied') {
       console.error("Permission denied: Check Firestore rules for mentorRequests collection");
     } else if (error.code === 'failed-precondition') {
