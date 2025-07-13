@@ -1,9 +1,4 @@
-<<<<<<< HEAD
 import { FileTextIcon, Loader2, AlertCircle, UserCircle, KeyRound, ChevronDown, ChevronUp, Eye, RefreshCw } from "lucide-react";
-=======
-
-import { FileTextIcon, Loader2, AlertCircle, UserCircle, KeyRound, ChevronDown, ChevronUp, Eye } from "lucide-react";
->>>>>>> beb9523e675e3445f808db4c0308240e0955707d
 import { Button } from "@/components/ui/button";
 import { Submission, SubmissionStatus, CampusStatus } from "@/types/Submission";
 import { StatusBadge } from "./StatusBadge";
@@ -39,7 +34,6 @@ const formatDate = (date: Date | string | Timestamp | undefined) => {
   }
 };
 
-<<<<<<< HEAD
 // Component for expandable idea cell
 function IdeaCell({ idea, submissionId, status, temporaryUserId, temporaryPassword }: {
   idea: string;
@@ -93,8 +87,6 @@ function IdeaCell({ idea, submissionId, status, temporaryUserId, temporaryPasswo
   );
 }
 
-=======
->>>>>>> beb9523e675e3445f808db4c0308240e0955707d
 export function SubmissionsTable({
   submissions,
   processingAction,
@@ -238,10 +230,6 @@ export function SubmissionsTable({
                       submissionId={submission.id}
                       status={submission.status}
                       processingAction={processingAction}
-<<<<<<< HEAD
-                      onAccept={() => onProcessAction(submission.id, 'accept', submission.name, submission.email)}
-                      onReject={() => onProcessAction(submission.id, 'reject', submission.name, submission.email)}
-=======
                       onAccept={() => onProcessAction(
                         submission.id, 
                         'accept', 
@@ -256,7 +244,6 @@ export function SubmissionsTable({
                         submission.email,
                         submission.campusStatus
                       )}
->>>>>>> beb9523e675e3445f808db4c0308240e0955707d
                     />
                   </div>
                 </td>

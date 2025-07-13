@@ -107,19 +107,13 @@ function AdminSubmissionsContent() {
   const SubmissionsGrid = ({ submissions, type }: { submissions: Submission[], type: 'on-campus' | 'off-campus' }) => {
     if (isLoading) {
       return (
-<<<<<<< HEAD
         <div className="flex items-center justify-center py-10 rounded-xl admin-card">
           <Loader2 className="mr-3 h-8 w-8 animate-spin text-blue-600" />
           <span className="admin-body-small admin-font-medium">Loading {type} submissions...</span>
-=======
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-6">
-          {[...Array(6)].map((_, i) => <div key={i} className="h-96 bg-neutral-800/50 rounded-2xl animate-pulse" />)}
->>>>>>> beb9523e675e3445f808db4c0308240e0955707d
         </div>
       );
     }
     if (error) {
-<<<<<<< HEAD
       return (
         <div className="flex flex-col items-center justify-center py-10 rounded-xl bg-rose-900/10 border border-rose-900/30">
           <AlertCircle className="h-10 w-10 text-rose-400 mb-3" />
@@ -134,13 +128,9 @@ function AdminSubmissionsContent() {
           </Button>
         </div>
       );
-=======
-      return <div className="text-center py-10 text-red-400">{error}</div>;
->>>>>>> beb9523e675e3445f808db4c0308240e0955707d
     }
     if (submissions.length === 0) {
       return (
-<<<<<<< HEAD
         <div className="text-center py-16 rounded-2xl admin-card border-dashed border-gray-200/50 relative overflow-hidden">
           {/* Background effects */}
           <div className="absolute inset-0 bg-gradient-to-br from-blue-50/30 via-white/10 to-purple-50/20 rounded-2xl"></div>
@@ -192,17 +182,6 @@ function AdminSubmissionsContent() {
               </div>
             </div>
           </div>
-=======
-        <div className="text-center py-20 rounded-2xl bg-neutral-900/30 border border-dashed border-neutral-700/50">
-          <FileTextIcon className="mx-auto h-12 w-12 text-neutral-500 mb-4" />
-          <h3 className="text-lg font-medium text-neutral-200">No {type} submissions yet</h3>
-          {type === 'off-campus' && (
-            <Button onClick={handleImportOffCampus} disabled={isImporting} variant="secondary" size="sm" className="mt-4">
-              {isImporting ? <Loader2 className="animate-spin mr-2" /> : <UploadCloud className="mr-2" />}
-              Import Off-Campus Data
-            </Button>
-          )}
->>>>>>> beb9523e675e3445f808db4c0308240e0955707d
         </div>
       );
     }
@@ -222,7 +201,6 @@ function AdminSubmissionsContent() {
   };
 
   return (
-<<<<<<< HEAD
     <div className="w-full min-h-screen flex flex-col items-center bg-gray-50 py-10 px-2">
       <div className="w-full max-w-6xl mx-auto space-y-8">
         <div className="bg-white rounded-2xl shadow-md border border-gray-200 overflow-hidden relative">
@@ -302,49 +280,12 @@ function AdminSubmissionsContent() {
           submission={selectedSubmission}
         />
       </div>
-=======
-    <div className="space-y-8">
-      <div className="flex flex-col sm:flex-row sm:justify-between items-start sm:items-center">
-        <div>
-          <h2 className="text-2xl font-bold text-white flex items-center"><FileTextIcon className="mr-3 h-6 w-6 text-indigo-400"/>Submissions</h2>
-          <p className="text-sm text-neutral-400 mt-1">Review and process all incoming applications.</p>
-        </div>
-        <div className="flex items-center gap-2 mt-4 sm:mt-0">
-          <Button onClick={fetchSubmissions} disabled={isLoading} variant="outline" size="sm" className="border-neutral-700 hover:border-neutral-500">
-            {isLoading ? <Loader2 className="animate-spin mr-2"/> : <RefreshCw className="mr-2"/>}Refresh
-          </Button>
-          <Button onClick={handleImportOffCampus} disabled={isImporting} variant="secondary" size="sm">
-            {isImporting ? <Loader2 className="animate-spin mr-2"/> : <UploadCloud className="mr-2"/>}Import Off-Campus
-          </Button>
-        </div>
-      </div>
-      
-      <Tabs value={activeTab} className="w-full">
-        <TabsList className="grid w-full grid-cols-2 bg-neutral-800/50">
-          <TabsTrigger value="on-campus"><Landmark className="mr-2 h-4 w-4"/>On-Campus</TabsTrigger>
-          <TabsTrigger value="off-campus"><Building className="mr-2 h-4 w-4"/>Off-Campus</TabsTrigger>
-        </TabsList>
-        <TabsContent value="on-campus">
-          <SubmissionsGrid submissions={onCampusSubmissions} type="on-campus" />
-        </TabsContent>
-        <TabsContent value="off-campus">
-          <SubmissionsGrid submissions={offCampusSubmissions} type="off-campus" />
-        </TabsContent>
-      </Tabs>
-      
-      <SubmissionDetailModal
-        submission={selectedSubmission}
-        isOpen={!!selectedSubmission}
-        onClose={() => setSelectedSubmission(null)}
-      />
->>>>>>> beb9523e675e3445f808db4c0308240e0955707d
     </div>
   );
 }
 
 export default function AdminSubmissionsPage() {
   return (
-<<<<<<< HEAD
     <Suspense fallback={
       <div className="space-y-8">
         <div className="admin-card overflow-hidden">
@@ -362,9 +303,6 @@ export default function AdminSubmissionsPage() {
         </div>
       </div>
     }>
-=======
-    <Suspense fallback={<div className="flex h-full w-full items-center justify-center"><Loader2 className="h-8 w-8 animate-spin" /></div>}>
->>>>>>> beb9523e675e3445f808db4c0308240e0955707d
       <AdminSubmissionsContent />
     </Suspense>
   );

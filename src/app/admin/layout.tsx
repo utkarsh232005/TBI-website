@@ -319,15 +319,10 @@ function AdminLayoutContent({
           </div>
         </header>
 
-<<<<<<< HEAD
         {/* Desktop header with notifications */}
         <header className="hidden md:flex items-center justify-end h-16 px-3 bg-white border-b border-gray-200 shadow-sm">
           <NotificationsPanel userId="admin@tbi.com" />
         </header>
-=======
-        {/* Floating Notifications Panel */}
-        <NotificationsPanel userId="admin@tbi.com" />
->>>>>>> beb9523e675e3445f808db4c0308240e0955707d
 
         {/* Page content */}
         <main className="flex-1 overflow-y-auto p-3 md:p-4 bg-white">

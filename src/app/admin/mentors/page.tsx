@@ -2,16 +2,9 @@
 // src/app/admin/mentors/page.tsx
 "use client";
 
-<<<<<<< HEAD
-// src/app/admin/mentors/page.tsx
-"use client";
-
 // Complete React import to ensure proper JSX transformation
 import * as React from 'react';
 import { useState, useEffect, Fragment } from 'react';
-=======
-import { useState, useEffect, useCallback } from 'react';
->>>>>>> beb9523e675e3445f808db4c0308240e0955707d
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -295,174 +288,24 @@ export default function AdminMentorsPage() {
                         </div>
                         Add New Mentor
                       </DialogTitle>
-<<<<<<< HEAD
-                      <DialogDescription className="admin-body-small">
-                        Fill in the details below to add a new mentor to the platform.
-=======
                       <DialogDescription className="text-gray-400">
                         Fill in the details below to add a new mentor and create their login account.
->>>>>>> beb9523e675e3445f808db4c0308240e0955707d
                       </DialogDescription>
                     </DialogHeader>
                     <Form {...form}>
                       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4 py-4 max-h-[70vh] overflow-y-auto pr-2 pl-3">
-                      <FormField
-                        control={form.control}
-                        name="name"
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormLabel>Full Name</FormLabel>
-                            <FormControl>
-                              <Input placeholder="e.g., Dr. Jane Doe" {...field} disabled={isSubmitting} suppressHydrationWarning />
-                            </FormControl>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
-                      <FormField
-                        control={form.control}
-                        name="designation"
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormLabel>Designation</FormLabel>
-                            <FormControl>
-                              <Input placeholder="e.g., Lead Innovator, Acme Corp" {...field} disabled={isSubmitting} suppressHydrationWarning />
-                            </FormControl>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
-                      <FormField
-                        control={form.control}
-                        name="expertise"
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormLabel>Area of Expertise/Mentorship</FormLabel>
-                            <FormControl>
-                              <Input placeholder="e.g., AI & Machine Learning" {...field} disabled={isSubmitting} suppressHydrationWarning />
-                            </FormControl>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
-                      <FormField
-                        control={form.control}
-                        name="description"
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormLabel>Description / Bio</FormLabel>
-                            <FormControl>
-                              <Textarea
-                                placeholder="Brief description of the mentor's background and experience..."
-                                {...field}
-                                rows={4}
-                                disabled={isSubmitting}
-                                suppressHydrationWarning
-                              />
-                            </FormControl>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
-                      <FormField
-                        control={form.control}
-                        name="email"
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormLabel>Email Address</FormLabel>
-                            <FormControl>
-                              <Input
-                                type="email"
-                                placeholder="mentor@example.com"
-                                {...field}
-                                disabled={isSubmitting}
-                                suppressHydrationWarning
-                              />
-                            </FormControl>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />                        <FormField
-                        control={form.control}
-                        name="profilePictureUrl"
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormLabel>Profile Picture</FormLabel>
-                            <FormControl>
-                              <ImageUploadComponent
-                                value={field.value}
-                                onChange={(imageUrl) => {
-                                  field.onChange(imageUrl || '');
-                                }}
-                                placeholder="Upload profile picture or enter URL"
-                                options={{
-                                  maxSizeBytes: 3 * 1024 * 1024, // 3MB
-                                  allowedTypes: ['image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'image/webp'],
-                                  quality: 0.8,
-                                  maxWidth: 500,
-                                  maxHeight: 500,
-                                }}
-                                onUploadComplete={(result) => {
-                                  if (result.success) {
-                            
-                                  }
-                                }}
-                                previewClassName="w-24 h-24 rounded-full"
-                              />
-                            </FormControl>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
-                      <FormField
-                        control={form.control}
-                        name="linkedinUrl"
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormLabel>LinkedIn Profile URL (Optional)</FormLabel>
-                            <FormControl>
-                              <Input
-                                placeholder="https://linkedin.com/in/username"
-                                {...field}
-                                value={field.value || ''}
-                                disabled={isSubmitting}
-                                suppressHydrationWarning
-                              />
-                            </FormControl>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
-                      <DialogFooter className="mt-6">
-                        <Button
-                          type="button"
-                          variant="outline"
-                          onClick={() => setIsCreateDialogOpen(false)}
-                          disabled={isSubmitting}
-                          className="border-gray-200/70 hover:border-blue-300/70 bg-white/80 hover:bg-blue-50/50 text-gray-700 hover:text-blue-700 transition-all duration-300"
-                          suppressHydrationWarning
-                        >
-                          Cancel
-                        </Button>
-                        <Button
-                          type="submit"
-                          disabled={isSubmitting}
-                          className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white transition-all duration-300 shadow-md hover:shadow-lg border-0"
-                          suppressHydrationWarning
-                        >
-                          {isSubmitting ? (
-                            <>
-                              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                              Adding...
-                            </>
-                          ) : (
-                            'Add Mentor'
+                        <FormField
+                          control={form.control}
+                          name="name"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel>Full Name</FormLabel>
+                              <FormControl>
+                                <Input placeholder="e.g., Dr. Jane Doe" {...field} disabled={isSubmitting} suppressHydrationWarning />
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
                           )}
-<<<<<<< HEAD
-                        </Button>
-                      </DialogFooter>
-                    </form>
-=======
                         />
                         <FormField
                           control={form.control}
@@ -625,7 +468,6 @@ export default function AdminMentorsPage() {
                           </Button>
                         </DialogFooter>
                       </form>
->>>>>>> beb9523e675e3445f808db4c0308240e0955707d
                     </Form>
                   </DialogContent>
                 </Dialog>

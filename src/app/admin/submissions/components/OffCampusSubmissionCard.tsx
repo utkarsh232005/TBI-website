@@ -102,7 +102,6 @@ export function OffCampusSubmissionCard({
   ].filter(part => part && part.trim()).join('\n\n') || submission.idea || 'No details provided.';
 
   return (
-<<<<<<< HEAD
     <div className="w-full h-full">
       <Card className="relative h-full bg-white border border-purple-100 shadow-sm hover:shadow-md transition rounded-xl overflow-hidden">
         <CardHeader className="pb-4">
@@ -298,195 +297,55 @@ export function OffCampusSubmissionCard({
                 <div className="p-2 bg-emerald-100 rounded-md">
                   <KeyRound className="h-4 w-4 text-emerald-600" />
                 </div>
-                <div className="text-sm font-bold text-emerald-700 uppercase tracking-wide">Login Credentials</div>
+                <div className="text-sm font-semibold text-emerald-800">Login Credentials Generated</div>
               </div>
               <div className="space-y-2">
-                <div className="flex items-center gap-3 p-2 bg-emerald-100 rounded-md">
-                  <UserCircle className="h-4 w-4 text-emerald-600" />
-                  <div className="flex-1 min-w-0">
-                    <div className="text-xs font-medium text-emerald-600 uppercase tracking-wide">User ID</div>
-                    <div className="font-mono text-sm font-semibold text-emerald-800 truncate">
-                      {submission.temporaryUserId}
-                    </div>
-                  </div>
+                <div className="flex items-center gap-2">
+                  <UserCircle className="h-3 w-3 text-emerald-700" />
+                  <span className="font-mono bg-emerald-100 px-2 py-1 rounded text-emerald-800 text-xs">{submission.temporaryUserId}</span>
                 </div>
-                <div className="flex items-center gap-3 p-2 bg-emerald-100 rounded-md">
-                  <KeyRound className="h-4 w-4 text-emerald-600" />
-                  <div className="flex-1 min-w-0">
-                    <div className="text-xs font-medium text-emerald-600 uppercase tracking-wide">Password</div>
-                    <div className="font-mono text-sm font-semibold text-emerald-800 truncate">
-                      {submission.temporaryPassword}
-                    </div>
-                  </div>
+                <div className="flex items-center gap-2">
+                  <KeyRound className="h-3 w-3 text-emerald-700" />
+                  <span className="font-mono bg-emerald-100 px-2 py-1 rounded text-emerald-800 text-xs">{submission.temporaryPassword}</span>
                 </div>
               </div>
             </div>
           )}
         </CardContent>
-        <CardFooter className="pt-4 flex flex-col gap-3">
-          <Button 
-            onClick={() => onViewDetails(submission)}
-            className="w-full bg-purple-600 hover:bg-purple-700 text-white font-semibold py-2 px-4 rounded-lg shadow-sm transition"
-          >
-            <div className="flex items-center justify-center gap-2">
-              <Eye className="h-4 w-4" />
-              <span>View Details</span>
-              <ArrowRight className="h-4 w-4" />
-            </div>
-          </Button>
-          {submission.status === 'pending' && (
-            <div className="flex gap-2 w-full">
-              <Button
-                onClick={() => onProcessAction(submission.id, 'accept', submission.name, submission.email)}
-                disabled={isProcessing}
-                className="flex-1 bg-emerald-600 hover:bg-emerald-700 text-white font-semibold py-2 px-4 rounded-lg shadow-sm transition"
-              >
-                {isProcessing && processingAction?.type === 'accept' ? (
-                  <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                ) : (
-                  <ThumbsUp className="h-4 w-4 mr-2" />
-                )}
-                Accept
-              </Button>
-              <Button
-                onClick={() => onProcessAction(submission.id, 'reject', submission.name, submission.email)}
-                disabled={isProcessing}
-                className="flex-1 bg-rose-600 hover:bg-rose-700 text-white font-semibold py-2 px-4 rounded-lg shadow-sm transition"
-              >
-                {isProcessing && processingAction?.type === 'reject' ? (
-                  <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                ) : (
-                  <ThumbsDown className="h-4 w-4 mr-2" />
-                )}
-                Reject
-              </Button>
-            </div>
-          )}
+        <CardFooter className="pt-0">
+          <div className="w-full space-y-3">
+            <Button 
+              onClick={() => onViewDetails(submission)}
+              className="w-full bg-purple-600 hover:bg-purple-700 text-white font-semibold py-2 px-4 rounded-lg shadow-sm transition"
+            >
+              <div className="flex items-center justify-center gap-2">
+                <Eye className="h-4 w-4" />
+                <span>View Details</span>
+                <ArrowRight className="h-4 w-4" />
+              </div>
+            </Button>
+            <SubmissionActions
+              submissionId={submission.id}
+              status={submission.status}
+              processingAction={processingAction}
+              onAccept={() => onProcessAction(
+                submission.id, 
+                'accept', 
+                submission.name || submission.companyName || 'Unknown', 
+                submission.companyEmail || submission.email || 'unknown@example.com',
+                submission.campusStatus
+              )}
+              onReject={() => onProcessAction(
+                submission.id, 
+                'reject', 
+                submission.name || submission.companyName || 'Unknown', 
+                submission.companyEmail || submission.email || 'unknown@example.com',
+                submission.campusStatus
+              )}
+            />
+          </div>
         </CardFooter>
       </Card>
     </div>
-=======
-    <Card className="flex flex-col h-full bg-gradient-to-br from-neutral-900/60 via-neutral-800/40 to-neutral-900/60 border-neutral-700/50 hover:border-neutral-600/70 transition-all duration-300 hover:shadow-xl group">
-      <CardHeader className="pb-4">
-        <div className="flex items-start justify-between">
-          <div className="flex items-center space-x-3">
-            <div className={`w-10 h-10 rounded-full flex items-center justify-center border ${submission.campusStatus === 'off-campus' ? 'bg-purple-500/20 border-purple-400/30' : 'bg-blue-500/20 border-blue-400/30'}`}>
-              {submission.campusStatus === 'off-campus' ? <Building className="h-5 w-5 text-purple-300" /> : <Landmark className="h-5 w-5 text-blue-300" />}
-            </div>
-            <div className="flex-1 min-w-0">
-              <CardTitle className="text-lg font-semibold text-neutral-100 truncate group-hover:text-white transition-colors">
-                {submission.companyName || submission.fullName || 'Unknown Company'}
-              </CardTitle>
-              <CardDescription className="text-sm text-neutral-400 truncate">
-                {submission.founderNames || submission.fullName || 'Unknown Founder'}
-              </CardDescription>
-            </div>
-          </div>
-          <Badge 
-            className={`inline-flex items-center gap-1.5 px-2.5 py-1 text-xs font-medium border ${getStatusBadgeClasses(submission.status)}`}
-          >
-            {getStatusIcon(submission.status)}
-            {submission.status || 'pending'}
-          </Badge>
-        </div>
-      </CardHeader>
-
-      <CardContent className="flex-grow space-y-4">
-        <div className="space-y-3">
-          <div className="flex items-center gap-2 text-sm text-neutral-300">
-            <Mail className="h-4 w-4 text-neutral-400 flex-shrink-0" />
-            <span className="truncate">{submission.companyEmail || submission.email || 'No email'}</span>
-          </div>
-          
-          <div className="flex items-center gap-2 text-sm text-neutral-300">
-            <Briefcase className="h-4 w-4 text-neutral-400 flex-shrink-0" />
-            <Badge variant="secondary" className="bg-blue-500/10 text-blue-300 border-blue-500/20">
-              {submission.domain || 'N/A'}
-            </Badge>
-          </div>
-
-          <div className="flex items-center gap-2 text-sm text-neutral-300">
-            <CalendarDays className="h-4 w-4 text-neutral-400 flex-shrink-0" />
-            <span className="text-xs">{formatDate(submission.submittedAt)}</span>
-          </div>
-        </div>
-
-        <div className="space-y-2">
-            <div className="flex items-center gap-2">
-              <FlaskConical className="h-4 w-4 text-neutral-400" />
-              <span className="text-sm font-medium text-neutral-200">Startup Idea</span>
-            </div>
-            <div className="text-sm text-neutral-300 leading-relaxed bg-neutral-800/30 rounded-lg p-3 border border-neutral-700/30">
-              {isExpanded ? fullIdea : truncateText(fullIdea)}
-              {fullIdea.length > 100 && (
-                <button
-                  onClick={() => setIsExpanded(!isExpanded)}
-                  className="ml-2 text-xs text-indigo-400 hover:text-indigo-300 transition-colors"
-                >
-                  {isExpanded ? 'Show less' : 'Show more'}
-                </button>
-              )}
-            </div>
-          </div>
-
-        {submission.status === 'accepted' && (
-          <div className="bg-emerald-950/30 border border-emerald-800/30 rounded-lg p-3 space-y-2">
-            <div className="text-xs font-medium text-emerald-100 mb-2 flex items-center gap-2">
-              <KeyRound className="h-3 w-3" /> Login Credentials
-            </div>
-            <div className="space-y-1 text-xs">
-              <div className="flex items-center gap-2">
-                <UserCircle className="h-3 w-3 text-emerald-400" />
-                <span className="font-mono bg-emerald-900/30 px-2 py-1 rounded text-emerald-100">
-                  {submission.firebaseUid}
-                </span>
-              </div>
-            </div>
-          </div>
-        )}
-      </CardContent>
-
-      <CardFooter className="pt-4 flex flex-col gap-3">
-        <Button 
-          onClick={() => onViewDetails(submission)} 
-          variant="outline"
-          className="w-full border-neutral-600/50 text-neutral-300 hover:bg-neutral-800/50 hover:text-white hover:border-neutral-500"
-        >
-          <Eye className="h-4 w-4 mr-2" />
-          View Details
-        </Button>
-        
-        {submission.status === 'pending' && (
-          <div className="flex gap-2 w-full">
-            <Button
-              onClick={() => onProcessAction(submission.id, 'accept', submission.fullName || submission.name, submission.companyEmail || submission.email, submission.campusStatus)}
-              disabled={isProcessing}
-              className="flex-1 bg-emerald-600 hover:bg-emerald-700 text-white"
-            >
-              {isProcessing && processingAction?.type === 'accept' ? (
-                <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-              ) : (
-                <ThumbsUp className="h-4 w-4 mr-2" />
-              )}
-              Accept
-            </Button>
-            <Button
-              onClick={() => onProcessAction(submission.id, 'reject', submission.fullName || submission.name, submission.companyEmail || submission.email, submission.campusStatus)}
-              disabled={isProcessing}
-              variant="destructive"
-              className="flex-1"
-            >
-              {isProcessing && processingAction?.type === 'reject' ? (
-                <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-              ) : (
-                <ThumbsDown className="h-4 w-4 mr-2" />
-              )}
-              Reject
-            </Button>
-          </div>
-        )}
-      </CardFooter>
-    </Card>
->>>>>>> beb9523e675e3445f808db4c0308240e0955707d
   );
 }
