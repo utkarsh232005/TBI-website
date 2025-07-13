@@ -14,6 +14,10 @@ import { useState } from "react";
 import { verifyAdminCredentials, type AdminLoginFormValues, type VerifyUserCredentialsResponse } from "@/app/actions/auth-actions";
 import { cn } from "@/lib/utils";
 import { motion } from "framer-motion";
+import { group } from "console";
+import all from "gsap/all";
+import { relative } from "path";
+import { text } from "stream/consumers";
 
 const formSchema = z.object({
   email: z.string().email({ message: "Please enter a valid email." }),
@@ -43,7 +47,7 @@ const LabelInputContainer = ({
   );
 };
 
-export default function AdminLoginForm() {
+export default function AdminLoginForm({ onForgotPassword }: { onForgotPassword?: () => void }) {
   const { toast } = useToast();
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
@@ -79,7 +83,7 @@ export default function AdminLoginForm() {
         toast({
           title: "Login Failed",
           description: result.message || "An unknown error occurred.",
-          variant: "destructive",
+          variant: "warning",
         });
       }
     } catch (error: any) {
@@ -105,7 +109,7 @@ export default function AdminLoginForm() {
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.6 }}
-      className="shadow-input mx-auto w-full max-w-md rounded-2xl bg-white/10 backdrop-blur-md p-8 border border-white/20"
+      className="mx-auto w-full max-w-md rounded-2xl bg-white shadow-lg border border-gray-200 p-6"
     >
       <motion.div
         initial={{ opacity: 0 }}
@@ -113,50 +117,63 @@ export default function AdminLoginForm() {
         transition={{ delay: 0.2, duration: 0.6 }}
         className="text-center mb-6"
       >
-        <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-gradient-to-r from-purple-600 to-indigo-600 mb-4">
-          <Shield className="h-8 w-8 text-white" />
+        <div className="inline-flex items-center justify-center w-12 h-12 rounded-full bg-gray-800 border border-gray-700 mb-3">
+          <Shield className="h-6 w-6 text-white" />
         </div>
-        <h2 className="text-2xl font-bold text-white mb-2">
-          Admin Portal
+        <h2 className="text-xl font-bold text-gray-900 mb-1">
+          Admin Access
         </h2>
-        <p className="text-gray-300 text-sm">
-          Enter your administrator credentials to access the RCOEM-TBI admin panel
+        <p className="text-gray-600 text-xs font-medium">
+          Enter administrator credentials
         </p>
       </motion.div>
 
-      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
         <LabelInputContainer>
-          <Label htmlFor="admin-email" className="text-white">Admin Email</Label>
+          <Label htmlFor="admin-email" className="text-gray-900 font-medium">Admin Email</Label>
           <Input
             id="admin-email"
             placeholder="admin@rcoem.edu"
             type="email"
             {...form.register("email")}
-            className="bg-white/5 border border-white/20 text-white placeholder:text-gray-400 focus:border-purple-500 focus:ring-2 focus:ring-purple-500/20 transition-all duration-200"
+            className="bg-gray-50 border border-gray-300 text-gray-900 placeholder:text-gray-500 focus:border-gray-600 focus:ring-2 focus:ring-gray-600/20 transition-all duration-200"
             disabled={isLoading}
           />
           {form.formState.errors.email && (
-            <p className="text-red-400 text-sm">{form.formState.errors.email.message}</p>
+            <p className="text-red-600 text-sm font-medium">{form.formState.errors.email.message}</p>
           )}
         </LabelInputContainer>
 
         <LabelInputContainer>
-          <Label htmlFor="admin-password" className="text-white">Password</Label>
+          <Label htmlFor="admin-password" className="text-gray-900 font-medium">Password</Label>
           <Input
             id="admin-password"
             placeholder="••••••••"
             type="password"
             {...form.register("password")}
-            className="bg-white/5 border border-white/20 text-white placeholder:text-gray-400 focus:border-purple-500 focus:ring-2 focus:ring-purple-500/20 transition-all duration-200"
+            className="bg-gray-50 border border-gray-300 text-gray-900 placeholder:text-gray-500 focus:border-gray-600 focus:ring-2 focus:ring-gray-600/20 transition-all duration-200"
             disabled={isLoading}
           />
           {form.formState.errors.password && (
-            <p className="text-red-400 text-sm">{form.formState.errors.password.message}</p>
+            <p className="text-red-600 text-sm font-medium">{form.formState.errors.password.message}</p>
+          )}
+          {/* Forgot Password Link */}
+          {onForgotPassword && (
+            <div className="flex justify-end">
+              <button
+                type="button"
+                onClick={onForgotPassword}
+                className="text-sm text-gray-700 hover:text-gray-900 transition-colors font-medium"
+                disabled={isLoading}
+              >
+                Forgot your password?
+              </button>
+            </div>
           )}
         </LabelInputContainer>
 
         <button
-          className="group/btn relative block h-12 w-full rounded-lg bg-gradient-to-br from-purple-600 to-indigo-600 font-medium text-white shadow-[0px_1px_0px_0px_#ffffff40_inset,0px_-1px_0px_0px_#ffffff40_inset] hover:shadow-lg transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+          className="group/btn relative block h-10 w-full rounded-lg bg-gray-800 hover:bg-gray-900 font-semibold text-white shadow-lg hover:shadow-xl transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
           type="submit"
           disabled={isLoading}
         >
@@ -164,18 +181,17 @@ export default function AdminLoginForm() {
             {isLoading ? (
               <Loader2 className="mr-2 h-5 w-5 animate-spin" />
             ) : (
-              <LogIn className="mr-2 h-5 w-5 transition-transform group-hover/btn:translate-x-1" />
+              <Shield className="mr-2 h-5 w-5 transition-transform group-hover/btn:translate-x-1" />
             )}
             {isLoading ? "Signing in..." : "Sign in as Admin"}
           </div>
-          <BottomGradient />
         </button>
 
         <motion.p
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 0.8, duration: 0.6 }}
-          className="text-xs text-center text-gray-400 pt-2"
+          className="text-xs text-center text-gray-600 pt-2 font-medium"
         >
           Security Warning: Admin passwords should be stored hashed. This demo stores them in Firestore for simplicity.
         </motion.p>

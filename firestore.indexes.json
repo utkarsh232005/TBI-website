@@ -1,3 +1,4 @@
+
 {
   "indexes": [
     {
@@ -52,6 +53,24 @@
         },
         {
           "fieldPath": "createdAt",
+          "order": "DESCENDING"
+        }
+      ]
+    },
+    {
+      "collectionGroup": "mentorRequests",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "mentorEmail",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "status",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "mentorProcessedAt",
           "order": "DESCENDING"
         }
       ]

@@ -1,9 +1,10 @@
+
 "use client";
 
 import { useState } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { Send } from "lucide-react";
-import { DOMAIN_OPTIONS, SECTOR_OPTIONS, LEGAL_STATUS_OPTIONS } from "@/lib/validation/dropdown-constants";
+import { DOMAIN_OPTIONS, SECTOR_OPTIONS } from "@/lib/validation/dropdown-constants";
 
 interface FormData {
   fullName: string;
@@ -16,25 +17,11 @@ interface FormData {
   portfolioUrl: string;
   teamInfo: string;
   startupIdea: string;
-  targetAudience: string;
   problemSolving: string;
   uniqueness: string;
-  currentStage: string;
   domain: string;
   sector: string;
-  legalStatus: string;
-  attachmentBase64: string;
-  attachmentName: string;
 }
-
-const fileToBase64 = (file: File): Promise<string> => {
-  return new Promise((resolve, reject) => {
-    const reader = new FileReader();
-    reader.readAsDataURL(file);
-    reader.onload = () => resolve(reader.result as string);
-    reader.onerror = error => reject(error);
-  });
-};
 
 export default function CampusApplicationForm() {
   const { toast } = useToast();
@@ -49,15 +36,10 @@ export default function CampusApplicationForm() {
     portfolioUrl: "",
     teamInfo: "",
     startupIdea: "",
-    targetAudience: "",
     problemSolving: "",
     uniqueness: "",
-    currentStage: "",
     domain: "",
     sector: "",
-    legalStatus: "",
-    attachmentBase64: "",
-    attachmentName: ""
   });
 
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -70,46 +52,24 @@ export default function CampusApplicationForm() {
     }));
   };
 
-  const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (file) {
-      if (file.size > 10 * 1024 * 1024) {
-        toast({
-          title: "File too large",
-          description: "File size must be 10MB or less.",
-          variant: "destructive"
-        });
-        return;
-      }
-      
-      try {
-        const base64 = await fileToBase64(file);
-        setFormData(prev => ({
-          ...prev,
-          attachmentBase64: base64,
-          attachmentName: file.name
-        }));
-      } catch (error) {
-        toast({
-          title: "File upload failed",
-          description: "Could not process the file.",
-          variant: "destructive"
-        });
-      }
-    }
-  };
-
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
 
     try {
+      const campusStatus = typeof window !== 'undefined' ? localStorage.getItem('applicantCampusStatus') : 'campus';
+
+      const submissionData = {
+        ...formData,
+        campusStatus: campusStatus,
+      };
+
       const response = await fetch('/api/contact-submissions', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
         },
-        body: JSON.stringify(formData)
+        body: JSON.stringify(submissionData)
       });
 
       const result = await response.json();
@@ -131,15 +91,10 @@ export default function CampusApplicationForm() {
           portfolioUrl: "",
           teamInfo: "",
           startupIdea: "",
-          targetAudience: "",
           problemSolving: "",
           uniqueness: "",
-          currentStage: "",
           domain: "",
           sector: "",
-          legalStatus: "",
-          attachmentBase64: "",
-          attachmentName: ""
         });
       } else {
         toast({
@@ -167,7 +122,7 @@ export default function CampusApplicationForm() {
           <div className="w-2 h-8 bg-gradient-to-b from-blue-400 to-purple-500 rounded-full"></div>
           <div>
             <h2 className="text-2xl font-bold text-white bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent">
-              Campus Incubation Application
+              Incubation Application
             </h2>
             <p className="text-neutral-400 text-sm mt-1">
               Join our innovation ecosystem and transform your startup vision into reality
@@ -281,7 +236,7 @@ export default function CampusApplicationForm() {
           </div>
 
           {/* Business Classification */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             {/* Domain */}
             <div className="space-y-2">
               <label className="text-sm font-medium text-neutral-300 flex items-center">
@@ -318,26 +273,6 @@ export default function CampusApplicationForm() {
                 <option value="" className="bg-neutral-800">Select sector...</option>
                 {SECTOR_OPTIONS.map((sector) => (
                   <option key={sector} value={sector} className="bg-neutral-800">{sector}</option>
-                ))}
-              </select>
-            </div>
-
-            {/* Legal Status */}
-            <div className="space-y-2">
-              <label className="text-sm font-medium text-neutral-300 flex items-center">
-                Legal Status
-                <span className="text-red-400 ml-1">*</span>
-              </label>
-              <select
-                name="legalStatus"
-                required
-                className="w-full bg-neutral-800/60 border border-neutral-600/50 focus:border-purple-400/60 focus:ring-2 focus:ring-purple-400/20 rounded-lg px-4 py-3 text-white transition-all duration-200 hover:border-neutral-500"
-                value={formData.legalStatus}
-                onChange={handleChange}
-              >
-                <option value="" className="bg-neutral-800">Select status...</option>
-                {LEGAL_STATUS_OPTIONS.map((status) => (
-                  <option key={status} value={status} className="bg-neutral-800">{status}</option>
                 ))}
               </select>
             </div>
@@ -435,46 +370,6 @@ export default function CampusApplicationForm() {
             />
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {/* Target Audience */}
-            <div className="space-y-2">
-              <label className="text-sm font-medium text-neutral-300 flex items-center">
-                Target Audience
-                <span className="text-red-400 ml-1">*</span>
-              </label>
-              <input
-                name="targetAudience"
-                type="text"
-                required
-                placeholder="Who is your target audience?"
-                className="w-full bg-neutral-800/60 border border-neutral-600/50 focus:border-yellow-400/60 focus:ring-2 focus:ring-yellow-400/20 rounded-lg px-4 py-3 text-white placeholder-neutral-500 transition-all duration-200 hover:border-neutral-500"
-                value={formData.targetAudience}
-                onChange={handleChange}
-              />
-            </div>
-
-            {/* Current Stage */}
-            <div className="space-y-2">
-              <label className="text-sm font-medium text-neutral-300 flex items-center">
-                Current Stage of Startup
-                <span className="text-red-400 ml-1">*</span>
-              </label>
-              <select
-                name="currentStage"
-                required
-                className="w-full bg-neutral-800/60 border border-neutral-600/50 focus:border-yellow-400/60 focus:ring-2 focus:ring-yellow-400/20 rounded-lg px-4 py-3 text-white transition-all duration-200 hover:border-neutral-500"
-                value={formData.currentStage}
-                onChange={handleChange}
-              >
-                <option value="" className="bg-neutral-800">Select current stage...</option>
-                <option value="Ideation" className="bg-neutral-800">Ideation</option>
-                <option value="MVP" className="bg-neutral-800">MVP</option>
-                <option value="Early Revenue" className="bg-neutral-800">Early Revenue</option>
-                <option value="Scaling" className="bg-neutral-800">Scaling</option>
-              </select>
-            </div>
-          </div>
-
           {/* Problem Solving */}
           <div className="space-y-2">
             <label className="text-sm font-medium text-neutral-300">What Problem Are You Solving?</label>
@@ -501,38 +396,6 @@ export default function CampusApplicationForm() {
               value={formData.uniqueness}
               onChange={handleChange}
             />
-          </div>
-        </div>
-
-        {/* Supporting Documents Section */}
-        <div className="space-y-6">
-          <div className="flex items-center space-x-2 mb-4">
-            <div className="w-1 h-6 bg-gradient-to-b from-red-400 to-pink-600 rounded-full"></div>
-            <h3 className="text-lg font-semibold text-neutral-200">Supporting Documents</h3>
-          </div>
-          
-          <div className="space-y-2">
-            <label className="text-sm font-medium text-neutral-300 flex items-center">
-              Supporting Document
-              <span className="text-red-400 ml-1">*</span>
-              <span className="text-xs text-neutral-500 ml-2">(max 10MB)</span>
-            </label>
-            <div className="relative">
-              <input
-                name="supportingDoc"
-                type="file"
-                required
-                accept=".pdf,.doc,.docx,.ppt,.pptx,.jpg,.jpeg,.png"
-                className="w-full bg-neutral-800/60 border border-neutral-600/50 focus:border-red-400/60 focus:ring-2 focus:ring-red-400/20 rounded-lg px-4 py-3 text-white file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:bg-gradient-to-r file:from-red-500 file:to-pink-500 file:text-white file:font-medium file:cursor-pointer hover:file:from-red-600 hover:file:to-pink-600 transition-all duration-200 hover:border-neutral-500"
-                onChange={handleFileUpload}
-              />
-              {formData.attachmentName && (
-                <div className="mt-2 text-xs text-green-400 flex items-center">
-                  <div className="w-2 h-2 bg-green-400 rounded-full mr-2"></div>
-                  {formData.attachmentName}
-                </div>
-              )}
-            </div>
           </div>
         </div>
 

@@ -1,5 +1,7 @@
+
 'use client';
 
+<<<<<<< HEAD
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -8,14 +10,23 @@ import { format } from 'date-fns';
 import { FileTextIcon, UserCircle, KeyRound, Mail, CalendarDays, FlaskConical, Building, Landmark, Phone, ExternalLink, GraduationCap, User, Info, Eye, Sparkles, Star, Award, Clock, BookOpen, Zap, Heart, ArrowRight, CheckCircle, XCircle } from "lucide-react";
 import { SubmissionActions } from "@/app/admin/dashboard/components/SubmissionActions";
 import { useState } from "react";
+=======
+// This component is now largely a wrapper around OffCampusSubmissionCard as their structure is identical.
+// If specific on-campus features are needed, they can be added here.
+// For now, it re-uses the more detailed card for consistency.
+
+import { OffCampusSubmissionCard } from './OffCampusSubmissionCard';
+import { Submission } from "@/types/Submission";
+>>>>>>> beb9523e675e3445f808db4c0308240e0955707d
 
 interface OnCampusSubmissionCardProps {
   submission: Submission;
   processingAction: { id: string; type: 'accept' | 'reject' } | null;
-  onProcessAction: (id: string, action: 'accept' | 'reject', name: string, email: string) => void;
+  onProcessAction: (id: string, action: 'accept' | 'reject', name: string, email: string, campusStatus: Submission['campusStatus']) => void;
   onViewDetails: (submission: Submission) => void;
 }
 
+<<<<<<< HEAD
 const formatDate = (date: Date | string | undefined) => {
   if (!date) return 'N/A';
   try {
@@ -152,3 +163,8 @@ export function OnCampusSubmissionCard({
     </div>
   );
 } 
+=======
+export function OnCampusSubmissionCard(props: OnCampusSubmissionCardProps) {
+  return <OffCampusSubmissionCard {...props} />;
+}
+>>>>>>> beb9523e675e3445f808db4c0308240e0955707d

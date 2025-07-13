@@ -17,7 +17,6 @@ import {
 } from 'firebase/firestore';
 import { revalidatePath } from 'next/cache';
 import { Resend } from 'resend';
-import { createEmailToken, verifyEmailToken, markTokenAsUsed } from '@/lib/email-tokens';
 import type { 
   MentorRequest, 
   MentorRequestFormData, 
@@ -25,6 +24,7 @@ import type {
   MentorDecisionAction,
   NotificationData
 } from '@/types/mentor-request';
+import { getUserData } from './user-actions';
 
 // Validation schemas
 const mentorRequestSchema = z.object({
@@ -170,250 +170,6 @@ async function getUserProfileDetails(userId: string): Promise<{
   }
 }
 
-// Helper function to create HTML email template for mentor notification
-function createMentorNotificationHTML(
-  mentorName: string,
-  userDetails: any,
-  requestMessage: string,
-  acceptToken: string,
-  rejectToken: string,
-  reviewToken: string,
-  appUrl: string
-): string {
-  const acceptUrl = `${appUrl}/mentor/requests?token=${acceptToken}`;
-  const rejectUrl = `${appUrl}/mentor/requests?token=${rejectToken}`;
-  const reviewUrl = `${appUrl}/mentor/requests?token=${reviewToken}`;
-
-  return `
-    <!DOCTYPE html>
-    <html lang="en">
-    <head>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>New Mentorship Request</title>
-        <style>
-            body {
-                font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-                line-height: 1.6;
-                color: #333;
-                max-width: 600px;
-                margin: 0 auto;
-                padding: 20px;
-                background-color: #f8f9fa;
-            }
-            .container {
-                background: white;
-                border-radius: 10px;
-                padding: 30px;
-                box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-            }
-            .header {
-                text-align: center;
-                border-bottom: 2px solid #e9ecef;
-                padding-bottom: 20px;
-                margin-bottom: 30px;
-            }
-            .logo {
-                font-size: 24px;
-                font-weight: bold;
-                color: #6366f1;
-                margin-bottom: 10px;
-            }
-            .student-card {
-                background: #f8f9ff;
-                border: 1px solid #e0e7ff;
-                border-radius: 8px;
-                padding: 20px;
-                margin: 20px 0;
-            }
-            .student-name {
-                font-size: 20px;
-                font-weight: bold;
-                color: #4f46e5;
-                margin-bottom: 10px;
-            }
-            .detail-row {
-                display: flex;
-                margin-bottom: 8px;
-                align-items: center;
-            }
-            .detail-label {
-                font-weight: 600;
-                color: #6b7280;
-                min-width: 120px;
-            }
-            .detail-value {
-                color: #374151;
-            }
-            .message-section {
-                background: #fef3c7;
-                border-left: 4px solid #f59e0b;
-                padding: 15px;
-                margin: 20px 0;
-                border-radius: 0 8px 8px 0;
-            }
-            .actions {
-                text-align: center;
-                margin: 30px 0;
-            }
-            .btn {
-                display: inline-block;
-                padding: 12px 30px;
-                margin: 0 10px;
-                border-radius: 6px;
-                text-decoration: none;
-                font-weight: 600;
-                font-size: 16px;
-                transition: all 0.3s ease;
-            }
-            .btn-accept {
-                background: #10b981;
-                color: white;
-            }
-            .btn-accept:hover {
-                background: #059669;
-            }
-            .btn-reject {
-                background: #ef4444;
-                color: white;
-            }
-            .btn-reject:hover {
-                background: #dc2626;
-            }
-            .btn-review {
-                background: #6366f1;
-                color: white;
-                margin-top: 15px;
-                display: block;
-            }
-            .btn-review:hover {
-                background: #4f46e5;
-            }
-            .footer {
-                text-align: center;
-                margin-top: 30px;
-                padding-top: 20px;
-                border-top: 1px solid #e9ecef;
-                color: #6b7280;
-                font-size: 14px;
-            }
-            .skills-list {
-                display: flex;
-                flex-wrap: wrap;
-                gap: 6px;
-                margin-top: 5px;
-            }
-            .skill-tag {
-                background: #ddd6fe;
-                color: #5b21b6;
-                padding: 4px 8px;
-                border-radius: 12px;
-                font-size: 12px;
-                font-weight: 500;
-            }
-        </style>
-    </head>
-    <body>
-        <div class="container">
-            <div class="header">
-                <div class="logo">🚀 TBI Platform</div>
-                <h1>New Mentorship Request</h1>
-                <p>Hello ${mentorName}, you have a new mentorship opportunity!</p>
-            </div>
-
-            <div class="student-card">
-                <div class="student-name">👨‍🎓 ${userDetails.name}</div>
-                
-                <div class="detail-row">
-                    <span class="detail-label">📧 Email:</span>
-                    <span class="detail-value">${userDetails.email}</span>
-                </div>
-                
-                ${userDetails.phone ? `
-                <div class="detail-row">
-                    <span class="detail-label">📱 Phone:</span>
-                    <span class="detail-value">${userDetails.phone}</span>
-                </div>
-                ` : ''}
-                
-                ${userDetails.college ? `
-                <div class="detail-row">
-                    <span class="detail-label">🏫 College:</span>
-                    <span class="detail-value">${userDetails.college}</span>
-                </div>
-                ` : ''}
-                
-                ${userDetails.course ? `
-                <div class="detail-row">
-                    <span class="detail-label">📚 Course:</span>
-                    <span class="detail-value">${userDetails.course}</span>
-                </div>
-                ` : ''}
-                
-                ${userDetails.yearOfStudy ? `
-                <div class="detail-row">
-                    <span class="detail-label">📅 Year:</span>
-                    <span class="detail-value">${userDetails.yearOfStudy}</span>
-                </div>
-                ` : ''}
-                
-                ${userDetails.linkedinUrl ? `
-                <div class="detail-row">
-                    <span class="detail-label">💼 LinkedIn:</span>
-                    <span class="detail-value"><a href="${userDetails.linkedinUrl}" style="color: #0066cc;">${userDetails.linkedinUrl}</a></span>
-                </div>
-                ` : ''}
-                
-                ${userDetails.portfolioUrl ? `
-                <div class="detail-row">
-                    <span class="detail-label">🌐 Portfolio:</span>
-                    <span class="detail-value"><a href="${userDetails.portfolioUrl}" style="color: #0066cc;">${userDetails.portfolioUrl}</a></span>
-                </div>
-                ` : ''}
-                
-                ${userDetails.skills && userDetails.skills.length > 0 ? `
-                <div class="detail-row" style="align-items: flex-start;">
-                    <span class="detail-label">💡 Skills:</span>
-                    <div class="skills-list">
-                        ${userDetails.skills.map((skill: string) => `<span class="skill-tag">${skill}</span>`).join('')}
-                    </div>
-                </div>
-                ` : ''}
-                
-                ${userDetails.bio ? `
-                <div style="margin-top: 15px;">
-                    <div class="detail-label" style="margin-bottom: 8px;">📖 About:</div>
-                    <div style="background: white; padding: 12px; border-radius: 6px; border: 1px solid #e5e7eb;">
-                        ${userDetails.bio}
-                    </div>
-                </div>
-                ` : ''}
-            </div>
-
-            <div class="message-section">
-                <strong>💬 Student's Message:</strong>
-                <p style="margin: 10px 0 0 0; font-style: italic;">"${requestMessage}"</p>
-            </div>
-
-            <div class="actions">
-                <p><strong>What would you like to do?</strong></p>
-                <a href="${acceptUrl}" class="btn btn-accept">✅ Accept Request</a>
-                <a href="${rejectUrl}" class="btn btn-reject">❌ Decline Request</a>
-                <br>
-                <a href="${reviewUrl}" class="btn btn-review">📝 Review & Respond</a>
-            </div>
-
-            <div class="footer">
-                <p>This request has been reviewed and approved by our admin team.</p>
-                <p>If you have any questions, please contact us at support@tbi.com</p>
-                <p>© 2025 TBI Platform - Connecting Mentors with Future Innovators</p>
-            </div>
-        </div>
-    </body>
-    </html>
-  `;
-}
-
 // 1. User submits mentor request
 export async function submitMentorRequest(
   userId: string,
@@ -528,18 +284,7 @@ export async function processAdminMentorRequest(
 
     if (action.action === 'reject') {
       // Send rejection email to user
-      const rejectionEmailBody = `Dear ${requestData.userName},
-
-Thank you for your interest in connecting with ${requestData.mentorName} through our TBI platform.
-
-After careful review, we regret to inform you that your mentor request cannot be approved at this time.
-
-${action.notes ? `Reason: ${action.notes}` : ''}
-
-We encourage you to explore other mentors available on our platform who might be a better fit for your current needs.
-
-Best regards,
-The TBI Team`;
+      const rejectionEmailBody = `Dear ${requestData.userName},\n\nThank you for your interest in connecting with ${requestData.mentorName} through our TBI platform.\n\nAfter careful review, we regret to inform you that your mentor request cannot be approved at this time.\n\n${action.notes ? `Reason: ${action.notes}` : ''}\n\nWe encourage you to explore other mentors available on our platform who might be a better fit for your current needs.\n\nBest regards,\nThe TBI Team`;
 
       await sendEmailNotification(
         requestData.userEmail,
@@ -559,63 +304,26 @@ The TBI Team`;
         read: false,
       });
 
-    } else {
-      // Get detailed user profile information
-      const userProfile = await getUserProfileDetails(requestData.userId);
-      const userDetails = userProfile || {
-        name: requestData.userName,
-        email: requestData.userEmail,
-      };
+    } else { // Admin approves and notifies mentor
+      const userDetails = await getUserProfileDetails(requestData.userId);
 
-      // Generate secure email tokens for mentor actions
-      const approveToken = await createEmailToken(action.requestId, requestData.mentorEmail, 'approve');
-      const rejectToken = await createEmailToken(action.requestId, requestData.mentorEmail, 'reject');
-      const reviewToken = await createEmailToken(action.requestId, requestData.mentorEmail);
+      const loginUrl = `${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:9002'}/login`;
+      const requestUrl = `${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:9002'}/mentor/requests`;
 
-      // Send approval email to mentor with detailed HTML template
-      const textEmailBody = `Dear ${requestData.mentorName},
+      const textEmailBody = `Dear ${requestData.mentorName},\n\nYou have a new mentorship request from ${userDetails?.name || requestData.userName}.\n\nPlease log in to your TBI Mentor Dashboard to review the request and respond:\n${requestUrl}\n\nIf you are not logged in, please go to: ${loginUrl}\n\nThank you for your guidance and support.\n\nBest regards,\nThe TBI Team`;
 
-You have received a new mentorship request through the TBI platform.
-
-Student Details:
-- Name: ${userDetails.name}
-- Email: ${userDetails.email}
-${userDetails.phone ? `- Phone: ${userDetails.phone}` : ''}
-${userDetails.college ? `- College: ${userDetails.college}` : ''}
-${userDetails.course ? `- Course: ${userDetails.course}` : ''}
-${userDetails.yearOfStudy ? `- Year of Study: ${userDetails.yearOfStudy}` : ''}
-${userDetails.linkedinUrl ? `- LinkedIn: ${userDetails.linkedinUrl}` : ''}
-${userDetails.portfolioUrl ? `- Portfolio: ${userDetails.portfolioUrl}` : ''}
-
-Student's Message: ${requestData.requestMessage}
-
-${userDetails.bio ? `About the Student: ${userDetails.bio}` : ''}
-
-This request has been reviewed and approved by our admin team. You can now choose to accept or decline this mentorship opportunity.
-
-Quick Actions:
-- Accept: ${process.env.NEXT_PUBLIC_APP_URL}/mentor/requests?token=${approveToken}&action=approve
-- Decline: ${process.env.NEXT_PUBLIC_APP_URL}/mentor/requests?token=${rejectToken}&action=reject
-- Review & Respond: ${process.env.NEXT_PUBLIC_APP_URL}/mentor/requests?token=${reviewToken}
-
-If you accept, we will connect you directly with the student. If you decline, the student will be notified to explore other mentorship options.
-
-Best regards,
-The TBI Team`;
-
-      const htmlEmailBody = createMentorNotificationHTML(
-        requestData.mentorName,
-        userDetails,
-        requestData.requestMessage || '',
-        approveToken,
-        rejectToken,
-        reviewToken,
-        process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'
-      );
+      const htmlEmailBody = `
+        <p>Dear ${requestData.mentorName},</p>
+        <p>You have a new mentorship request from <strong>${userDetails?.name || requestData.userName}</strong>.</p>
+        <p>Please log in to your TBI Mentor Dashboard to review the full request and respond.</p>
+        <a href="${requestUrl}">Click here to view your requests</a>
+        <p>Thank you for your guidance and support.</p>
+        <p>Best regards,<br>The TBI Team</p>
+      `;
 
       await sendEmailNotification(
         requestData.mentorEmail,
-        "🎓 New Mentorship Request - Action Required",
+        "🎓 You Have a New Mentorship Request",
         textEmailBody,
         htmlEmailBody
       );
@@ -626,8 +334,8 @@ The TBI Team`;
     return { 
       success: true, 
       message: action.action === 'approve' 
-        ? "Request approved and forwarded to mentor" 
-        : "Request rejected and user notified" 
+        ? "Request approved and mentor has been notified." 
+        : "Request rejected and user notified." 
     };
 
   } catch (error: any) {
@@ -638,16 +346,15 @@ The TBI Team`;
 
 // 3. Mentor makes final decision
 export async function processMentorDecision(
-  action: MentorDecisionAction
+  action: MentorDecisionAction,
+  mentorEmail: string // Added for security
 ): Promise<{ success: boolean; message: string }> {
   try {
-    // Validate action data
     const validatedAction = mentorDecisionSchema.safeParse(action);
     if (!validatedAction.success) {
       return { success: false, message: "Invalid action data" };
     }
 
-    // Get the request
     const requestDoc = await getDoc(doc(db, 'mentorRequests', action.requestId));
     if (!requestDoc.exists()) {
       return { success: false, message: "Request not found" };
@@ -655,13 +362,16 @@ export async function processMentorDecision(
 
     const requestData = requestDoc.data() as MentorRequest;
 
+    if (requestData.mentorEmail !== mentorEmail) {
+      return { success: false, message: "Unauthorized: You are not the assigned mentor for this request." };
+    }
+
     if (requestData.status !== 'admin_approved') {
       return { success: false, message: "Request is not in a state to be processed by mentor" };
     }
 
     const newStatus = action.action === 'approve' ? 'mentor_approved' : 'mentor_rejected';
 
-    // Update request status
     await updateDoc(doc(db, 'mentorRequests', action.requestId), {
       status: newStatus,
       mentorNotes: action.notes || '',
@@ -670,79 +380,23 @@ export async function processMentorDecision(
     });
 
     if (action.action === 'approve') {
-      // Send success email to user
-      const successEmailBody = `Dear ${requestData.userName},
-
-Great news! ${requestData.mentorName} has accepted your mentorship request.
-
-You can now reach out to your mentor directly at: ${requestData.mentorEmail}
-
-${action.notes ? `Mentor's message: ${action.notes}` : ''}
-
-We're excited to see your mentorship journey begin!
-
-Best regards,
-The TBI Team`;
-
-      await sendEmailNotification(
-        requestData.userEmail,
-        "Mentorship Request Approved!",
-        successEmailBody
-      );
-
-      // Create notification for user
-      await createNotification({
-        userId: requestData.userId,
-        type: 'mentor_request_approved',
-        title: 'Mentorship Approved!',
-        message: `${requestData.mentorName} has accepted your mentorship request`,
-        mentorId: requestData.mentorId,
-        mentorName: requestData.mentorName,
-        requestId: action.requestId,
-        read: false,
-      });
-
+      const successEmailBody = `Dear ${requestData.userName},\n\nGreat news! ${requestData.mentorName} has accepted your mentorship request.\n\nYou can now reach out to your mentor directly at: ${requestData.mentorEmail}\n\n${action.notes ? `Mentor's message: ${action.notes}` : ''}\n\nWe're excited to see your mentorship journey begin!\n\nBest regards,\nThe TBI Team`;
+      await sendEmailNotification(requestData.userEmail, "Mentorship Request Approved!", successEmailBody);
+      await createNotification({ userId: requestData.userId, type: 'mentor_request_approved', title: 'Mentorship Approved!', message: `${requestData.mentorName} has accepted your mentorship request`, mentorId: requestData.mentorId, mentorName: requestData.mentorName, requestId: action.requestId, read: false });
     } else {
-      // Send rejection email to user
-      const rejectionEmailBody = `Dear ${requestData.userName},
-
-Thank you for your interest in connecting with ${requestData.mentorName}.
-
-After consideration, ${requestData.mentorName} is unable to take on new mentees at this time.
-
-${action.notes ? `Mentor's message: ${action.notes}` : ''}
-
-We encourage you to explore other mentors available on our platform.
-
-Best regards,
-The TBI Team`;
-
-      await sendEmailNotification(
-        requestData.userEmail,
-        "Update on Your Mentorship Request",
-        rejectionEmailBody
-      );
-
-      // Create notification for user
-      await createNotification({
-        userId: requestData.userId,
-        type: 'mentor_request_rejected',
-        title: 'Mentorship Request Update',
-        message: `${requestData.mentorName} was unable to accept your mentorship request`,
-        mentorId: requestData.mentorId,
-        mentorName: requestData.mentorName,
-        requestId: action.requestId,
-        read: false,
-      });
+      const rejectionEmailBody = `Dear ${requestData.userName},\n\nThank you for your interest in connecting with ${requestData.mentorName}.\n\nAfter consideration, ${requestData.mentorName} is unable to take on new mentees at this time.\n\n${action.notes ? `Mentor's message: ${action.notes}` : ''}\n\nWe encourage you to explore other mentors available on our platform.\n\nBest regards,\nThe TBI Team`;
+      await sendEmailNotification(requestData.userEmail, "Update on Your Mentorship Request", rejectionEmailBody);
+      await createNotification({ userId: requestData.userId, type: 'mentor_request_rejected', title: 'Mentorship Request Update', message: `${requestData.mentorName} was unable to accept your mentorship request`, mentorId: requestData.mentorId, mentorName: requestData.mentorName, requestId: action.requestId, read: false });
     }
+
+    revalidatePath('/mentor/requests');
+    revalidatePath(`/mentor/requests/${action.requestId}`);
+    revalidatePath('/user/mentor-requests');
 
     return { 
       success: true, 
-      message: action.action === 'approve' 
-        ? "Mentorship request approved! User has been notified." 
-        : "Mentorship request declined. User has been notified." 
+      message: action.action === 'approve' ? "Mentorship request approved! User has been notified." : "Mentorship request declined. User has been notified." 
     };
-
   } catch (error: any) {
     console.error("Error processing mentor decision:", error);
     return { success: false, message: "Failed to process mentor decision" };
@@ -765,12 +419,10 @@ export async function getAdminMentorRequests(): Promise<MentorRequest[]> {
       requests.push({
         id: doc.id,
         ...data,
-        // Convert Firestore Timestamps to Date objects for Next.js compatibility
         createdAt: data.createdAt?.toDate() || new Date(),
         updatedAt: data.updatedAt?.toDate() || new Date(),
         adminProcessedAt: data.adminProcessedAt?.toDate() || undefined,
         mentorProcessedAt: data.mentorProcessedAt?.toDate() || undefined,
-        // Ensure required fields exist with defaults
         status: data.status || 'pending',
         userId: data.userId || '',
         mentorId: data.mentorId || '',
@@ -784,7 +436,6 @@ export async function getAdminMentorRequests(): Promise<MentorRequest[]> {
     return requests;
   } catch (error: any) {
     console.error("Error fetching mentor requests:", error);
-    // Handle specific Firestore errors
     if (error.code === 'permission-denied') {
       console.error("Permission denied: Check Firestore rules for mentorRequests collection");
     } else if (error.code === 'failed-precondition') {
@@ -794,154 +445,32 @@ export async function getAdminMentorRequests(): Promise<MentorRequest[]> {
   }
 }
 
-// Secure mentor decision using email token
-export async function processMentorDecisionWithToken(
-  tokenId: string,
-  action: 'approve' | 'reject',
-  notes?: string
-): Promise<{ success: boolean; message: string; requestId?: string }> {
-  try {
-    // Verify the email token
-    const { valid, token: emailToken, error } = await verifyEmailToken(tokenId);
-    
-    if (!valid || !emailToken) {
-      return { success: false, message: error || 'Invalid or expired token' };
-    }
-
-    // Check if token action matches requested action (if token has specific action)
-    if (emailToken.action && emailToken.action !== action) {
-      return { success: false, message: 'Token action mismatch' };
-    }
-
-    // Get the request
-    const requestDoc = await getDoc(doc(db, 'mentorRequests', emailToken.requestId));
-    if (!requestDoc.exists()) {
-      return { success: false, message: "Request not found" };
-    }
-
-    const requestData = requestDoc.data() as MentorRequest;
-
-    // Verify mentor email matches
-    if (requestData.mentorEmail !== emailToken.mentorEmail) {
-      return { success: false, message: "Token mentor mismatch" };
-    }
-
-    if (requestData.status !== 'admin_approved') {
-      return { success: false, message: "Request is not in a state to be processed by mentor" };
-    }
-
-    const newStatus = action === 'approve' ? 'mentor_approved' : 'mentor_rejected';
-
-    // Mark token as used
-    await markTokenAsUsed(tokenId);
-
-    // Update request status
-    await updateDoc(doc(db, 'mentorRequests', emailToken.requestId), {
-      status: newStatus,
-      mentorNotes: notes || '',
-      mentorProcessedAt: serverTimestamp(),
-      updatedAt: serverTimestamp(),
-    });
-
-    // Create notification for user
-    await createNotification({
-      userId: requestData.userId,
-      type: action === 'approve' ? 'mentor_request_approved' : 'mentor_request_rejected',
-      title: 'Mentor Response Received',
-      message: `${requestData.mentorName} has ${action}d your mentorship request`,
-      mentorId: requestData.mentorId,
-      mentorName: requestData.mentorName,
-      requestId: emailToken.requestId,
-      read: false,
-    });
-
-    // Send email notification to user
-    const userEmailBody = action === 'approve' 
-      ? `Great news! ${requestData.mentorName} has accepted your mentorship request.
-
-We will connect you with your mentor shortly via email. You can also reach out to them directly at: ${requestData.mentorEmail}
-
-${notes ? `Mentor's message: ${notes}` : ''}
-
-Welcome to your mentorship journey!
-
-Best regards,
-The TBI Team`
-      : `Thank you for your interest in connecting with ${requestData.mentorName}.
-
-Unfortunately, they are unable to take on new mentees at this time.
-
-${notes ? `Mentor's message: ${notes}` : ''}
-
-We encourage you to explore other mentors who might be available to guide you on your journey.
-
-Best regards,
-The TBI Team`;
-
-    await sendEmailNotification(
-      requestData.userEmail,
-      action === 'approve' 
-        ? "🎉 Your Mentorship Request has been Accepted!" 
-        : "Update on Your Mentorship Request",
-      userEmailBody
-    );
-
-    revalidatePath('/mentor/requests');
-    revalidatePath('/user/mentor-requests');
-    
-    return { 
-      success: true, 
-      message: action === 'approve' 
-        ? "Mentorship request accepted successfully" 
-        : "Mentorship request declined",
-      requestId: emailToken.requestId
-    };
-
-  } catch (error: any) {
-    console.error("Error processing mentor decision with token:", error);
-    return { success: false, message: "Failed to process decision" };
-  }
-}
-
-// Get mentor request by token (for display purposes)
-export async function getMentorRequestByToken(
-  tokenId: string
+// Get mentor request by ID for a specific mentor
+export async function getMentorRequestForMentor(
+  requestId: string,
+  mentorEmail: string
 ): Promise<{ success: boolean; request?: MentorRequest; userDetails?: any; error?: string }> {
   try {
-    // Verify the email token
-    const { valid, token: emailToken, error } = await verifyEmailToken(tokenId);
+    const requestDoc = await getDoc(doc(db, 'mentorRequests', requestId));
     
-    if (!valid || !emailToken) {
-      return { success: false, error: error || 'Invalid or expired token' };
-    }
-
-    // Get the request
-    const requestDoc = await getDoc(doc(db, 'mentorRequests', emailToken.requestId));
     if (!requestDoc.exists()) {
-      return { success: false, error: "Request not found" };
+      return { success: false, error: "Request not found." };
     }
 
     const data = requestDoc.data();
+    if (data.mentorEmail !== mentorEmail) {
+      return { success: false, error: "You are not authorized to view this request." };
+    }
+
     const requestData = { 
       id: requestDoc.id, 
       ...data,
-      // Convert Firestore Timestamps to Date objects for Next.js compatibility
       createdAt: data.createdAt?.toDate() || new Date(),
       updatedAt: data.updatedAt?.toDate() || new Date(),
-      adminProcessedAt: data.adminProcessedAt?.toDate() || undefined,
-      mentorProcessedAt: data.mentorProcessedAt?.toDate() || undefined,
+      adminProcessedAt: data.adminProcessedAt?.toDate(),
+      mentorProcessedAt: data.mentorProcessedAt?.toDate(),
     } as MentorRequest;
 
-    // Verify mentor email matches
-    if (requestData.mentorEmail !== emailToken.mentorEmail) {
-      return { success: false, error: "Token mentor mismatch" };
-    }
-
-    if (requestData.status !== 'admin_approved') {
-      return { success: false, error: "This request is not available for processing" };
-    }
-
-    // Get detailed user information
     const userProfile = await getUserProfileDetails(requestData.userId);
     
     return { 
@@ -952,12 +481,12 @@ export async function getMentorRequestByToken(
         email: requestData.userEmail,
       }
     };
-
   } catch (error: any) {
-    console.error("Error getting mentor request by token:", error);
-    return { success: false, error: "Failed to load request" };
+    console.error("Error fetching request for mentor:", error);
+    return { success: false, error: "An unexpected error occurred while fetching the request." };
   }
 }
+
 
 // Get mentor requests for a specific user
 export async function getUserMentorRequests(userId: string): Promise<MentorRequest[]> {
@@ -976,12 +505,10 @@ export async function getUserMentorRequests(userId: string): Promise<MentorReque
       requests.push({
         id: doc.id,
         ...data,
-        // Convert Firestore Timestamps to Date objects for Next.js compatibility
         createdAt: data.createdAt?.toDate() || new Date(),
         updatedAt: data.updatedAt?.toDate() || new Date(),
         adminProcessedAt: data.adminProcessedAt?.toDate() || undefined,
         mentorProcessedAt: data.mentorProcessedAt?.toDate() || undefined,
-        // Ensure required fields exist with defaults
         status: data.status || 'pending',
         userId: data.userId || userId,
         mentorId: data.mentorId || '',
@@ -995,12 +522,81 @@ export async function getUserMentorRequests(userId: string): Promise<MentorReque
     return requests;
   } catch (error: any) {
     console.error("Error fetching user mentor requests:", error);
-    // Handle specific Firestore errors
     if (error.code === 'permission-denied') {
       console.error("Permission denied: Check Firestore rules for mentorRequests collection");
     } else if (error.code === 'failed-precondition') {
       console.error("Failed precondition: mentorRequests collection might not exist or index might be missing");
     }
     return [];
+  }
+}
+
+// Get approved mentees for a mentor
+export async function getApprovedMentees(mentorEmail: string): Promise<{ success: boolean; mentees?: MentorRequest[]; error?: string }> {
+  try {
+    const q = query(
+      collection(db, 'mentorRequests'),
+      where('mentorEmail', '==', mentorEmail),
+      where('status', '==', 'mentor_approved'),
+      orderBy('mentorProcessedAt', 'desc')
+    );
+    
+    const querySnapshot = await getDocs(q);
+    const mentees: MentorRequest[] = [];
+    
+    querySnapshot.forEach((doc) => {
+      const data = doc.data();
+      mentees.push({
+        id: doc.id,
+        ...data,
+        createdAt: data.createdAt?.toDate() || new Date(),
+        updatedAt: data.updatedAt?.toDate() || new Date(),
+        adminProcessedAt: data.adminProcessedAt?.toDate(),
+        mentorProcessedAt: data.mentorProcessedAt?.toDate(),
+      } as MentorRequest);
+    });
+    
+    return { success: true, mentees };
+  } catch (error: any) {
+    console.error("Error fetching approved mentees:", error);
+    // Provide a more specific error message for easier debugging
+    let errorMessage = "Failed to fetch mentees.";
+    if (error.code === 'failed-precondition') {
+        errorMessage = "Database query requires a specific index. The link to create it should be in your browser's developer console. You can also deploy it by running 'firebase deploy --only firestore:indexes' in your terminal.";
+    } else if (error.code === 'permission-denied') {
+        errorMessage = "Permission denied. Please check your Firestore security rules for the 'mentorRequests' collection.";
+    }
+    return { success: false, error: errorMessage };
+  }
+}
+
+// Get a specific mentee's profile if the mentor is authorized
+export async function getMenteeProfile(menteeUserId: string, mentorEmail: string): Promise<any> {
+  try {
+    // Security Check: Verify there's an approved mentorship relationship
+    const q = query(
+      collection(db, 'mentorRequests'),
+      where('userId', '==', menteeUserId),
+      where('mentorEmail', '==', mentorEmail),
+      where('status', '==', 'mentor_approved')
+    );
+
+    const snapshot = await getDocs(q);
+    if (snapshot.empty) {
+      return { success: false, message: "Unauthorized: You are not the mentor for this user." };
+    }
+
+    // If authorized, fetch the user's full profile data
+    const userProfileData = await getUserData(menteeUserId);
+
+    if (!userProfileData.success) {
+      return { success: false, message: "Could not retrieve mentee profile." };
+    }
+
+    return userProfileData;
+
+  } catch (error: any) {
+    console.error("Error getting mentee profile:", error);
+    return { success: false, message: "An unexpected error occurred." };
   }
 }
