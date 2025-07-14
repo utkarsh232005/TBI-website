@@ -215,7 +215,25 @@ export default function AdminMentorsPage() {
   async function onSubmit(values: MentorFormValues) {
     setIsSubmitting(true);
     try {
-      const result = await createMentorAction(values);
+      // Pass both admin and mapped mentor profile fields to the action
+      const mentorData = {
+        // Admin fields
+        name: values.name,
+        description: values.description,
+        designation: values.designation,
+        expertise: values.expertise,
+        email: values.email,
+        password: values.password,
+        profilePictureUrl: values.profilePictureUrl || "",
+        linkedinUrl: values.linkedinUrl || "",
+        // Mentor profile fields
+        fullName: values.name,
+        bio: values.description,
+        profilePicture: values.profilePictureUrl || "",
+        linkedin: values.linkedinUrl || "",
+        createdAt: new Date(),
+      };
+      const result = await createMentorAction(mentorData);
       if (result.success) {
         toast({
           title: "Mentor Added",
