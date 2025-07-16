@@ -115,32 +115,32 @@ export default function AdminSettingsPage() {
   };
 
   return (
-    <div className="min-h-screen bg-[#121212] text-[#E0E0E0] p-6">
+    <div className="min-h-screen bg-gray-50 text-gray-900 p-6">
       <motion.div 
-        className="max-w-5xl mx-auto"
+        className="max-w-3xl mx-auto"
         initial="hidden"
         animate="show"
         variants={containerVariants}
       >
         <motion.div variants={itemVariants} className="mb-8">
-          <h1 className="text-3xl font-bold mb-2 flex items-center">
-            <Settings className="mr-3 h-7 w-7 text-[#4F46E5]" />
+          <h1 className="admin-heading-2 mb-2 flex items-center">
+            <Settings className="mr-3 h-7 w-7 text-indigo-600" />
             Settings
           </h1>
-          <p className="text-gray-400">Manage your account settings and preferences</p>
+          <p className="admin-caption">Manage your account settings and preferences</p>
         </motion.div>
 
         <Tabs defaultValue="account" className="w-full">
-          <TabsList className="grid grid-cols-3 mb-8 bg-[#1E1E1E] p-1 rounded-xl">
-            <TabsTrigger value="account" className="data-[state=active]:bg-[#2D2D2D] rounded-lg">
+          <TabsList className="grid grid-cols-3 mb-8 bg-white border border-gray-200 p-1 rounded-xl shadow-sm">
+            <TabsTrigger value="account" className="data-[state=active]:bg-indigo-50 data-[state=active]:text-indigo-700 rounded-lg transition-colors">
               <User className="h-4 w-4 mr-2" />
               Account
             </TabsTrigger>
-            <TabsTrigger value="security" className="data-[state=active]:bg-[#2D2D2D] rounded-lg">
+            <TabsTrigger value="security" className="data-[state=active]:bg-indigo-50 data-[state=active]:text-indigo-700 rounded-lg transition-colors">
               <Lock className="h-4 w-4 mr-2" />
               Security
             </TabsTrigger>
-            <TabsTrigger value="preferences" className="data-[state=active]:bg-[#2D2D2D] rounded-lg">
+            <TabsTrigger value="preferences" className="data-[state=active]:bg-indigo-50 data-[state=active]:text-indigo-700 rounded-lg transition-colors">
               <Cog className="h-4 w-4 mr-2" />
               Preferences
             </TabsTrigger>
@@ -148,23 +148,23 @@ export default function AdminSettingsPage() {
           
           <TabsContent value="security" className="space-y-6">
             <motion.div variants={itemVariants}>
-              <Card className="bg-[#1E1E1E] border-[#333333] shadow-xl rounded-xl overflow-hidden">
-                <CardHeader className="border-b border-[#333333] bg-[#232323]">
-                  <CardTitle className="flex items-center text-2xl">
-                    <ShieldAlert className="mr-3 h-6 w-6 text-[#4F46E5]" />
+              <Card className="bg-white border border-gray-200 shadow-lg rounded-xl overflow-hidden">
+                <CardHeader className="border-b border-gray-100 bg-gray-50">
+                  <CardTitle className="flex items-center admin-heading-3">
+                    <ShieldAlert className="mr-3 h-6 w-6 text-indigo-600" />
                     Admin Credentials
                   </CardTitle>
-                  <CardDescription className="text-gray-400">
+                  <CardDescription className="admin-body-small">
                     Update your administrator email and password.
                   </CardDescription>
                 </CardHeader>
                 <CardContent className="pt-6">
-                  <div className="bg-[#2A2A2A] border-l-4 border-amber-500 p-4 mb-6 rounded-r-lg">
+                  <div className="bg-yellow-50 border-l-4 border-yellow-400 p-4 mb-6 rounded-r-lg">
                     <div className="flex">
-                      <AlertCircle className="h-5 w-5 text-amber-500 mr-2 flex-shrink-0 mt-0.5" />
+                      <AlertCircle className="h-5 w-5 text-yellow-500 mr-2 flex-shrink-0 mt-0.5" />
                       <div>
-                        <p className="text-sm font-semibold text-amber-500">Security Notice</p>
-                        <p className="text-xs text-gray-400 mt-1">
+                        <p className="admin-body-small admin-font-semibold text-yellow-700">Security Notice</p>
+                        <p className="admin-caption text-yellow-700/80 mt-1">
                           Passwords are currently stored in plaintext in Firestore for this demonstration. 
                           This is highly insecure for production environments.
                         </p>
@@ -179,21 +179,21 @@ export default function AdminSettingsPage() {
                         name="newEmail"
                         render={({ field }) => (
                           <FormItem>
-                            <FormLabel className="text-gray-300">New Admin Email</FormLabel>
+                            <FormLabel className="text-gray-700">New Admin Email</FormLabel>
                             <FormControl>
                               <div className="relative">
-                                <Mail className="absolute left-3 top-3 h-4 w-4 text-gray-500" />
+                                <Mail className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
                                 <Input 
                                   type="email" 
                                   placeholder="admin@example.com" 
                                   {...field} 
                                   disabled={isLoading}
-                                  className="bg-[#262626] border-[#333333] pl-10 focus:border-[#4F46E5] focus:ring-[#4F46E5]/10 rounded-lg"
+                                  className="bg-gray-50 border border-gray-200 pl-10 focus:border-indigo-500 focus:ring-indigo-100 rounded-lg transition-all"
                                   suppressHydrationWarning
                                 />
                               </div>
                             </FormControl>
-                            <FormMessage className="text-red-400" />
+                            <FormMessage className="text-red-500" />
                           </FormItem>
                         )}
                       />
@@ -202,21 +202,21 @@ export default function AdminSettingsPage() {
                         name="newPassword"
                         render={({ field }) => (
                           <FormItem>
-                            <FormLabel className="text-gray-300">New Password</FormLabel>
+                            <FormLabel className="text-gray-700">New Password</FormLabel>
                             <FormControl>
                               <div className="relative">
-                                <Lock className="absolute left-3 top-3 h-4 w-4 text-gray-500" />
+                                <Lock className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
                                 <Input 
                                   type="password" 
                                   placeholder="••••••••" 
                                   {...field} 
                                   disabled={isLoading}
-                                  className="bg-[#262626] border-[#333333] pl-10 focus:border-[#4F46E5] focus:ring-[#4F46E5]/10 rounded-lg"
+                                  className="bg-gray-50 border border-gray-200 pl-10 focus:border-indigo-500 focus:ring-indigo-100 rounded-lg transition-all"
                                   suppressHydrationWarning
                                 />
                               </div>
                             </FormControl>
-                            <FormMessage className="text-red-400" />
+                            <FormMessage className="text-red-500" />
                           </FormItem>
                         )}
                       />
@@ -225,21 +225,21 @@ export default function AdminSettingsPage() {
                         name="confirmPassword"
                         render={({ field }) => (
                           <FormItem>
-                            <FormLabel className="text-gray-300">Confirm New Password</FormLabel>
+                            <FormLabel className="text-gray-700">Confirm New Password</FormLabel>
                             <FormControl>
                               <div className="relative">
-                                <Lock className="absolute left-3 top-3 h-4 w-4 text-gray-500" />
+                                <Lock className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
                                 <Input 
                                   type="password" 
                                   placeholder="••••••••" 
                                   {...field} 
                                   disabled={isLoading}
-                                  className="bg-[#262626] border-[#333333] pl-10 focus:border-[#4F46E5] focus:ring-[#4F46E5]/10 rounded-lg"
+                                  className="bg-gray-50 border border-gray-200 pl-10 focus:border-indigo-500 focus:ring-indigo-100 rounded-lg transition-all"
                                   suppressHydrationWarning
                                 />
                               </div>
                             </FormControl>
-                            <FormMessage className="text-red-400" />
+                            <FormMessage className="text-red-500" />
                           </FormItem>
                         )}
                       />
@@ -247,7 +247,7 @@ export default function AdminSettingsPage() {
                         <Button 
                           type="submit" 
                           disabled={isLoading} 
-                          className="bg-[#4F46E5] hover:bg-[#4338CA] text-white rounded-lg"
+                          className="bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg shadow-sm px-6 py-2 font-medium transition-all"
                           suppressHydrationWarning
                         >
                           {isLoading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Save className="mr-2 h-4 w-4" />}
@@ -260,49 +260,49 @@ export default function AdminSettingsPage() {
               </Card>
             </motion.div>
             
-            <motion.p variants={itemVariants} className="text-sm text-gray-400 flex items-center">
-              <Info className="h-4 w-4 mr-2 text-gray-500" />
+            <motion.p variants={itemVariants} className="text-sm text-gray-500 flex items-center">
+              <Info className="h-4 w-4 mr-2 text-gray-400" />
               Remember to use strong, unique passwords. After updating, you will need to use the new credentials to log in.
             </motion.p>
           </TabsContent>
           
           <TabsContent value="account" className="space-y-6">
             <motion.div variants={itemVariants}>
-              <Card className="bg-[#1E1E1E] border-[#333333] shadow-xl rounded-xl">
-                <CardHeader className="border-b border-[#333333] bg-[#232323]">
+              <Card className="bg-white border border-gray-200 shadow-lg rounded-xl">
+                <CardHeader className="border-b border-gray-100 bg-gray-50">
                   <CardTitle className="flex items-center">
-                    <User className="mr-3 h-5 w-5 text-[#4F46E5]" />
+                    <User className="mr-3 h-5 w-5 text-indigo-600" />
                     Profile Information
                   </CardTitle>
-                  <CardDescription className="text-gray-400">
+                  <CardDescription className="text-gray-500">
                     Update your personal profile details
                   </CardDescription>
                 </CardHeader>
                 <CardContent className="pt-6">
                   <div className="space-y-4">
                     <div className="space-y-2">
-                      <label className="text-gray-300 text-sm font-medium">Name</label>
+                      <label className="text-gray-700 text-sm font-medium">Name</label>
                       <div className="relative">
-                        <User className="absolute left-3 top-3 h-4 w-4 text-gray-500" />
+                        <User className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
                         <Input 
                           placeholder="Your name" 
-                          className="bg-[#262626] border-[#333333] pl-10 focus:border-[#4F46E5] focus:ring-[#4F46E5]/10 rounded-lg"
+                          className="bg-gray-50 border border-gray-200 pl-10 focus:border-indigo-500 focus:ring-indigo-100 rounded-lg transition-all"
                           suppressHydrationWarning
                         />
                       </div>
                     </div>
                     <div className="space-y-2">
-                      <label className="text-gray-300 text-sm font-medium">Bio</label>
+                      <label className="text-gray-700 text-sm font-medium">Bio</label>
                       <Textarea 
                         placeholder="Write a short bio about yourself" 
-                        className="bg-[#262626] border-[#333333] focus:border-[#4F46E5] focus:ring-[#4F46E5]/10 resize-none h-24 rounded-lg"
+                        className="bg-gray-50 border border-gray-200 focus:border-indigo-500 focus:ring-indigo-100 resize-none h-24 rounded-lg transition-all"
                         suppressHydrationWarning
                       />
                     </div>
                   </div>
                 </CardContent>
-                <CardFooter className="flex justify-end border-t border-[#333333] bg-[#232323]">
-                  <Button className="bg-[#4F46E5] hover:bg-[#4338CA] text-white rounded-lg" suppressHydrationWarning>
+                <CardFooter className="flex justify-end border-t border-gray-100 bg-gray-50">
+                  <Button className="bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg shadow-sm px-6 py-2 font-medium transition-all" suppressHydrationWarning>
                     <Save className="mr-2 h-4 w-4" />
                     Save Changes
                   </Button>
@@ -313,13 +313,13 @@ export default function AdminSettingsPage() {
           
           <TabsContent value="preferences" className="space-y-6">
             <motion.div variants={itemVariants}>
-              <Card className="bg-[#1E1E1E] border-[#333333] shadow-xl rounded-xl">
-                <CardHeader className="border-b border-[#333333] bg-[#232323]">
+              <Card className="bg-white border border-gray-200 shadow-lg rounded-xl">
+                <CardHeader className="border-b border-gray-100 bg-gray-50">
                   <CardTitle className="flex items-center">
-                    <Paintbrush className="mr-3 h-5 w-5 text-[#4F46E5]" />
+                    <Paintbrush className="mr-3 h-5 w-5 text-indigo-600" />
                     Interface Settings
                   </CardTitle>
-                  <CardDescription className="text-gray-400">
+                  <CardDescription className="text-gray-500">
                     Customize your interface appearance
                   </CardDescription>
                 </CardHeader>
@@ -327,39 +327,39 @@ export default function AdminSettingsPage() {
                   <div className="space-y-6">
                     <div className="flex items-center justify-between">
                       <div>
-                        <p className="font-medium text-gray-200">Dark Mode</p>
+                        <p className="font-medium text-gray-700">Dark Mode</p>
                         <p className="text-sm text-gray-400">Toggle dark mode on or off</p>
                       </div>
                       <button 
                         type="button" 
-                        className="h-6 w-11 bg-[#4F46E5] rounded-full relative"
+                        className="h-6 w-11 bg-indigo-100 rounded-full relative border border-indigo-200 transition-all"
                         aria-label="Toggle dark mode"
                         suppressHydrationWarning
                       >
-                        <span className="h-5 w-5 bg-white rounded-full absolute top-0.5 right-0.5 transition-all duration-200"></span>
+                        <span className="h-5 w-5 bg-white rounded-full absolute top-0.5 right-0.5 shadow transition-all duration-200"></span>
                       </button>
                     </div>
                     
                     <div className="flex items-center justify-between">
                       <div>
-                        <p className="font-medium text-gray-200">Notifications</p>
+                        <p className="font-medium text-gray-700">Notifications</p>
                         <p className="text-sm text-gray-400">Receive email notifications</p>
                       </div>
                       <button 
                         type="button" 
-                        className="h-6 w-11 bg-[#333333] rounded-full relative"
+                        className="h-6 w-11 bg-gray-200 rounded-full relative border border-gray-300 transition-all"
                         aria-label="Toggle notifications"
                         suppressHydrationWarning
                       >
-                        <span className="h-5 w-5 bg-white rounded-full absolute top-0.5 left-0.5 transition-all duration-200"></span>
+                        <span className="h-5 w-5 bg-white rounded-full absolute top-0.5 left-0.5 shadow transition-all duration-200"></span>
                       </button>
                     </div>
                     
                     <div className="space-y-2">
-                      <label className="font-medium text-gray-200 block">Language</label>
+                      <label className="font-medium text-gray-700 block">Language</label>
                       <div className="relative">
-                        <Globe className="absolute left-3 top-3 h-4 w-4 text-gray-500" />
-                        <select className="w-full bg-[#262626] border-[#333333] text-gray-300 rounded-lg h-10 pl-10 pr-3 appearance-none" suppressHydrationWarning>
+                        <Globe className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
+                        <select className="w-full bg-gray-50 border border-gray-200 text-gray-700 rounded-lg h-10 pl-10 pr-3 appearance-none focus:border-indigo-500 focus:ring-indigo-100 transition-all" suppressHydrationWarning>
                           <option>English (US)</option>
                           <option>Hindi</option>
                           <option>French</option>
@@ -369,8 +369,8 @@ export default function AdminSettingsPage() {
                     </div>
                   </div>
                 </CardContent>
-                <CardFooter className="flex justify-end border-t border-[#333333] bg-[#232323]">
-                  <Button className="bg-[#4F46E5] hover:bg-[#4338CA] text-white rounded-lg" suppressHydrationWarning>
+                <CardFooter className="flex justify-end border-t border-gray-100 bg-gray-50">
+                  <Button className="bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg shadow-sm px-6 py-2 font-medium transition-all" suppressHydrationWarning>
                     <Save className="mr-2 h-4 w-4" />
                     Save Preferences
                   </Button>

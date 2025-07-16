@@ -23,8 +23,8 @@ export function SubmissionActions({
 }: SubmissionActionsProps) {
   if (status !== 'pending') {
     return (
-      <div className="flex items-center text-xs text-neutral-500">
-        <CheckCircle className="h-3.5 w-3.5 mr-1.5" />
+      <div className="flex items-center text-xs text-gray-500 bg-gray-50 px-3 py-1.5 rounded-xl border border-gray-100">
+        <CheckCircle className="h-3.5 w-3.5 mr-2 text-green-500" />
         Processed
       </div>
     );
@@ -41,20 +41,20 @@ export function SubmissionActions({
         size="sm"
         onClick={onAccept}
         disabled={isProcessing}
-        className={`h-8 px-3 text-xs font-medium rounded-md ${
+        className={`inline-flex items-center justify-center gap-1 whitespace-nowrap rounded-xl text-xs font-medium transition-all duration-200 border h-8 px-3 shadow-sm ${
           isAccepting
-            ? 'bg-teal-500/20 border-teal-500/30 text-teal-300 cursor-not-allowed'
-            : 'bg-teal-500/10 border-teal-500/20 text-teal-400 hover:bg-teal-500/20'
+            ? 'bg-green-50 border-green-200 text-green-500 cursor-not-allowed opacity-80'
+            : 'bg-white border-green-200 text-green-600 hover:bg-green-50 hover:shadow-md hover:border-green-300'
         }`}
       >
         {isAccepting ? (
           <>
-            <Loader2 className="h-3.5 w-3.5 animate-spin mr-1.5" />
+            <Loader2 className="h-3.5 w-3.5 animate-spin mr-1" />
             Accepting...
           </>
         ) : (
           <>
-            <ThumbsUp className="h-3.5 w-3.5 mr-1.5" />
+            <ThumbsUp className="h-3.5 w-3.5 mr-1" />
             Accept
           </>
         )}
@@ -64,20 +64,20 @@ export function SubmissionActions({
         size="sm"
         onClick={onReject}
         disabled={isProcessing}
-        className={`h-8 px-3 text-xs font-medium rounded-md ${
+        className={`inline-flex items-center justify-center gap-1 whitespace-nowrap rounded-xl text-xs font-medium transition-all duration-200 border h-8 px-3 shadow-sm ${
           isRejecting
-            ? 'bg-rose-500/20 border-rose-500/30 text-rose-300 cursor-not-allowed'
-            : 'bg-rose-500/10 border-rose-500/20 text-rose-400 hover:bg-rose-500/20'
+            ? 'bg-red-50 border-red-200 text-red-500 cursor-not-allowed opacity-80'
+            : 'bg-white border-red-200 text-red-600 hover:bg-red-50 hover:shadow-md hover:border-red-300'
         }`}
       >
         {isRejecting ? (
           <>
-            <Loader2 className="h-3.5 w-3.5 animate-spin mr-1.5" />
+            <Loader2 className="h-3.5 w-3.5 animate-spin mr-1" />
             Rejecting...
           </>
         ) : (
           <>
-            <ThumbsDown className="h-3.5 w-3.5 mr-1.5" />
+            <ThumbsDown className="h-3.5 w-3.5 mr-1" />
             Reject
           </>
         )}
