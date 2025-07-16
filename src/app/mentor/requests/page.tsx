@@ -29,12 +29,12 @@ import { useUser } from '@/contexts/user-context';
 import Link from 'next/link';
 import { cn } from '@/lib/utils';
 
-const statusConfig: { [key: string]: { label: string; color: string; icon: React.ReactNode } } = {
-  pending: { label: 'Under Review', color: 'bg-gray-100 text-gray-800 border-gray-200', icon: <Clock /> },
-  admin_approved: { label: 'Awaiting Your Response', color: 'bg-blue-100 text-blue-800 border-blue-200', icon: <ArrowRight /> },
-  admin_rejected: { label: 'Not Approved by Admin', color: 'bg-red-100 text-red-800 border-red-200', icon: <XCircle /> },
-  mentor_approved: { label: 'Approved', color: 'bg-green-100 text-green-800 border-green-200', icon: <CheckCircle /> },
-  mentor_rejected: { label: 'Declined by You', color: 'bg-gray-100 text-gray-800 border-gray-200', icon: <XCircle /> },
+const statusConfig: { [key: string]: { label: string; color: string; icon: React.ReactElement } } = {
+  pending: { label: 'Under Review', color: 'bg-gray-100 text-gray-800 border-gray-200', icon: <Clock className="h-3 w-3" /> },
+  admin_approved: { label: 'Awaiting Your Response', color: 'bg-blue-100 text-blue-800 border-blue-200', icon: <ArrowRight className="h-3 w-3" /> },
+  admin_rejected: { label: 'Not Approved by Admin', color: 'bg-red-100 text-red-800 border-red-200', icon: <XCircle className="h-3 w-3" /> },
+  mentor_approved: { label: 'Approved', color: 'bg-green-100 text-green-800 border-green-200', icon: <CheckCircle className="h-3 w-3" /> },
+  mentor_rejected: { label: 'Declined by You', color: 'bg-gray-100 text-gray-800 border-gray-200', icon: <XCircle className="h-3 w-3" /> },
 };
 
 export default function MentorRequestsPage() {
@@ -52,10 +52,10 @@ export default function MentorRequestsPage() {
 
     setIsLoading(true);
     try {
+      // Temporary: Remove orderBy while index is building
       const q = query(
         collection(db, 'mentorRequests'),
-        where('mentorEmail', '==', user.email),
-        orderBy('createdAt', 'desc')
+        where('mentorEmail', '==', user.email)
       );
       
       const querySnapshot = await getDocs(q);
@@ -67,6 +67,14 @@ export default function MentorRequestsPage() {
           createdAt: data.createdAt?.toDate() || new Date(),
           updatedAt: data.updatedAt?.toDate() || new Date(),
         } as MentorRequest;
+      });
+      
+      // Sort manually since we removed orderBy
+      mentorRequests.sort((a, b) => {
+        // Since we already converted to Date objects above, we can directly compare
+        const aTime = a.createdAt ? new Date(a.createdAt).getTime() : 0;
+        const bTime = b.createdAt ? new Date(b.createdAt).getTime() : 0;
+        return bTime - aTime;
       });
       
       setRequests(mentorRequests);
@@ -142,8 +150,8 @@ export default function MentorRequestsPage() {
                         </div>
                       </div>
                       <div className="text-right flex-shrink-0">
-                        <Badge className={cn("mb-2 text-xs border", statusInfo.color)}>
-                            {React.cloneElement(statusInfo.icon, { className: "h-3 w-3 mr-1.5" })}
+                        <Badge className={cn("mb-2 text-xs border flex items-center", statusInfo.color)}>
+                            <span className="mr-1.5">{statusInfo.icon}</span>
                             {statusInfo.label}
                         </Badge>
                         <p className="text-xs text-gray-500 flex items-center justify-end mt-1">

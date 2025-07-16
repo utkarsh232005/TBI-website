@@ -52,10 +52,10 @@ export default function MentorDashboardPage() {
     
     try {
       setIsLoading(true);
+      // Temporary: Remove orderBy while index is building
       const q = query(
         collection(db, 'mentorRequests'),
-        where('mentorEmail', '==', user.email),
-        orderBy('createdAt', 'desc')
+        where('mentorEmail', '==', user.email)
       );
       
       const querySnapshot = await getDocs(q);
@@ -67,6 +67,13 @@ export default function MentorDashboardPage() {
           createdAt: data.createdAt?.toDate() || new Date(),
           updatedAt: data.updatedAt?.toDate() || new Date(),
         } as MentorRequest;
+      });
+      
+      // Sort manually since we removed orderBy
+      mentorRequests.sort((a, b) => {
+        const aTime = a.createdAt ? new Date(a.createdAt).getTime() : 0;
+        const bTime = b.createdAt ? new Date(b.createdAt).getTime() : 0;
+        return bTime - aTime;
       });
       
       setRequests(mentorRequests);

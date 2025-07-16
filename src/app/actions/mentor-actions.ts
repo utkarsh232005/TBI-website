@@ -1,10 +1,9 @@
-
 // src/app/actions/mentor-actions.ts
 'use server';
 
 import { z } from 'zod';
 import { db, auth } from '@/lib/firebase';
-import { collection, serverTimestamp, doc, setDoc } from 'firebase/firestore';
+import { collection, serverTimestamp, doc, setDoc, deleteDoc } from 'firebase/firestore';
 import { revalidatePath } from 'next/cache';
 import { createUserWithEmailAndPassword } from 'firebase/auth';
 import { Resend } from 'resend';
@@ -96,34 +95,49 @@ export async function createMentorAction(values: MentorFormValues): Promise<Crea
     const userCredential = await createUserWithEmailAndPassword(auth, email, password);
     const firebaseUser = userCredential.user;
     
-    // Data to be stored in 'mentors' collection, now using UID as document ID
+    // Main mentor document with basic info only
     const mentorData = {
       uid: firebaseUser.uid,
       name,
-      designation,
-      expertise,
-      description,
-      profilePictureUrl: profilePictureUrl || `https://placehold.co/100x100/7DF9FF/121212.png?text=${encodeURIComponent(name.substring(0,2))}`,
-      linkedinUrl: linkedinUrl || null,
       email,
+      role: 'mentor',
+      status: 'active',
       createdAt: serverTimestamp(),
       updatedAt: serverTimestamp(),
     };
 
-    // Data for the 'users' collection to handle roles
-    const userData = {
-        uid: firebaseUser.uid,
-        email,
-        name,
-        role: 'mentor',
-        status: 'active',
-        createdAt: serverTimestamp(),
-        updatedAt: serverTimestamp(),
+    // Profile data for subcollection - detailed information
+    const profileData = {
+      // Personal Information
+      name,
+      fullName: name,
+      email,
+      
+      // Professional Details
+      designation,
+      expertise,
+      description,
+      bio: description,
+      
+      // Social & Media Links
+      profilePictureUrl: profilePictureUrl || `https://placehold.co/100x100/7DF9FF/121212.png?text=${encodeURIComponent(name.substring(0,2))}`,
+      profilePicture: profilePictureUrl || `https://placehold.co/100x100/7DF9FF/121212.png?text=${encodeURIComponent(name.substring(0,2))}`,
+      linkedinUrl: linkedinUrl || null,
+      linkedin: linkedinUrl || null,
+      
+      // Metadata
+      createdAt: serverTimestamp(),
+      updatedAt: serverTimestamp(),
+      lastModified: new Date().toISOString(),
+      profileVersion: "2.0",
+      isActive: true,
     };
 
-    // Use setDoc to specify the document ID as the user's UID
+    // Create mentor document and profile subcollection
     await setDoc(doc(db, "mentors", firebaseUser.uid), mentorData);
-    await setDoc(doc(db, "users", firebaseUser.uid), userData);
+    await setDoc(doc(db, "mentors", firebaseUser.uid, "profile", "details"), profileData);
+    
+    // Note: No longer creating in 'users' collection - mentors are only in 'mentors' collection
     
     // Send welcome email with credentials
     const emailSubject = 'Welcome to the RCOEM-TBI Mentor Panel!';
@@ -150,12 +164,93 @@ export async function createMentorAction(values: MentorFormValues): Promise<Crea
     console.error("Error in createMentorAction: ", error);
     let errorMessage = "Failed to add mentor.";
     if (error.code === 'auth/email-already-in-use') {
-        errorMessage = "This email is already registered. Please use a different email.";
+        errorMessage = "This email is already registered in Firebase Authentication. If you recently deleted a mentor with this email, you need to also delete the Firebase Auth user from the Firebase Console (Authentication > Users) to reuse this email.";
     } else if (error.code === 'permission-denied') {
         errorMessage = "Permission denied. Check Firestore rules for 'mentors' and 'users' collections.";
     } else if (error.message) {
         errorMessage = error.message;
     }
     return { success: false, message: errorMessage };
+  }
+}
+
+// Function to delete a mentor completely (Auth user + Firestore documents)
+export async function deleteMentorAction(mentorId: string, deleteAuthUser: boolean = false): Promise<{ success: boolean; message: string }> {
+  try {
+    // Delete from mentor collection and its subcollections
+    await Promise.all([
+      deleteDoc(doc(db, "mentors", mentorId)),
+      deleteDoc(doc(db, "mentors", mentorId, "profile", "details"))
+      // Note: No longer deleting from 'users' collection since mentors aren't stored there
+    ]);
+    
+    let authUserMessage = "";
+    
+    if (deleteAuthUser) {
+      try {
+        // Attempt to delete Firebase Auth user via API
+        const response = await fetch('/api/admin/delete-auth-user', {
+          method: 'DELETE',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ uid: mentorId }),
+        });
+        
+        const result = await response.json();
+        
+        if (result.success) {
+          authUserMessage = " Firebase Auth user also deleted successfully.";
+        } else {
+          authUserMessage = ` Warning: Firebase Auth user could not be deleted automatically (${result.message}). Please delete manually from Firebase Console.`;
+        }
+      } catch (error) {
+        authUserMessage = " Warning: Could not connect to auth deletion API. Please delete Firebase Auth user manually from Firebase Console.";
+      }
+    } else {
+      authUserMessage = " Note: Firebase Auth account still exists. To reuse this email, delete the auth user manually from Firebase Console (Authentication > Users).";
+    }
+    
+    revalidatePath('/admin/mentors');
+    revalidatePath('/mentors');
+    
+    return { 
+      success: true, 
+      message: `Mentor removed from database successfully.${authUserMessage}` 
+    };
+    
+  } catch (error: any) {
+    console.error("Error in deleteMentorAction: ", error);
+    let errorMessage = "Failed to delete mentor.";
+    if (error.message) {
+      errorMessage = error.message;
+    }
+    return { success: false, message: errorMessage };
+  }
+}
+
+// Function to check if email exists in Firebase Auth and provide guidance
+export async function checkEmailExistsAction(email: string): Promise<{ 
+  exists: boolean; 
+  message: string; 
+  canProceed: boolean;
+}> {
+  try {
+    // Try to create a user with the email to see if it exists
+    // Note: This is a workaround since we can't directly check email existence in client-side code
+    
+    // Return guidance for admin
+    return {
+      exists: false, // We can't actually check this client-side
+      message: "If you're getting 'email already exists' errors, the Firebase Auth user still exists. You need to manually delete it from Firebase Console (Authentication > Users) to reuse this email.",
+      canProceed: true
+    };
+    
+  } catch (error: any) {
+    return {
+      exists: true,
+      message: "Email check failed. Please verify manually in Firebase Console.",
+      canProceed: false
+    };
   }
 }

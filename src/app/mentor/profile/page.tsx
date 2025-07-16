@@ -26,6 +26,7 @@ export default function MentorProfilePage() {
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
+  const [user, setUser] = useState<any>(null);
   const [profile, setProfile] = useState({
     fullName: "",
     designation: "",
@@ -39,6 +40,23 @@ export default function MentorProfilePage() {
   const [profilePicFile, setProfilePicFile] = useState<File | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
+  // Check authentication state and fetch profile
+  useEffect(() => {
+    const auth = getAuth();
+    const unsubscribe = onAuthStateChanged(auth, async (currentUser) => {
+      console.log('Auth state changed:', currentUser ? 'User logged in' : 'No user');
+      if (currentUser) {
+        setUser(currentUser);
+        await fetchMentorProfile(currentUser);
+      } else {
+        setError("Please log in to view your profile");
+        setLoading(false);
+      }
+    });
+
+    return () => unsubscribe();
+  }, []);
+
   // Helper to fetch mentor profile
   const fetchMentorProfile = async (user: any) => {
     if (!user) {
@@ -47,62 +65,69 @@ export default function MentorProfilePage() {
       return;
     }
     try {
-      const docRef = doc(db, "mentors", user.uid);
-      const docSnap = await getDoc(docRef);
-      if (docSnap.exists()) {
-        const data = docSnap.data();
-        setProfile({
-          fullName: data.fullName || "",
-          designation: data.designation || "",
-          expertise: data.expertise || "",
-          bio: data.bio || "",
-          email: user.email || "",
-          password: "",
-          profilePicture: data.profilePicture || "",
-          linkedin: data.linkedin || "",
-        });
-      } else {
-        // Create a default mentor document if it doesn't exist
-        const defaultProfile = {
-          fullName: user.displayName || "",
-          designation: "",
-          expertise: "",
-          bio: "",
-          email: user.email || "",
-          password: "",
-          profilePicture: user.photoURL || "",
-          linkedin: "",
-          createdAt: new Date(),
-        };
-        await setDoc(docRef, defaultProfile, { merge: true });
-        setProfile(defaultProfile);
+      console.log('🔍 Fetching profile for user:', user.uid);
+      
+      // First check if mentor exists in main collection
+      const mentorRef = doc(db, "mentors", user.uid);
+      const mentorSnap = await getDoc(mentorRef);
+      
+      console.log('📋 Main mentor document exists:', mentorSnap.exists());
+      if (mentorSnap.exists()) {
+        console.log('📋 Main mentor data:', mentorSnap.data());
       }
+      
+      if (!mentorSnap.exists()) {
+        setError("Mentor not found. Please contact admin.");
+        setLoading(false);
+        return;
+      }
+      
+      const mentorData = mentorSnap.data();
+      
+      // Get profile details from subcollection
+      const profileRef = doc(db, "mentors", user.uid, "profile", "details");
+      const profileSnap = await getDoc(profileRef);
+      
+      console.log('📂 Profile subcollection exists:', profileSnap.exists());
+      
+      let profileData = null;
+      if (profileSnap.exists()) {
+        profileData = profileSnap.data();
+        console.log('📂 Profile subcollection data:', profileData);
+      } else {
+        console.log('📂 No profile subcollection found, checking main document for data');
+      }
+      
+      // Use data from either subcollection or main document (backward compatibility)
+      const dataSource = profileData || mentorData;
+      console.log('🎯 Using data source:', dataSource);
+      
+      // Organized field mapping with fallbacks for compatibility
+      const newProfile = {
+        // Personal Information
+        fullName: dataSource.name || dataSource.fullName || mentorData.name || user.displayName || "",
+        email: user.email || dataSource.email || "",
+        password: "",
+        
+        // Professional Details
+        designation: dataSource.designation || "",
+        expertise: dataSource.expertise || "",
+        bio: dataSource.description || dataSource.bio || "",
+        
+        // Social & Media Links
+        profilePicture: dataSource.profilePictureUrl || dataSource.profilePicture || "",
+        linkedin: dataSource.linkedinUrl || dataSource.linkedin || "",
+      };
+      
+      console.log('✅ Final profile object:', newProfile);
+      setProfile(newProfile);
+      
     } catch (e) {
-      setError("Failed to load profile");
+      console.error('❌ Error fetching mentor profile:', e);
+      setError("Failed to load profile: " + (e as Error).message);
     }
     setLoading(false);
   };
-
-  // Listen for auth state changes
-  useEffect(() => {
-    setLoading(true);
-    setError("");
-    const auth = getAuth();
-    const unsubscribe = onAuthStateChanged(auth, (user) => {
-      fetchMentorProfile(user);
-    });
-    return () => unsubscribe();
-  }, []);
-
-  // If already logged in, fetch profile immediately on mount
-  useEffect(() => {
-    const auth = getAuth();
-    if (auth.currentUser) {
-      setLoading(true);
-      setError("");
-      fetchMentorProfile(auth.currentUser);
-    }
-  }, []);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
@@ -126,49 +151,75 @@ export default function MentorProfilePage() {
     setError("");
     setSuccess("");
     try {
-      const auth = getAuth();
-      const user = auth.currentUser;
       if (!user) {
         setError("Not logged in");
         setSaving(false);
         return;
       }
+      
+      // Temporarily skip image upload completely
       let profilePicURL = profile.profilePicture;
       if (profilePicFile) {
-        // Upload to Firebase Storage
-        const storageRef = ref(storage, `mentor-profile-pics/${user.uid}`);
-        await uploadBytes(storageRef, profilePicFile);
-        profilePicURL = await getDownloadURL(storageRef);
+        setError("Image upload is temporarily disabled. Your profile data will still be saved.");
+        // Clear the file input
+        setProfilePicFile(null);
+        if (fileInputRef.current) {
+          fileInputRef.current.value = '';
+        }
       }
-      const docRef = doc(db, "mentors", user.uid);
+      
+      const docRef = doc(db, "mentors", user.uid, "profile", "details");
       const data = {
-        fullName: profile.fullName,
+        // Personal Information
+        name: profile.fullName,           // For existing mentor system compatibility
+        fullName: profile.fullName,       // Primary name field
+        email: profile.email,
+        
+        // Professional Details
         designation: profile.designation,
         expertise: profile.expertise,
-        bio: profile.bio,
-        profilePicture: profilePicURL,
-        linkedin: profile.linkedin,
-        email: profile.email,
+        description: profile.bio,         // For existing mentor system compatibility
+        bio: profile.bio,                 // Primary bio field
+        
+        // Social & Media Links
+        profilePictureUrl: profilePicURL, // For existing mentor system compatibility
+        profilePicture: profilePicURL,    // Primary profile picture field
+        linkedinUrl: profile.linkedin,    // For existing mentor system compatibility
+        linkedin: profile.linkedin,       // Primary LinkedIn field
+        
+        // Metadata
         updatedAt: new Date(),
+        lastModified: new Date().toISOString(),
+        profileVersion: "2.0"
       };
+      
       await setDoc(docRef, data, { merge: true });
       setSuccess("Profile updated successfully!");
+      
       // Refetch profile to update UI with latest data
       const docSnap = await getDoc(docRef);
       if (docSnap.exists()) {
         const data = docSnap.data();
+        
+        // Organized field mapping with fallbacks for compatibility
         setProfile({
-          fullName: data.fullName || "",
-          designation: data.designation || "",
-          expertise: data.expertise || "",
-          bio: data.bio || "",
+          // Personal Information
+          fullName: data.name || data.fullName || "",
           email: profile.email,
           password: "",
-          profilePicture: data.profilePicture || "",
-          linkedin: data.linkedin || "",
+          
+          // Professional Details
+          designation: data.designation || "",
+          expertise: data.expertise || "",
+          bio: data.description || data.bio || "",
+          
+          // Social & Media Links
+          profilePicture: data.profilePictureUrl || data.profilePicture || "",
+          linkedin: data.linkedinUrl || data.linkedin || "",
         });
       }
     } catch (e) {
+      console.error('Profile save error:', e);
       setError("Failed to save profile");
     }
     setSaving(false);
@@ -189,6 +240,7 @@ export default function MentorProfilePage() {
   return (
     <div className="min-h-screen bg-gray-50 flex items-center justify-center py-8">
       <div className="w-full max-w-2xl mx-auto space-y-8 p-4 sm:p-8">
+        
         <Card className="bg-white border border-gray-100 shadow-lg rounded-2xl">
           <CardHeader className="flex flex-col items-center gap-2 pb-2">
             <div className="relative flex flex-col items-center w-full">
@@ -253,6 +305,9 @@ export default function MentorProfilePage() {
                       {profilePicFile ? profilePicFile.name : "PNG, JPG, GIF up to 3MB"}
                     </span>
                   </div>
+                  <p className="text-xs text-amber-600 mt-2">
+                    Note: Image uploads are temporarily unavailable while Firebase Storage is being configured. Profile data will still be saved.
+                  </p>
                 </div>
                 <div className="sm:col-span-2">
                   <label className="block text-gray-700 font-semibold mb-2 text-base tracking-wide">LinkedIn Profile URL (Optional)</label>

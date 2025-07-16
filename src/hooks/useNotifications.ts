@@ -14,10 +14,10 @@ export function useNotifications(userId: string) {
   useEffect(() => {
     if (!userId) return;
 
+    // Temporary: Remove orderBy while index is building
     const q = query(
       collection(db, 'notifications'),
-      where('userId', '==', userId),
-      orderBy('createdAt', 'desc')
+      where('userId', '==', userId)
     );
 
     const unsubscribe = onSnapshot(q, (snapshot) => {
@@ -27,6 +27,13 @@ export function useNotifications(userId: string) {
           id: doc.id,
           ...doc.data()
         } as NotificationData & { id: string });
+      });
+      
+      // Sort manually since we removed orderBy
+      notifs.sort((a, b) => {
+        const aTime = a.createdAt?.toDate ? a.createdAt.toDate() : new Date(0);
+        const bTime = b.createdAt?.toDate ? b.createdAt.toDate() : new Date(0);
+        return bTime.getTime() - aTime.getTime();
       });
       
       setNotifications(notifs);
