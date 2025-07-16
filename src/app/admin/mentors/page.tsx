@@ -584,7 +584,15 @@ export default function AdminMentorsPage() {
                           >
                             <div
                               className="p-6 cursor-pointer"
+                              role="button"
+                              tabIndex={0}
                               onClick={() => toggleMentorExpansion(mentor.id)}
+                              onKeyDown={(e) => {
+                                if (e.key === "Enter" || e.key === " ") {
+                                  e.preventDefault();
+                                  toggleMentorExpansion(mentor.id);
+                                }
+                              }}
                             >
                               <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
                                 <div className="flex items-center space-x-4 min-w-0 flex-1">
