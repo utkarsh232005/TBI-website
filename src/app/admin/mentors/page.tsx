@@ -389,6 +389,8 @@ Type "DELETE" to confirm:`;
                       Migrate DB
                     </>
                   )}
+                </Button>
+              </div>
 
               <div className="flex flex-col sm:flex-row gap-3 md:flex-shrink-0">
                 <Button 
@@ -399,7 +401,6 @@ Type "DELETE" to confirm:`;
                 >
                   <RefreshCw className="mr-2 h-4 w-4" />
                   Refresh
-
                 </Button>
                 <Dialog open={isCreateDialogOpen} onOpenChange={setIsCreateDialogOpen}>
                   <DialogTrigger asChild>
