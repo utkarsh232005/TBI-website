@@ -35,20 +35,16 @@ export async function POST(request: NextRequest) {
       const profileData = {
         // Personal Information
         name: mentorData.name || "",
-        fullName: mentorData.name || "",
         email: mentorData.email || "",
         
         // Professional Details
         designation: mentorData.designation || "",
         expertise: mentorData.expertise || "",
         description: mentorData.description || "",
-        bio: mentorData.description || "",
         
         // Social & Media Links
         profilePictureUrl: mentorData.profilePictureUrl || "",
-        profilePicture: mentorData.profilePictureUrl || "",
         linkedinUrl: mentorData.linkedinUrl || "",
-        linkedin: mentorData.linkedinUrl || "",
         
         // Metadata
         createdAt: mentorData.createdAt || new Date(),

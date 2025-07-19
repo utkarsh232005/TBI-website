@@ -110,20 +110,16 @@ export async function createMentorAction(values: MentorFormValues): Promise<Crea
     const profileData = {
       // Personal Information
       name,
-      fullName: name,
       email,
       
       // Professional Details
       designation,
       expertise,
       description,
-      bio: description,
       
       // Social & Media Links
       profilePictureUrl: profilePictureUrl || `https://placehold.co/100x100/7DF9FF/121212.png?text=${encodeURIComponent(name.substring(0,2))}`,
-      profilePicture: profilePictureUrl || `https://placehold.co/100x100/7DF9FF/121212.png?text=${encodeURIComponent(name.substring(0,2))}`,
       linkedinUrl: linkedinUrl || null,
-      linkedin: linkedinUrl || null,
       
       // Metadata
       createdAt: serverTimestamp(),
@@ -177,17 +173,30 @@ export async function createMentorAction(values: MentorFormValues): Promise<Crea
 // Function to delete a mentor completely (Auth user + Firestore documents)
 export async function deleteMentorAction(mentorId: string, deleteAuthUser: boolean = false): Promise<{ success: boolean; message: string }> {
   try {
+    console.log(`🗑️ Starting deletion process for mentor: ${mentorId}`);
+    
     // Delete from mentor collection and its subcollections
-    await Promise.all([
+    const deletionPromises = [
       deleteDoc(doc(db, "mentors", mentorId)),
       deleteDoc(doc(db, "mentors", mentorId, "profile", "details"))
+        .catch(error => {
+          // If subcollection doesn't exist, that's fine
+          if (error.code !== 'not-found') {
+            console.warn('Error deleting profile subcollection:', error);
+          }
+        })
       // Note: No longer deleting from 'users' collection since mentors aren't stored there
-    ]);
+    ];
+    
+    await Promise.allSettled(deletionPromises);
+    console.log(`✅ Firestore documents deleted for mentor: ${mentorId}`);
     
     let authUserMessage = "";
     
     if (deleteAuthUser) {
       try {
+        console.log(`🔐 Attempting to delete Firebase Auth user: ${mentorId}`);
+        
         // Attempt to delete Firebase Auth user via API
         const response = await fetch('/api/admin/delete-auth-user', {
           method: 'DELETE',
@@ -200,15 +209,18 @@ export async function deleteMentorAction(mentorId: string, deleteAuthUser: boole
         const result = await response.json();
         
         if (result.success) {
-          authUserMessage = " Firebase Auth user also deleted successfully.";
+          authUserMessage = " ✅ Firebase Auth user deleted successfully.";
+          console.log(`✅ Firebase Auth user deleted: ${mentorId}`);
         } else {
-          authUserMessage = ` Warning: Firebase Auth user could not be deleted automatically (${result.message}). Please delete manually from Firebase Console.`;
+          authUserMessage = ` ⚠️ Warning: Firebase Auth user could not be deleted automatically (${result.message}). Please delete manually from Firebase Console.`;
+          console.warn(`⚠️ Auth deletion failed for ${mentorId}:`, result.message);
         }
       } catch (error) {
-        authUserMessage = " Warning: Could not connect to auth deletion API. Please delete Firebase Auth user manually from Firebase Console.";
+        authUserMessage = " ⚠️ Warning: Could not connect to auth deletion API. Please delete Firebase Auth user manually from Firebase Console.";
+        console.error(`❌ Auth deletion API error for ${mentorId}:`, error);
       }
     } else {
-      authUserMessage = " Note: Firebase Auth account still exists. To reuse this email, delete the auth user manually from Firebase Console (Authentication > Users).";
+      authUserMessage = " ℹ️ Note: Firebase Auth account still exists. To reuse this email, delete the auth user manually from Firebase Console (Authentication > Users).";
     }
     
     revalidatePath('/admin/mentors');
@@ -220,7 +232,7 @@ export async function deleteMentorAction(mentorId: string, deleteAuthUser: boole
     };
     
   } catch (error: any) {
-    console.error("Error in deleteMentorAction: ", error);
+    console.error("❌ Error in deleteMentorAction: ", error);
     let errorMessage = "Failed to delete mentor.";
     if (error.message) {
       errorMessage = error.message;

@@ -6,16 +6,27 @@ import { getAuth } from 'firebase-admin/auth';
 
 // Initialize Firebase Admin if not already initialized
 if (getApps().length === 0) {
-  // Note: You need to set up Firebase Admin credentials
-  // Either through service account key file or environment variables
-  initializeApp({
-    // credential: cert({
-    //   projectId: process.env.FIREBASE_PROJECT_ID,
-    //   clientEmail: process.env.FIREBASE_CLIENT_EMAIL,
-    //   privateKey: process.env.FIREBASE_PRIVATE_KEY?.replace(/\\n/g, '\n'),
-    // }),
-    // Or use default credentials if running on Firebase Functions
-  });
+  try {
+    // Try to initialize with service account credentials from environment variables
+    if (process.env.FIREBASE_PROJECT_ID && process.env.FIREBASE_CLIENT_EMAIL && process.env.FIREBASE_PRIVATE_KEY) {
+      initializeApp({
+        credential: cert({
+          projectId: process.env.FIREBASE_PROJECT_ID,
+          clientEmail: process.env.FIREBASE_CLIENT_EMAIL,
+          privateKey: process.env.FIREBASE_PRIVATE_KEY.replace(/\\n/g, '\n'),
+        }),
+      });
+      console.log('✅ Firebase Admin initialized with service account credentials');
+    } else {
+      // Initialize without credentials (will work in Firebase Functions or with default application credentials)
+      initializeApp();
+      console.log('⚠️ Firebase Admin initialized with default credentials (some features may not work)');
+    }
+  } catch (error) {
+    console.error('❌ Failed to initialize Firebase Admin:', error);
+    // Initialize without credentials as fallback
+    initializeApp();
+  }
 }
 
 const adminAuth = getAuth();
@@ -26,11 +37,24 @@ const adminAuth = getAuth();
  */
 export async function deleteFirebaseAuthUser(uid: string): Promise<{ success: boolean; message: string }> {
   try {
+    // Check if Firebase Admin is properly initialized
+    if (!adminAuth) {
+      return { success: false, message: 'Firebase Admin not properly initialized' };
+    }
+
     await adminAuth.deleteUser(uid);
     return { success: true, message: `Firebase Auth user ${uid} deleted successfully.` };
   } catch (error: any) {
     console.error('Error deleting Firebase Auth user:', error);
-    return { success: false, message: `Failed to delete Firebase Auth user: ${error.message}` };
+    
+    // Handle specific error cases
+    if (error.code === 'auth/user-not-found') {
+      return { success: false, message: 'User not found in Firebase Authentication' };
+    } else if (error.code === 'auth/insufficient-permission') {
+      return { success: false, message: 'Insufficient permissions to delete user. Check Firebase Admin SDK setup.' };
+    } else {
+      return { success: false, message: `Failed to delete Firebase Auth user: ${error.message}` };
+    }
   }
 }
 

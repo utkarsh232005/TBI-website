@@ -1,8 +1,6 @@
 // src/app/mentor/profile/page.tsx
 "use client";
 
-
-
 import { useEffect, useState, useRef } from "react";
 import { Card, CardHeader, CardTitle, CardContent, CardDescription } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -12,7 +10,7 @@ import { getAuth, onAuthStateChanged } from "firebase/auth";
 import { doc, getDoc, setDoc } from "firebase/firestore";
 import { db, storage } from "@/lib/firebase";
 import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
-import { User } from "lucide-react";
+import { User, Camera, Loader2, Save, Mail, MapPin, Globe, Edit } from "lucide-react";
 
 function getInitials(name: string) {
   if (!name) return "?";
@@ -171,21 +169,17 @@ export default function MentorProfilePage() {
       const docRef = doc(db, "mentors", user.uid, "profile", "details");
       const data = {
         // Personal Information
-        name: profile.fullName,           // For existing mentor system compatibility
-        fullName: profile.fullName,       // Primary name field
+        name: profile.fullName,
         email: profile.email,
         
         // Professional Details
         designation: profile.designation,
         expertise: profile.expertise,
-        description: profile.bio,         // For existing mentor system compatibility
-        bio: profile.bio,                 // Primary bio field
+        description: profile.bio,
         
         // Social & Media Links
-        profilePictureUrl: profilePicURL, // For existing mentor system compatibility
-        profilePicture: profilePicURL,    // Primary profile picture field
-        linkedinUrl: profile.linkedin,    // For existing mentor system compatibility
-        linkedin: profile.linkedin,       // Primary LinkedIn field
+        profilePictureUrl: profilePicURL,
+        linkedinUrl: profile.linkedin,
         
         // Metadata
         updatedAt: new Date(),
@@ -225,115 +219,196 @@ export default function MentorProfilePage() {
     setSaving(false);
   };
 
-  if (loading) return (
-    <div className="max-w-2xl mx-auto p-8">
-      <div className="animate-pulse space-y-6">
-        <div className="h-8 bg-gray-200 rounded w-1/3" />
-        <div className="h-4 bg-gray-200 rounded w-1/2" />
-        <div className="h-40 bg-gray-200 rounded" />
-        <div className="h-8 bg-gray-200 rounded w-1/4" />
-        <div className="h-8 bg-gray-200 rounded w-1/4" />
+  if (loading) {
+    return (
+      <div className="flex justify-center items-center h-96">
+        <div className="text-center">
+          <Loader2 className="h-8 w-8 animate-spin text-blue-600 mx-auto mb-4" />
+          <p className="text-gray-600">Loading your profile...</p>
+        </div>
       </div>
-    </div>
-  );
+    );
+  }
 
   return (
-    <div className="min-h-screen bg-gray-50 flex items-center justify-center py-8">
-      <div className="w-full max-w-2xl mx-auto space-y-8 p-4 sm:p-8">
-        
-        <Card className="bg-white border border-gray-100 shadow-lg rounded-2xl">
-          <CardHeader className="flex flex-col items-center gap-2 pb-2">
-            <div className="relative flex flex-col items-center w-full">
+    <div className="space-y-8">
+      {/* Header Section */}
+      <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+        <div className="flex items-center justify-between">
+          <div>
+            <h1 className="text-3xl font-bold text-gray-900 mb-2">
+              Profile Settings
+            </h1>
+            <p className="text-gray-600 text-lg">
+              Manage your mentor profile and information
+            </p>
+          </div>
+          <div className="flex items-center space-x-2 text-gray-600">
+            <Edit className="h-5 w-5" />
+            <span className="text-sm">Edit Mode</span>
+          </div>
+        </div>
+      </div>
+
+      <Card className="border-gray-200 bg-white shadow-sm">
+        <CardHeader className="pb-6">
+          <div className="flex flex-col items-center">
+            <div className="relative mb-4">
               {profile.profilePicture ? (
                 <img
                   src={profile.profilePicture}
                   alt="Profile"
-                  className="h-24 w-24 rounded-full object-cover border-2 border-primary shadow"
+                  className="h-32 w-32 rounded-full object-cover border-4 border-blue-200 shadow-lg"
                 />
               ) : (
-                <div className="h-24 w-24 rounded-full bg-gray-200 flex items-center justify-center text-3xl font-bold text-gray-500 border-2 border-primary shadow">
+                <div className="h-32 w-32 rounded-full bg-blue-100 flex items-center justify-center text-4xl font-bold text-blue-700 border-4 border-blue-200 shadow-lg">
                   {getInitials(profile.fullName)}
                 </div>
               )}
-              <div className="mt-2 text-xl font-semibold text-gray-900">{profile.fullName || "Mentor"}</div>
-              <div className="text-sm text-gray-500">{profile.designation}</div>
+              <button
+                onClick={() => fileInputRef.current?.click()}
+                className="absolute bottom-0 right-0 bg-blue-600 hover:bg-blue-700 text-white p-3 rounded-full shadow-lg border-2 border-white transition-colors"
+              >
+                <Camera className="h-4 w-4" />
+              </button>
+              <input
+                ref={fileInputRef}
+                type="file"
+                accept="image/*"
+                onChange={handleProfilePicChange}
+                className="hidden"
+              />
             </div>
-          </CardHeader>
-          <CardContent>
-            <form className="space-y-8" onSubmit={handleSubmit}>
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-8">
-                <div>
-                  <label className="block text-gray-700 font-semibold mb-2 text-base tracking-wide">Full Name</label>
-                  <Input name="fullName" value={profile.fullName} onChange={handleChange} placeholder="e.g., Dr. Jane Doe" required className="bg-gray-100 border border-gray-200 rounded-lg placeholder-gray-400 text-gray-800" />
+            <div className="text-center">
+              <h2 className="text-2xl font-bold text-gray-900 mb-1">{profile.fullName || "Mentor"}</h2>
+              <p className="text-blue-600">{profile.designation || "Mentor"}</p>
+              {profile.email && (
+                <div className="flex items-center justify-center text-gray-600 mt-2">
+                  <Mail className="h-4 w-4 mr-2" />
+                  <span className="text-sm">{profile.email}</span>
                 </div>
-                <div>
-                  <label className="block text-gray-700 font-semibold mb-2 text-base tracking-wide">Designation</label>
-                  <Input name="designation" value={profile.designation} onChange={handleChange} placeholder="e.g., Lead Innovator, Acme Corp" required className="bg-gray-100 border border-gray-200 rounded-lg placeholder-gray-400 text-gray-800" />
-                </div>
-                <div className="sm:col-span-2">
-                  <label className="block text-gray-700 font-semibold mb-2 text-base tracking-wide">Area of Expertise/Mentorship</label>
-                  <Input name="expertise" value={profile.expertise} onChange={handleChange} placeholder="e.g., AI & Machine Learning" required className="bg-gray-100 border border-gray-200 rounded-lg placeholder-gray-400 text-gray-800" />
-                </div>
-                <div className="sm:col-span-2">
-                  <label className="block text-gray-700 font-semibold mb-2 text-base tracking-wide">Description / Bio</label>
-                  <Textarea name="bio" value={profile.bio} onChange={handleChange} placeholder="Brief description of the mentor's background and experience..." rows={4} required className="bg-gray-100 border border-gray-200 rounded-lg placeholder-gray-400 text-gray-800" />
-                </div>
-                <div className="sm:col-span-2">
-                  <label className="block text-gray-700 font-semibold mb-2 text-base tracking-wide">Email Address (for login)</label>
-                  <Input name="email" value={profile.email} onChange={handleChange} placeholder="mentor@example.com" type="email" required disabled className="bg-gray-100 border border-gray-200 rounded-lg placeholder-gray-400 text-gray-800 cursor-not-allowed" />
-                </div>
-                <div className="sm:col-span-2">
-                  <label className="block text-gray-700 font-semibold mb-2 text-base tracking-wide">Profile Picture</label>
-                  <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4">
-                    <input
-                      type="file"
-                      accept="image/png, image/jpeg, image/jpg, image/gif"
-                      onChange={handleProfilePicChange}
-                      ref={fileInputRef}
-                      className="hidden"
-                      id="profilePicInput"
-                    />
-                    <Button
-                      type="button"
-                      onClick={() => fileInputRef.current && fileInputRef.current.click()}
-                      className="bg-blue-400 text-white px-4 py-2 rounded-lg shadow hover:bg-blue-500 focus:bg-blue-500 active:bg-blue-600 transition border border-blue-400 hover:border-blue-500 focus:border-blue-500 active:border-blue-600"
-                      style={{ backgroundColor: '#60a5fa', borderColor: '#60a5fa' }}
-                    >
-                      Choose File
-                    </Button>
-                    <span className="text-xs text-gray-500">
-                      {profilePicFile ? profilePicFile.name : "PNG, JPG, GIF up to 3MB"}
-                    </span>
-                  </div>
-                  <p className="text-xs text-amber-600 mt-2">
-                    Note: Image uploads are temporarily unavailable while Firebase Storage is being configured. Profile data will still be saved.
-                  </p>
-                </div>
-                <div className="sm:col-span-2">
-                  <label className="block text-gray-700 font-semibold mb-2 text-base tracking-wide">LinkedIn Profile URL (Optional)</label>
-                  <Input name="linkedin" value={profile.linkedin} onChange={handleChange} placeholder="https://linkedin.com/in/username" className="bg-gray-100 border border-gray-200 rounded-lg placeholder-gray-400 text-gray-800" />
-                </div>
+              )}
+            </div>
+          </div>
+        </CardHeader>
+        <CardContent>
+          <form className="space-y-6" onSubmit={handleSubmit}>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div>
+                <label className="block text-gray-700 font-semibold mb-2 text-sm tracking-wide">Full Name</label>
+                <Input 
+                  name="fullName" 
+                  value={profile.fullName} 
+                  onChange={handleChange} 
+                  placeholder="e.g., Dr. Jane Doe" 
+                  required 
+                  className="bg-white border-gray-300 text-gray-900 placeholder-gray-500 focus:border-blue-500 focus:ring-blue-500" 
+                />
               </div>
-              {error && <div className="text-red-500 text-sm mt-2">{error}</div>}
-              {success && <div className="text-green-600 text-sm mt-2">{success}</div>}
-              <div className="flex justify-end pt-2">
-                <Button
-                  type="submit"
-                  disabled={saving}
-                  className="px-8 py-2 text-base font-semibold bg-blue-400 text-white rounded-lg shadow hover:bg-blue-500 focus:bg-blue-500 active:bg-blue-600 transition border border-blue-400 hover:border-blue-500 focus:border-blue-500 active:border-blue-600"
-                  style={{ backgroundColor: '#60a5fa', borderColor: '#60a5fa' }}
-                >
-                  {saving ? (
-                    <span className="flex items-center gap-2"><span className="animate-spin h-4 w-4 border-2 border-t-transparent border-white rounded-full"></span>Saving...</span>
-                  ) : (
-                    "Save Profile"
-                  )}
-                </Button>
+              
+              <div>
+                <label className="block text-gray-700 font-semibold mb-2 text-sm tracking-wide">Designation</label>
+                <Input 
+                  name="designation" 
+                  value={profile.designation} 
+                  onChange={handleChange} 
+                  placeholder="e.g., Lead Innovator, Acme Corp" 
+                  required 
+                  className="bg-white border-gray-300 text-gray-900 placeholder-gray-500 focus:border-blue-500 focus:ring-blue-500" 
+                />
               </div>
-            </form>
-          </CardContent>
-        </Card>
-      </div>
+            </div>
+
+            <div>
+              <label className="block text-gray-700 font-semibold mb-2 text-sm tracking-wide">Area of Expertise/Mentorship</label>
+              <Input 
+                name="expertise" 
+                value={profile.expertise} 
+                onChange={handleChange} 
+                placeholder="e.g., AI & Machine Learning" 
+                required 
+                className="bg-white border-gray-300 text-gray-900 placeholder-gray-500 focus:border-blue-500 focus:ring-blue-500" 
+              />
+            </div>
+
+            <div>
+              <label className="block text-gray-700 font-semibold mb-2 text-sm tracking-wide">Description / Bio</label>
+              <Textarea 
+                name="bio" 
+                value={profile.bio} 
+                onChange={handleChange} 
+                placeholder="Brief description of your background and mentoring experience..." 
+                rows={4} 
+                required 
+                className="bg-white border-gray-300 text-gray-900 placeholder-gray-500 focus:border-blue-500 focus:ring-blue-500 resize-none" 
+              />
+            </div>
+
+            <div>
+              <label className="block text-gray-700 font-semibold mb-2 text-sm tracking-wide">Email Address</label>
+              <Input 
+                name="email" 
+                value={profile.email} 
+                onChange={handleChange} 
+                placeholder="mentor@example.com" 
+                type="email" 
+                required 
+                disabled 
+                className="bg-gray-100 border-gray-300 text-gray-500 placeholder-gray-400 cursor-not-allowed" 
+              />
+              <p className="text-xs text-gray-500 mt-1">Email cannot be changed after registration</p>
+            </div>
+
+            <div>
+              <label className="block text-gray-700 font-semibold mb-2 text-sm tracking-wide">LinkedIn Profile URL (Optional)</label>
+              <div className="relative">
+                <Globe className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+                <Input 
+                  name="linkedin" 
+                  value={profile.linkedin} 
+                  onChange={handleChange} 
+                  placeholder="https://linkedin.com/in/username" 
+                  className="bg-white border-gray-300 text-gray-900 placeholder-gray-500 focus:border-blue-500 focus:ring-blue-500 pl-10" 
+                />
+              </div>
+            </div>
+
+            {/* Error and Success Messages */}
+            {error && (
+              <div className="p-4 bg-red-50 border border-red-200 rounded-lg">
+                <p className="text-red-700 text-sm">{error}</p>
+              </div>
+            )}
+            
+            {success && (
+              <div className="p-4 bg-green-50 border border-green-200 rounded-lg">
+                <p className="text-green-700 text-sm">{success}</p>
+              </div>
+            )}
+
+            {/* Submit Button */}
+            <div className="flex justify-end">
+              <Button
+                type="submit"
+                disabled={saving}
+                className="px-8 py-3 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-lg shadow-lg disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+              >
+                {saving ? (
+                  <>
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                    Saving...
+                  </>
+                ) : (
+                  <>
+                    <Save className="h-4 w-4" />
+                    Save Profile
+                  </>
+                )}
+              </Button>
+            </div>
+          </form>
+        </CardContent>
+      </Card>
     </div>
   );
 }

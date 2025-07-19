@@ -211,22 +211,46 @@ export default function AdminMentorsPage() {
 
   // Delete mentor handler
   const handleDeleteMentor = async (mentorId: string, mentorName: string) => {
-    if (!confirm(`Are you sure you want to delete ${mentorName}? This action cannot be undone.`)) {
+    const confirmMessage = `⚠️ PERMANENT DELETION WARNING ⚠️
+
+Are you sure you want to delete "${mentorName}"?
+
+This will:
+✗ Remove all mentor data from the database
+✗ Delete their Firebase Authentication account
+✗ Remove their profile and subcollections
+✗ Make their email address available for new registrations
+
+This action CANNOT be undone!
+
+Type "DELETE" to confirm:`;
+
+    const userConfirmation = prompt(confirmMessage);
+    
+    if (userConfirmation !== "DELETE") {
+      if (userConfirmation !== null) {
+        toast({
+          title: "Deletion Cancelled",
+          description: "You must type 'DELETE' exactly to confirm deletion.",
+          variant: "destructive",
+        });
+      }
       return;
     }
 
     try {
-      const result = await deleteMentorAction(mentorId);
+      // Pass true to delete both Firestore data AND Firebase Auth user
+      const result = await deleteMentorAction(mentorId, true);
       
       if (result.success) {
         toast({
-          title: "Mentor Deleted",
+          title: "Mentor Completely Deleted",
           description: result.message,
         });
         fetchMentors();
       } else {
         toast({
-          title: "Error",
+          title: "Deletion Error",
           description: result.message,
           variant: "destructive",
         });
@@ -234,8 +258,8 @@ export default function AdminMentorsPage() {
     } catch (error) {
       console.error("Error deleting mentor: ", error);
       toast({
-        title: "Error",
-        description: "Failed to delete mentor. Please try again.",
+        title: "Deletion Failed",
+        description: "Failed to delete mentor completely. Please try again.",
         variant: "destructive",
       });
     }
@@ -250,21 +274,17 @@ export default function AdminMentorsPage() {
     try {
       // Pass both admin and mapped mentor profile fields to the action
       const mentorData = {
-        // Admin fields
+        // Admin fields for mentor document
+        email: values.email,
+        password: values.password,
+        createdAt: new Date(),
+        // Mentor profile fields for subcollection
         name: values.name,
         description: values.description,
         designation: values.designation,
         expertise: values.expertise,
-        email: values.email,
-        password: values.password,
         profilePictureUrl: values.profilePictureUrl || "",
         linkedinUrl: values.linkedinUrl || "",
-        // Mentor profile fields
-        fullName: values.name,
-        bio: values.description,
-        profilePicture: values.profilePictureUrl || "",
-        linkedin: values.linkedinUrl || "",
-        createdAt: new Date(),
       };
       const result = await createMentorAction(mentorData);
       if (result.success) {
