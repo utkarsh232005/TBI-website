@@ -3,7 +3,7 @@ import React, { useState, useEffect, useMemo } from "react";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend, LabelList, Cell, RadialBarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis, RadialBar, PieChart, Pie } from "recharts";
 import { motion } from "framer-motion";
 import * as XLSX from 'xlsx';
-import { TrendingUp, Search, ExternalLink, Download, Filter, ChevronDown } from "lucide-react";
+import { TrendingUp, Search, ExternalLink, Download, Filter, ChevronDown, Upload, FileText, BarChart3, Plus } from "lucide-react";
 import {
   Card,
   CardContent,
@@ -282,6 +282,58 @@ function findSummarySheetName(workbook: XLSX.WorkBook): string | null {
 }
 
 const AnalysisPage = () => {
+  // Status badge color logic for production-ready appearance
+  const getStatusBadgeColors = (status: string) => {
+    const normalizedStatus = status.toLowerCase().trim();
+    
+    if (normalizedStatus.includes('active') || normalizedStatus.includes('running') || normalizedStatus.includes('operational')) {
+      return 'bg-emerald-50 text-emerald-700 border border-emerald-200';
+    }
+    if (normalizedStatus.includes('pending') || normalizedStatus.includes('review') || normalizedStatus.includes('processing')) {
+      return 'bg-amber-50 text-amber-700 border border-amber-200';
+    }
+    if (normalizedStatus.includes('completed') || normalizedStatus.includes('graduated') || normalizedStatus.includes('success')) {
+      return 'bg-green-50 text-green-700 border border-green-200';
+    }
+    if (normalizedStatus.includes('inactive') || normalizedStatus.includes('suspended') || normalizedStatus.includes('terminated')) {
+      return 'bg-red-50 text-red-700 border border-red-200';
+    }
+    if (normalizedStatus.includes('draft') || normalizedStatus.includes('preparation') || normalizedStatus.includes('initial')) {
+      return 'bg-slate-50 text-slate-700 border border-slate-200';
+    }
+    if (normalizedStatus.includes('incubation') || normalizedStatus.includes('development') || normalizedStatus.includes('progress')) {
+      return 'bg-blue-50 text-blue-700 border border-blue-200';
+    }
+    // Default for unknown statuses
+    return 'bg-gray-50 text-gray-700 border border-gray-200';
+  };
+
+  // Legal status badge color logic for production-ready appearance
+  const getLegalStatusBadgeColors = (legalStatus: string) => {
+    const normalizedStatus = legalStatus.toLowerCase().trim();
+    
+    if (normalizedStatus.includes('registered') || normalizedStatus.includes('incorporated') || normalizedStatus.includes('approved')) {
+      return 'bg-green-50 text-green-700 border border-green-200';
+    }
+    if (normalizedStatus.includes('pending') || normalizedStatus.includes('application') || normalizedStatus.includes('processing')) {
+      return 'bg-amber-50 text-amber-700 border border-amber-200';
+    }
+    if (normalizedStatus.includes('private') || normalizedStatus.includes('ltd') || normalizedStatus.includes('limited') || normalizedStatus.includes('company')) {
+      return 'bg-blue-50 text-blue-700 border border-blue-200';
+    }
+    if (normalizedStatus.includes('partnership') || normalizedStatus.includes('llp') || normalizedStatus.includes('firm')) {
+      return 'bg-purple-50 text-purple-700 border border-purple-200';
+    }
+    if (normalizedStatus.includes('sole') || normalizedStatus.includes('proprietorship') || normalizedStatus.includes('individual')) {
+      return 'bg-teal-50 text-teal-700 border border-teal-200';
+    }
+    if (normalizedStatus.includes('rejected') || normalizedStatus.includes('cancelled') || normalizedStatus.includes('withdrawn')) {
+      return 'bg-red-50 text-red-700 border border-red-200';
+    }
+    // Default for unknown legal statuses
+    return 'bg-slate-50 text-slate-700 border border-slate-200';
+  };
+
   const [excelData, setExcelData] = useState<StartupData[]>([]);
   const [chartData, setChartData] = useState<ChartData[]>([]);
   const [successData, setSuccessData] = useState<SuccessData[]>([]);
@@ -917,414 +969,446 @@ const AnalysisPage = () => {
   }
 
   return (
-    <div className="min-h-screen bg-[#1A1A1A] text-white p-6">
-      {/* Header Section */}
-      <div className="flex justify-between items-center mb-12">
-        <div className="text-gray-100">
-          <h1 className="text-4xl font-extrabold tracking-tight lg:text-5xl">Admin Analysis Dashboard</h1>
-          <p className="text-lg text-gray-400 mt-2">Track and analyze startup performance metrics</p>
-        </div>
-        <div className="flex items-center space-x-4">
-          <Button
-            onClick={() => document.getElementById('excel-upload')?.click()}
-            className="bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-2 px-4 rounded-lg shadow-md transition-all duration-300 flex items-center justify-center gap-2 whitespace-nowrap hover:scale-105 hover:shadow-lg hover:shadow-indigo-500/20"
-          >
-            <Download className="h-5 w-5" /> Upload Excel
-          </Button>
-          <input
-            id="excel-upload"
-            type="file"
-            accept=".xlsx, .xls"
-            onChange={handleFileUpload}
-            className="hidden"
-          />
-          <Select value={selectedTemplate} onValueChange={(value) => {
-            setSelectedTemplate(value);
-            handleDownloadTemplate(value);
-          }}>
-            <SelectTrigger className="bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 text-white font-semibold py-2 px-4 rounded-lg shadow-lg shadow-green-500/20 transition-all duration-300 flex items-center justify-center gap-2 whitespace-nowrap hover:scale-105 hover:shadow-xl hover:shadow-green-500/30 border border-emerald-500/70 relative overflow-hidden group">
-              <Download className="h-5 w-5" />
-              <span>
-                {selectedTemplate ?
-                  (selectedTemplate === "incubationSummary" ? "Incubation Summary" :
-                   selectedTemplate === "vcInvestment" ? "VC Investment Details" :
-                   selectedTemplate === "startupDetails" ? "Startup Details" : "Download Template")
-                : "Download Template"}
-              </span>
-            </SelectTrigger>
-            <SelectContent className="bg-gray-800 text-white border-gray-700">
-              <SelectItem value="incubationSummary">Incubation Summary</SelectItem>
-              <SelectItem value="vcInvestment">VC Investment Details</SelectItem>
-              <SelectItem value="startupDetails">Startup Details</SelectItem>
-            </SelectContent>
-          </Select>
-        </div>
-      </div>
-
-      <h2 className="text-3xl font-bold text-gray-100 mb-2 mt-12">Incubation Summary</h2>
-      <p className="text-gray-400 mb-0">Track and analyze startup performance metrics based on various summary categories.</p>
-
-      <div className="flex justify-end mb-0">
-        <div className="relative">
-          <select
-            value={selectedSummaryGraph}
-            onChange={(e) => setSelectedSummaryGraph(e.target.value)}
-            className="appearance-none bg-gray-800 border border-gray-700 text-gray-300 py-2 pl-4 pr-10 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all duration-300 ease-in-out"
-          >
-            {/* <option value="">Select Graph</option> */}
-            {Object.keys(summaryBlocks || dummyData).map((key) => (
-              <option key={key} value={key}>
-                {key.replace(/([A-Z])/g, ' $1').replace(/^./, (str) => str.toUpperCase())}
-              </option>
-            ))}
-          </select>
-          <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-3 text-gray-400">
-            <ChevronDown className="h-5 w-5" />
+    <div className="min-h-screen bg-gray-50 py-8 px-4">
+      <div className="max-w-7xl mx-auto space-y-8">
+        {/* Enhanced Header & Creation Section */}
+        <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-8 mb-8">
+          <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-8">
+            <div className="flex items-center gap-3 mb-6 lg:mb-0">
+              <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-xl flex items-center justify-center shadow-lg">
+                <BarChart3 className="w-6 h-6 text-white" />
+              </div>
+              <div>
+                <h1 className="admin-heading-1">Startup Analysis Dashboard</h1>
+                <p className="admin-section-subtitle">Visualize, filter, and analyze startup performance and investments</p>
+              </div>
+            </div>
+            <div className="flex flex-col sm:flex-row gap-4 lg:flex-shrink-0 w-full lg:w-auto">
+              {/* Upload Data Section */}
+              <div className="flex flex-col gap-2 w-full sm:w-auto">
+                <Button
+                  onClick={() => document.getElementById('excel-upload')?.click()}
+                  className="bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white font-semibold py-3 px-6 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 flex items-center justify-center gap-3 w-full sm:w-auto"
+                >
+                  <Upload className="h-5 w-5" />
+                  Upload Data
+                </Button>
+                <input
+                  id="excel-upload"
+                  type="file"
+                  accept=".xlsx, .xls"
+                  onChange={handleFileUpload}
+                  className="hidden"
+                />
+              </div>
+              {/* Template Download Section */}
+              <div className="flex flex-col gap-2 w-full sm:w-auto">
+                <Select value={selectedTemplate} onValueChange={(value) => {
+                  setSelectedTemplate(value);
+                  handleDownloadTemplate(value);
+                }}>
+                  <SelectTrigger className="bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 text-white font-semibold py-3 px-6 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 flex items-center justify-center gap-3 w-full sm:w-auto border-0">
+                    <Download className="h-5 w-5" />
+                    <span>
+                      {selectedTemplate ?
+                        (selectedTemplate === "incubationSummary" ? "Incubation Summary" :
+                         selectedTemplate === "vcInvestment" ? "VC Investment" :
+                         selectedTemplate === "startupDetails" ? "Startup Details" : "Templates")
+                      : "Download Templates"}
+                    </span>
+                  </SelectTrigger>
+                  <SelectContent className="bg-white border border-gray-200 shadow-xl rounded-xl">
+                    <SelectItem value="incubationSummary" className="hover:bg-gray-50 rounded-lg">
+                      <div className="flex items-center gap-3">
+                        <FileText className="h-4 w-4 text-blue-600" />
+                        <span>Incubation Summary</span>
+                      </div>
+                    </SelectItem>
+                    <SelectItem value="vcInvestment" className="hover:bg-gray-50 rounded-lg">
+                      <div className="flex items-center gap-3">
+                        <FileText className="h-4 w-4 text-green-600" />
+                        <span>VC Investment Details</span>
+                      </div>
+                    </SelectItem>
+                    <SelectItem value="startupDetails" className="hover:bg-gray-50 rounded-lg">
+                      <div className="flex items-center gap-3">
+                        <FileText className="h-4 w-4 text-purple-600" />
+                        <span>Startup Details</span>
+                      </div>
+                    </SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
           </div>
         </div>
-      </div>
 
-      {/* Summary Charts */} 
-      <motion.div
-        key={selectedSummaryGraph} // Key changes on graph selection to trigger re-animation
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5 }}
-        className="mb-8"
-      >
-        {selectedSummaryGraph === "" ? (
-          <Card className="bg-gray-900 border-gray-700 text-gray-200">
-            <CardHeader>
-              <CardTitle className="text-xl font-semibold text-gray-100">Select a Summary Graph</CardTitle>
-              <CardDescription className="text-gray-400">Please choose an option from the dropdown above to view the corresponding analysis.</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="h-[450px] flex items-center justify-center text-gray-500 text-lg">
-                No graph selected.
-              </div>
-            </CardContent>
-          </Card>
-        ) : (
-          <Card className="bg-gray-900 border-gray-700 text-gray-200">
-            <CardHeader>
-              <CardTitle className="text-xl font-semibold text-gray-100">
-                {selectedSummaryGraph.replace(/([A-Z])/g, ' $1').replace(/^./, (str) => str.toUpperCase())} Overview
-              </CardTitle>
-              <CardDescription className="text-gray-400">Summary as imported from Excel</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <ResponsiveContainer width="100%" height={450}>
-                <BarChart
-                  layout="vertical"
-                  data={summaryBlocks ? summaryBlocks[selectedSummaryGraph] || [] : (dummyData as any)[selectedSummaryGraph.split(' -')[1]?.toLowerCase() || 'stages'] || []}
-                  margin={{
-                    top: 20,
-                    right: 30,
-                    left: 80,
-                    bottom: 5,
-                  }}
-                  barSize={30}
-                  barCategoryGap={5}
-                >
-                  <CartesianGrid strokeDasharray="3 3" stroke="#333" />
-                  <XAxis type="number" tick={{ fill: TEXT_LIGHT, fontSize: 14 }} />
-                  <YAxis type="category" dataKey="label" tick={{ fill: TEXT_LIGHT, fontSize: 14 }} width={120} />
-                  <Tooltip
-                    contentStyle={{ 
-                      background: 'rgba(35, 35, 43, 0.95)',
-                      borderRadius: 12,
-                      border: '1px solid #444',
-                      color: '#fff',
-                      fontSize: 16,
-                      boxShadow: '0 4px 20px rgba(0, 0, 0, 0.3)',
-                      backdropFilter: 'blur(8px)'
-                    }}
-                    itemStyle={{ color: '#fff', fontWeight: 600 }}
-                    formatter={(value: any, name: any) => [`${value} items`, name]}
-                    cursor={{ fill: 'rgba(255, 255, 255, 0.1)' }}
-                  />
-                  <Bar 
-                    dataKey="value" 
-                    fill={ACCENT} 
-                    radius={[0, 10, 10, 0]} 
-                    className="cursor-pointer transition-all duration-300 ease-in-out"
-                  >
-                    {(summaryBlocks ? summaryBlocks[selectedSummaryGraph] || [] : (dummyData as any)[selectedSummaryGraph.split(' -')[1]?.toLowerCase() || 'stages'] || []).map((entry: { category: string }, index: number) => {
-                      const category = entry.category || 'Default';
-                      return (
-                        <Cell 
-                          key={`cell-${index}`} 
-                          fill={categoryColors[category] || ACCENT}
-                          className="transition-all duration-300 ease-in-out hover:brightness-125 hover:shadow-lg"
-                          style={{
-                            filter: 'drop-shadow(0 0 0 rgba(255, 255, 255, 0))',
-                            transition: 'all 0.3s ease-in-out'
-                          }}
-                        />
-                      );
-                    })}
-                  </Bar>
-                </BarChart>
-              </ResponsiveContainer>
-            </CardContent>
-          </Card>
-        )}
-      </motion.div>
-
-      {isLoading ? (
-        <div className="flex justify-center items-center h-64">
-          <div className="animate-spin rounded-full h-12 w-12 border-4 border-blue-500 border-t-transparent"></div>
-        </div>
-      ) : (
-        <>
-          {/* VC Investment Details Table */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.4, duration: 0.5 }}
-            className="mb-12"
-          >
-            <h2 className="text-2xl font-semibold text-gray-100 mb-4">VC Investment Details</h2>
-            <div className="overflow-x-auto rounded-xl shadow-2xl border border-gray-700" style={{ backgroundColor: BG_DARK }}>
-              <table className="min-w-full">
-                <thead>
-                  <tr className="bg-[#1A1A1A] border-b border-gray-600">
-                    <th className="text-left py-4 px-6 text-gray-200 font-semibold text-lg">Startup Name</th>
-                    <th className="text-left py-4 px-6 text-gray-200 font-semibold text-lg">Amount</th>
-                    <th className="text-left py-4 px-6 text-gray-200 font-semibold text-lg">Organization</th>
-                    <th className="text-left py-4 px-6 text-gray-200 font-semibold text-lg">Year of receiving VC investment</th>
-                    <th className="text-left py-4 px-6 text-gray-200 font-semibold text-lg">Proof Link</th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-gray-800">
-                  {vcData.map((investment, index) => (
-                    <tr key={investment.id} className={`${index % 2 === 0 ? 'bg-[#1C1C1C]' : 'bg-[#121212]'} hover:bg-[#2A2A2A] transition-colors`}>
-                      <td className="py-3.5 px-6 text-gray-100">
-                        {investment.startupName && investment.startupName.trim() !== '' ? investment.startupName : <span className="text-gray-500">—</span>}
-                      </td>
-                      <td className="py-3.5 px-6 text-indigo-400 font-bold text-lg">
-                        {investment.amount > 0 ? formatAmount(investment.amount) : <span className="text-gray-500">—</span>}
-                      </td>
-                      <td className="py-3.5 px-6 text-gray-100">
-                        {investment.organization && investment.organization.trim() !== '' ? investment.organization : <span className="text-gray-500">—</span>}
-                      </td>
-                      <td className="py-3.5 px-6 text-gray-100">
-                        {investment.yearDisplay && investment.yearDisplay.trim() !== '' ? investment.yearDisplay : <span className="text-gray-500">—</span>}
-                      </td>
-                      <td className="py-3.5 px-6">
-                        {investment.proofLink && investment.proofLink.trim() !== '' ? (
-                          <a
-                            href={investment.proofLink}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="text-blue-400 hover:text-blue-300 transition-colors inline-flex items-center font-medium"
-                          >
-                            View Proof <ExternalLink className="ml-1 w-4 h-4" />
-                          </a>
-                        ) : (
-                          <span className="text-gray-500">—</span>
-                        )}
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
+        {/* Summary Section */}
+        <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-8">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-6 mb-6">
+            <div className="space-y-2">
+              <h2 className="admin-heading-3">Performance Overview</h2>
+              <p className="admin-body-small">Track and analyze startup metrics by category</p>
             </div>
-          </motion.div>
+            <div className="relative min-w-[280px]">
+              <select
+                value={selectedSummaryGraph}
+                onChange={(e) => setSelectedSummaryGraph(e.target.value)}
+                className="w-full appearance-none bg-white border border-gray-300 text-gray-900 py-3 pl-4 pr-12 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 font-medium shadow-sm"
+              >
+                {Object.keys(summaryBlocks || dummyData).map((key) => (
+                  <option key={key} value={key}>
+                    {key.replace(/([A-Z])/g, ' $1').replace(/^./, (str) => str.toUpperCase())}
+                  </option>
+                ))}
+              </select>
+              <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-4 text-gray-500">
+                <ChevronDown className="h-5 w-5" />
+              </div>
+            </div>
+          </div>
+        </div>
 
-          {/* Startup Details Table */}
-          {startupDetails.length > 0 && (
+        {/* Summary Charts */}
+        <motion.div
+          key={selectedSummaryGraph}
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5 }}
+          className="mb-8"
+        >
+          {selectedSummaryGraph === "" ? (
+            <Card className="bg-white border border-gray-200 shadow-sm rounded-2xl">
+              <CardHeader className="pb-6">
+                <CardTitle className="admin-heading-4">Select a Category</CardTitle>
+                <CardDescription className="admin-body-small">Choose an option from the dropdown above to view analytics</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="h-[400px] flex items-center justify-center text-gray-500 text-lg">
+                  No category selected.
+                </div>
+              </CardContent>
+            </Card>
+          ) : (
+            <Card className="bg-white border border-gray-200 shadow-sm rounded-2xl">
+              <CardHeader className="pb-6">
+                <CardTitle className="admin-heading-4">
+                  {selectedSummaryGraph.replace(/([A-Z])/g, ' $1').replace(/^./, (str) => str.toUpperCase())} Analytics
+                </CardTitle>
+                <CardDescription className="admin-body-small">Data visualization and insights</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <ResponsiveContainer width="100%" height={400}>
+                  <BarChart
+                    layout="vertical"
+                    data={summaryBlocks ? summaryBlocks[selectedSummaryGraph] || [] : (dummyData as any)[selectedSummaryGraph.split(' -')[1]?.toLowerCase() || 'stages'] || []}
+                    margin={{
+                      top: 20,
+                      right: 30,
+                      left: 80,
+                      bottom: 20,
+                    }}
+                    barSize={32}
+                    barCategoryGap={8}
+                  >
+                    <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
+                    <XAxis type="number" tick={{ fill: '#6b7280', fontSize: 12 }} axisLine={{ stroke: '#d1d5db' }} />
+                    <YAxis type="category" dataKey="label" tick={{ fill: '#6b7280', fontSize: 12 }} width={120} axisLine={{ stroke: '#d1d5db' }} />
+                    <Tooltip
+                      contentStyle={{ 
+                        background: 'white',
+                        borderRadius: 12,
+                        border: '1px solid #d1d5db',
+                        color: '#1f2937',
+                        fontSize: 14,
+                        boxShadow: '0 10px 25px -5px rgba(0, 0, 0, 0.1)'
+                      }}
+                      itemStyle={{ color: '#1f2937', fontWeight: 500 }}
+                      formatter={(value: any) => [`${value} items`, 'Count']}
+                      cursor={{ fill: '#f3f4f6' }}
+                    />
+                    <Bar 
+                      dataKey="value" 
+                      fill="#4f46e5" 
+                      radius={[0, 6, 6, 0]}
+                    >
+                      {(summaryBlocks ? summaryBlocks[selectedSummaryGraph] || [] : (dummyData as any)[selectedSummaryGraph.split(' -')[1]?.toLowerCase() || 'stages'] || []).map((entry: { category: string }, index: number) => {
+                        const category = entry.category || 'Default';
+                        return (
+                          <Cell 
+                            key={`cell-${index}`} 
+                            fill={categoryColors[category] || '#4f46e5'}
+                          />
+                        );
+                      })}
+                    </Bar>
+                  </BarChart>
+                </ResponsiveContainer>
+              </CardContent>
+            </Card>
+          )}
+        </motion.div>
+
+        {isLoading ? (
+          <div className="flex justify-center items-center h-64">
+            <div className="animate-spin rounded-full h-12 w-12 border-4 border-blue-500 border-t-transparent"></div>
+          </div>
+        ) : (
+          <>
+            {/* VC Investment Details Table */}
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.6, duration: 0.5 }}
+              transition={{ delay: 0.4, duration: 0.5 }}
               className="mb-12"
             >
-              <h2 className="text-2xl font-semibold text-gray-100 mb-4">Startup Details</h2>
-              
-              {/* Filter Controls */}
-              <div className="mb-6 grid grid-cols-1 md:grid-cols-4 gap-4">
-                {/* Search Bar */}
-                <div className="relative">
-                  <input
-                    type="text"
-                    value={searchTerm}
-                    onChange={(e) => setSearchTerm(e.target.value)}
-                    placeholder="Search startups..."
-                    className="w-full p-2 pl-10 bg-gray-800 border border-gray-700 rounded-lg text-gray-300 focus:outline-none focus:border-indigo-500"
-                  />
-                  <Search className="absolute left-3 top-2.5 h-5 w-5 text-gray-400" />
-                </div>
-
-                {/* Status Filter */}
-                <div className="relative">
-                  <select
-                    value={filterOptions.status}
-                    onChange={(e) => setFilterOptions(prev => ({ ...prev, status: e.target.value }))}
-                    className="w-full p-2 pl-10 bg-gray-800 border border-gray-700 rounded-lg text-gray-300 focus:outline-none focus:border-indigo-500 appearance-none"
-                  >
-                    {uniqueStatuses.map((status) => (
-                      <option key={status} value={status}>
-                        {status}
-                      </option>
-                    ))}
-                  </select>
-                  <Filter className="absolute left-3 top-2.5 h-5 w-5 text-gray-400" />
-                </div>
-
-                {/* Legal Status Filter */}
-                <div className="relative">
-                  <select
-                    value={filterOptions.legalStatus}
-                    onChange={(e) => setFilterOptions(prev => ({ ...prev, legalStatus: e.target.value }))}
-                    className="w-full p-2 pl-10 bg-gray-800 border border-gray-700 rounded-lg text-gray-300 focus:outline-none focus:border-indigo-500 appearance-none"
-                  >
-                    {uniqueLegalStatuses.map((status) => (
-                      <option key={status} value={status}>
-                        {status}
-                      </option>
-                    ))}
-                  </select>
-                  <Filter className="absolute left-3 top-2.5 h-5 w-5 text-gray-400" />
-                </div>
-
-                {/* Year Filter */}
-                <div className="relative">
-                  <select
-                    value={filterYear}
-                    onChange={(e) => setFilterYear(e.target.value === "all" ? "all" : parseInt(e.target.value, 10))}
-                    className="w-full p-2 pl-10 bg-gray-800 border border-gray-700 rounded-lg text-gray-300 focus:outline-none focus:border-indigo-500 appearance-none"
-                  >
-                    <option value="all">All Years</option>
-                    {availableYears.map(year => (
-                      <option key={year} value={year}>{year}</option>
-                    ))}
-                  </select>
-                  <Filter className="absolute left-3 top-2.5 h-5 w-5 text-gray-400" />
-                </div>
-
-                {/* Date Sort */}
-                <div className="relative">
-                  <select
-                    value={filterOptions.dateSort}
-                    onChange={(e) => setFilterOptions(prev => ({ ...prev, dateSort: e.target.value as 'asc' | 'desc' | 'none' }))}
-                    className="w-full p-2 pl-10 bg-gray-800 border border-gray-700 rounded-lg text-gray-300 focus:outline-none focus:border-indigo-500 appearance-none"
-                  >
-                    <option value="none">Sort by Date</option>
-                    <option value="asc">Oldest First</option>
-                    <option value="desc">Newest First</option>
-                  </select>
-                  <TrendingUp className="absolute left-3 top-2.5 h-5 w-5 text-gray-400" />
-                </div>
-              </div>
-
-              <div className="overflow-x-auto rounded-lg shadow-lg mb-8" style={{ backgroundColor: BG_DARK, border: '1px solid #333' }}>
-                <table className="min-w-full divide-y divide-gray-700">
+              <h2 className="text-2xl font-semibold text-gray-900 mb-6">VC Investment Details</h2>
+              <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-x-auto">
+                <table className="min-w-full divide-y divide-gray-200">
                   <thead>
-                    <tr className="bg-[#171717]">
-                      <th className="text-left py-3 px-4 text-gray-300 font-bold text-lg">Serial No.</th>
-                      <th className="text-left py-3 px-4 text-gray-300 font-bold text-lg">Company Name</th>
-                      <th className="text-left py-3 px-4 text-gray-300 font-bold text-lg">Incubation Date</th>
-                      <th className="text-left py-3 px-4 text-gray-300 font-bold text-lg">Status</th>
-                      <th className="text-left py-3 px-4 text-gray-300 font-bold text-lg">Legal Status</th>
+                    <tr className="bg-gray-50">
+                      <th className="text-left py-4 px-6 text-gray-900 font-semibold text-sm uppercase tracking-wide">Startup Name</th>
+                      <th className="text-left py-4 px-6 text-gray-900 font-semibold text-sm uppercase tracking-wide">Amount</th>
+                      <th className="text-left py-4 px-6 text-gray-900 font-semibold text-sm uppercase tracking-wide">Organization</th>
+                      <th className="text-left py-4 px-6 text-gray-900 font-semibold text-sm uppercase tracking-wide">Investment Year</th>
+                      <th className="text-left py-4 px-6 text-gray-900 font-semibold text-sm uppercase tracking-wide">Proof Link</th>
                     </tr>
                   </thead>
-                  <tbody className="divide-y divide-gray-800">
-                    {filterAndGraphStartupDetails.length > 0 ? (
-                      filterAndGraphStartupDetails.map((detail, index) => (
-                        <tr key={index} className={index % 2 === 0 ? 'bg-[#121212]' : 'bg-[#1E1E1E]'}>
-                          <td className="py-3 px-4 text-gray-100">
-                            {detail.serialNo && detail.serialNo.trim() !== 'N/A' ? detail.serialNo : <span className="text-gray-500">—</span>}
-                          </td>
-                          <td className="py-3 px-4 text-gray-100 font-medium">
-                            {detail.companyName && detail.companyName.trim() !== 'N/A' ? detail.companyName : <span className="text-gray-500">—</span>}
-                          </td>
-                          <td className="py-3 px-4 text-gray-300">
-                            {detail.incubationDate && detail.incubationDate.trim() !== 'N/A' ? detail.incubationDate : <span className="text-gray-500">—</span>}
-                          </td>
-                          <td className="py-3 px-4 text-gray-300">
-                            {detail.status && detail.status.trim() !== 'N/A' ? detail.status : <span className="text-gray-500">—</span>}
-                          </td>
-                          <td className="py-3 px-4 text-gray-300">
-                            {detail.legalStatus && detail.legalStatus.trim() !== 'N/A' ? detail.legalStatus : <span className="text-gray-500">—</span>}
-                          </td>
-                        </tr>
-                      ))
-                    ) : (
-                      <tr>
-                        <td colSpan={5} className="py-4 text-center text-gray-400">No startup details found matching the filters.</td>
+                  <tbody className="divide-y divide-gray-200">
+                    {vcData.map((investment, index) => (
+                      <tr key={investment.id} className={`${index % 2 === 0 ? 'bg-white' : 'bg-gray-50'} hover:bg-blue-50 transition-colors`}>
+                        <td className="py-4 px-6 text-gray-900 font-medium">
+                          {investment.startupName && investment.startupName.trim() !== '' ? investment.startupName : <span className="text-gray-400">—</span>}
+                        </td>
+                        <td className="py-4 px-6 text-blue-600 font-bold text-lg">
+                          {investment.amount > 0 ? formatAmount(investment.amount) : <span className="text-gray-400">—</span>}
+                        </td>
+                        <td className="py-4 px-6 text-gray-900">
+                          {investment.organization && investment.organization.trim() !== '' ? investment.organization : <span className="text-gray-400">—</span>}
+                        </td>
+                        <td className="py-4 px-6 text-gray-900">
+                          {investment.yearDisplay && investment.yearDisplay.trim() !== '' ? investment.yearDisplay : <span className="text-gray-400">—</span>}
+                        </td>
+                        <td className="py-4 px-6">
+                          {investment.proofLink && investment.proofLink.trim() !== '' ? (
+                            <a
+                              href={investment.proofLink}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="text-blue-600 hover:text-blue-800 transition-colors inline-flex items-center font-medium"
+                            >
+                              View Proof <ExternalLink className="ml-1 w-4 h-4" />
+                            </a>
+                          ) : (
+                            <span className="text-gray-400">—</span>
+                          )}
+                        </td>
                       </tr>
-                    )}
+                    ))}
                   </tbody>
                 </table>
               </div>
             </motion.div>
-          )}
 
-          {/* Startup Details Modal */}
-          {selectedStartup && (
-            <div className="fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4 z-50">
+            {/* Startup Details Table */}
+            {startupDetails.length > 0 && (
               <motion.div
-                initial={{ opacity: 0, scale: 0.95 }}
-                animate={{ opacity: 1, scale: 1 }}
-                exit={{ opacity: 0, scale: 0.95 }}
-                className="w-full max-w-2xl"
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.6, duration: 0.5 }}
+                className="mb-12"
               >
-                <Card className="bg-[#1A1A1A] border-gray-800 shadow-2xl">
-                  <CardHeader>
-                    <CardTitle className="text-2xl font-bold text-gray-100">{selectedStartup.startupName}</CardTitle>
-                    <CardDescription className="text-gray-400">
-                      <span className="px-2 py-1 rounded-full text-xs font-medium bg-blue-900/30 text-blue-400 mr-2">
-                        {selectedStartup.stage}
-                      </span>
-                      {selectedStartup.sector}
-                    </CardDescription>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="space-y-6">
-                      <div>
-                        <h3 className="text-sm font-medium text-gray-400 mb-2">Investment Details</h3>
-                        <p className="text-3xl font-bold bg-gradient-to-r from-blue-400 to-purple-500 bg-clip-text text-transparent">
-                          {formatAmount(selectedStartup.amount)}
-                        </p>
-                      </div>
-                      <div>
-                        <h3 className="text-sm font-medium text-gray-400 mb-2">Organization</h3>
-                        <p className="text-gray-100">{selectedStartup.organization || ''}</p>
-                      </div>
-                      <div>
-                        <h3 className="text-sm font-medium text-gray-400 mb-2">Description</h3>
-                        <p className="text-gray-300 leading-relaxed">{selectedStartup.description || ''}</p>
-                      </div>
-                      {selectedStartup.proofLink && (
-                        <div>
-                          <h3 className="text-sm font-medium text-gray-400 mb-2">Proof Link</h3>
-                          <a
-                            href={selectedStartup.proofLink}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="inline-flex items-center gap-2 text-blue-400 hover:text-blue-300 transition-colors"
-                          >
-                            View Proof <ExternalLink className="h-4 w-4" />
-                          </a>
-                        </div>
-                      )}
-                    </div>
-                  </CardContent>
-                  <CardFooter className="border-t border-gray-800">
-                    <button
-                      onClick={() => setSelectedStartup(null)}
-                      className="ml-auto px-4 py-2 bg-gray-800 hover:bg-gray-700 text-gray-100 rounded-lg transition-colors"
+                <h2 className="text-2xl font-semibold text-gray-900 mb-6">Startup Details</h2>
+                <div className="mb-6 grid grid-cols-1 md:grid-cols-5 gap-4">
+                  {/* Search Bar */}
+                  <div className="relative">
+                    <input
+                      type="text"
+                      value={searchTerm}
+                      onChange={(e) => setSearchTerm(e.target.value)}
+                      placeholder="Search startups..."
+                      className="w-full p-3 pl-10 bg-white border border-gray-300 rounded-lg text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    />
+                    <Search className="absolute left-3 top-3.5 h-5 w-5 text-gray-400" />
+                  </div>
+                  {/* Status Filter */}
+                  <div className="relative">
+                    <select
+                      value={filterOptions.status}
+                      onChange={(e) => setFilterOptions(prev => ({ ...prev, status: e.target.value }))}
+                      className="w-full p-3 pl-10 bg-white border border-gray-300 rounded-lg text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 appearance-none"
                     >
-                      Close
-                    </button>
-                  </CardFooter>
-                </Card>
+                      {uniqueStatuses.map((status) => (
+                        <option key={status} value={status}>
+                          {status}
+                        </option>
+                      ))}
+                    </select>
+                    <Filter className="absolute left-3 top-3.5 h-5 w-5 text-gray-400" />
+                  </div>
+                  {/* Legal Status Filter */}
+                  <div className="relative">
+                    <select
+                      value={filterOptions.legalStatus}
+                      onChange={(e) => setFilterOptions(prev => ({ ...prev, legalStatus: e.target.value }))}
+                      className="w-full p-3 pl-10 bg-white border border-gray-300 rounded-lg text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 appearance-none"
+                    >
+                      {uniqueLegalStatuses.map((status) => (
+                        <option key={status} value={status}>
+                          {status}
+                        </option>
+                      ))}
+                    </select>
+                    <Filter className="absolute left-3 top-3.5 h-5 w-5 text-gray-400" />
+                  </div>
+                  {/* Year Filter */}
+                  <div className="relative">
+                    <select
+                      value={filterYear}
+                      onChange={(e) => setFilterYear(e.target.value === "all" ? "all" : parseInt(e.target.value, 10))}
+                      className="w-full p-3 pl-10 bg-white border border-gray-300 rounded-lg text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 appearance-none"
+                    >
+                      <option value="all">All Years</option>
+                      {availableYears.map(year => (
+                        <option key={year} value={year}>{year}</option>
+                      ))}
+                    </select>
+                    <Filter className="absolute left-3 top-2.5 h-5 w-5 text-gray-400" />
+                  </div>
+                  {/* Date Sort */}
+                  <div className="relative">
+                    <select
+                      value={filterOptions.dateSort}
+                      onChange={(e) => setFilterOptions(prev => ({ ...prev, dateSort: e.target.value as 'asc' | 'desc' | 'none' }))}
+                      className="w-full p-3 pl-10 bg-white border border-gray-300 rounded-lg text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 appearance-none"
+                    >
+                      <option value="none">Sort by Date</option>
+                      <option value="asc">Oldest First</option>
+                      <option value="desc">Newest First</option>
+                    </select>
+                    <TrendingUp className="absolute left-3 top-3.5 h-5 w-5 text-gray-400" />
+                  </div>
+                </div>
+                <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-x-auto">
+                  <table className="min-w-full divide-y divide-gray-200">
+                    <thead>
+                      <tr className="bg-gray-50">
+                        <th className="text-left py-4 px-6 text-gray-900 font-semibold text-sm uppercase tracking-wide">Serial No.</th>
+                        <th className="text-left py-4 px-6 text-gray-900 font-semibold text-sm uppercase tracking-wide">Company Name</th>
+                        <th className="text-left py-4 px-6 text-gray-900 font-semibold text-sm uppercase tracking-wide">Incubation Date</th>
+                        <th className="text-left py-4 px-6 text-gray-900 font-semibold text-sm uppercase tracking-wide">Status</th>
+                        <th className="text-left py-4 px-6 text-gray-900 font-semibold text-sm uppercase tracking-wide">Legal Status</th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-gray-200">
+                      {filterAndGraphStartupDetails.length > 0 ? (
+                        filterAndGraphStartupDetails.map((detail, index) => (
+                          <tr key={index} className={`${index % 2 === 0 ? 'bg-white' : 'bg-gray-50'} hover:bg-blue-50 transition-colors`}>
+                            <td className="py-4 px-6 text-gray-900">
+                              {detail.serialNo && detail.serialNo.trim() !== 'N/A' ? detail.serialNo : <span className="text-gray-400">—</span>}
+                            </td>
+                            <td className="py-4 px-6 text-gray-900 font-medium">
+                              {detail.companyName && detail.companyName.trim() !== 'N/A' ? detail.companyName : <span className="text-gray-400">—</span>}
+                            </td>
+                            <td className="py-4 px-6 text-gray-600">
+                              {detail.incubationDate && detail.incubationDate.trim() !== 'N/A' ? detail.incubationDate : <span className="text-gray-400">—</span>}
+                            </td>
+                            <td className="py-4 px-6">
+                              {detail.status && detail.status.trim() !== 'N/A' ? (
+                                <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getStatusBadgeColors(detail.status)}`}>
+                                  {detail.status}
+                                </span>
+                              ) : (
+                                <span className="text-gray-400">—</span>
+                              )}
+                            </td>
+                            <td className="py-4 px-6">
+                              {detail.legalStatus && detail.legalStatus.trim() !== 'N/A' ? (
+                                <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getLegalStatusBadgeColors(detail.legalStatus)}`}>
+                                  {detail.legalStatus}
+                                </span>
+                              ) : (
+                                <span className="text-gray-400">—</span>
+                              )}
+                            </td>
+                          </tr>
+                        ))
+                      ) : (
+                        <tr>
+                          <td colSpan={5} className="py-8 text-center text-gray-500">No startup details found matching the filters.</td>
+                        </tr>
+                      )}
+                    </tbody>
+                  </table>
+                </div>
               </motion.div>
-            </div>
-          )}
-        </>
-      )}
+            )}
+
+            {/* Professional Modal */}
+            {selectedStartup && (
+              <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4 z-50">
+                <motion.div
+                  initial={{ opacity: 0, scale: 0.95 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  exit={{ opacity: 0, scale: 0.95 }}
+                  className="w-full max-w-2xl"
+                >
+                  <Card className="bg-white border border-gray-200 shadow-xl">
+                    <CardHeader>
+                      <CardTitle className="text-2xl font-bold text-gray-900">{selectedStartup.startupName}</CardTitle>
+                      <CardDescription className="text-gray-600">
+                        <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium mr-2 ${getStatusBadgeColors(selectedStartup.stage)}`}>
+                          {selectedStartup.stage}
+                        </span>
+                        {selectedStartup.sector}
+                      </CardDescription>
+                    </CardHeader>
+                    <CardContent>
+                      <div className="space-y-6">
+                        <div>
+                          <h3 className="text-sm font-medium text-gray-600 mb-2">Investment Details</h3>
+                          <p className="text-3xl font-bold text-blue-600">
+                            {formatAmount(selectedStartup.amount)}
+                          </p>
+                        </div>
+                        <div>
+                          <h3 className="text-sm font-medium text-gray-600 mb-2">Organization</h3>
+                          <p className="text-gray-900">{selectedStartup.organization || ''}</p>
+                        </div>
+                        <div>
+                          <h3 className="text-sm font-medium text-gray-600 mb-2">Description</h3>
+                          <p className="text-gray-700 leading-relaxed">{selectedStartup.description || ''}</p>
+                        </div>
+                        {selectedStartup.proofLink && (
+                          <div>
+                            <h3 className="text-sm font-medium text-gray-600 mb-2">Proof Link</h3>
+                            <a
+                              href={selectedStartup.proofLink}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="inline-flex items-center gap-2 text-blue-600 hover:text-blue-800 transition-colors"
+                            >
+                              View Proof <ExternalLink className="h-4 w-4" />
+                            </a>
+                          </div>
+                        )}
+                      </div>
+                    </CardContent>
+                    <CardFooter className="border-t border-gray-200">
+                      <button
+                        onClick={() => setSelectedStartup(null)}
+                        className="ml-auto px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-900 rounded-lg transition-colors"
+                      >
+                        Close
+                      </button>
+                    </CardFooter>
+                  </Card>
+                </motion.div>
+              </div>
+            )}
+          </>
+        )}
+      </div>
     </div>
   );
 };
