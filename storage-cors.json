@@ -1,8 +1,8 @@
 [
   {
-    "origin": ["http://localhost:9002"],
-    "method": ["GET", "POST", "PUT", "OPTIONS"],
+    "origin": ["http://localhost:9002", "http://localhost:3000", "https://tbi-2025.web.app", "https://tbi-2025.firebaseapp.com"],
+    "method": ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
     "maxAgeSeconds": 3600,
-    "responseHeader": ["Content-Type", "Authorization", "x-goog-meta-custom"]
+    "responseHeader": ["Content-Type", "Authorization", "x-goog-meta-*", "x-goog-acl", "x-goog-content-disposition", "x-goog-content-encoding", "x-goog-content-language", "x-goog-content-type"]
   }
 ]

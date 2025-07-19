@@ -1,0 +1,33 @@
+rules_version = '2';
+
+// Craft rules based on data in your Firestore database
+// allow write: if firestore.get(
+//    /databases/(default)/documents/users/$(request.auth.uid)).data.isAdmin == true;
+service firebase.storage {
+  match /b/{bucket}/o {
+    // Allow uploads for mentor profile pictures
+    match /mentor-profile-pics/{allPaths=**} {
+      allow read, write: if true; // For development - make more restrictive in production
+    }
+    
+    // Allow uploads for user profile pictures  
+    match /user-profile-pics/{allPaths=**} {
+      allow read, write: if true; // For development - make more restrictive in production
+    }
+    
+    // Allow uploads for startup logos/images
+    match /startup-images/{allPaths=**} {
+      allow read, write: if true; // For development - make more restrictive in production
+    }
+    
+    // Allow uploads for event images
+    match /event-images/{allPaths=**} {
+      allow read, write: if true; // For development - make more restrictive in production
+    }
+    
+    // Default deny all other paths
+    match /{allPaths=**} {
+      allow read, write: if false;
+    }
+  }
+}

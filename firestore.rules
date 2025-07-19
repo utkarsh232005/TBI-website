@@ -115,6 +115,18 @@ service cloud.firestore {
       allow read: if true; // Allows anyone to read mentors for the public page
       // Allow writes for admin panel actions (development setting)
       allow write: if true;
+      
+      // Rules for mentor subcollections
+      match /profile/{profileDoc} {
+        allow read: if true;   // Allow reading mentor profile details
+        allow write: if true;  // Allow writing mentor profile details
+      }
+      
+      // Rules for potential future subcollections
+      match /{subcollection=**} {
+        allow read: if true;   // Allow reading all mentor subcollections
+        allow write: if true;  // Allow writing all mentor subcollections
+      }
     }
     
     // Rules for startups

@@ -38,8 +38,9 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { useToast } from "@/hooks/use-toast";
 import { db } from '@/lib/firebase';
-import { collection, getDocs, Timestamp, orderBy, query, doc, deleteDoc } from 'firebase/firestore';
-import { createMentorAction } from '@/app/actions/mentor-actions';
+import { collection, getDocs, Timestamp, orderBy, query, doc, getDoc } from 'firebase/firestore';
+import { createMentorAction, deleteMentorAction } from '@/app/actions/mentor-actions';
+import { runMigration } from '@/lib/migrate-mentors';
 import { format } from 'date-fns';
 import ImageUploadComponent from '@/components/ui/image-upload';
 
@@ -108,6 +109,7 @@ export default function AdminMentorsPage() {
   const [filteredMentors, setFilteredMentors] = useState<MentorDocument[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isMigrating, setIsMigrating] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
@@ -155,20 +157,42 @@ export default function AdminMentorsPage() {
       const querySnapshot = await getDocs(q);
       const fetchedMentors: MentorDocument[] = [];
 
-      querySnapshot.forEach((doc) => {
-        const data = doc.data();
-        fetchedMentors.push({
-          id: doc.id,
-          name: data.name,
-          designation: data.designation,
-          expertise: data.expertise,
-          description: data.description,
-          profilePictureUrl: data.profilePictureUrl,
-          linkedinUrl: data.linkedinUrl,
-          email: data.email,
-          createdAt: data.createdAt,
-        });
-      });
+      // Fetch each mentor's profile details from subcollection
+      for (const mentorDoc of querySnapshot.docs) {
+        const mentorData = mentorDoc.data();
+        
+        // Get profile details from subcollection
+        const profileRef = doc(db, "mentors", mentorDoc.id, "profile", "details");
+        const profileSnap = await getDoc(profileRef);
+        
+        if (profileSnap.exists()) {
+          const profileData = profileSnap.data();
+          fetchedMentors.push({
+            id: mentorDoc.id,
+            name: profileData.name || mentorData.name || "",
+            designation: profileData.designation || "",
+            expertise: profileData.expertise || "",
+            description: profileData.description || profileData.bio || "",
+            profilePictureUrl: profileData.profilePictureUrl || profileData.profilePicture || "",
+            linkedinUrl: profileData.linkedinUrl || profileData.linkedin || "",
+            email: mentorData.email || profileData.email || "",
+            createdAt: mentorData.createdAt || profileData.createdAt,
+          });
+        } else {
+          // Fallback for mentors without profile subcollection (legacy data)
+          fetchedMentors.push({
+            id: mentorDoc.id,
+            name: mentorData.name || "",
+            designation: mentorData.designation || "",
+            expertise: mentorData.expertise || "",
+            description: mentorData.description || "",
+            profilePictureUrl: mentorData.profilePictureUrl || "",
+            linkedinUrl: mentorData.linkedinUrl || "",
+            email: mentorData.email || "",
+            createdAt: mentorData.createdAt,
+          });
+        }
+      }
 
       setMentors(fetchedMentors);
       setFilteredMentors(filterMentors(fetchedMentors, searchQuery));
@@ -188,22 +212,55 @@ export default function AdminMentorsPage() {
 
   // Delete mentor handler
   const handleDeleteMentor = async (mentorId: string, mentorName: string) => {
-    if (!confirm(`Are you sure you want to delete ${mentorName}? This action cannot be undone.`)) {
+    const confirmMessage = `⚠️ PERMANENT DELETION WARNING ⚠️
+
+Are you sure you want to delete "${mentorName}"?
+
+This will:
+✗ Remove all mentor data from the database
+✗ Delete their Firebase Authentication account
+✗ Remove their profile and subcollections
+✗ Make their email address available for new registrations
+
+This action CANNOT be undone!
+
+Type "DELETE" to confirm:`;
+
+    const userConfirmation = prompt(confirmMessage);
+    
+    if (userConfirmation !== "DELETE") {
+      if (userConfirmation !== null) {
+        toast({
+          title: "Deletion Cancelled",
+          description: "You must type 'DELETE' exactly to confirm deletion.",
+          variant: "destructive",
+        });
+      }
       return;
     }
 
     try {
-      await deleteDoc(doc(db, "mentors", mentorId));
-      toast({
-        title: "Mentor Deleted",
-        description: `${mentorName} has been removed from mentors.`,
-      });
-      fetchMentors();
+      // Pass true to delete both Firestore data AND Firebase Auth user
+      const result = await deleteMentorAction(mentorId, true);
+      
+      if (result.success) {
+        toast({
+          title: "Mentor Completely Deleted",
+          description: result.message,
+        });
+        fetchMentors();
+      } else {
+        toast({
+          title: "Deletion Error",
+          description: result.message,
+          variant: "destructive",
+        });
+      }
     } catch (error) {
       console.error("Error deleting mentor: ", error);
       toast({
-        title: "Error",
-        description: "Failed to delete mentor. Please try again.",
+        title: "Deletion Failed",
+        description: "Failed to delete mentor completely. Please try again.",
         variant: "destructive",
       });
     }
@@ -216,7 +273,21 @@ export default function AdminMentorsPage() {
   async function onSubmit(values: MentorFormValues) {
     setIsSubmitting(true);
     try {
-      const result = await createMentorAction(values);
+      // Pass both admin and mapped mentor profile fields to the action
+      const mentorData = {
+        // Admin fields for mentor document
+        email: values.email,
+        password: values.password,
+        createdAt: new Date(),
+        // Mentor profile fields for subcollection
+        name: values.name,
+        description: values.description,
+        designation: values.designation,
+        expertise: values.expertise,
+        profilePictureUrl: values.profilePictureUrl || "",
+        linkedinUrl: values.linkedinUrl || "",
+      };
+      const result = await createMentorAction(mentorData);
       if (result.success) {
         toast({
           title: "Mentor Added",
@@ -248,6 +319,40 @@ export default function AdminMentorsPage() {
     setExpandedMentor(expandedMentor === mentorId ? null : mentorId);
   };
 
+  // Handle mentor migration to new structure
+  const handleMigration = async () => {
+    if (!confirm('This will migrate all existing mentors to the new subcollection structure. Continue?')) {
+      return;
+    }
+
+    setIsMigrating(true);
+    try {
+      const result = await runMigration();
+      
+      if (result.success) {
+        toast({
+          title: "Migration Successful",
+          description: `Migrated: ${result.migrated} mentors, Skipped: ${result.skipped} mentors`,
+        });
+        fetchMentors(); // Refresh the list
+      } else {
+        toast({
+          title: "Migration Failed",
+          description: result.error || "Migration failed",
+          variant: "destructive",
+        });
+      }
+    } catch (error: any) {
+      toast({
+        title: "Migration Error",
+        description: error.message || "An unexpected error occurred during migration",
+        variant: "destructive",
+      });
+    } finally {
+      setIsMigrating(false);
+    }
+  };
+
   return (
     <>
       <div className="min-h-screen bg-gray-50 w-full flex flex-col items-center py-10 px-2">
@@ -264,6 +369,27 @@ export default function AdminMentorsPage() {
                   <p className="admin-caption">Manage and organize your team of expert mentors</p>
                 </div>
               </div>
+
+              <div className="flex gap-3">
+                <Button 
+                  onClick={handleMigration}
+                  disabled={isMigrating}
+                  variant="outline"
+                  className="border-amber-600 text-amber-400 hover:bg-amber-600/10 hover:text-amber-300" 
+                  suppressHydrationWarning
+                >
+                  {isMigrating ? (
+                    <>
+                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                      Migrating...
+                    </>
+                  ) : (
+                    <>
+                      <RefreshCw className="mr-2 h-4 w-4" />
+                      Migrate DB
+                    </>
+                  )}
+
               <div className="flex flex-col sm:flex-row gap-3 md:flex-shrink-0">
                 <Button 
                   variant="outline" 
@@ -273,6 +399,7 @@ export default function AdminMentorsPage() {
                 >
                   <RefreshCw className="mr-2 h-4 w-4" />
                   Refresh
+
                 </Button>
                 <Dialog open={isCreateDialogOpen} onOpenChange={setIsCreateDialogOpen}>
                   <DialogTrigger asChild>
