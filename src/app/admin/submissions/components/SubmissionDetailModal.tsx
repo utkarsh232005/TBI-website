@@ -25,7 +25,14 @@ import {
   Calendar,
   Download,
   KeyRound,
-  Landmark
+  Landmark,
+  Tags,
+  Info,
+  MessageSquare,
+  ExternalLink,
+  GraduationCap,
+  ClipboardList,
+  CheckCircle
 } from "lucide-react";
 
 interface SubmissionDetailModalProps {
