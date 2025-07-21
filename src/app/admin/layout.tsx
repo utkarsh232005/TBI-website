@@ -4,6 +4,7 @@
 import * as React from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import Image from "next/image"; // Import the Next.js Image component
 import {
   Sidebar,
   SidebarBody,
@@ -25,7 +26,6 @@ import {
   ClipboardCheck,
   LogOut
 } from "lucide-react";
-import { InnoNexusLogo } from "@/components/icons/innnexus-logo";
 import { motion } from "framer-motion";
 import { cn } from "@/lib/utils";
 import NotificationsPanel from "@/components/ui/notifications-panel";
@@ -122,7 +122,13 @@ function AdminLayoutContent({
         <SidebarBody>
             <div className="flex items-center justify-between h-16 px-4">
               <Link href="/admin/dashboard" className="flex items-center space-x-2">
-                <InnoNexusLogo className="h-8 w-8 text-blue-600 flex-shrink-0" />
+                <Image
+                  src="/logo192.png"
+                  alt="TBI Logo"
+                  width={32}
+                  height={32}
+                  className="h-8 w-8 flex-shrink-0"
+                />
                 <motion.span
                   animate={{
                     opacity: open ? 1 : 0,
@@ -145,7 +151,7 @@ function AdminLayoutContent({
                       icon: item.icon,
                     }}
                     className={cn(
-                        pathname === item.href ? "bg-gray-200 text-gray-900" : "text-gray-600 hover:bg-gray-100",
+                        pathname === item.href ? "font-semibold text-gray-900" : "text-gray-600 hover:bg-gray-100",
                         item.disabled && "opacity-50 cursor-not-allowed"
                     )}
                     onClick={(e) => {
@@ -179,7 +185,13 @@ function AdminLayoutContent({
               <Menu className="h-6 w-6" />
             </button>
             <Link href="/admin/dashboard" className="ml-4">
-                <InnoNexusLogo className="h-8 w-8 text-blue-600" />
+                 <Image
+                  src="/logo192.png"
+                  alt="TBI Logo"
+                  width={32}
+                  height={32}
+                  className="h-8 w-8"
+                />
             </Link>
           </div>
           <NotificationsPanel userId="admin@tbi.com" />

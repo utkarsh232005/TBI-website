@@ -4,6 +4,7 @@
 import * as React from "react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
+import Image from "next/image"; // Import the Next.js Image component
 import {
   Sidebar,
   SidebarBody,
@@ -24,7 +25,6 @@ import {
 import { useUser } from "@/contexts/user-context";
 import { clearUserSession } from "@/lib/client-utils";
 import { logoutUser } from "@/app/actions/auth-actions";
-import { InnoNexusLogo } from "@/components/icons/innnexus-logo";
 import { motion } from "framer-motion";
 import { cn } from "@/lib/utils";
 import NotificationsPanel from "@/components/ui/notifications-panel";
@@ -103,7 +103,24 @@ function MentorLayoutContent({
       <Sidebar>
         <SidebarBody>
             <div className="flex items-center justify-center h-16 border-b border-gray-200">
-               <InnoNexusLogo className="h-8 w-8 text-gray-800" text="Mentor Panel" />
+              <Link href="/mentor/dashboard" className="flex items-center space-x-2">
+                 <Image
+                  src="/logo192.png"
+                  alt="TBI Logo"
+                  width={32}
+                  height={32}
+                  className="h-8 w-8 flex-shrink-0"
+                />
+                 <motion.span
+                  animate={{
+                    opacity: open ? 1 : 0,
+                    display: open ? 'flex' : 'none'
+                  }}
+                  className="font-semibold text-lg"
+                >
+                  Mentor Panel
+                </motion.span>
+              </Link>
             </div>
             <nav className="flex-1 overflow-y-auto py-4 px-4">
               <ul className="space-y-1">
@@ -118,7 +135,7 @@ function MentorLayoutContent({
                       className={cn(
                         'flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors',
                         pathname === item.href
-                          ? 'bg-blue-100 text-blue-700'
+                          ? 'font-semibold text-blue-700'
                           : 'text-gray-600 hover:bg-gray-100 hover:text-gray-900',
                         item.disabled && 'opacity-50 cursor-not-allowed'
                       )}
@@ -150,7 +167,14 @@ function MentorLayoutContent({
       <div className="flex-1 flex flex-col overflow-hidden">
         <header className="md:hidden flex items-center justify-between h-16 px-4 border-b border-gray-200 bg-white">
           <Link href="/mentor/dashboard" className="flex items-center space-x-2">
-            <InnoNexusLogo className="h-8 w-8 text-gray-800" text="Mentor" />
+             <Image
+                src="/logo192.png"
+                alt="TBI Logo"
+                width={32}
+                height={32}
+                className="h-8 w-8"
+              />
+              <span className="font-semibold">Mentor</span>
           </Link>
           <button onClick={() => setOpen(!open)} className="p-2">
             {open ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}

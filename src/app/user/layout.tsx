@@ -4,6 +4,7 @@
 import * as React from "react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation"; // Added useRouter
+import Image from "next/image"; // Import the Next.js Image component
 import {
   Sidebar,
   SidebarBody,
@@ -23,7 +24,6 @@ import {
   Star, // Add Star icon for Evaluation
 } from "lucide-react";
 import NotificationsPanel from "@/components/ui/notifications-panel";
-import { InnoNexusLogo } from "@/components/icons/innnexus-logo";
 import { motion } from "framer-motion";
 import { cn } from "@/lib/utils";
 import { OnboardingPopup } from "@/components/ui/onboarding-popup";
@@ -123,7 +123,13 @@ function UserLayoutContent({
         <SidebarBody>
             <div className="flex items-center justify-between h-16 px-4">
               <Link href="/user/dashboard" className="flex items-center space-x-2">
-                <InnoNexusLogo className="h-8 w-8 text-white flex-shrink-0" />
+                 <Image
+                  src="/logo192.png"
+                  alt="TBI Logo"
+                  width={32}
+                  height={32}
+                  className="h-8 w-8 flex-shrink-0"
+                />
                 <motion.span
                   animate={{
                     opacity: open ? 1 : 0,
@@ -146,7 +152,7 @@ function UserLayoutContent({
                           icon: item.icon,
                       }}
                       className={cn(
-                        pathname === item.href ? "bg-indigo-900/50 text-white" : "text-neutral-300 hover:bg-neutral-800/50",
+                        pathname === item.href ? "font-semibold text-white" : "text-neutral-300 hover:bg-neutral-800/50",
                         item.disabled && "opacity-50 cursor-not-allowed"
                       )}
                       onClick={(e) => {
@@ -194,7 +200,13 @@ function UserLayoutContent({
               <Menu className="h-5 w-5" />
             </button>
             <Link href="/user/dashboard" className="flex items-center space-x-2">
-              <InnoNexusLogo className="h-8 w-8 text-white" />
+               <Image
+                  src="/logo192.png"
+                  alt="TBI Logo"
+                  width={32}
+                  height={32}
+                  className="h-8 w-8"
+                />
               <span className="text-lg font-semibold text-white">Portal</span>
             </Link>
           </div>
