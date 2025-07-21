@@ -4,6 +4,7 @@ import { cn } from "@/lib/utils";
 import React, { useState, createContext, useContext } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { IconMenu2, IconX } from "@tabler/icons-react";
+import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 
 interface Links {
   label: string;
@@ -162,20 +163,42 @@ export const SidebarLink = ({
 }: {
   link: Links;
   className?: string;
-  [key: string]: any; 
+  [key: string]: any;
 }) => {
   const { open, animate } = useSidebar();
+
+  if (!open && animate) {
+    return (
+      <Tooltip>
+        <TooltipTrigger asChild>
+          <a
+            href={link.href}
+            className={cn(
+              "flex items-center justify-center gap-2 group/sidebar py-2",
+              className
+            )}
+            {...props}
+          >
+            {link.icon}
+          </a>
+        </TooltipTrigger>
+        <TooltipContent side="right">
+          <p>{link.label}</p>
+        </TooltipContent>
+      </Tooltip>
+    );
+  }
+
   return (
     <a
       href={link.href}
       className={cn(
-        "flex items-center justify-start gap-2  group/sidebar py-2",
+        "flex items-center justify-start gap-2 group/sidebar py-2",
         className
       )}
       {...props}
     >
       {link.icon}
-
       <motion.span
         animate={{
           display: animate ? (open ? "inline-block" : "none") : "inline-block",
