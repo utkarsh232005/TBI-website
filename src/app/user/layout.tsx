@@ -121,70 +121,67 @@ function UserLayoutContent({
 
   return (
     <div className="flex h-screen bg-gray-50 text-gray-800">
-      <TooltipProvider>
-        <Sidebar>
-          <SidebarBody>
-              <div className="flex items-center justify-center h-16 border-b border-gray-200">
-                <Link href="/user/dashboard" className="flex items-center space-x-2">
-                  <Image
-                    src="/logo192.png"
-                    alt="TBI Logo"
-                    width={32}
-                    height={32}
-                    className="h-8 w-8 flex-shrink-0"
-                  />
-                  <motion.span
-                    animate={{
-                      opacity: open ? 1 : 0,
-                      display: open ? 'flex' : 'none'
-                    }}
-                    className="font-semibold text-lg text-gray-800"
-                  >
-                    User Portal
-                  </motion.span>
-                </Link>
-              </div>
-              <nav className="flex-1 overflow-y-auto py-4 px-4">
-                <ul className="space-y-1">
-                  {navItems.map((item) => (
-                    <li key={item.href}>
-                      <SidebarLink
-                        link={{
-                            href: item.href,
-                            label: item.label,
-                            icon: item.icon,
-                        }}
-                        className={cn(
-                          'flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors',
-                          pathname === item.href
-                            ? 'bg-blue-100 text-blue-700 font-semibold'
-                            : 'text-gray-600 hover:bg-gray-100 hover:text-gray-900',
-                          item.disabled && 'opacity-50 cursor-not-allowed'
-                        )}
-                        onClick={(e) => {
-                          if(item.disabled) e.preventDefault();
-                          handleMobileLinkClick();
-                        }}
-                      />
-                    </li>
-                  ))}
-                </ul>
-              </nav>
-              <div className="p-4 border-t border-gray-200">
-                <button
-                  onClick={handleLogout}
-                  className="flex items-center w-full gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-red-600 hover:bg-red-50 transition-colors"
+       <TooltipProvider>
+      <Sidebar>
+        <SidebarBody>
+            <div className="flex items-center justify-center h-16">
+              <Link href="/user/dashboard" className="flex items-center space-x-2">
+                <Image
+                  src="/logo192.png"
+                  alt="TBI Logo"
+                  width={32}
+                  height={32}
+                  className="h-8 w-8 flex-shrink-0"
+                />
+                <motion.span
+                  animate={{
+                    opacity: open ? 1 : 0,
+                    display: open ? 'flex' : 'none'
+                  }}
+                  className="font-semibold text-lg text-gray-800"
                 >
-                  <LogOut className="h-5 w-5" />
-                  <motion.span
-                      animate={{ display: open ? "inline-block" : "none", opacity: open ? 1: 0}}
-                  >
-                      Logout
-                  </motion.span>
-                </button>
+                  User Portal
+                </motion.span>
+              </Link>
+            </div>
+            <nav className="flex-1 overflow-y-auto py-2">
+              <div className="space-y-1">
+                {navItems.map((item) => (
+                   <SidebarLink
+                   key={item.href}
+                   link={{
+                     href: item.href,
+                     label: item.label,
+                     icon: <div className="min-w-6 flex items-center justify-center">{item.icon}</div>,
+                   }}
+                   className={cn(
+                     "font-medium text-gray-700",
+                     pathname === item.href && "bg-gray-200 text-gray-900",
+                     item.disabled && "opacity-50 cursor-not-allowed"
+                   )}
+                   onClick={(e) => {
+                     if (item.disabled) e.preventDefault();
+                     handleMobileLinkClick();
+                   }}
+                 />
+                ))}
               </div>
-          </SidebarBody>
-        </Sidebar>
+            </nav>
+            <div className="p-4 border-t border-gray-200">
+              <button
+                onClick={handleLogout}
+                className="flex items-center w-full gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-red-600 hover:bg-red-50 transition-colors"
+              >
+                <LogOut className="h-5 w-5" />
+                <motion.span
+                    animate={{ display: open ? "inline-block" : "none", opacity: open ? 1: 0}}
+                >
+                    Logout
+                </motion.span>
+              </button>
+            </div>
+        </SidebarBody>
+      </Sidebar>
       </TooltipProvider>
 
       <div className="flex-1 flex flex-col overflow-hidden">

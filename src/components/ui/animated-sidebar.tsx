@@ -4,7 +4,7 @@ import { cn } from "@/lib/utils";
 import React, { useState, createContext, useContext } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { IconMenu2, IconX } from "@tabler/icons-react";
-import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
+import { Tooltip, TooltipContent, TooltipTrigger, TooltipProvider } from "@/components/ui/tooltip";
 
 interface Links {
   label: string;
@@ -198,7 +198,9 @@ export const SidebarLink = ({
       )}
       {...props}
     >
-      {link.icon}
+      <div className="min-w-6 flex items-center justify-center">
+        {link.icon}
+      </div>
       <motion.span
         animate={{
           display: animate ? (open ? "inline-block" : "none") : "inline-block",
