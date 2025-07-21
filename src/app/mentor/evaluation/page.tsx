@@ -1,15 +1,18 @@
+
 // src/app/mentor/evaluation/page.tsx
 "use client";
 
 import { Card, CardHeader, CardTitle, CardContent, CardDescription } from "@/components/ui/card";
-import { ClipboardCheck, Star, TrendingUp, Award } from "lucide-react";
+import { ClipboardCheck, Star, TrendingUp, Award, Send, Paperclip } from "lucide-react";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { useState } from "react";
 import { useChat } from '@/hooks/useChat';
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { format } from "date-fns";
+import { motion, AnimatePresence } from "framer-motion";
 
 export default function MentorEvaluationPage() {
-  // Move questions to a variable for reuse
   const prerequisiteQuestions = [
     "Have you completed the assigned tasks from the last session?",
     "What challenges did you face this week?",
@@ -18,18 +21,15 @@ export default function MentorEvaluationPage() {
     "Is there any resource or support you need from me?",
   ];
 
-  // Use shared chatId for both mentor and user
-  const chatId = 'mentor-user-evaluation'; // Replace with dynamic value for real app
+  const chatId = 'mentor-user-evaluation';
   const { messages, loading, sendMessage, user } = useChat(chatId);
 
-  // Handler to send a message as mentor
-  const sendMentorMessage = (text) => {
+  const sendMentorMessage = (text: string) => {
     sendMessage(text, 'mentor');
   };
 
   return (
     <div className="space-y-8">
-      {/* Header Section */}
       <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
         <div className="flex items-center justify-between">
           <div>
@@ -47,7 +47,6 @@ export default function MentorEvaluationPage() {
         </div>
       </div>
 
-      {/* Stats Cards */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         <Card className="border-gray-200 bg-white shadow-sm hover:shadow-md transition-shadow">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
@@ -89,7 +88,6 @@ export default function MentorEvaluationPage() {
         </Card>
       </div>
 
-      {/* Prerequisite Questions Section */}
       <Card className="border-gray-200 bg-white shadow-sm">
         <CardHeader>
           <CardTitle className="text-lg text-gray-900">Prerequisite Questions</CardTitle>
@@ -116,7 +114,6 @@ export default function MentorEvaluationPage() {
         </CardContent>
       </Card>
 
-      {/* Chatbox Section */}
       <Card className="border-gray-200 bg-white shadow-sm">
         <CardHeader>
           <CardTitle className="text-lg text-gray-900">Chat with Mentee</CardTitle>
@@ -130,80 +127,90 @@ export default function MentorEvaluationPage() {
             loading={loading}
             sendMessage={sendMessage}
             user={user}
+            currentUserType="mentor"
           />
-        </CardContent>
-      </Card>
-
-      {/* Coming Soon Notice */}
-      <Card className="border-gray-200 bg-white shadow-sm">
-        <CardHeader>
-          <CardTitle className="text-xl text-gray-900">Evaluation System</CardTitle>
-          <CardDescription className="text-gray-600">
-            Comprehensive mentee evaluation and feedback tools
-          </CardDescription>
-        </CardHeader>
-        <CardContent className="text-center py-12">
-          <div className="mx-auto w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mb-6">
-            <TrendingUp className="h-8 w-8 text-blue-600" />
-          </div>
-          <h3 className="text-lg font-semibold text-gray-900 mb-3">Enhanced Evaluation Tools Coming Soon</h3>
-          <p className="text-gray-600 max-w-md mx-auto">
-            We're developing advanced evaluation features to help you better assess and guide your mentees' progress. Stay tuned for updates!
-          </p>
         </CardContent>
       </Card>
     </div>
   );
 }
 
-// Update ChatBox to accept messages and setMessages as props
-function ChatBox({ messages, loading, sendMessage, user }) {
+function ChatBox({ messages, loading, sendMessage, user, currentUserType }) {
   const [input, setInput] = useState("");
+  const messagesEndRef = React.useRef<HTMLDivElement>(null);
 
+  useEffect(() => {
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+  }, [messages]);
+  
   const handleSend = () => {
     if (input.trim() === "") return;
-    sendMessage(input, 'mentor');
+    sendMessage(input, currentUserType);
     setInput("");
   };
 
   return (
-    <div className="flex flex-col space-y-4">
-      <div className="h-48 overflow-y-auto border rounded-md p-3 bg-gray-50 mb-2">
-        {loading ? (
-          <div className="text-gray-400 text-center">Loading chat...</div>
-        ) : (
-          messages.map((msg, idx) => (
-            <div
-              key={idx}
-              className={`mb-2 flex ${msg.senderType === "mentor" ? "justify-end" : "justify-start"}`}
-            >
-              <span
-                className={`px-3 py-2 rounded-lg text-sm max-w-xs break-words ${
-                  msg.senderType === "mentor"
-                    ? "bg-blue-500 text-white"
-                    : "bg-gray-200 text-gray-900"
-                }`}
+    <div className="flex flex-col h-[600px] bg-gray-50 rounded-lg border border-gray-200">
+      <div className="flex-1 overflow-y-auto p-4 space-y-4">
+        <AnimatePresence>
+          {loading ? (
+            <div className="text-gray-400 text-center">Loading chat...</div>
+          ) : (
+            messages.map((msg, idx) => (
+              <motion.div
+                key={idx}
+                layout
+                initial={{ opacity: 0, scale: 0.8, y: 20 }}
+                animate={{ opacity: 1, scale: 1, y: 0 }}
+                exit={{ opacity: 0, scale: 0.8 }}
+                transition={{ type: 'spring', stiffness: 300, damping: 25 }}
+                className={`flex items-end gap-2 ${msg.senderType === currentUserType ? 'justify-end' : 'justify-start'}`}
               >
-                {msg.text}
-              </span>
-            </div>
-          ))
-        )}
+                {msg.senderType !== currentUserType && (
+                  <Avatar className="h-8 w-8">
+                    <AvatarFallback>{msg.senderType.charAt(0).toUpperCase()}</AvatarFallback>
+                  </Avatar>
+                )}
+                <div className="max-w-xs lg:max-w-md">
+                  <div className={`px-4 py-3 rounded-2xl ${msg.senderType === currentUserType
+                      ? 'bg-blue-600 text-white rounded-br-none'
+                      : 'bg-gray-200 text-gray-900 rounded-bl-none'
+                    }`}>
+                    <p className="text-sm break-words">{msg.text}</p>
+                  </div>
+                  <p className={`text-xs text-gray-400 mt-1 ${msg.senderType === currentUserType ? 'text-right' : 'text-left'}`}>
+                    {msg.timestamp ? format(msg.timestamp.toDate(), 'p') : 'sending...'}
+                  </p>
+                </div>
+              </motion.div>
+            ))
+          )}
+        </AnimatePresence>
+        <div ref={messagesEndRef} />
       </div>
-      <div className="flex gap-2">
-        <Textarea
-          className="flex-1 min-h-[40px] max-h-24 resize-none"
-          placeholder="Type your message..."
-          value={input}
-          onChange={e => setInput(e.target.value)}
-          onKeyDown={e => {
-            if (e.key === "Enter" && !e.shiftKey) {
-              e.preventDefault();
-              handleSend();
-            }
-          }}
-        />
-        <Button onClick={handleSend} type="button" className="h-10 px-4">Send</Button>
+      <div className="p-4 bg-white border-t border-gray-200">
+        <div className="relative">
+          <Textarea
+            className="w-full min-h-[48px] pr-28 resize-none rounded-full border-gray-300 focus:ring-blue-500 focus:border-blue-500 transition"
+            placeholder="Type your message..."
+            value={input}
+            onChange={e => setInput(e.target.value)}
+            onKeyDown={e => {
+              if (e.key === "Enter" && !e.shiftKey) {
+                e.preventDefault();
+                handleSend();
+              }
+            }}
+          />
+          <div className="absolute right-2 top-1/2 -translate-y-1/2 flex items-center">
+            <Button variant="ghost" size="icon" className="text-gray-500 hover:text-gray-700">
+              <Paperclip className="h-5 w-5" />
+            </Button>
+            <Button size="icon" onClick={handleSend} className="rounded-full bg-blue-600 hover:bg-blue-700">
+              <Send className="h-5 w-5 text-white" />
+            </Button>
+          </div>
+        </div>
       </div>
     </div>
   );
