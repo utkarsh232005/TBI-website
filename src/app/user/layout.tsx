@@ -121,7 +121,7 @@ function UserLayoutContent({
     <div className="flex h-screen bg-neutral-900 text-white overflow-hidden">
       <Sidebar>
         <SidebarBody>
-            <div className="flex items-center justify-between h-16 px-4">
+            <div className="flex items-center justify-center h-16">
               <Link href="/user/dashboard" className="flex items-center space-x-2">
                  <Image
                   src="/logo192.png"

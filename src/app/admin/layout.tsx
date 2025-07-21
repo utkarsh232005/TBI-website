@@ -120,7 +120,7 @@ function AdminLayoutContent({
       
       <Sidebar>
         <SidebarBody>
-            <div className="flex items-center justify-between h-16 px-4">
+            <div className="flex items-center justify-center h-16">
               <Link href="/admin/dashboard" className="flex items-center space-x-2">
                 <Image
                   src="/logo192.png"
