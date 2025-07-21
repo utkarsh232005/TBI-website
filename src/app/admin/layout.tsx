@@ -7,8 +7,6 @@ import { usePathname } from "next/navigation";
 import {
   Sidebar,
   SidebarBody,
-  DesktopSidebar,
-  MobileSidebar,
   SidebarLink,
   useSidebar,
   SidebarProvider
@@ -24,7 +22,8 @@ import {
   FileCheck,
   MessageSquare,
   Rocket,
-  ClipboardCheck
+  ClipboardCheck,
+  LogOut
 } from "lucide-react";
 import { InnoNexusLogo } from "@/components/icons/innnexus-logo";
 import { motion } from "framer-motion";
