@@ -3,7 +3,7 @@
 
 import * as React from "react";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import Image from "next/image"; // Import the Next.js Image component
 import {
   Sidebar,
@@ -24,11 +24,14 @@ import {
   MessageSquare,
   Rocket,
   ClipboardCheck,
-  LogOut
+  LogOut,
+  X,
 } from "lucide-react";
 import { motion } from "framer-motion";
 import { cn } from "@/lib/utils";
 import NotificationsPanel from "@/components/ui/notifications-panel";
+import { clearUserSession } from "@/lib/client-utils";
+import { logoutUser } from "@/app/actions/auth-actions";
 
 interface NavItem {
   href: string;
@@ -43,6 +46,7 @@ function AdminLayoutContent({
   children: React.ReactNode;
 }) {
   const pathname = usePathname();
+  const router = useRouter();
   const { open, setOpen } = useSidebar();
 
   React.useEffect(() => {
@@ -115,6 +119,19 @@ function AdminLayoutContent({
     }
   };
 
+  const handleLogout = async () => {
+    try {
+      await logoutUser();
+      clearUserSession();
+      router.push('/');
+    } catch (error) {
+      console.error('Error during logout:', error);
+      clearUserSession();
+      router.push('/');
+    }
+  };
+
+
   return (
     <div className="flex h-screen bg-gray-50 text-gray-900 overflow-hidden">
       
@@ -151,7 +168,7 @@ function AdminLayoutContent({
                       icon: item.icon,
                     }}
                     className={cn(
-                        pathname === item.href ? "font-semibold text-gray-900" : "text-gray-600 hover:bg-gray-100",
+                        "font-semibold text-gray-900", // No background color for active link
                         item.disabled && "opacity-50 cursor-not-allowed"
                     )}
                     onClick={(e) => {
@@ -163,14 +180,17 @@ function AdminLayoutContent({
               </div>
             </nav>
             <div className="p-4 border-t border-gray-200">
-              <SidebarLink
-                link={{
-                  href: "/logout", 
-                  label: "Logout",
-                  icon: <LogOut className="h-5 w-5" />
-                }}
-                className="text-red-600 hover:bg-red-50"
-              />
+              <button
+                onClick={handleLogout}
+                className="flex items-center w-full gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-red-600 hover:bg-red-50 transition-colors"
+              >
+                <LogOut className="h-5 w-5" />
+                <motion.span
+                    animate={{ display: open ? "inline-block" : "none", opacity: open ? 1: 0}}
+                >
+                    Logout
+                </motion.span>
+              </button>
             </div>
         </SidebarBody>
       </Sidebar>

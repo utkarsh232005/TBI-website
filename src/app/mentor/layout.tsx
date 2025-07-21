@@ -84,11 +84,11 @@ function MentorLayoutContent({
     try {
       await logoutUser();
       clearUserSession();
-      router.push('/login');
+      router.push('/');
     } catch (error) {
       console.error('Error during logout:', error);
       clearUserSession();
-      router.push('/login');
+      router.push('/');
     }
   };
   

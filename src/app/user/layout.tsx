@@ -22,6 +22,7 @@ import {
   Menu,
   User,
   Star, // Add Star icon for Evaluation
+  X,
 } from "lucide-react";
 import NotificationsPanel from "@/components/ui/notifications-panel";
 import { motion } from "framer-motion";
@@ -103,11 +104,11 @@ function UserLayoutContent({
       if (typeof window !== 'undefined' && window.innerWidth < 768) {
         setOpen(false);
       }
-      router.push('/login');
+      router.push('/');
     } catch (error) {
       console.error('Error during logout:', error);
       clearUserSession();
-      router.push('/login');
+      router.push('/');
     }
   };
 
@@ -152,7 +153,7 @@ function UserLayoutContent({
                           icon: item.icon,
                       }}
                       className={cn(
-                        pathname === item.href ? "font-semibold text-white" : "text-neutral-300 hover:bg-neutral-800/50",
+                        "font-semibold text-white", // No background color for active link
                         item.disabled && "opacity-50 cursor-not-allowed"
                       )}
                       onClick={(e) => {
