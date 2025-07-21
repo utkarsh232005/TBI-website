@@ -1,4 +1,3 @@
-
 // src/app/user/mentors/page.tsx
 "use client";
 
@@ -81,10 +80,10 @@ export default function UserMentorsPage() {
             description: data.description,
             areaOfMentorship: data.expertise,
             email: data.email,
-            avatarUrl: data.profilePictureUrl || `https://placehold.co/100x100/7DF9FF/121212.png?text=${encodeURIComponent(data.name.substring(0, 2))}`,
-            backgroundImageUrl: `https://placehold.co/400x600/121212/1E1E1E.png?text=${encodeURIComponent(data.name.substring(0, 1))}`,
+            avatarUrl: data.profilePictureUrl || `https://placehold.co/100x100/E0E7FF/4F46E5.png?text=${encodeURIComponent(data.name.substring(0, 2))}`,
+            backgroundImageUrl: `https://placehold.co/400x600/F3F4F6/E0E7FF.png?text=${encodeURIComponent(data.name.substring(0, 1))}`,
             dataAiHintAvatar: `professional ${data.name.split(' ')[0].toLowerCase()}`,
-            dataAiHintBackground: 'abstract tech design',
+            dataAiHintBackground: 'abstract texture',
             linkedinUrl: data.linkedinUrl,
           });
         });
@@ -110,7 +109,7 @@ export default function UserMentorsPage() {
   if (userLoading) {
     return (
       <div className="flex justify-center items-center py-20">
-        <Loader2 className="h-12 w-12 animate-spin text-indigo-400" />
+        <Loader2 className="h-12 w-12 animate-spin text-blue-600" />
       </div>
     );
   }
@@ -119,9 +118,9 @@ export default function UserMentorsPage() {
   if (!user) {
     return (
       <div className="text-center py-20">
-        <Lock className="mx-auto h-12 w-12 text-neutral-500 mb-4" />
-        <h2 className="text-2xl font-semibold text-white mb-2">Authentication Required</h2>
-        <p className="text-neutral-400 text-lg">
+        <Lock className="mx-auto h-12 w-12 text-gray-500 mb-4" />
+        <h2 className="text-2xl font-semibold text-gray-900 mb-2">Authentication Required</h2>
+        <p className="text-gray-600 text-lg">
           Please log in to view and select mentors.
         </p>
       </div>
@@ -136,11 +135,11 @@ export default function UserMentorsPage() {
         animate="visible"
         variants={pageTitleVariants}
       >
-        <h1 className="font-montserrat text-3xl font-bold tracking-tight text-white">
+        <h1 className="font-montserrat text-3xl font-bold tracking-tight text-gray-900">
           Our Mentors
         </h1>
         <motion.p
-          className="mt-2 max-w-2xl text-lg text-neutral-400"
+          className="mt-2 max-w-2xl text-lg text-gray-600"
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0, transition: { duration: 0.5, delay: 0.2, ease: "easeOut" } }}
         >
@@ -150,28 +149,28 @@ export default function UserMentorsPage() {
 
       {userLoading ? (
         <div className="flex justify-center items-center py-20">
-          <Loader2 className="h-12 w-12 animate-spin text-indigo-400" />
+          <Loader2 className="h-12 w-12 animate-spin text-blue-600" />
         </div>
       ) : !user ? (
-        <div className="text-center py-10 bg-amber-900/20 border border-amber-500/30 rounded-lg p-6">
-          <Lock className="mx-auto h-10 w-10 mb-3 text-amber-400" />
-          <p className="text-xl font-semibold text-amber-300">Authentication Required</p>
-          <p className="text-neutral-400">Please log in to view and select mentors.</p>
+        <div className="text-center py-10 bg-yellow-50 border border-yellow-200 rounded-lg p-6">
+          <Lock className="mx-auto h-10 w-10 mb-3 text-yellow-600" />
+          <p className="text-xl font-semibold text-yellow-800">Authentication Required</p>
+          <p className="text-gray-600">Please log in to view and select mentors.</p>
         </div>
       ) : isLoading ? (
         <div className="flex justify-center items-center py-20">
-          <Loader2 className="h-12 w-12 animate-spin text-indigo-400" />
+          <Loader2 className="h-12 w-12 animate-spin text-blue-600" />
         </div>
       ) : error ? (
-        <div className="text-center py-10 bg-rose-900/20 border border-rose-500/30 rounded-lg p-6 text-rose-300">
-          <AlertCircle className="mx-auto h-10 w-10 mb-3 text-rose-400" />
+        <div className="text-center py-10 bg-red-50 border border-red-200 rounded-lg p-6 text-red-800">
+          <AlertCircle className="mx-auto h-10 w-10 mb-3 text-red-600" />
           <p className="text-xl font-semibold">Could not load mentors</p>
-          <p className="text-neutral-400">{error}</p>
+          <p className="text-gray-600">{error}</p>
         </div>
       ) : mentors.length === 0 ? (
-        <div className="text-center py-10 bg-neutral-800/30 rounded-lg border border-dashed border-neutral-700">
-          <Users className="mx-auto h-12 w-12 text-neutral-500 mb-4" />
-          <p className="text-neutral-400 text-lg">
+        <div className="text-center py-10 bg-gray-50 rounded-lg border border-dashed border-gray-200">
+          <Users className="mx-auto h-12 w-12 text-gray-500 mb-4" />
+          <p className="text-gray-600 text-lg">
             No mentors are currently listed. Please check back later.
           </p>
         </div>

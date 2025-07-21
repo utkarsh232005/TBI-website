@@ -1,4 +1,3 @@
-
 // src/app/user/events/page.tsx
 "use client";
 
@@ -62,7 +61,7 @@ export default function UserEventsPage() {
             time: data.time,
             venue: data.venue,
             applyLink: data.applyLink,
-            imageUrl: data.imageUrl || `https://placehold.co/600x400/121212/7DF9FF.png?text=${encodeURIComponent(data.title.substring(0,10))}`,
+            imageUrl: data.imageUrl || `https://placehold.co/600x400/E0E7FF/4F46E5.png?text=${encodeURIComponent(data.title.substring(0,10))}`,
             createdAt: data.createdAt,
             dataAiHint: `event ${data.title.toLowerCase().split(' ').slice(0,1).join('') || 'general'}`
           });
@@ -82,16 +81,16 @@ export default function UserEventsPage() {
   return (
     <div className="space-y-8">
         <motion.div
-          className="text-left mb-8" // Changed to text-left
+          className="text-left mb-8"
           initial="hidden"
           animate="visible"
           variants={pageTitleVariants}
         >
-          <h1 className="font-montserrat text-3xl font-bold tracking-tight text-white">
+          <h1 className="font-montserrat text-3xl font-bold tracking-tight text-gray-900">
             Upcoming Events
           </h1>
           <motion.p
-            className="mt-2 max-w-2xl text-lg text-neutral-400"
+            className="mt-2 max-w-2xl text-lg text-gray-600"
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0, transition: { duration: 0.5, delay: 0.2, ease: "easeOut"} }}
           >
@@ -101,18 +100,18 @@ export default function UserEventsPage() {
 
         {isLoading ? (
           <div className="flex justify-center items-center py-20">
-            <Loader2 className="h-12 w-12 animate-spin text-indigo-400" />
+            <Loader2 className="h-12 w-12 animate-spin text-blue-600" />
           </div>
         ) : error ? (
-          <div className="text-center py-10 bg-rose-900/20 border border-rose-500/30 rounded-lg p-6 text-rose-300">
-            <AlertCircle className="mx-auto h-10 w-10 mb-3 text-rose-400" />
+          <div className="text-center py-10 bg-red-50 border border-red-200 rounded-lg p-6 text-red-800">
+            <AlertCircle className="mx-auto h-10 w-10 mb-3 text-red-600" />
             <p className="text-xl font-semibold">Could not load events</p>
-            <p className="text-neutral-400">{error}</p>
+            <p className="text-gray-600">{error}</p>
           </div>
         ) : events.length === 0 ? (
-          <div className="text-center py-10 bg-neutral-800/30 rounded-lg border border-dashed border-neutral-700">
-            <CalendarDays className="mx-auto h-12 w-12 text-neutral-500 mb-4" />
-            <p className="text-neutral-400 text-lg">
+          <div className="text-center py-10 bg-gray-50 rounded-lg border border-dashed border-gray-200">
+            <CalendarDays className="mx-auto h-12 w-12 text-gray-500 mb-4" />
+            <p className="text-gray-600 text-lg">
               No upcoming events scheduled at the moment. Please check back later.
             </p>
           </div>
@@ -131,7 +130,7 @@ export default function UserEventsPage() {
                 time: eventData.time,
                 location: eventData.venue,
                 description: eventData.description,
-                imageUrl: eventData.imageUrl || `https://placehold.co/600x400/121212/7DF9FF.png?text=${encodeURIComponent(eventData.title.substring(0,10))}`,
+                imageUrl: eventData.imageUrl || `https://placehold.co/600x400/E0E7FF/4F46E5.png?text=${encodeURIComponent(eventData.title.substring(0,10))}`,
                 dataAiHint: eventData.dataAiHint || 'event general',
                 detailsUrl: eventData.applyLink,
               };
@@ -146,14 +145,3 @@ export default function UserEventsPage() {
     </div>
   );
 }
-
-const sectionVariants = { // Keep if used elsewhere, otherwise can remove if only for this page
-  hidden: { opacity: 0 },
-  visible: { opacity: 1, transition: { staggerChildren: 0.1, delayChildren: 0.1 } },
-};
-
-const fadeInUp = { // Keep if used elsewhere
-  hidden: { opacity: 0, y: 20 },
-  visible: { opacity: 1, y: 0, transition: { duration: 0.6, ease: "easeOut" } },
-};
-

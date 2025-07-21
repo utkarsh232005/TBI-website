@@ -5,7 +5,6 @@ import { useState, useEffect } from 'react';
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { 
   Clock, 
   CheckCircle, 
@@ -27,11 +26,11 @@ import Link from 'next/link';
 import { useUser } from '@/contexts/user-context';
 
 const statusColors = {
-  pending: 'bg-yellow-100 text-yellow-800',
-  admin_approved: 'bg-blue-100 text-blue-800',
-  admin_rejected: 'bg-red-100 text-red-800',
-  mentor_approved: 'bg-green-100 text-green-800',
-  mentor_rejected: 'bg-gray-100 text-gray-800',
+  pending: 'bg-yellow-100 text-yellow-800 border-yellow-200',
+  admin_approved: 'bg-blue-100 text-blue-800 border-blue-200',
+  admin_rejected: 'bg-red-100 text-red-800 border-red-200',
+  mentor_approved: 'bg-green-100 text-green-800 border-green-200',
+  mentor_rejected: 'bg-gray-100 text-gray-800 border-gray-200',
 };
 
 const statusLabels = {
@@ -94,7 +93,7 @@ export default function UserMentorRequestsPage() {
       case 'mentor_rejected':
         return <XCircle className="h-5 w-5 text-gray-600" />;
       default:
-        return <Clock className="h-5 w-5 text-muted-foreground" />;
+        return <Clock className="h-5 w-5 text-gray-500" />;
     }
   };
 
@@ -107,11 +106,11 @@ export default function UserMentorRequestsPage() {
   }
 
   return (
-    <div className="container mx-auto px-4 py-8">
-      <div className="flex justify-between items-center mb-8">
+    <div className="space-y-8">
+      <div className="flex justify-between items-center">
         <div>
-          <h1 className="text-3xl font-bold">My Mentor Requests</h1>
-          <p className="text-muted-foreground mt-2">
+          <h1 className="text-3xl font-bold text-gray-900">My Mentor Requests</h1>
+          <p className="text-gray-600 mt-2">
             Track the status of your mentor selection requests
           </p>
         </div>
@@ -120,8 +119,8 @@ export default function UserMentorRequestsPage() {
             <RefreshCw className="mr-2 h-4 w-4" />
             Refresh
           </Button>
-          <Button asChild>
-            <Link href="/mentors">
+          <Button asChild size="sm">
+            <Link href="/user/mentors">
               <Users className="mr-2 h-4 w-4" />
               Browse Mentors
             </Link>
@@ -130,15 +129,15 @@ export default function UserMentorRequestsPage() {
       </div>
 
       {requests.length === 0 ? (
-        <Card className="text-center py-12">
+        <Card className="text-center py-12 bg-white border-gray-200">
           <CardContent>
-            <Users className="mx-auto h-12 w-12 text-muted-foreground mb-4" />
-            <h3 className="text-lg font-medium mb-2">No mentor requests yet</h3>
-            <p className="text-muted-foreground mb-6">
+            <Users className="mx-auto h-12 w-12 text-gray-400 mb-4" />
+            <h3 className="text-lg font-medium mb-2 text-gray-800">No mentor requests yet</h3>
+            <p className="text-gray-600 mb-6">
               Start by browsing our mentors and selecting one that matches your goals.
             </p>
             <Button asChild>
-              <Link href="/mentors">
+              <Link href="/user/mentors">
                 Browse Available Mentors
               </Link>
             </Button>
@@ -147,7 +146,7 @@ export default function UserMentorRequestsPage() {
       ) : (
         <div className="space-y-6">
           {requests.map((request) => (
-            <Card key={request.id} className="overflow-hidden">
+            <Card key={request.id} className="overflow-hidden bg-white border-gray-200 shadow-sm">
               <CardHeader className="pb-4">
                 <div className="flex justify-between items-start">
                   <div className="flex items-center space-x-3">
@@ -155,14 +154,14 @@ export default function UserMentorRequestsPage() {
                       {getStatusIcon(request.status)}
                     </div>
                     <div>
-                      <CardTitle className="text-lg">{request.mentorName}</CardTitle>
-                      <p className="text-sm text-muted-foreground flex items-center mt-1">
+                      <CardTitle className="text-lg text-gray-900">{request.mentorName}</CardTitle>
+                      <p className="text-sm text-gray-500 flex items-center mt-1">
                         <Mail className="mr-1 h-3 w-3" />
                         {request.mentorEmail}
                       </p>
                     </div>
                   </div>
-                  <Badge className={statusColors[request.status]}>
+                  <Badge className={`border ${statusColors[request.status]}`}>
                     {statusLabels[request.status]}
                   </Badge>
                 </div>
@@ -170,47 +169,41 @@ export default function UserMentorRequestsPage() {
               
               <CardContent className="pt-0">
                 <div className="grid md:grid-cols-3 gap-4">
-                  {/* Request Details */}
                   <div className="md:col-span-2 space-y-4">
                     <div>
-                      <h4 className="font-medium mb-2">Your Request Message:</h4>
-                      <div className="bg-muted/50 p-3 rounded-lg text-sm">
+                      <h4 className="font-medium mb-2 text-gray-800">Your Request Message:</h4>
+                      <div className="bg-gray-50 p-3 rounded-lg text-sm text-gray-700">
                         {request.requestMessage}
                       </div>
                     </div>
-
                     {request.adminNotes && (
                       <div>
-                        <h4 className="font-medium mb-2">Admin Notes:</h4>
+                        <h4 className="font-medium mb-2 text-gray-800">Admin Notes:</h4>
                         <div className="bg-blue-50 border border-blue-200 p-3 rounded-lg text-sm text-blue-800">
                           {request.adminNotes}
                         </div>
                       </div>
                     )}
-
                     {request.mentorNotes && (
                       <div>
-                        <h4 className="font-medium mb-2">Mentor's Response:</h4>
+                        <h4 className="font-medium mb-2 text-gray-800">Mentor's Response:</h4>
                         <div className="bg-green-50 border border-green-200 p-3 rounded-lg text-sm text-green-800">
                           {request.mentorNotes}
                         </div>
                       </div>
                     )}
                   </div>
-
-                  {/* Status & Timeline */}
                   <div className="space-y-4">
                     <div>
-                      <h4 className="font-medium mb-2">Status</h4>
-                      <div className="text-sm text-muted-foreground">
+                      <h4 className="font-medium mb-2 text-gray-800">Status</h4>
+                      <div className="text-sm text-gray-500">
                         {statusDescriptions[request.status]}
                       </div>
                     </div>
-
-                    <div className="space-y-3 text-xs">
+                    <div className="space-y-3 text-xs text-gray-500">
                       <div className="flex items-center space-x-2">
                         <Calendar className="h-3 w-3 flex-shrink-0" />
-                        <span className="text-muted-foreground">
+                        <span>
                           Requested: {format(
                             request.createdAt instanceof Date 
                               ? request.createdAt 
@@ -219,27 +212,23 @@ export default function UserMentorRequestsPage() {
                           )}
                         </span>
                       </div>
-                      
                       {request.adminProcessedAt && (
                         <div className="flex items-center space-x-2">
                           <CheckCircle className="h-3 w-3 flex-shrink-0 text-blue-500" />
-                          <span className="text-muted-foreground">
+                          <span>
                             Admin reviewed: {format(request.adminProcessedAt, 'MMM d, yyyy')}
                           </span>
                         </div>
                       )}
-                      
                       {request.mentorProcessedAt && (
                         <div className="flex items-center space-x-2">
                           <CheckCircle className="h-3 w-3 flex-shrink-0 text-green-500" />
-                          <span className="text-muted-foreground">
+                          <span>
                             Mentor responded: {format(request.mentorProcessedAt, 'MMM d, yyyy')}
                           </span>
                         </div>
                       )}
                     </div>
-
-                    {/* Action buttons for completed requests */}
                     {request.status === 'mentor_approved' && (
                       <div className="pt-2">
                         <Button size="sm" className="w-full" asChild>
@@ -250,11 +239,10 @@ export default function UserMentorRequestsPage() {
                         </Button>
                       </div>
                     )}
-
                     {(request.status === 'admin_rejected' || request.status === 'mentor_rejected') && (
                       <div className="pt-2">
                         <Button size="sm" variant="outline" className="w-full" asChild>
-                          <Link href="/mentors">
+                          <Link href="/user/mentors">
                             Find Another Mentor
                           </Link>
                         </Button>

@@ -3,15 +3,15 @@
 
 import * as React from "react";
 import Link from "next/link";
-import { usePathname, useRouter } from "next/navigation"; // Added useRouter
-import Image from "next/image"; // Import the Next.js Image component
+import { usePathname, useRouter } from "next/navigation";
+import Image from "next/image";
 import {
   Sidebar,
   SidebarBody,
   SidebarLink,
   useSidebar,
   SidebarProvider
-} from "@/components/ui/animated-sidebar"; // Adjusted import path
+} from "@/components/ui/animated-sidebar";
 import {
   LayoutDashboard,
   Users,
@@ -21,8 +21,9 @@ import {
   Home,
   Menu,
   User,
-  Star, // Add Star icon for Evaluation
+  Star,
   X,
+  MessageSquare,
 } from "lucide-react";
 import NotificationsPanel from "@/components/ui/notifications-panel";
 import { motion } from "framer-motion";
@@ -31,7 +32,6 @@ import { OnboardingPopup } from "@/components/ui/onboarding-popup";
 import { useOnboarding } from "@/hooks/useOnboarding";
 import { UserProvider, useUser } from "@/contexts/user-context";
 import { clearUserSession } from "@/lib/client-utils";
-// import { logoutUser } from "@/app/actions/auth-actions";
 import { logoutUser } from "@/app/actions/auth-actions";
 
 interface NavItem {
@@ -47,8 +47,8 @@ function UserLayoutContent({
   children: React.ReactNode;
 }) {
   const pathname = usePathname();
-  const router = useRouter(); // For logout
-  const { open, setOpen } = useSidebar(); 
+  const router = useRouter();
+  const { open, setOpen } = useSidebar();
   const { showOnboarding, completeOnboarding } = useOnboarding();
   const { user } = useUser();
 
@@ -61,7 +61,7 @@ function UserLayoutContent({
   const navItems: NavItem[] = [
     {
       href: "/user/dashboard",
-      label: "My Dashboard",
+      label: "Dashboard",
       icon: <LayoutDashboard className="h-5 w-5" />,
       disabled: false
     },
@@ -73,8 +73,8 @@ function UserLayoutContent({
     },
     {
       href: "/user/mentor-requests",
-      label: "Mentor Requests",
-      icon: <Users className="h-5 w-5" />,
+      label: "My Requests",
+      icon: <MessageSquare className="h-5 w-5" />,
       disabled: false
     },
     {
@@ -93,7 +93,7 @@ function UserLayoutContent({
       href: "/user/settings",
       label: "Profile",
       icon: <User className="h-5 w-5" />,
-      disabled: false // Now functional
+      disabled: false
     },
   ];
 
@@ -119,12 +119,12 @@ function UserLayoutContent({
   };
 
   return (
-    <div className="flex h-screen bg-neutral-900 text-white overflow-hidden">
+    <div className="flex h-screen bg-gray-50 text-gray-800">
       <Sidebar>
         <SidebarBody>
-            <div className="flex items-center justify-center h-16">
+            <div className="flex items-center justify-center h-16 border-b border-gray-200">
               <Link href="/user/dashboard" className="flex items-center space-x-2">
-                 <Image
+                <Image
                   src="/logo192.png"
                   alt="TBI Logo"
                   width={32}
@@ -136,38 +136,42 @@ function UserLayoutContent({
                     opacity: open ? 1 : 0,
                     display: open ? 'flex' : 'none'
                   }}
-                  className="font-semibold text-lg"
+                  className="font-semibold text-lg text-gray-800"
                 >
                   User Portal
                 </motion.span>
               </Link>
             </div>
-            <nav className="flex-1 overflow-y-auto py-2">
-              <div className="space-y-1">
+            <nav className="flex-1 overflow-y-auto py-4 px-4">
+              <ul className="space-y-1">
                 {navItems.map((item) => (
+                  <li key={item.href}>
                     <SidebarLink
-                      key={item.href}
                       link={{
                           href: item.href,
                           label: item.label,
                           icon: item.icon,
                       }}
                       className={cn(
-                        "font-semibold text-white", // No background color for active link
-                        item.disabled && "opacity-50 cursor-not-allowed"
+                        'flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors',
+                        pathname === item.href
+                          ? 'bg-blue-100 text-blue-700 font-semibold'
+                          : 'text-gray-600 hover:bg-gray-100 hover:text-gray-900',
+                        item.disabled && 'opacity-50 cursor-not-allowed'
                       )}
                       onClick={(e) => {
                         if(item.disabled) e.preventDefault();
                         handleMobileLinkClick();
                       }}
                     />
+                  </li>
                 ))}
-              </div>
+              </ul>
             </nav>
-            <div className="p-4 border-t border-neutral-800 space-y-1">
+            <div className="p-4 border-t border-gray-200">
               <button
                 onClick={handleLogout}
-                className="flex items-center w-full gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-red-400 hover:bg-red-800/50 transition-colors"
+                className="flex items-center w-full gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-red-600 hover:bg-red-50 transition-colors"
               >
                 <LogOut className="h-5 w-5" />
                 <motion.span
@@ -176,48 +180,32 @@ function UserLayoutContent({
                     Logout
                 </motion.span>
               </button>
-              <Link
-                href="/"
-                className="flex items-center w-full gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-neutral-300 hover:bg-neutral-800/50 transition-colors"
-              >
-                <Home className="h-5 w-5" />
-                <motion.span
-                    animate={{ display: open ? "inline-block" : "none", opacity: open ? 1: 0}}
-                >
-                    Back to Home
-                </motion.span>
-              </Link>
             </div>
         </SidebarBody>
       </Sidebar>
 
       <div className="flex-1 flex flex-col overflow-hidden">
-        <header className="md:hidden flex items-center justify-between h-16 px-4 border-b border-neutral-800 bg-neutral-900/80 backdrop-blur-sm">
-          <div className="flex items-center space-x-2">
-            <button
-              onClick={() => setOpen(!open)}
-              className="p-2 rounded-md text-neutral-400 hover:text-white hover:bg-neutral-800/50 transition-colors"
-            >
-              <Menu className="h-5 w-5" />
-            </button>
-            <Link href="/user/dashboard" className="flex items-center space-x-2">
-               <Image
-                  src="/logo192.png"
-                  alt="TBI Logo"
-                  width={32}
-                  height={32}
-                  className="h-8 w-8"
-                />
-              <span className="text-lg font-semibold text-white">Portal</span>
-            </Link>
-          </div>
+        <header className="md:hidden flex items-center justify-between h-16 px-4 border-b border-gray-200 bg-white">
+          <Link href="/user/dashboard" className="flex items-center space-x-2">
+             <Image
+                src="/logo192.png"
+                alt="TBI Logo"
+                width={32}
+                height={32}
+                className="h-8 w-8"
+              />
+              <span className="font-semibold text-gray-800">Portal</span>
+          </Link>
+          <button onClick={() => setOpen(!open)} className="p-2">
+            {open ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
+          </button>
         </header>
 
-        <header className="hidden md:flex items-center justify-end h-16 px-6 bg-neutral-900 border-b border-neutral-800">
+        <header className="hidden md:flex items-center justify-end h-16 px-6 bg-white border-b border-gray-200">
             {user?.uid && <NotificationsPanel userId={user.uid} />}
         </header>
 
-        <main className="flex-1 overflow-y-auto p-4 md:p-6 bg-neutral-900/50">
+        <main className="flex-1 overflow-y-auto p-4 md:p-8 bg-gray-100">
           {children}
         </main>
       </div>
@@ -238,10 +226,10 @@ export default function UserLayout({
   children: React.ReactNode;
 }) {
   return (
-    <SidebarProvider>
-      <UserLayoutContent>
-        {children}
-      </UserLayoutContent>
-    </SidebarProvider>
+      <SidebarProvider>
+        <UserLayoutContent>
+            {children}
+        </UserLayoutContent>
+      </SidebarProvider>
   );
 }

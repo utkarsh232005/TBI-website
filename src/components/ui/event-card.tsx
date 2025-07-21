@@ -1,4 +1,3 @@
-
 // src/components/ui/event-card.tsx
 "use client";
 
@@ -43,7 +42,9 @@ export default function EventCard({ event }: EventCardProps) {
       transition={{ type: "spring", stiffness: 400, damping: 15 }}
       className="h-full" 
     >
-      <Card className="group flex flex-col overflow-hidden bg-card shadow-lg transition-all duration-300 hover:shadow-accent/20 rounded-2xl border border-border h-full">        <div className="relative w-full h-48 sm:h-56 overflow-hidden">          <Image
+      <Card className="group flex flex-col overflow-hidden bg-white shadow-lg transition-all duration-300 hover:shadow-blue-500/20 rounded-2xl border border-gray-200 h-full">        
+        <div className="relative w-full h-48 sm:h-56 overflow-hidden">          
+          <Image
             src={processImageUrl(event.imageUrl, event.title.substring(0,10))}
             alt={event.title}
             fill
@@ -53,7 +54,7 @@ export default function EventCard({ event }: EventCardProps) {
             onError={(e) => {
               // Fallback to placeholder if image fails to load
               const target = e.target as HTMLImageElement;
-              target.src = `https://placehold.co/600x400/121212/7DF9FF.png?text=${encodeURIComponent(event.title.substring(0,10))}`;
+              target.src = `https://placehold.co/600x400/E0E7FF/4F46E5.png?text=${encodeURIComponent(event.title.substring(0,10))}`;
             }}
           />
           <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/30 to-transparent"></div>
@@ -64,21 +65,21 @@ export default function EventCard({ event }: EventCardProps) {
           </div>
         </div>
         <CardContent className="p-5 flex-grow flex flex-col">
-          <div className="flex items-center text-sm text-muted-foreground mb-2">
-            <CalendarDays className="mr-2 h-4 w-4 text-foreground" /> {/* Icon color to white */}
+          <div className="flex items-center text-sm text-gray-500 mb-2">
+            <CalendarDays className="mr-2 h-4 w-4 text-blue-600" />
             <span>{displayDate} at {event.time}</span>
           </div>
-          <div className="flex items-center text-sm text-muted-foreground mb-4">
-            <MapPin className="mr-2 h-4 w-4 text-foreground" /> {/* Icon color to white */}
+          <div className="flex items-center text-sm text-gray-500 mb-4">
+            <MapPin className="mr-2 h-4 w-4 text-blue-600" />
             <span>{event.location}</span>
           </div>
-          <CardDescription className="text-muted-foreground line-clamp-3 flex-grow mb-4">
+          <CardDescription className="text-gray-600 line-clamp-3 flex-grow mb-4">
             {event.description}
           </CardDescription>
         </CardContent>
-        <CardFooter className="p-5 border-t border-border">
+        <CardFooter className="p-5 border-t border-gray-100">
           {event.detailsUrl ? (
-            <Button asChild variant="default" className="w-full group/button bg-accent hover:bg-accent/90">
+            <Button asChild variant="default" className="w-full group/button bg-blue-600 hover:bg-blue-700 text-white">
               <a href={event.detailsUrl} target="_blank" rel="noopener noreferrer" className="flex items-center">
                 <LinkIcon className="mr-2 h-4 w-4" />
                 Apply / View Details 
