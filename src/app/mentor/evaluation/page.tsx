@@ -11,6 +11,7 @@ import { useChat } from '@/hooks/useChat';
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { format } from "date-fns";
 import { motion, AnimatePresence } from "framer-motion";
+import React, { useEffect, useRef } from 'react';
 
 export default function MentorEvaluationPage() {
   const prerequisiteQuestions = [
@@ -137,7 +138,7 @@ export default function MentorEvaluationPage() {
 
 function ChatBox({ messages, loading, sendMessage, user, currentUserType }) {
   const [input, setInput] = useState("");
-  const messagesEndRef = React.useRef<HTMLDivElement>(null);
+  const messagesEndRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
