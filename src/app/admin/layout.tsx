@@ -117,218 +117,81 @@ function AdminLayoutContent({
   };
 
   return (
-    <div className="flex h-screen bg-gray-50 text-gray-900 overflow-hidden admin-typography-system">
+    <div className="flex h-screen bg-gray-50 text-gray-900 overflow-hidden">
       
       <Sidebar>
         <SidebarBody>
-          <DesktopSidebar>
-            {/* Logo */}
-            <div className="flex items-center justify-between h-16 px-4 border-b border-gray-200">
-              <Link href="/admin/dashboard" className="flex items-center space-x-3 min-w-max">
+            <div className="flex items-center justify-between h-16 px-4">
+              <Link href="/admin/dashboard" className="flex items-center space-x-2">
                 <InnoNexusLogo className="h-8 w-8 text-blue-600 flex-shrink-0" />
                 <motion.span
-                  className="admin-heading-5 whitespace-nowrap"
                   animate={{
                     opacity: open ? 1 : 0,
                     display: open ? 'flex' : 'none'
                   }}
-                  transition={{ duration: 0.2 }}
+                  className="font-semibold text-lg"
                 >
                   Admin Panel
                 </motion.span>
               </Link>
             </div>
-
-            {/* Navigation - Remove scrollbar and perfect spacing */}
-            <nav className="flex-1 overflow-hidden">
-              <div className="space-y-2 h-full overflow-y-auto scrollbar-hide sidebar-scroll pr-1">
+            <nav className="flex-1 overflow-y-auto py-2">
+              <div className="space-y-1">
                 {navItems.map((item) => (
-                  <div key={item.href} className="group relative" title={item.disabled ? 'Coming soon' : ''}>
-                    <a
-                      href={item.disabled ? '#' : item.href}
-                      className={cn(
-                        'flex items-center justify-start gap-3 py-3 px-3 rounded-lg transition-colors duration-200',
-                        'cursor-pointer',
-                        pathname === item.href
-                          ? 'bg-blue-50 text-blue-700 border border-blue-200'
-                          : 'text-gray-700 hover:bg-gray-100 hover:text-gray-900',
-                        item.disabled && 'opacity-50 hover:bg-transparent hover:text-gray-400',
-                        'group/sidebar'
-                      )}
-                      onClick={(e) => {
-                        if (item.disabled) {
-                          e.preventDefault();
-                        } else {
-                          handleMobileLinkClick();
-                        }
-                      }}
-                    >
-                      {/* Active indicator: simple blue vertical bar */}
-                      {pathname === item.href && (
-                        <div className="absolute left-0 top-1/2 -translate-y-1/2 w-[3px] h-6 bg-blue-500 rounded-full"></div>
-                      )}
-                      
-                      <div className={cn(
-                        'flex items-center justify-center w-10 h-10 rounded-lg transition-all duration-200 flex-shrink-0',
-                        pathname === item.href 
-                          ? 'bg-blue-100 text-blue-600' 
-                          : 'bg-gray-100 text-gray-600 group-hover:bg-gray-200 group-hover:text-gray-700'
-                      )}>
-                        <div className="flex items-center justify-center text-base">
-                          {item.icon}
-                        </div>
-                      </div>
-                      
-                      <motion.span
-                        animate={{
-                          display: 'inline-block',
-                          opacity: 1
-                        }}
-                        className={cn(
-                          "admin-nav-text transition-all duration-200 whitespace-pre inline-block !p-0 !m-0 relative z-10 min-w-0 flex-1",
-                          pathname === item.href ? 'admin-nav-text-active' : 'group-hover:admin-nav-text-active'
-                        )}
-                      >
-                        {item.label}
-                      </motion.span>
-                    </a>
-                  </div>
+                  <SidebarLink
+                    key={item.href}
+                    link={{
+                      href: item.href,
+                      label: item.label,
+                      icon: item.icon,
+                    }}
+                    className={cn(
+                        pathname === item.href ? "bg-gray-200 text-gray-900" : "text-gray-600 hover:bg-gray-100",
+                        item.disabled && "opacity-50 cursor-not-allowed"
+                    )}
+                    onClick={(e) => {
+                        if(item.disabled) e.preventDefault();
+                        handleMobileLinkClick();
+                    }}
+                  />
                 ))}
               </div>
             </nav>
-
-            {/* Footer */}
-            <div className="mt-4">
+            <div className="p-4 border-t border-gray-200">
               <SidebarLink
                 link={{
-                  href: "/logout", // Or your logout route
+                  href: "/logout", 
                   label: "Logout",
-                  icon: <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path d="M16 17l5-5-5-5M21 12H9M13 7V5a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2v-2"/></svg>
+                  icon: <LogOut className="h-5 w-5" />
                 }}
-                className="text-red-600 hover:bg-red-50 hover:text-red-700 font-semibold"
+                className="text-red-600 hover:bg-red-50"
               />
             </div>
-          </DesktopSidebar>
-
-          <MobileSidebar>
-            {/* Mobile sidebar content */}
-            <div className="flex flex-col h-full">
-              {/* Mobile Logo */}
-              <div className="mb-8 px-3">
-                <div className="flex items-center space-x-3 p-4 bg-white rounded-lg border border-gray-200 shadow-sm">
-                  <div className="p-3 bg-blue-100 rounded-lg">
-                    <InnoNexusLogo className="h-6 w-6 text-blue-600" />
-                  </div>
-                  <div className="flex flex-col">
-                    <span className="admin-heading-5">
-                      Admin Panel
-                    </span>
-                    <span className="admin-caption">
-                      TBI Management
-                    </span>
-                  </div>
-                </div>
-              </div>
-
-              <div className="flex-1 overflow-y-auto scrollbar-hide sidebar-scroll py-2">
-                <div className="space-y-2 px-3">
-                  {navItems.map((item) => (
-                    <div key={`mobile-${item.href}`} className="group relative" title={item.disabled ? 'Coming soon' : ''}>
-                      <Link
-                        href={item.disabled ? '#' : item.href}
-                        className={cn(
-                          "flex items-center px-3 py-3 rounded-lg admin-nav-text transition-colors cursor-pointer",
-                          pathname === item.href
-                            ? 'bg-blue-50 text-blue-700 border border-blue-200'
-                            : 'text-gray-700 hover:bg-gray-100 hover:text-gray-900',
-                          item.disabled && 'opacity-50 hover:bg-transparent hover:text-gray-400'
-                        )}
-                        onClick={(e) => {
-                          if (item.disabled) {
-                            e.preventDefault();
-                          }
-                          handleMobileLinkClick();
-                        }}
-                      >
-                        {/* Active indicator */}
-                        {pathname === item.href && (
-                          <div className="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-6 bg-blue-600 rounded-r-full"></div>
-                        )}
-                        
-                        <div className={cn(
-                          'flex items-center justify-center w-10 h-10 rounded-lg transition-all duration-200 border',
-                          pathname === item.href 
-                            ? 'bg-blue-100 text-blue-600 border-blue-200' 
-                            : 'bg-gray-100 text-gray-600 border-gray-200 group-hover:bg-gray-200 group-hover:text-gray-700'
-                        )}>
-                          <div className="flex items-center justify-center text-base">
-                            {item.icon}
-                          </div>
-                        </div>
-                        
-                        <span className="relative z-10 min-w-0 flex-1">
-                          {item.label}
-                        </span>
-                      </Link>
-                    </div>
-                  ))}
-                </div>
-              </div>
-
-              <div className="p-4">
-                <Link
-                  href="/"
-                  className="flex items-center px-3 py-2.5 rounded-lg admin-nav-text text-gray-600 hover:bg-gray-100 hover:text-gray-800 transition-colors"
-                  onClick={handleMobileLinkClick}
-                >
-                  <Home className="h-5 w-5 mr-3" />
-                  <span>Back to Home</span>
-                </Link>
-              </div>
-            </div>
-          </MobileSidebar>
         </SidebarBody>
       </Sidebar>
 
-      {/* Main Content */}
       <div className="flex-1 flex flex-col overflow-hidden">
-        {/* Mobile header */}
-        <header className="md:hidden flex items-center justify-between h-16 px-3 bg-white border-b border-gray-200 shadow-sm">
-          <div className="flex items-center space-x-3">
-            <div className="p-2 rounded-lg bg-gray-100 border border-gray-200">
-              <button
-                onClick={() => setOpen(!open)}
-                className="text-gray-600 hover:text-gray-800 transition-colors duration-200"
-              >
-                <Menu className="h-5 w-5" />
-              </button>
-            </div>
-            <Link href="/admin/dashboard" className="flex items-center space-x-3">
-              <div className="p-2 bg-blue-100 rounded-lg">
-                <InnoNexusLogo className="h-5 w-5 text-blue-600" />
-              </div>
-              <div className="flex flex-col">
-                <span className="admin-body-small admin-font-semibold">
-                  Admin Panel
-                </span>
-                <span className="admin-caption">
-                  TBI Management
-                </span>
-              </div>
+        <header className="md:hidden flex items-center justify-between h-16 px-4 bg-white border-b border-gray-200">
+          <div className="flex items-center">
+            <button
+              onClick={() => setOpen(!open)}
+              className="p-2 text-gray-600 hover:text-gray-900"
+            >
+              <Menu className="h-6 w-6" />
+            </button>
+            <Link href="/admin/dashboard" className="ml-4">
+                <InnoNexusLogo className="h-8 w-8 text-blue-600" />
             </Link>
           </div>
-        </header>
-
-        {/* Desktop header with notifications */}
-        <header className="hidden md:flex items-center justify-end h-16 px-3 bg-white border-b border-gray-200 shadow-sm">
           <NotificationsPanel userId="admin@tbi.com" />
         </header>
 
-        {/* Page content */}
-        <main className="flex-1 overflow-y-auto p-3 md:p-4 bg-white">
-          <div className="max-w-7xl mx-auto">
+        <header className="hidden md:flex items-center justify-end h-16 px-6 bg-white border-b border-gray-200">
+          <NotificationsPanel userId="admin@tbi.com" />
+        </header>
+
+        <main className="flex-1 overflow-y-auto p-4 md:p-6 bg-gray-50">
             {children}
-          </div>
         </main>
       </div>
     </div>
