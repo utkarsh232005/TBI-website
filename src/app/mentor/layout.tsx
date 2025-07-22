@@ -1,4 +1,3 @@
-// src/app/mentor/layout.tsx
 "use client";
 
 import * as React from "react";
@@ -12,6 +11,7 @@ import {
   useSidebar,
   SidebarProvider
 } from "@/components/ui/animated-sidebar";
+import { TooltipProvider } from "@/components/ui/tooltip";
 import {
   LayoutDashboard,
   Users,
@@ -139,7 +139,7 @@ function MentorLayoutContent({
                           : 'text-gray-600 hover:bg-gray-100 hover:text-gray-900',
                         item.disabled && 'opacity-50 cursor-not-allowed'
                       )}
-                      onClick={(e) => {
+                      onClick={(e: React.MouseEvent) => {
                         if(item.disabled) e.preventDefault();
                         handleMobileLinkClick();
                       }}
@@ -199,10 +199,12 @@ export default function MentorLayout({
   children: React.ReactNode;
 }) {
   return (
+    <TooltipProvider>
       <SidebarProvider>
         <MentorLayoutContent>
             {children}
         </MentorLayoutContent>
       </SidebarProvider>
+    </TooltipProvider>
   );
 }

@@ -12,6 +12,7 @@ import {
   useSidebar,
   SidebarProvider
 } from "@/components/ui/animated-sidebar";
+import { TooltipProvider } from "@/components/ui/tooltip";
 import {
   Settings,
   CalendarDays,
@@ -171,7 +172,7 @@ function AdminLayoutContent({
                         "font-semibold text-gray-900", // No background color for active link
                         item.disabled && "opacity-50 cursor-not-allowed"
                     )}
-                    onClick={(e) => {
+                    onClick={(e: React.MouseEvent) => {
                         if(item.disabled) e.preventDefault();
                         handleMobileLinkClick();
                     }}
@@ -235,10 +236,12 @@ export default function AdminLayout({
   children: React.ReactNode;
 }) {
   return (
-    <SidebarProvider>
-      <AdminLayoutContent>
-        {children}
-      </AdminLayoutContent>
-    </SidebarProvider>
+    <TooltipProvider>
+      <SidebarProvider>
+        <AdminLayoutContent>
+          {children}
+        </AdminLayoutContent>
+      </SidebarProvider>
+    </TooltipProvider>
   );
 }

@@ -12,6 +12,7 @@ import {
   useSidebar,
   SidebarProvider
 } from "@/components/ui/animated-sidebar";
+import { TooltipProvider } from "@/components/ui/tooltip";
 import {
   LayoutDashboard,
   Users,
@@ -33,7 +34,6 @@ import { useOnboarding } from "@/hooks/useOnboarding";
 import { UserProvider, useUser } from "@/contexts/user-context";
 import { clearUserSession } from "@/lib/client-utils";
 import { logoutUser } from "@/app/actions/auth-actions";
-import { TooltipProvider } from "@/components/ui/tooltip";
 
 interface NavItem {
   href: string;
@@ -159,7 +159,7 @@ function UserLayoutContent({
                      pathname === item.href && "bg-gray-200 text-gray-900",
                      item.disabled && "opacity-50 cursor-not-allowed"
                    )}
-                   onClick={(e) => {
+                   onClick={(e: React.MouseEvent) => {
                      if (item.disabled) e.preventDefault();
                      handleMobileLinkClick();
                    }}
@@ -226,10 +226,12 @@ export default function UserLayout({
   children: React.ReactNode;
 }) {
   return (
+    <TooltipProvider>
       <SidebarProvider>
         <UserLayoutContent>
             {children}
         </UserLayoutContent>
       </SidebarProvider>
+    </TooltipProvider>
   );
 }
