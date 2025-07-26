@@ -1,4 +1,4 @@
-// src/app/user/settings/page.tsx
+
 "use client";
 
 import React, { useState, useEffect } from 'react';
@@ -224,7 +224,7 @@ const StartupProfile = () => {
                         type="text"
                         value={startupData.companyName}
                         onChange={(e) => handleInputChange('companyName', e.target.value)}
-                        className="mt-1 bg-white text-black"
+                        className="mt-1 bg-white text-black border-gray-300 rounded-md"
                       />
                     </div>
                     <div>
@@ -234,7 +234,7 @@ const StartupProfile = () => {
                         type="text"
                         value={startupData.tagline}
                         onChange={(e) => handleInputChange('tagline', e.target.value)}
-                        className="mt-1 bg-white text-black"
+                        className="mt-1 bg-white text-black border-gray-300 rounded-md"
                       />
                     </div>
                     <div>
@@ -244,7 +244,7 @@ const StartupProfile = () => {
                         value={startupData.description}
                         onChange={(e) => handleInputChange('description', e.target.value)}
                         rows={4}
-                        className="mt-1 bg-white text-black"
+                        className="mt-1 bg-white text-black border-gray-300 rounded-md"
                       />
                     </div>
                   </div>
@@ -385,7 +385,7 @@ const StartupProfile = () => {
                           placeholder="Name"
                           value={member.name}
                           onChange={(e) => updateTeamMember(member.id, 'name', e.target.value)}
-                          className="w-full text-center bg-white text-black"
+                          className="w-full text-center bg-white text-black border-gray-300 rounded-md"
                         />
                         <Label htmlFor={`role-${member.id}`} className="sr-only">Role</Label>
                         <Input
@@ -393,7 +393,7 @@ const StartupProfile = () => {
                           placeholder="Role"
                           value={member.role}
                           onChange={(e) => updateTeamMember(member.id, 'role', e.target.value)}
-                          className="w-full text-center bg-white text-black"
+                          className="w-full text-center bg-white text-black border-gray-300 rounded-md"
                         />
                         <Label htmlFor={`bio-${member.id}`} className="sr-only">Bio</Label>
                         <Textarea
@@ -402,7 +402,7 @@ const StartupProfile = () => {
                           value={member.bio}
                           onChange={(e) => updateTeamMember(member.id, 'bio', e.target.value)}
                           rows={3}
-                          className="w-full bg-white text-black"
+                          className="w-full bg-white text-black border-gray-300 rounded-md"
                         />
                         <Label htmlFor={`linkedin-${member.id}`} className="sr-only">LinkedIn URL</Label>
                         <Input
@@ -410,7 +410,7 @@ const StartupProfile = () => {
                           placeholder="LinkedIn URL"
                           value={member.linkedin}
                           onChange={(e) => updateTeamMember(member.id, 'linkedin', e.target.value)}
-                          className="w-full bg-white text-black"
+                          className="w-full bg-white text-black border-gray-300 rounded-md"
                         />
                       </div>
                     ) : (
