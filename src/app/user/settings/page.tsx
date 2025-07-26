@@ -34,6 +34,7 @@ import { getUserData, updateUserProfile } from "@/app/actions/user-actions";
 import { useToast } from "@/hooks/use-toast";
 import { motion } from "framer-motion";
 import { UserProfileData, UpdateUserProfileFormValues } from "@/types/user";
+import { Label } from "@/components/ui/label";
 
 export default function UserSettingsPage() {
   const { user } = useUser();
