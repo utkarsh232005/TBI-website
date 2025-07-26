@@ -1,3 +1,4 @@
+// src/app/actions/user-actions.ts
 'use server';
 
 import { z } from 'zod';
@@ -7,9 +8,14 @@ import {
   getDoc, 
   updateDoc, 
   serverTimestamp,
-  DocumentData 
+  DocumentData,
+  collection,
+  query,
+  where,
+  getDocs
 } from 'firebase/firestore';
 import { UserProfileData, UpdateUserProfileFormValues } from '@/types/user';
+import { Submission } from '@/types/Submission';
 
 // Response interface
 export interface UserActionResponse {
@@ -42,7 +48,7 @@ const UpdateNotificationPreferencesSchema = z.object({
 
 export type UpdateNotificationPreferencesFormValues = z.infer<typeof UpdateNotificationPreferencesSchema>;
 
-// Function to get user data by UID
+// Function to get user data by UID, now also fetching submission data
 export async function getUserData(uid: string): Promise<UserActionResponse> {
   try {
     if (!uid) {
@@ -63,14 +69,39 @@ export async function getUserData(uid: string): Promise<UserActionResponse> {
     }
 
     const userData = userDoc.data() as UserProfileData;
+    let submissionData: Submission | null = null;
     
-    // Serialize timestamp fields
-    const serializedData = serializeUserData(userData);
+    // Fetch submission data if submissionId exists
+    if (userData.submissionId) {
+        // We need to check both contactSubmissions and offCampusApplications
+        const collectionsToSearch = ['contactSubmissions', 'offCampusApplications'];
+        for (const collectionName of collectionsToSearch) {
+            const submissionDocRef = doc(db, collectionName, userData.submissionId);
+            const submissionDoc = await getDoc(submissionDocRef);
+            if (submissionDoc.exists()) {
+                submissionData = {
+                    id: submissionDoc.id,
+                    ...submissionDoc.data()
+                } as Submission;
+                break; // Found it, no need to check other collections
+            }
+        }
+    }
+    
+    // Serialize timestamp fields before sending to client
+    const serializedUserData = serializeTimestampFields(userData);
+    const serializedSubmissionData = submissionData ? serializeTimestampFields(submissionData) : null;
+    
+    // Combine user data with submission data
+    const combinedData = {
+      ...serializedUserData,
+      submissionData: serializedSubmissionData,
+    };
 
     return {
       success: true,
-      data: serializedData,
-      message: 'User data retrieved successfully.',
+      data: combinedData,
+      message: 'User data and submission details retrieved successfully.',
     };
   } catch (error: any) {
     console.error('Error fetching user data:', error);
@@ -262,47 +293,18 @@ export async function markPasswordChanged(uid: string): Promise<UserActionRespon
   }
 }
 
-// Helper function to serialize Firestore data for client components
-function serializeUserData(userData: UserProfileData): any {
-  const serialized: any = { ...userData };
+// Helper function to serialize Firestore timestamps for client components
+function serializeTimestampFields(data: DocumentData): any {
+  if (!data) return data;
   
-  // Convert all timestamp fields to ISO strings
-  const timestampFields = [
-    'createdAt',
-    'updatedAt',
-  ];
+  const serialized: any = { ...data };
   
-  timestampFields.forEach(field => {
-    if (serialized[field]) {
-      serialized[field] = serialized[field].toDate ? 
-        serialized[field].toDate().toISOString() : 
-        serialized[field];
+  for (const key in serialized) {
+    if (serialized[key] && typeof serialized[key].toDate === 'function') {
+      serialized[key] = serialized[key].toDate().toISOString();
+    } else if (typeof serialized[key] === 'object' && serialized[key] !== null) {
+      serialized[key] = serializeTimestampFields(serialized[key]);
     }
-  });
-  
-  // Handle nested timestamp fields in onboardingProgress
-  if (serialized.onboardingProgress) {
-    const progressFields = [
-      'passwordChangedAt',
-      'profileCompletedAt', 
-      'notificationsConfiguredAt',
-      'completedAt'
-    ];
-    
-    progressFields.forEach(field => {
-      if (serialized.onboardingProgress[field]) {
-        serialized.onboardingProgress[field] = serialized.onboardingProgress[field].toDate ?
-          serialized.onboardingProgress[field].toDate().toISOString() :
-          serialized.onboardingProgress[field];
-      }
-    });
-  }
-  
-  // Handle nested timestamp in notificationPreferences
-  if (serialized.notificationPreferences && serialized.notificationPreferences.updatedAt) {
-    serialized.notificationPreferences.updatedAt = serialized.notificationPreferences.updatedAt.toDate ?
-      serialized.notificationPreferences.updatedAt.toDate().toISOString() :
-      serialized.notificationPreferences.updatedAt;
   }
   
   return serialized;

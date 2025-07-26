@@ -1,318 +1,519 @@
-
 // src/app/user/settings/page.tsx
 "use client";
 
-import React, { useState, useEffect, useRef } from "react";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
-import { Separator } from "@/components/ui/separator";
-import { Badge } from "@/components/ui/badge";
-import {
-  User,
-  Loader2,
-  Save,
-  Mail,
-  Linkedin,
-  Rocket,
-  Users,
-  FileText,
-  Award,
-  UploadCloud,
-  X,
-  Phone,
+import React, { useState, useEffect } from 'react';
+import { 
+  User, 
+  Users, 
+  Building2, 
+  FileText, 
+  Award, 
+  Edit3, 
+  Save, 
+  X, 
+  Plus,
+  Calendar,
+  MapPin,
   Globe,
-  Camera,
-  Building2,
-  Settings,
-} from "lucide-react";
-import { useUser } from "@/contexts/user-context";
-import { getUserData, updateUserProfile } from "@/app/actions/user-actions";
-import { useToast } from "@/hooks/use-toast";
-import { motion } from "framer-motion";
-import { UserProfileData, UpdateUserProfileFormValues } from "@/types/user";
-import { Label } from "@/components/ui/label";
+  Mail,
+  Phone,
+  Linkedin,
+  Upload,
+  Star,
+  TrendingUp,
+  Target,
+  DollarSign,
+  Loader2,
+  AlertCircle
+} from 'lucide-react';
+import { useUser } from '@/contexts/user-context';
+import { useAuth } from '@/contexts/AuthContext';
+import { Button } from '@/components/ui/button';
 
-export default function UserSettingsPage() {
+const StartupProfile = () => {
   const { user } = useUser();
-  const { toast } = useToast();
-  const [profileData, setProfileData] = useState<UserProfileData | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
-  const [isSaving, setIsSaving] = useState(false);
-  const [profilePictureFile, setProfilePictureFile] = useState<File | null>(null);
-  const fileInputRef = useRef<HTMLInputElement>(null);
+  const { userData, loading: authLoading } = useAuth();
+  const [isEditing, setIsEditing] = useState(false);
+  const [activeTab, setActiveTab] = useState('overview');
+  
+  const [startupData, setStartupData] = useState({
+    companyName: '',
+    tagline: 'Revolutionizing the future of AI-driven solutions', // Placeholder
+    description: '',
+    industry: '',
+    stage: '',
+    location: '',
+    founded: '',
+    website: '',
+    email: '',
+    phone: '',
+    socialLinks: {
+      linkedin: '',
+      twitter: '',
+    },
+    logo: null
+  });
+
+  const [teamMembers, setTeamMembers] = useState<any[]>([]);
+  const [documents, setDocuments] = useState<any[]>([]);
+  const [milestones, setMilestones] = useState<any[]>([]);
 
   useEffect(() => {
-    const fetchProfileData = async () => {
-      if (!user?.uid) {
-        setIsLoading(false);
-        return;
-      }
-      try {
-        const result = await getUserData(user.uid);
-        if (result.success && result.data) {
-          setProfileData(result.data as UserProfileData);
-        } else {
-          toast({
-            title: "Error",
-            description: result.message,
-            variant: "destructive",
-          });
-        }
-      } catch (error) {
-        console.error("Error fetching profile data:", error);
-        toast({
-          title: "Error",
-          description: "Failed to load profile data",
-          variant: "destructive",
-        });
-      } finally {
-        setIsLoading(false);
-      }
+    if (userData) {
+      const submissionData = (userData as any).submissionData;
+      setStartupData({
+        companyName: submissionData?.companyName || userData.name || '',
+        description: submissionData?.startupIdea || submissionData?.idea || 'No description provided.',
+        industry: submissionData?.domain || 'Not specified',
+        stage: submissionData?.currentStage || 'Ideation',
+        location: 'Nagpur, India', // Placeholder
+        founded: submissionData?.createdAt ? new Date(submissionData.createdAt).getFullYear().toString() : 'N/A',
+        website: submissionData?.portfolioUrl || '',
+        email: submissionData?.companyEmail || userData.email || '',
+        phone: submissionData?.phone || '',
+        socialLinks: {
+          linkedin: submissionData?.linkedinUrl || '',
+          twitter: '', // No twitter field in submission
+        },
+        tagline: 'Revolutionizing the future', // Placeholder
+        logo: null // Logo should be handled
+      });
+      setTeamMembers(submissionData?.founderNames ? [{
+        id: 1,
+        name: submissionData.founderNames,
+        role: 'Founder',
+        bio: submissionData.founderBio || '',
+        linkedin: submissionData.linkedinUrl || '',
+        image: null
+      }] : []);
+    }
+  }, [userData]);
+
+
+  const handleInputChange = (field: string, value: any) => {
+    setStartupData(prev => ({
+      ...prev,
+      [field]: value
+    }));
+  };
+
+  const handleSave = () => {
+    setIsEditing(false);
+    // Here you would typically save to a backend
+    console.log('Saving startup data:', startupData);
+  };
+
+  const addTeamMember = () => {
+    const newMember = {
+      id: Date.now(),
+      name: '',
+      role: '',
+      bio: '',
+      linkedin: '',
+      image: null
     };
+    setTeamMembers([...teamMembers, newMember]);
+  };
 
-    fetchProfileData();
-  }, [user, toast]);
+  const updateTeamMember = (id: number, field: string, value: any) => {
+    setTeamMembers(prev => prev.map(member => 
+      member.id === id ? { ...member, [field]: value } : member
+    ));
+  };
+
+  const removeTeamMember = (id: number) => {
+    setTeamMembers(prev => prev.filter(member => member.id !== id));
+  };
+
+  const getStatusColor = (status: string) => {
+    switch (status) {
+      case 'Approved': return 'text-green-600 bg-green-100';
+      case 'Under Review': return 'text-yellow-600 bg-yellow-100';
+      case 'Pending': return 'text-red-600 bg-red-100';
+      default: return 'text-gray-600 bg-gray-100';
+    }
+  };
   
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files && e.target.files[0]) {
-      const file = e.target.files[0];
-      setProfilePictureFile(file);
-      const reader = new FileReader();
-      reader.onload = (event) => {
-        if (profileData) {
-          setProfileData({ ...profileData, profilePicture: event.target?.result as string });
-        }
-      };
-      reader.readAsDataURL(file);
-    }
-  };
-
-  const handleRemoveProfilePicture = () => {
-    setProfilePictureFile(null);
-    if (profileData) {
-      setProfileData({ ...profileData, profilePicture: "" });
-    }
-  };
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!user?.uid || !profileData) return;
-
-    setIsSaving(true);
-    try {
-      const valuesToSave: UpdateUserProfileFormValues = {
-        uid: user.uid,
-        firstName: profileData.firstName || '',
-        lastName: profileData.lastName || '',
-        phone: profileData.phone || '',
-        bio: profileData.bio || '',
-        linkedin: profileData.linkedin || '',
-        profilePicture: profileData.profilePicture || '',
-        startupName: profileData.startupName || '',
-        startupDescription: profileData.startupDescription || '',
-        startupWebsite: profileData.startupWebsite || '',
-        teamInfo: profileData.teamInfo || '',
-      };
-
-      const result = await updateUserProfile(valuesToSave);
-
-      if (result.success) {
-        toast({ title: "Success", description: "Profile updated successfully!" });
-      } else {
-        toast({ title: "Error", description: result.message, variant: "destructive" });
-      }
-    } catch (error) {
-      toast({ title: "Error", description: "An unexpected error occurred.", variant: "destructive" });
-    } finally {
-      setIsSaving(false);
-    }
-  };
-
-  const getInitials = (name?: string) => {
-    if (!name) return "U";
-    return name
-      .split(' ')
-      .map(n => n[0])
-      .join('')
-      .toUpperCase();
-  };
-
-
-  if (isLoading) {
-    return <div className="flex justify-center items-center h-full"><Loader2 className="h-8 w-8 animate-spin" /></div>;
+  if (authLoading) {
+      return (
+          <div className="flex justify-center items-center h-96">
+            <div className="text-center">
+                <Loader2 className="h-8 w-8 animate-spin text-blue-600 mx-auto mb-4" />
+                <p className="text-gray-600">Loading your profile...</p>
+            </div>
+          </div>
+      )
   }
 
-  if (!profileData) {
-    return <div className="text-center">Could not load profile data.</div>;
+  if (!userData) {
+      return <div className="text-center py-10">User data could not be loaded. Please try again later.</div>
   }
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-10 max-w-6xl mx-auto">
-      <motion.div initial={{ opacity: 0, y: -20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }}>
-        <div className="flex items-center gap-4">
-          <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center">
-            <Settings className="w-6 h-6 text-blue-600" />
-          </div>
-          <div>
-            <h1 className="text-3xl font-bold text-gray-900">Profile Settings</h1>
-            <p className="text-gray-600 mt-1">Manage your personal and startup information.</p>
-          </div>
-        </div>
-      </motion.div>
-
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-10">
-        <div className="lg:col-span-1 space-y-8 lg:sticky lg:top-8">
-          {/* Profile Card */}
-          <Card className="shadow-sm border-gray-200">
-            <CardContent className="p-6 text-center">
-              <div className="relative w-32 h-32 mx-auto mb-4">
-                <div className="w-full h-full rounded-full bg-gray-100 flex items-center justify-center overflow-hidden border-4 border-white shadow-md">
-                  {profileData.profilePicture ? (
-                    <img src={profileData.profilePicture} alt="Profile" className="w-full h-full object-cover" />
-                  ) : (
-                    <span className="text-4xl font-bold text-gray-500">{getInitials(profileData.name)}</span>
-                  )}
-                </div>
-                <Button
-                  type="button"
-                  size="icon"
-                  className="absolute bottom-1 right-1 h-9 w-9 rounded-full bg-blue-600 hover:bg-blue-700"
-                  onClick={() => fileInputRef.current?.click()}
-                >
-                  <Camera className="h-4 w-4" />
-                </Button>
-                <input type="file" ref={fileInputRef} onChange={handleFileChange} className="hidden" accept="image/*" />
-              </div>
-              <h2 className="text-xl font-bold text-gray-900">{profileData.name}</h2>
-              <p className="text-sm text-gray-500">{user?.email}</p>
-              
-              <div className="mt-4 flex justify-center gap-3">
-                <Button variant="outline" size="sm" asChild>
-                  <a href={profileData.linkedin || '#'} target="_blank" rel="noopener noreferrer" className="flex items-center gap-1.5">
-                    <Linkedin className="h-4 w-4" /> LinkedIn
-                  </a>
-                </Button>
-                <Button variant="outline" size="sm" asChild>
-                  <a href={`mailto:${profileData.email}`} className="flex items-center gap-1.5">
-                    <Mail className="h-4 w-4" /> Email
-                  </a>
-                </Button>
-              </div>
-            </CardContent>
-          </Card>
-          
-          {/* Milestones & Achievements Card */}
-          <Card className="shadow-sm border-gray-200">
-            <CardHeader>
-              <CardTitle className="flex items-center"><Award className="mr-2 text-yellow-500" /> Milestones</CardTitle>
-              <CardDescription>Badges awarded by your mentors.</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="flex flex-wrap gap-2">
-                <Badge className="py-1 px-3 bg-yellow-100 text-yellow-800 border-yellow-200">First Pitch</Badge>
-                <Badge className="py-1 px-3 bg-green-100 text-green-800 border-green-200">Prototype Ready</Badge>
-                <Badge className="py-1 px-3 bg-blue-100 text-blue-800 border-blue-200">Seed Funding Ready</Badge>
-              </div>
-            </CardContent>
-          </Card>
-        </div>
-
-        <div className="lg:col-span-2 space-y-8">
-          {/* Personal Information */}
-          <Card className="shadow-sm border-gray-200">
-            <CardHeader>
-              <CardTitle className="flex items-center"><User className="mr-2 text-blue-600" /> Personal Information</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-6">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div>
-                  <Label htmlFor="firstName">First Name</Label>
-                  <Input id="firstName" value={profileData.firstName || ''} onChange={(e) => setProfileData({ ...profileData, firstName: e.target.value })} />
-                </div>
-                <div>
-                  <Label htmlFor="lastName">Last Name</Label>
-                  <Input id="lastName" value={profileData.lastName || ''} onChange={(e) => setProfileData({ ...profileData, lastName: e.target.value })} />
-                </div>
+    <div className="min-h-screen bg-gray-50">
+      {/* Header */}
+      <div className="bg-white shadow-sm">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex justify-between items-center py-6">
+            <div className="flex items-center space-x-4">
+              <div className="w-16 h-16 bg-gradient-to-r from-blue-500 to-purple-600 rounded-lg flex items-center justify-center">
+                <Building2 className="w-8 h-8 text-white" />
               </div>
               <div>
-                <Label htmlFor="phone">Phone</Label>
-                <div className="relative">
-                  <Phone className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
-                  <Input id="phone" type="tel" value={profileData.phone || ''} onChange={(e) => setProfileData({ ...profileData, phone: e.target.value })} className="pl-10" />
-                </div>
+                <h1 className="text-3xl font-bold text-gray-900">{startupData.companyName}</h1>
+                <p className="text-gray-600">{startupData.tagline}</p>
               </div>
-              <div>
-                <Label htmlFor="bio">Bio</Label>
-                <Textarea id="bio" value={profileData.bio || ''} onChange={(e) => setProfileData({ ...profileData, bio: e.target.value })} placeholder="Tell us a bit about yourself" />
-              </div>
-            </CardContent>
-          </Card>
-
-          {/* Startup Information */}
-          <Card className="shadow-sm border-gray-200">
-            <CardHeader>
-              <CardTitle className="flex items-center"><Rocket className="mr-2 text-blue-600" /> Startup Information</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div>
-                <Label htmlFor="startupName">Startup Name</Label>
-                <Input id="startupName" value={profileData.startupName || ''} onChange={(e) => setProfileData({ ...profileData, startupName: e.target.value })} />
-              </div>
-              <div>
-                <Label htmlFor="startupDescription">Startup Description</Label>
-                <Textarea id="startupDescription" value={profileData.startupDescription || ''} onChange={(e) => setProfileData({ ...profileData, startupDescription: e.target.value })} placeholder="What does your startup do?" />
-              </div>
-              <div>
-                <Label htmlFor="startupWebsite">Website</Label>
-                <div className="relative">
-                  <Globe className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
-                  <Input id="startupWebsite" type="url" value={profileData.startupWebsite || ''} onChange={(e) => setProfileData({ ...profileData, startupWebsite: e.target.value })} placeholder="https://example.com" className="pl-10" />
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-
-          {/* Team & Documents */}
-          <Card className="shadow-sm border-gray-200">
-            <CardHeader>
-              <CardTitle className="flex items-center"><Users className="mr-2 text-blue-600" /> Team & Documents</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-6">
-              <div>
-                <Label htmlFor="teamInfo">Team Information</Label>
-                <Textarea id="teamInfo" value={profileData.teamInfo || ''} onChange={(e) => setProfileData({ ...profileData, teamInfo: e.target.value })} placeholder="List your team members and their roles." />
-              </div>
-              <div>
-                <Label>Documents</Label>
-                <div className="p-6 border-2 border-dashed rounded-lg text-center mt-2">
-                  <UploadCloud className="mx-auto h-12 w-12 text-gray-400" />
-                  <p className="mt-2 text-sm text-gray-600">Drag and drop files here, or click to browse.</p>
-                  <p className="text-xs text-gray-500 mt-1">PDF, DOCX, PPTX up to 10MB</p>
-                  <Button type="button" variant="outline" className="mt-4">
-                    Upload Files
-                  </Button>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-
-          {/* Save Button */}
-          <div className="flex justify-end">
-            <Button type="submit" disabled={isSaving} className="px-8 py-3 bg-blue-600 hover:bg-blue-700">
-              {isSaving ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Save className="mr-2 h-4 w-4" />}
-              Save Profile
-            </Button>
+            </div>
+            <button
+              onClick={() => isEditing ? handleSave() : setIsEditing(true)}
+              className={`flex items-center space-x-2 px-4 py-2 rounded-lg font-medium ${
+                isEditing 
+                  ? 'bg-green-600 hover:bg-green-700 text-white' 
+                  : 'bg-blue-600 hover:bg-blue-700 text-white'
+              }`}
+            >
+              {isEditing ? <Save className="w-4 h-4" /> : <Edit3 className="w-4 h-4" />}
+              <span>{isEditing ? 'Save Changes' : 'Edit Profile'}</span>
+            </button>
           </div>
         </div>
       </div>
-    </form>
+
+      {/* Navigation Tabs */}
+      <div className="bg-white border-b">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <nav className="flex space-x-8">
+            {[
+              { id: 'overview', label: 'Overview', icon: Building2 },
+              { id: 'team', label: 'Team', icon: Users },
+              { id: 'documents', label: 'Documents', icon: FileText },
+              { id: 'milestones', label: 'Milestones', icon: Award }
+            ].map(tab => (
+              <button
+                key={tab.id}
+                onClick={() => setActiveTab(tab.id)}
+                className={`flex items-center space-x-2 py-4 px-1 border-b-2 font-medium text-sm ${
+                  activeTab === tab.id
+                    ? 'border-blue-500 text-blue-600'
+                    : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                }`}
+              >
+                <tab.icon className="w-4 h-4" />
+                <span>{tab.label}</span>
+              </button>
+            ))}
+          </nav>
+        </div>
+      </div>
+
+      {/* Content */}
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        {/* Overview Tab */}
+        {activeTab === 'overview' && (
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            {/* Main Information */}
+            <div className="lg:col-span-2 space-y-6">
+              <div className="bg-white rounded-lg shadow p-6">
+                <h2 className="text-xl font-semibold mb-4">Company Overview</h2>
+                {isEditing ? (
+                  <div className="space-y-4">
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">Company Name</label>
+                      <input
+                        type="text"
+                        value={startupData.companyName}
+                        onChange={(e) => handleInputChange('companyName', e.target.value)}
+                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">Tagline</label>
+                      <input
+                        type="text"
+                        value={startupData.tagline}
+                        onChange={(e) => handleInputChange('tagline', e.target.value)}
+                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">Description</label>
+                      <textarea
+                        value={startupData.description}
+                        onChange={(e) => handleInputChange('description', e.target.value)}
+                        rows={4}
+                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      />
+                    </div>
+                  </div>
+                ) : (
+                  <p className="text-gray-700 leading-relaxed">{startupData.description}</p>
+                )}
+              </div>
+
+              {/* Key Metrics */}
+              <div className="bg-white rounded-lg shadow p-6">
+                <h2 className="text-xl font-semibold mb-4">Key Metrics</h2>
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                  <div className="text-center p-4 bg-blue-50 rounded-lg">
+                    <TrendingUp className="w-8 h-8 text-blue-600 mx-auto mb-2" />
+                    <div className="text-2xl font-bold text-blue-600">0</div>
+                    <div className="text-sm text-gray-600">Active Users</div>
+                  </div>
+                  <div className="text-center p-4 bg-green-50 rounded-lg">
+                    <DollarSign className="w-8 h-8 text-green-600 mx-auto mb-2" />
+                    <div className="text-2xl font-bold text-green-600">$0K</div>
+                    <div className="text-sm text-gray-600">Revenue</div>
+                  </div>
+                  <div className="text-center p-4 bg-purple-50 rounded-lg">
+                    <Target className="w-8 h-8 text-purple-600 mx-auto mb-2" />
+                    <div className="text-2xl font-bold text-purple-600">{teamMembers.length}</div>
+                    <div className="text-sm text-gray-600">Team Size</div>
+                  </div>
+                  <div className="text-center p-4 bg-orange-50 rounded-lg">
+                    <Award className="w-8 h-8 text-orange-600 mx-auto mb-2" />
+                    <div className="text-2xl font-bold text-orange-600">{milestones.length}</div>
+                    <div className="text-sm text-gray-600">Milestones</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Sidebar */}
+            <div className="space-y-6">
+              {/* Company Details */}
+              <div className="bg-white rounded-lg shadow p-6">
+                <h3 className="text-lg font-semibold mb-4">Company Details</h3>
+                <div className="space-y-3">
+                  <div className="flex items-center space-x-3">
+                    <Building2 className="w-4 h-4 text-gray-400" />
+                    <span className="text-sm text-gray-600">Industry:</span>
+                    <span className="text-sm font-medium">{startupData.industry}</span>
+                  </div>
+                  <div className="flex items-center space-x-3">
+                    <TrendingUp className="w-4 h-4 text-gray-400" />
+                    <span className="text-sm text-gray-600">Stage:</span>
+                    <span className="text-sm font-medium">{startupData.stage}</span>
+                  </div>
+                  <div className="flex items-center space-x-3">
+                    <MapPin className="w-4 h-4 text-gray-400" />
+                    <span className="text-sm text-gray-600">Location:</span>
+                    <span className="text-sm font-medium">{startupData.location}</span>
+                  </div>
+                  <div className="flex items-center space-x-3">
+                    <Calendar className="w-4 h-4 text-gray-400" />
+                    <span className="text-sm text-gray-600">Founded:</span>
+                    <span className="text-sm font-medium">{startupData.founded}</span>
+                  </div>
+                </div>
+              </div>
+
+              {/* Contact Information */}
+              <div className="bg-white rounded-lg shadow p-6">
+                <h3 className="text-lg font-semibold mb-4">Contact Information</h3>
+                <div className="space-y-3">
+                  <div className="flex items-center space-x-3">
+                    <Globe className="w-4 h-4 text-gray-400" />
+                    <a href={startupData.website} className="text-sm text-blue-600 hover:underline">
+                      {startupData.website || 'Not Provided'}
+                    </a>
+                  </div>
+                  <div className="flex items-center space-x-3">
+                    <Mail className="w-4 h-4 text-gray-400" />
+                    <a href={`mailto:${startupData.email}`} className="text-sm text-blue-600 hover:underline">
+                      {startupData.email}
+                    </a>
+                  </div>
+                  <div className="flex items-center space-x-3">
+                    <Phone className="w-4 h-4 text-gray-400" />
+                    <span className="text-sm">{startupData.phone || 'Not Provided'}</span>
+                  </div>
+                  <div className="flex items-center space-x-3">
+                    <Linkedin className="w-4 h-4 text-gray-400" />
+                    <a href={startupData.socialLinks.linkedin} className="text-sm text-blue-600 hover:underline">
+                      LinkedIn
+                    </a>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Team Tab */}
+        {activeTab === 'team' && (
+          <div className="space-y-6">
+            <div className="flex justify-between items-center">
+              <h2 className="text-2xl font-bold text-gray-900">Team Members</h2>
+              {isEditing && (
+                <button
+                  onClick={addTeamMember}
+                  className="flex items-center space-x-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+                >
+                  <Plus className="w-4 h-4" />
+                  <span>Add Member</span>
+                </button>
+              )}
+            </div>
+            
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {teamMembers.map(member => (
+                <div key={member.id} className="bg-white rounded-lg shadow p-6">
+                  {isEditing && (
+                    <div className="flex justify-end mb-2">
+                      <button
+                        onClick={() => removeTeamMember(member.id)}
+                        className="text-red-500 hover:text-red-700"
+                      >
+                        <X className="w-4 h-4" />
+                      </button>
+                    </div>
+                  )}
+                  
+                  <div className="text-center">
+                    <div className="w-20 h-20 bg-gradient-to-r from-blue-400 to-purple-500 rounded-full mx-auto mb-4 flex items-center justify-center">
+                      <User className="w-10 h-10 text-white" />
+                    </div>
+                    
+                    {isEditing ? (
+                      <div className="space-y-3">
+                        <input
+                          type="text"
+                          placeholder="Name"
+                          value={member.name}
+                          onChange={(e) => updateTeamMember(member.id, 'name', e.target.value)}
+                          className="w-full px-3 py-2 border border-gray-300 rounded-md text-center"
+                        />
+                        <input
+                          type="text"
+                          placeholder="Role"
+                          value={member.role}
+                          onChange={(e) => updateTeamMember(member.id, 'role', e.target.value)}
+                          className="w-full px-3 py-2 border border-gray-300 rounded-md text-center"
+                        />
+                        <textarea
+                          placeholder="Bio"
+                          value={member.bio}
+                          onChange={(e) => updateTeamMember(member.id, 'bio', e.target.value)}
+                          rows={3}
+                          className="w-full px-3 py-2 border border-gray-300 rounded-md"
+                        />
+                        <input
+                          type="text"
+                          placeholder="LinkedIn URL"
+                          value={member.linkedin}
+                          onChange={(e) => updateTeamMember(member.id, 'linkedin', e.target.value)}
+                          className="w-full px-3 py-2 border border-gray-300 rounded-md"
+                        />
+                      </div>
+                    ) : (
+                      <>
+                        <h3 className="text-lg font-semibold text-gray-900">{member.name}</h3>
+                        <p className="text-blue-600 font-medium mb-2">{member.role}</p>
+                        <p className="text-gray-600 text-sm mb-4">{member.bio}</p>
+                        {member.linkedin && (
+                          <a 
+                            href={member.linkedin}
+                            className="inline-flex items-center space-x-1 text-blue-600 hover:underline"
+                          >
+                            <Linkedin className="w-4 h-4" />
+                            <span className="text-sm">LinkedIn</span>
+                          </a>
+                        )}
+                      </>
+                    )}
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* Documents Tab */}
+        {activeTab === 'documents' && (
+          <div className="space-y-6">
+            <div className="flex justify-between items-center">
+              <h2 className="text-2xl font-bold text-gray-900">Documents</h2>
+              <button className="flex items-center space-x-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">
+                <Upload className="w-4 h-4" />
+                <span>Upload Document</span>
+              </button>
+            </div>
+            
+            <div className="bg-white rounded-lg shadow">
+              <div className="px-6 py-4 border-b border-gray-200">
+                <h3 className="text-lg font-semibold">Document Library</h3>
+              </div>
+              <div className="divide-y divide-gray-200">
+                {documents.map(doc => (
+                  <div key={doc.id} className="px-6 py-4 flex items-center justify-between">
+                    <div className="flex items-center space-x-4">
+                      <FileText className="w-8 h-8 text-blue-500" />
+                      <div>
+                        <h4 className="font-medium text-gray-900">{doc.name}</h4>
+                        <p className="text-sm text-gray-600">
+                          {doc.type} • Uploaded {doc.uploadDate}
+                        </p>
+                      </div>
+                    </div>
+                    <div className="flex items-center space-x-4">
+                      <span className={`px-2 py-1 rounded-full text-xs font-medium ${getStatusColor(doc.status)}`}>
+                        {doc.status}
+                      </span>
+                      <button className="text-blue-600 hover:text-blue-800 text-sm font-medium">
+                        View
+                      </button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Milestones Tab */}
+        {activeTab === 'milestones' && (
+          <div className="space-y-6">
+            <h2 className="text-2xl font-bold text-gray-900">Milestone Badges</h2>
+            <p className="text-gray-600">Achievement badges awarded by mentors for reaching key milestones.</p>
+            
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              {milestones.map(milestone => (
+                <div key={milestone.id} className="bg-white rounded-lg shadow p-6">
+                  <div className="flex items-start space-x-4">
+                    <div className={`w-16 h-16 ${milestone.badgeColor} rounded-full flex items-center justify-center flex-shrink-0`}>
+                      <Award className="w-8 h-8 text-white" />
+                    </div>
+                    <div className="flex-1">
+                      <h3 className="text-lg font-semibold text-gray-900 mb-2">{milestone.title}</h3>
+                      <p className="text-gray-600 mb-3">{milestone.description}</p>
+                      <div className="flex items-center justify-between text-sm text-gray-500">
+                        <div className="flex items-center space-x-1">
+                          <User className="w-4 h-4" />
+                          <span>Awarded by {milestone.mentorName}</span>
+                        </div>
+                        <div className="flex items-center space-x-1">
+                          <Calendar className="w-4 h-4" />
+                          <span>{milestone.dateAchieved}</span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+            
+            {milestones.length === 0 && (
+              <div className="text-center py-12">
+                <Award className="w-16 h-16 text-gray-300 mx-auto mb-4" />
+                <h3 className="text-lg font-medium text-gray-900 mb-2">No milestones yet</h3>
+                <p className="text-gray-600">Keep working towards your goals! Mentors will award badges as you achieve key milestones.</p>
+              </div>
+            )}
+          </div>
+        )}
+      </div>
+    </div>
   );
-}
+};
+
+export default StartupProfile;
