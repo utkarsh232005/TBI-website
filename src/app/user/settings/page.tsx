@@ -1,7 +1,16 @@
+
 // src/app/user/settings/page.tsx
 "use client";
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect } from "react";
+import { useParams, useRouter } from 'next/navigation';
+import { useUser } from '@/contexts/user-context';
+import { getMenteeProfile } from '@/app/actions/mentor-request-actions';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Separator } from "@/components/ui/separator";
 import { 
   User, 
   Users, 
@@ -26,9 +35,7 @@ import {
   Loader2,
   AlertCircle
 } from 'lucide-react';
-import { useUser } from '@/contexts/user-context';
 import { useAuth } from '@/contexts/AuthContext';
-import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
@@ -227,7 +234,7 @@ const StartupProfile = () => {
                         type="text"
                         value={startupData.companyName}
                         onChange={(e) => handleInputChange('companyName', e.target.value)}
-                        className="mt-1"
+                        className="mt-1 bg-white text-black"
                       />
                     </div>
                     <div>
@@ -237,7 +244,7 @@ const StartupProfile = () => {
                         type="text"
                         value={startupData.tagline}
                         onChange={(e) => handleInputChange('tagline', e.target.value)}
-                        className="mt-1"
+                        className="mt-1 bg-white text-black"
                       />
                     </div>
                     <div>
@@ -247,7 +254,7 @@ const StartupProfile = () => {
                         value={startupData.description}
                         onChange={(e) => handleInputChange('description', e.target.value)}
                         rows={4}
-                        className="mt-1"
+                        className="mt-1 bg-white text-black"
                       />
                     </div>
                   </div>
@@ -388,7 +395,7 @@ const StartupProfile = () => {
                           placeholder="Name"
                           value={member.name}
                           onChange={(e) => updateTeamMember(member.id, 'name', e.target.value)}
-                          className="w-full text-center"
+                          className="w-full text-center bg-white text-black"
                         />
                         <Label htmlFor={`role-${member.id}`} className="sr-only">Role</Label>
                         <Input
@@ -396,7 +403,7 @@ const StartupProfile = () => {
                           placeholder="Role"
                           value={member.role}
                           onChange={(e) => updateTeamMember(member.id, 'role', e.target.value)}
-                          className="w-full text-center"
+                          className="w-full text-center bg-white text-black"
                         />
                         <Label htmlFor={`bio-${member.id}`} className="sr-only">Bio</Label>
                         <Textarea
@@ -405,7 +412,7 @@ const StartupProfile = () => {
                           value={member.bio}
                           onChange={(e) => updateTeamMember(member.id, 'bio', e.target.value)}
                           rows={3}
-                          className="w-full"
+                          className="w-full bg-white text-black"
                         />
                         <Label htmlFor={`linkedin-${member.id}`} className="sr-only">LinkedIn URL</Label>
                         <Input
@@ -413,7 +420,7 @@ const StartupProfile = () => {
                           placeholder="LinkedIn URL"
                           value={member.linkedin}
                           onChange={(e) => updateTeamMember(member.id, 'linkedin', e.target.value)}
-                          className="w-full"
+                          className="w-full bg-white text-black"
                         />
                       </div>
                     ) : (
