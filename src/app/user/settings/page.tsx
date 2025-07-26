@@ -30,7 +30,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
-
+import { Button as StatefulButton } from '@/components/ui/stateful-button'; // Import stateful button
 
 const StartupProfile = () => {
   const { userData, loading: authLoading } = useAuth();
@@ -98,10 +98,12 @@ const StartupProfile = () => {
     }));
   };
 
-  const handleSave = () => {
-    setIsEditing(false);
+  const handleSave = async (event: React.MouseEvent<HTMLButtonElement>) => {
     // Here you would typically save to a backend
     console.log('Saving startup data:', startupData);
+    // Simulate async operation
+    await new Promise(resolve => setTimeout(resolve, 1500));
+    setIsEditing(false);
   };
 
   const addTeamMember = () => {
@@ -165,17 +167,20 @@ const StartupProfile = () => {
                 <p className="text-gray-600">{startupData.tagline}</p>
               </div>
             </div>
-            <button
-              onClick={() => isEditing ? handleSave() : setIsEditing(true)}
-              className={`flex items-center space-x-2 px-4 py-2 rounded-lg font-medium ${
-                isEditing 
-                  ? 'bg-green-600 hover:bg-green-700 text-white' 
-                  : 'bg-blue-600 hover:bg-blue-700 text-white'
-              }`}
-            >
-              {isEditing ? <Save className="w-4 h-4" /> : <Edit3 className="w-4 h-4" />}
-              <span>{isEditing ? 'Save Changes' : 'Edit Profile'}</span>
-            </button>
+            {isEditing ? (
+              <StatefulButton onClick={handleSave}>
+                <Save className="w-4 h-4 mr-2" />
+                Save Changes
+              </StatefulButton>
+            ) : (
+              <button
+                onClick={() => setIsEditing(true)}
+                className="flex items-center space-x-2 px-4 py-2 rounded-lg font-medium bg-blue-600 hover:bg-blue-700 text-white"
+              >
+                <Edit3 className="w-4 h-4" />
+                <span>Edit Profile</span>
+              </button>
+            )}
           </div>
         </div>
       </div>
@@ -522,3 +527,5 @@ const StartupProfile = () => {
 };
 
 export default StartupProfile;
+
+    
