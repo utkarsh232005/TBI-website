@@ -171,14 +171,18 @@ const StartupProfile = () => {
               </div>
             </div>
             {isEditing ? (
-              <StatefulButton onClick={handleSave} disabled={isSaving}>
+              <StatefulButton 
+                onClick={handleSave} 
+                disabled={isSaving}
+                className="flex items-center space-x-2 px-5 py-2 rounded-full text-sm font-medium"
+              >
                 {!isSaving && <Save className="w-4 h-4 mr-2" />}
                 Save Changes
               </StatefulButton>
             ) : (
               <button
                 onClick={() => setIsEditing(true)}
-                className="flex items-center space-x-2 px-4 py-2 rounded-lg font-medium bg-blue-600 hover:bg-blue-700 text-white"
+                className="flex items-center space-x-2 px-5 py-2 rounded-full text-sm font-medium bg-blue-600 hover:bg-blue-700 text-white"
               >
                 <Edit3 className="w-4 h-4" />
                 <span>Edit Profile</span>
@@ -384,34 +388,26 @@ const StartupProfile = () => {
                     
                     {isEditing ? (
                       <div className="space-y-3">
-                        <Label htmlFor={`name-${member.id}`} className="sr-only">Name</Label>
                         <Input
-                          id={`name-${member.id}`}
                           placeholder="Name"
                           value={member.name}
                           onChange={(e) => updateTeamMember(member.id, 'name', e.target.value)}
                           className="w-full text-center bg-white text-black border-gray-300 rounded-md focus-visible:ring-0 focus-visible:ring-offset-0 focus:outline-none"
                         />
-                        <Label htmlFor={`role-${member.id}`} className="sr-only">Role</Label>
                         <Input
-                          id={`role-${member.id}`}
                           placeholder="Role"
                           value={member.role}
                           onChange={(e) => updateTeamMember(member.id, 'role', e.target.value)}
                           className="w-full text-center bg-white text-black border-gray-300 rounded-md focus-visible:ring-0 focus-visible:ring-offset-0 focus:outline-none"
                         />
-                        <Label htmlFor={`bio-${member.id}`} className="sr-only">Bio</Label>
                         <Textarea
-                          id={`bio-${member.id}`}
                           placeholder="Bio"
                           value={member.bio}
                           onChange={(e) => updateTeamMember(member.id, 'bio', e.target.value)}
                           rows={3}
                           className="w-full bg-white text-black border-gray-300 rounded-md focus-visible:ring-0 focus-visible:ring-offset-0 focus:outline-none"
                         />
-                        <Label htmlFor={`linkedin-${member.id}`} className="sr-only">LinkedIn URL</Label>
                         <Input
-                          id={`linkedin-${member.id}`}
                           placeholder="LinkedIn URL"
                           value={member.linkedin}
                           onChange={(e) => updateTeamMember(member.id, 'linkedin', e.target.value)}
