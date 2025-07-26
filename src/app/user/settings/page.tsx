@@ -58,6 +58,7 @@ const StartupProfile = () => {
   const [teamMembers, setTeamMembers] = useState<any[]>([]);
   const [documents, setDocuments] = useState<any[]>([]);
   const [milestones, setMilestones] = useState<any[]>([]);
+  const [isSaving, setIsSaving] = useState(false);
 
   useEffect(() => {
     if (userData) {
@@ -99,11 +100,13 @@ const StartupProfile = () => {
   };
 
   const handleSave = async (event: React.MouseEvent<HTMLButtonElement>) => {
+    setIsSaving(true);
     // Here you would typically save to a backend
     console.log('Saving startup data:', startupData);
     // Simulate async operation
     await new Promise(resolve => setTimeout(resolve, 1500));
     setIsEditing(false);
+    setIsSaving(false);
   };
 
   const addTeamMember = () => {
@@ -168,8 +171,8 @@ const StartupProfile = () => {
               </div>
             </div>
             {isEditing ? (
-              <StatefulButton onClick={handleSave}>
-                <Save className="w-4 h-4 mr-2" />
+              <StatefulButton onClick={handleSave} disabled={isSaving}>
+                {!isSaving && <Save className="w-4 h-4 mr-2" />}
                 Save Changes
               </StatefulButton>
             ) : (
@@ -527,5 +530,3 @@ const StartupProfile = () => {
 };
 
 export default StartupProfile;
-
-    
