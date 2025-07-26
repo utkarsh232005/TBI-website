@@ -29,6 +29,9 @@ import {
 import { useUser } from '@/contexts/user-context';
 import { useAuth } from '@/contexts/AuthContext';
 import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Textarea } from '@/components/ui/textarea';
+import { Label } from '@/components/ui/label';
 
 const StartupProfile = () => {
   const { user } = useUser();
@@ -218,30 +221,33 @@ const StartupProfile = () => {
                 {isEditing ? (
                   <div className="space-y-4">
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">Company Name</label>
-                      <input
+                      <Label htmlFor="companyName" className="text-sm font-medium text-gray-700">Company Name</Label>
+                      <Input
+                        id="companyName"
                         type="text"
                         value={startupData.companyName}
                         onChange={(e) => handleInputChange('companyName', e.target.value)}
-                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        className="mt-1"
                       />
                     </div>
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">Tagline</label>
-                      <input
+                      <Label htmlFor="tagline" className="text-sm font-medium text-gray-700">Tagline</Label>
+                      <Input
+                        id="tagline"
                         type="text"
                         value={startupData.tagline}
                         onChange={(e) => handleInputChange('tagline', e.target.value)}
-                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        className="mt-1"
                       />
                     </div>
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">Description</label>
-                      <textarea
+                      <Label htmlFor="description" className="text-sm font-medium text-gray-700">Description</Label>
+                      <Textarea
+                        id="description"
                         value={startupData.description}
                         onChange={(e) => handleInputChange('description', e.target.value)}
                         rows={4}
-                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        className="mt-1"
                       />
                     </div>
                   </div>
@@ -376,33 +382,38 @@ const StartupProfile = () => {
                     
                     {isEditing ? (
                       <div className="space-y-3">
-                        <input
-                          type="text"
+                        <Label htmlFor={`name-${member.id}`} className="sr-only">Name</Label>
+                        <Input
+                          id={`name-${member.id}`}
                           placeholder="Name"
                           value={member.name}
                           onChange={(e) => updateTeamMember(member.id, 'name', e.target.value)}
-                          className="w-full px-3 py-2 border border-gray-300 rounded-md text-center"
+                          className="w-full text-center"
                         />
-                        <input
-                          type="text"
+                        <Label htmlFor={`role-${member.id}`} className="sr-only">Role</Label>
+                        <Input
+                          id={`role-${member.id}`}
                           placeholder="Role"
                           value={member.role}
                           onChange={(e) => updateTeamMember(member.id, 'role', e.target.value)}
-                          className="w-full px-3 py-2 border border-gray-300 rounded-md text-center"
+                          className="w-full text-center"
                         />
-                        <textarea
+                        <Label htmlFor={`bio-${member.id}`} className="sr-only">Bio</Label>
+                        <Textarea
+                          id={`bio-${member.id}`}
                           placeholder="Bio"
                           value={member.bio}
                           onChange={(e) => updateTeamMember(member.id, 'bio', e.target.value)}
                           rows={3}
-                          className="w-full px-3 py-2 border border-gray-300 rounded-md"
+                          className="w-full"
                         />
-                        <input
-                          type="text"
+                        <Label htmlFor={`linkedin-${member.id}`} className="sr-only">LinkedIn URL</Label>
+                        <Input
+                          id={`linkedin-${member.id}`}
                           placeholder="LinkedIn URL"
                           value={member.linkedin}
                           onChange={(e) => updateTeamMember(member.id, 'linkedin', e.target.value)}
-                          className="w-full px-3 py-2 border border-gray-300 rounded-md"
+                          className="w-full"
                         />
                       </div>
                     ) : (
