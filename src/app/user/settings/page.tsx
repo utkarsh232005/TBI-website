@@ -18,6 +18,7 @@ import {
   Mail,
   Phone,
   Linkedin,
+  Twitter,
   Upload,
   Star,
   TrendingUp,
@@ -256,17 +257,7 @@ const StartupProfile = () => {
               {/* Key Metrics */}
               <div className="bg-white rounded-lg shadow p-6">
                 <h2 className="text-xl font-semibold mb-4">Key Metrics</h2>
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                  <div className="text-center p-4 bg-blue-50 rounded-lg">
-                    <TrendingUp className="w-8 h-8 text-blue-600 mx-auto mb-2" />
-                    <div className="text-2xl font-bold text-blue-600">0</div>
-                    <div className="text-sm text-gray-600">Active Users</div>
-                  </div>
-                  <div className="text-center p-4 bg-green-50 rounded-lg">
-                    <DollarSign className="w-8 h-8 text-green-600 mx-auto mb-2" />
-                    <div className="text-2xl font-bold text-green-600">$0K</div>
-                    <div className="text-sm text-gray-600">Revenue</div>
-                  </div>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div className="text-center p-4 bg-purple-50 rounded-lg">
                     <Target className="w-8 h-8 text-purple-600 mx-auto mb-2" />
                     <div className="text-2xl font-bold text-purple-600">{teamMembers.length}</div>
@@ -334,6 +325,12 @@ const StartupProfile = () => {
                     <Linkedin className="w-4 h-4 text-gray-400" />
                     <a href={startupData.socialLinks.linkedin} className="text-sm text-blue-600 hover:underline">
                       LinkedIn
+                    </a>
+                  </div>
+                  <div className="flex items-center space-x-3">
+                    <Twitter className="w-4 h-4 text-gray-400" />
+                    <a href={startupData.socialLinks.twitter} className="text-sm text-blue-600 hover:underline">
+                      Twitter
                     </a>
                   </div>
                 </div>
