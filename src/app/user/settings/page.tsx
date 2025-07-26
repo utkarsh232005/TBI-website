@@ -1,16 +1,7 @@
-
 // src/app/user/settings/page.tsx
 "use client";
 
-import React, { useState, useEffect } from "react";
-import { useParams, useRouter } from 'next/navigation';
-import { useUser } from '@/contexts/user-context';
-import { getMenteeProfile } from '@/app/actions/mentor-request-actions';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Separator } from "@/components/ui/separator";
+import React, { useState, useEffect } from 'react';
 import { 
   User, 
   Users, 
@@ -32,16 +23,15 @@ import {
   TrendingUp,
   Target,
   DollarSign,
-  Loader2,
-  AlertCircle
+  Loader2
 } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
 
+
 const StartupProfile = () => {
-  const { user } = useUser();
   const { userData, loading: authLoading } = useAuth();
   const [isEditing, setIsEditing] = useState(false);
   const [activeTab, setActiveTab] = useState('overview');
