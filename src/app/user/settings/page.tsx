@@ -93,10 +93,21 @@ const StartupProfile = () => {
 
 
   const handleInputChange = (field: string, value: any) => {
-    setStartupData(prev => ({
-      ...prev,
-      [field]: value
-    }));
+    if (field.startsWith('socialLinks.')) {
+        const socialField = field.split('.')[1];
+        setStartupData(prev => ({
+            ...prev,
+            socialLinks: {
+                ...prev.socialLinks,
+                [socialField]: value
+            }
+        }));
+    } else {
+        setStartupData(prev => ({
+            ...prev,
+            [field]: value
+        }));
+    }
   };
 
   const handleSave = async (event: React.MouseEvent<HTMLButtonElement>) => {
@@ -171,13 +182,13 @@ const StartupProfile = () => {
               </div>
             </div>
             {isEditing ? (
-              <StatefulButton 
-                onClick={handleSave} 
-                disabled={isSaving}
-                className="flex items-center space-x-2 px-4 py-2 rounded-full text-sm font-medium"
-              >
-                Save Changes
-              </StatefulButton>
+                            <StatefulButton 
+                                onClick={handleSave} 
+                                disabled={isSaving}
+                                className="flex items-center space-x-2 px-4 py-2 rounded-full text-sm font-medium"
+                            >
+                                {isSaving ? 'Saving...' : 'Save Changes'}
+                            </StatefulButton>
             ) : (
               <button
                 onClick={() => setIsEditing(true)}
@@ -288,63 +299,109 @@ const StartupProfile = () => {
               {/* Company Details */}
               <div className="bg-white rounded-lg shadow p-6">
                 <h3 className="text-lg font-semibold mb-4">Company Details</h3>
-                <div className="space-y-3">
-                  <div className="flex items-center space-x-3">
-                    <Building2 className="w-4 h-4 text-gray-400" />
-                    <span className="text-sm text-gray-600">Industry:</span>
-                    <span className="text-sm font-medium">{startupData.industry}</span>
+                {isEditing ? (
+                  <div className="space-y-4">
+                    <div>
+                        <Label htmlFor="industry" className="text-sm text-gray-600 font-medium">Industry</Label>
+                        <Input id="industry" value={startupData.industry} onChange={(e) => handleInputChange('industry', e.target.value)} className="mt-1 bg-white text-black border-gray-300 rounded-md focus-visible:ring-0 focus-visible:ring-offset-0 focus:outline-none"/>
+                    </div>
+                    <div>
+                        <Label htmlFor="stage" className="text-sm text-gray-600 font-medium">Stage</Label>
+                        <Input id="stage" value={startupData.stage} onChange={(e) => handleInputChange('stage', e.target.value)} className="mt-1 bg-white text-black border-gray-300 rounded-md focus-visible:ring-0 focus-visible:ring-offset-0 focus:outline-none"/>
+                    </div>
+                    <div>
+                        <Label htmlFor="location" className="text-sm text-gray-600 font-medium">Location</Label>
+                        <Input id="location" value={startupData.location} onChange={(e) => handleInputChange('location', e.target.value)} className="mt-1 bg-white text-black border-gray-300 rounded-md focus-visible:ring-0 focus-visible:ring-offset-0 focus:outline-none"/>
+                    </div>
+                    <div>
+                        <Label htmlFor="founded" className="text-sm text-gray-600 font-medium">Founded</Label>
+                        <Input id="founded" value={startupData.founded} onChange={(e) => handleInputChange('founded', e.target.value)} className="mt-1 bg-white text-black border-gray-300 rounded-md focus-visible:ring-0 focus-visible:ring-offset-0 focus:outline-none"/>
+                    </div>
                   </div>
-                  <div className="flex items-center space-x-3">
-                    <TrendingUp className="w-4 h-4 text-gray-400" />
-                    <span className="text-sm text-gray-600">Stage:</span>
-                    <span className="text-sm font-medium">{startupData.stage}</span>
-                  </div>
-                  <div className="flex items-center space-x-3">
-                    <MapPin className="w-4 h-4 text-gray-400" />
-                    <span className="text-sm text-gray-600">Location:</span>
-                    <span className="text-sm font-medium">{startupData.location}</span>
-                  </div>
-                  <div className="flex items-center space-x-3">
-                    <Calendar className="w-4 h-4 text-gray-400" />
-                    <span className="text-sm text-gray-600">Founded:</span>
-                    <span className="text-sm font-medium">{startupData.founded}</span>
-                  </div>
-                </div>
+                ) : (
+                    <div className="space-y-3">
+                        <div className="flex items-center space-x-3">
+                            <Building2 className="w-4 h-4 text-gray-400" />
+                            <span className="text-sm text-gray-600">Industry:</span>
+                            <span className="text-sm font-medium">{startupData.industry}</span>
+                        </div>
+                        <div className="flex items-center space-x-3">
+                            <TrendingUp className="w-4 h-4 text-gray-400" />
+                            <span className="text-sm text-gray-600">Stage:</span>
+                            <span className="text-sm font-medium">{startupData.stage}</span>
+                        </div>
+                        <div className="flex items-center space-x-3">
+                            <MapPin className="w-4 h-4 text-gray-400" />
+                            <span className="text-sm text-gray-600">Location:</span>
+                            <span className="text-sm font-medium">{startupData.location}</span>
+                        </div>
+                        <div className="flex items-center space-x-3">
+                            <Calendar className="w-4 h-4 text-gray-400" />
+                            <span className="text-sm text-gray-600">Founded:</span>
+                            <span className="text-sm font-medium">{startupData.founded}</span>
+                        </div>
+                    </div>
+                )}
               </div>
 
               {/* Contact Information */}
               <div className="bg-white rounded-lg shadow p-6">
                 <h3 className="text-lg font-semibold mb-4">Contact Information</h3>
-                <div className="space-y-3">
-                  <div className="flex items-center space-x-3">
-                    <Globe className="w-4 h-4 text-gray-400" />
-                    <a href={startupData.website} className="text-sm text-blue-600 hover:underline">
-                      {startupData.website || 'Not Provided'}
-                    </a>
+                {isEditing ? (
+                  <div className="space-y-4">
+                    <div>
+                        <Label htmlFor="website" className="text-sm text-gray-600 font-medium">Website</Label>
+                        <Input id="website" value={startupData.website} onChange={(e) => handleInputChange('website', e.target.value)} className="mt-1 bg-white text-black border-gray-300 rounded-md focus-visible:ring-0 focus-visible:ring-offset-0 focus:outline-none"/>
+                    </div>
+                    <div>
+                        <Label htmlFor="email" className="text-sm text-gray-600 font-medium">Email</Label>
+                        <Input id="email" type="email" value={startupData.email} onChange={(e) => handleInputChange('email', e.target.value)} className="mt-1 bg-white text-black border-gray-300 rounded-md focus-visible:ring-0 focus-visible:ring-offset-0 focus:outline-none"/>
+                    </div>
+                    <div>
+                        <Label htmlFor="phone" className="text-sm text-gray-600 font-medium">Phone</Label>
+                        <Input id="phone" value={startupData.phone} onChange={(e) => handleInputChange('phone', e.target.value)} className="mt-1 bg-white text-black border-gray-300 rounded-md focus-visible:ring-0 focus-visible:ring-offset-0 focus:outline-none"/>
+                    </div>
+                    <div>
+                        <Label htmlFor="linkedin" className="text-sm text-gray-600 font-medium">LinkedIn</Label>
+                        <Input id="linkedin" value={startupData.socialLinks.linkedin} onChange={(e) => handleInputChange('socialLinks.linkedin', e.target.value)} className="mt-1 bg-white text-black border-gray-300 rounded-md focus-visible:ring-0 focus-visible:ring-offset-0 focus:outline-none"/>
+                    </div>
+                    <div>
+                        <Label htmlFor="twitter" className="text-sm text-gray-600 font-medium">Twitter</Label>
+                        <Input id="twitter" value={startupData.socialLinks.twitter} onChange={(e) => handleInputChange('socialLinks.twitter', e.target.value)} className="mt-1 bg-white text-black border-gray-300 rounded-md focus-visible:ring-0 focus-visible:ring-offset-0 focus:outline-none"/>
+                    </div>
                   </div>
-                  <div className="flex items-center space-x-3">
-                    <Mail className="w-4 h-4 text-gray-400" />
-                    <a href={`mailto:${startupData.email}`} className="text-sm text-blue-600 hover:underline">
-                      {startupData.email}
-                    </a>
-                  </div>
-                  <div className="flex items-center space-x-3">
-                    <Phone className="w-4 h-4 text-gray-400" />
-                    <span className="text-sm">{startupData.phone || 'Not Provided'}</span>
-                  </div>
-                  <div className="flex items-center space-x-3">
-                    <Linkedin className="w-4 h-4 text-gray-400" />
-                    <a href={startupData.socialLinks.linkedin} className="text-sm text-blue-600 hover:underline">
-                      LinkedIn
-                    </a>
-                  </div>
-                  <div className="flex items-center space-x-3">
-                    <Twitter className="w-4 h-4 text-gray-400" />
-                    <a href={startupData.socialLinks.twitter} className="text-sm text-blue-600 hover:underline">
-                      Twitter
-                    </a>
-                  </div>
-                </div>
+                ) : (
+                    <div className="space-y-3">
+                      <div className="flex items-center space-x-3">
+                        <Globe className="w-4 h-4 text-gray-400" />
+                        <a href={startupData.website} className="text-sm text-blue-600 hover:underline">
+                          {startupData.website || 'Not Provided'}
+                        </a>
+                      </div>
+                      <div className="flex items-center space-x-3">
+                        <Mail className="w-4 h-4 text-gray-400" />
+                        <a href={`mailto:${startupData.email}`} className="text-sm text-blue-600 hover:underline">
+                          {startupData.email}
+                        </a>
+                      </div>
+                      <div className="flex items-center space-x-3">
+                        <Phone className="w-4 h-4 text-gray-400" />
+                        <span className="text-sm">{startupData.phone || 'Not Provided'}</span>
+                      </div>
+                      <div className="flex items-center space-x-3">
+                        <Linkedin className="w-4 h-4 text-gray-400" />
+                        <a href={startupData.socialLinks.linkedin} className="text-sm text-blue-600 hover:underline">
+                          LinkedIn
+                        </a>
+                      </div>
+                      <div className="flex items-center space-x-3">
+                        <Twitter className="w-4 h-4 text-gray-400" />
+                        <a href={startupData.socialLinks.twitter} className="text-sm text-blue-600 hover:underline">
+                          Twitter
+                        </a>
+                      </div>
+                    </div>
+                )}
               </div>
             </div>
           </div>
