@@ -31,6 +31,7 @@ import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
 import { Button as StatefulButton } from '@/components/ui/stateful-button'; // Import stateful button
+import { Button } from '@/components/ui/button';
 
 const StartupProfile = () => {
   const { userData, loading: authLoading } = useAuth();
@@ -231,7 +232,7 @@ const StartupProfile = () => {
                 {isEditing ? (
                   <div className="space-y-4">
                     <div>
-                      <Label htmlFor="companyName" className="text-sm font-medium text-gray-700">Company Name</Label>
+                      <Label htmlFor="companyName">Company Name</Label>
                       <Input
                         id="companyName"
                         type="text"
@@ -241,7 +242,7 @@ const StartupProfile = () => {
                       />
                     </div>
                     <div>
-                      <Label htmlFor="tagline" className="text-sm font-medium text-gray-700">Tagline</Label>
+                      <Label htmlFor="tagline">Tagline</Label>
                       <Input
                         id="tagline"
                         type="text"
@@ -251,7 +252,7 @@ const StartupProfile = () => {
                       />
                     </div>
                     <div>
-                      <Label htmlFor="description" className="text-sm font-medium text-gray-700">Description</Label>
+                      <Label htmlFor="description">Description</Label>
                       <Textarea
                         id="description"
                         value={startupData.description}
