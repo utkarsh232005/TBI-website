@@ -9,38 +9,7 @@ import {
   serverTimestamp,
   DocumentData 
 } from 'firebase/firestore';
-
-// Interface for user document structure in users collection
-interface UserData extends DocumentData {
-  uid: string;
-  email: string;
-  name: string;
-  status: string;
-  role: string;
-  submissionId?: string;
-  onboardingCompleted?: boolean;
-  onboardingProgress?: {
-    passwordChanged?: boolean;
-    profileCompleted?: boolean;
-    notificationsConfigured?: boolean;
-    completed?: boolean;
-    passwordChangedAt?: any;
-    profileCompletedAt?: any;
-    notificationsConfiguredAt?: any;
-    completedAt?: any;
-  };
-  notificationPreferences?: {
-    emailNotifications: boolean;
-    updatedAt?: any;
-  };
-  firstName?: string;
-  lastName?: string;
-  phone?: string;
-  bio?: string;
-  linkedin?: string;
-  createdAt?: any;
-  updatedAt?: any;
-}
+import { UserProfileData, UpdateUserProfileFormValues } from '@/types/user';
 
 // Response interface
 export interface UserActionResponse {
@@ -50,14 +19,19 @@ export interface UserActionResponse {
   error?: string;
 }
 
-// Schema for updating user profile
+// Schema for updating user profile - now includes new fields
 const UpdateUserProfileSchema = z.object({
   uid: z.string().min(1, 'User ID is required'),
-  firstName: z.string().min(1, 'First name is required'),
-  lastName: z.string().min(1, 'Last name is required'),
+  firstName: z.string().min(1, 'First name is required').optional(),
+  lastName: z.string().min(1, 'Last name is required').optional(),
   phone: z.string().optional(),
   bio: z.string().optional(),
   linkedin: z.string().url().optional().or(z.literal('')),
+  profilePicture: z.string().url().optional().or(z.literal('')),
+  startupName: z.string().optional(),
+  startupDescription: z.string().optional(),
+  startupWebsite: z.string().url().optional().or(z.literal('')),
+  teamInfo: z.string().optional(),
 });
 
 // Schema for updating notification preferences
@@ -66,7 +40,6 @@ const UpdateNotificationPreferencesSchema = z.object({
   emailNotifications: z.boolean(),
 });
 
-export type UpdateUserProfileFormValues = z.infer<typeof UpdateUserProfileSchema>;
 export type UpdateNotificationPreferencesFormValues = z.infer<typeof UpdateNotificationPreferencesSchema>;
 
 // Function to get user data by UID
@@ -89,7 +62,7 @@ export async function getUserData(uid: string): Promise<UserActionResponse> {
       };
     }
 
-    const userData = userDoc.data() as UserData;
+    const userData = userDoc.data() as UserProfileData;
     
     // Serialize timestamp fields
     const serializedData = serializeUserData(userData);
@@ -112,7 +85,7 @@ export async function getUserData(uid: string): Promise<UserActionResponse> {
 export async function updateUserProfile(values: UpdateUserProfileFormValues): Promise<UserActionResponse> {
   try {
     const validatedValues = UpdateUserProfileSchema.parse(values);
-    const { uid, firstName, lastName, phone, bio, linkedin } = validatedValues;
+    const { uid, ...profileData } = validatedValues;
 
     const userDocRef = doc(db, 'users', uid);
     const userDoc = await getDoc(userDocRef);
@@ -124,20 +97,16 @@ export async function updateUserProfile(values: UpdateUserProfileFormValues): Pr
       };
     }
 
-    const userData = userDoc.data() as UserData;
-
-    // Update user document
-    await updateDoc(userDocRef, {
-      firstName,
-      lastName,
-      phone: phone || '',
-      bio: bio || '',
-      linkedin: linkedin || '',
-      name: `${firstName} ${lastName}`, // Update full name
+    const updateData = {
+      ...profileData,
+      name: `${profileData.firstName || ''} ${profileData.lastName || ''}`.trim(),
       updatedAt: serverTimestamp(),
       'onboardingProgress.profileCompleted': true,
       'onboardingProgress.profileCompletedAt': serverTimestamp(),
-    });
+    };
+
+    // Update user document
+    await updateDoc(userDocRef, updateData);
 
     return {
       success: true,
@@ -294,7 +263,7 @@ export async function markPasswordChanged(uid: string): Promise<UserActionRespon
 }
 
 // Helper function to serialize Firestore data for client components
-function serializeUserData(userData: UserData): any {
+function serializeUserData(userData: UserProfileData): any {
   const serialized: any = { ...userData };
   
   // Convert all timestamp fields to ISO strings
