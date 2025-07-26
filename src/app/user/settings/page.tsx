@@ -31,7 +31,6 @@ import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
 import { Button as StatefulButton } from '@/components/ui/stateful-button'; // Import stateful button
-import { Button } from '@/components/ui/button';
 
 const StartupProfile = () => {
   const { userData, loading: authLoading } = useAuth();
@@ -175,7 +174,7 @@ const StartupProfile = () => {
               <StatefulButton 
                 onClick={handleSave} 
                 disabled={isSaving}
-                className="flex items-center space-x-2 px-5 py-2 rounded-full text-sm font-medium"
+                className="flex items-center space-x-2 px-4 py-2 rounded-full text-sm font-medium"
               >
                 {!isSaving && <Save className="w-4 h-4 mr-2" />}
                 Save Changes
@@ -183,7 +182,7 @@ const StartupProfile = () => {
             ) : (
               <button
                 onClick={() => setIsEditing(true)}
-                className="flex items-center space-x-2 px-5 py-2 rounded-full text-sm font-medium bg-blue-600 hover:bg-blue-700 text-white"
+                className="flex items-center space-x-2 px-4 py-2 rounded-full text-sm font-medium bg-blue-600 hover:bg-blue-700 text-white"
               >
                 <Edit3 className="w-4 h-4" />
                 <span>Edit Profile</span>
