@@ -188,7 +188,7 @@ export default function AdminSettingsPage() {
                                   placeholder="admin@example.com" 
                                   {...field} 
                                   disabled={isLoading}
-                                  className="bg-gray-50 border border-gray-200 pl-10 focus:border-indigo-500 focus:ring-indigo-100 rounded-lg transition-all"
+                                  className="pl-10"
                                   suppressHydrationWarning
                                 />
                               </div>
@@ -211,7 +211,7 @@ export default function AdminSettingsPage() {
                                   placeholder="••••••••" 
                                   {...field} 
                                   disabled={isLoading}
-                                  className="bg-gray-50 border border-gray-200 pl-10 focus:border-indigo-500 focus:ring-indigo-100 rounded-lg transition-all"
+                                  className="pl-10"
                                   suppressHydrationWarning
                                 />
                               </div>
@@ -234,7 +234,7 @@ export default function AdminSettingsPage() {
                                   placeholder="••••••••" 
                                   {...field} 
                                   disabled={isLoading}
-                                  className="bg-gray-50 border border-gray-200 pl-10 focus:border-indigo-500 focus:ring-indigo-100 rounded-lg transition-all"
+                                  className="pl-10"
                                   suppressHydrationWarning
                                 />
                               </div>
@@ -286,7 +286,7 @@ export default function AdminSettingsPage() {
                         <User className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
                         <Input 
                           placeholder="Your name" 
-                          className="bg-gray-50 border border-gray-200 pl-10 focus:border-indigo-500 focus:ring-indigo-100 rounded-lg transition-all"
+                          className="pl-10"
                           suppressHydrationWarning
                         />
                       </div>
@@ -295,7 +295,7 @@ export default function AdminSettingsPage() {
                       <label className="text-gray-700 text-sm font-medium">Bio</label>
                       <Textarea 
                         placeholder="Write a short bio about yourself" 
-                        className="bg-gray-50 border border-gray-200 focus:border-indigo-500 focus:ring-indigo-100 resize-none h-24 rounded-lg transition-all"
+                        className="resize-none h-24"
                         suppressHydrationWarning
                       />
                     </div>
@@ -359,7 +359,7 @@ export default function AdminSettingsPage() {
                       <label className="font-medium text-gray-700 block">Language</label>
                       <div className="relative">
                         <Globe className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
-                        <select className="w-full bg-gray-50 border border-gray-200 text-gray-700 rounded-lg h-10 pl-10 pr-3 appearance-none focus:border-indigo-500 focus:ring-indigo-100 transition-all" suppressHydrationWarning>
+                        <select className="w-full bg-background border border-border text-foreground rounded-lg h-10 pl-10 pr-3 appearance-none focus:border-indigo-500 focus:ring-indigo-100 transition-all" suppressHydrationWarning>
                           <option>English (US)</option>
                           <option>Hindi</option>
                           <option>French</option>
