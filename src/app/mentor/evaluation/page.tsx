@@ -66,11 +66,12 @@ const getStatusStyles = (status: Status): string => {
   }
 };
 
-const TaskCard = ({ task, handleDragStart }: { task: EvaluationTask, handleDragStart: (e: React.PointerEvent, task: EvaluationTask) => void }) => {
+const TaskCard = ({ task, handleDragStart }: { task: EvaluationTask, handleDragStart: (e: React.DragEvent<HTMLDivElement>, task: EvaluationTask) => void }) => {
   return (
     <motion.div
+      draggable="true"
+      onDragStart={(e) => handleDragStart(e, task)}
       layout
-      onPointerDown={(e) => handleDragStart(e, task)}
       initial={{ opacity: 0, y: 20, scale: 0.95 }}
       animate={{ opacity: 1, y: 0, scale: 1 }}
       exit={{ opacity: 0, scale: 0.95 }}
@@ -121,22 +122,28 @@ const TaskCard = ({ task, handleDragStart }: { task: EvaluationTask, handleDragS
   );
 };
 
-const BoardColumn = ({ title, status, tasks, handleDragStart, onDrop }: { title: string; status: Status; tasks: EvaluationTask[], handleDragStart: (e: React.PointerEvent, task: EvaluationTask) => void, onDrop: (e: React.PointerEvent, status: Status) => void }) => {
+const BoardColumn = ({ title, status, tasks, handleDragStart, onDrop }: { title: string; status: Status; tasks: EvaluationTask[], handleDragStart: (e: React.DragEvent<HTMLDivElement>, task: EvaluationTask) => void, onDrop: (e: React.DragEvent<HTMLDivElement>, status: Status) => void }) => {
   const [active, setActive] = useState(false);
   
-  const handleDragOver = (e: React.PointerEvent) => {
+  const handleDragOver = (e: React.DragEvent<HTMLDivElement>) => {
     e.preventDefault();
     setActive(true);
   };
 
-  const handleDragLeave = (e: React.PointerEvent) => {
+  const handleDragLeave = (e: React.DragEvent<HTMLDivElement>) => {
     e.preventDefault();
     setActive(false);
+  };
+
+  const handleDrop = (e: React.DragEvent<HTMLDivElement>) => {
+    e.preventDefault();
+    setActive(false);
+    onDrop(e, status);
   };
   
   return (
     <div 
-      onDrop={(e) => onDrop(e, status)}
+      onDrop={handleDrop}
       onDragOver={handleDragOver}
       onDragLeave={handleDragLeave}
       className={`bg-gray-100 rounded-xl p-4 flex-1 min-w-[300px] transition-colors duration-200 ${active ? 'bg-blue-100' : ''}`}
@@ -219,21 +226,19 @@ const AddTaskModal = ({ isOpen, onClose, onAddTask }: { isOpen: boolean, onClose
 
 export default function MentorEvaluationPage() {
   const [tasks, setTasks] = useState<EvaluationTask[]>(initialTasks);
-  const [draggedTask, setDraggedTask] = useState<EvaluationTask | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
 
-  const handleDragStart = (e: React.PointerEvent, task: EvaluationTask) => {
-    setDraggedTask(task);
+  const handleDragStart = (e: React.DragEvent<HTMLDivElement>, task: EvaluationTask) => {
+    e.dataTransfer.setData("taskId", task.id);
   };
 
-  const onDrop = (e: React.PointerEvent, status: Status) => {
+  const onDrop = (e: React.DragEvent<HTMLDivElement>, status: Status) => {
     e.preventDefault();
-    if (!draggedTask) return;
-
+    const taskId = e.dataTransfer.getData("taskId");
+    
     setTasks(prevTasks => prevTasks.map(task =>
-      task.id === draggedTask.id ? { ...task, status } : task
+      task.id === taskId ? { ...task, status } : task
     ));
-    setDraggedTask(null);
   };
 
   const handleAddTask = (newTaskData: Omit<EvaluationTask, 'id' | 'status'>) => {
