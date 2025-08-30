@@ -24,15 +24,6 @@ const formSchema = z.object({
 
 type FormValues = z.infer<typeof formSchema>;
 
-const BottomGradient = () => {
-  return (
-    <>
-      <span className="absolute inset-x-0 -bottom-px block h-px w-full bg-gradient-to-r from-transparent via-purple-500 to-transparent opacity-0 transition duration-500 group-hover/btn:opacity-100" />
-      <span className="absolute inset-x-10 -bottom-px mx-auto block h-px w-1/2 bg-gradient-to-r from-transparent via-indigo-500 to-transparent opacity-0 blur-sm transition duration-500 group-hover/btn:opacity-100" />
-    </>
-  );
-};
-
 const LabelInputContainer = ({
   children,
   className,
@@ -170,13 +161,13 @@ export default function UserLoginForm({ onForgotPassword }: { onForgotPassword?:
 
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
         <LabelInputContainer>
-          <Label htmlFor="user-email" className="text-gray-900 font-medium">Email Address</Label>
+          <Label htmlFor="user-email" className="text-gray-700 font-medium">Email Address</Label>
           <Input
             id="user-email"
             placeholder="your.email@example.com"
             type="email"
             {...form.register("email")}
-            className="bg-gray-50 border border-gray-300 text-gray-900 placeholder:text-gray-500 focus:border-gray-600 focus:ring-2 focus:ring-gray-600/20 transition-all duration-200"
+            className="bg-white border border-gray-200 rounded-xl px-5 py-3 text-base font-medium placeholder-gray-400 focus:border-blue-400 focus:ring-2 focus:ring-blue-100 transition-all duration-300 shadow-sm hover:shadow-md"
             disabled={isLoading}
           />
           {form.formState.errors.email && (
@@ -185,19 +176,18 @@ export default function UserLoginForm({ onForgotPassword }: { onForgotPassword?:
         </LabelInputContainer>
 
         <LabelInputContainer>
-          <Label htmlFor="user-password" className="text-gray-900 font-medium">Password</Label>
+          <Label htmlFor="user-password" className="text-gray-700 font-medium">Password</Label>
           <Input
             id="user-password"
             placeholder="••••••••"
             type="password"
             {...form.register("password")}
-            className="bg-gray-50 border border-gray-300 text-gray-900 placeholder:text-gray-500 focus:border-gray-600 focus:ring-2 focus:ring-gray-600/20 transition-all duration-200"
+            className="bg-white border border-gray-200 rounded-xl px-5 py-3 text-base font-medium placeholder-gray-400 focus:border-blue-400 focus:ring-2 focus:ring-blue-100 transition-all duration-300 shadow-sm hover:shadow-md"
             disabled={isLoading}
           />
           {form.formState.errors.password && (
             <p className="text-red-600 text-sm font-medium">{form.formState.errors.password.message}</p>
           )}
-          {/* Forgot Password Link */}
           {onForgotPassword && (
             <div className="flex justify-end">
               <button
@@ -213,7 +203,7 @@ export default function UserLoginForm({ onForgotPassword }: { onForgotPassword?:
         </LabelInputContainer>
 
         <button
-          className="group/btn relative block h-10 w-full rounded-lg bg-gray-900 hover:bg-gray-800 font-semibold text-white shadow-lg hover:shadow-xl transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+          className="group/btn relative block h-12 w-full rounded-lg bg-gray-900 hover:bg-gray-800 font-semibold text-white shadow-lg hover:shadow-xl transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
           type="submit"
           disabled={isLoading}
         >

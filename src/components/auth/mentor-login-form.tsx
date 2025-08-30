@@ -132,13 +132,13 @@ export default function MentorLoginForm({ onForgotPassword }: { onForgotPassword
 
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
         <LabelInputContainer>
-          <Label htmlFor="mentor-email" className="text-gray-900 font-medium">Email Address</Label>
+          <Label htmlFor="mentor-email" className="text-gray-700 font-medium">Email Address</Label>
           <Input
             id="mentor-email"
             placeholder="mentor.email@example.com"
             type="email"
             {...form.register("email")}
-            className="bg-gray-50 border border-gray-300 text-gray-900 placeholder:text-gray-500 focus:border-gray-600 focus:ring-2 focus:ring-gray-600/20 transition-all duration-200"
+            className="bg-white border border-gray-200 rounded-xl px-5 py-3 text-base font-medium placeholder-gray-400 focus:border-blue-400 focus:ring-2 focus:ring-blue-100 transition-all duration-300 shadow-sm hover:shadow-md"
             disabled={isLoading}
           />
           {form.formState.errors.email && (
@@ -147,13 +147,13 @@ export default function MentorLoginForm({ onForgotPassword }: { onForgotPassword
         </LabelInputContainer>
 
         <LabelInputContainer>
-          <Label htmlFor="mentor-password" className="text-gray-900 font-medium">Password</Label>
+          <Label htmlFor="mentor-password" className="text-gray-700 font-medium">Password</Label>
           <Input
             id="mentor-password"
             placeholder="••••••••"
             type="password"
             {...form.register("password")}
-            className="bg-gray-50 border border-gray-300 text-gray-900 placeholder:text-gray-500 focus:border-gray-600 focus:ring-2 focus:ring-gray-600/20 transition-all duration-200"
+            className="bg-white border border-gray-200 rounded-xl px-5 py-3 text-base font-medium placeholder-gray-400 focus:border-blue-400 focus:ring-2 focus:ring-blue-100 transition-all duration-300 shadow-sm hover:shadow-md"
             disabled={isLoading}
           />
           {form.formState.errors.password && (
@@ -174,7 +174,7 @@ export default function MentorLoginForm({ onForgotPassword }: { onForgotPassword
         </LabelInputContainer>
 
         <button
-          className="group/btn relative block h-10 w-full rounded-lg bg-gray-900 hover:bg-gray-800 font-semibold text-white shadow-lg hover:shadow-xl transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+          className="group/btn relative block h-12 w-full rounded-lg bg-gray-900 hover:bg-gray-800 font-semibold text-white shadow-lg hover:shadow-xl transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
           type="submit"
           disabled={isLoading}
         >

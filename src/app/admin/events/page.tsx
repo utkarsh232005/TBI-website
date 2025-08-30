@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useState, useEffect, useCallback } from 'react';
@@ -298,29 +299,29 @@ export default function EventsPage() {
                       <PlusCircle className="mr-2 h-5 w-5" /> Add New Event
                     </Button>
                   </DialogTrigger>
-                  <DialogContent className="sm:max-w-[480px] bg-white border-0 shadow-2xl rounded-3xl px-0 py-0">
-                    <DialogHeader className="px-8 pt-8 pb-2 text-left">
-                      <DialogTitle className="flex items-center gap-3 text-2xl font-extrabold tracking-tight text-gray-900">
-                        <span className="bg-gradient-to-br from-blue-100 to-indigo-100 text-blue-600 border border-blue-200 rounded-xl w-12 h-12 flex items-center justify-center shadow text-2xl">📅</span>
-                        <span>Create New Event</span>
+                  <DialogContent className="sm:max-w-[480px] bg-white border-0 shadow-2xl rounded-3xl p-0">
+                    <DialogHeader className="px-8 pt-8 pb-4">
+                      <DialogTitle className="flex items-center gap-3 text-2xl font-bold text-gray-900">
+                        <span className="bg-blue-100 text-blue-600 rounded-xl w-12 h-12 flex items-center justify-center">📅</span>
+                        Create New Event
                       </DialogTitle>
-                      <DialogDescription className="text-gray-400 mt-2 text-base font-normal">
-                        Fill in the details below to add a new event to the platform.
+                      <DialogDescription className="text-gray-500 mt-2 text-sm">
+                        Fill in the details below to add a new event.
                       </DialogDescription>
                     </DialogHeader>
-                    <div className="px-8 pb-8 pt-2">
+                    <div className="px-8 pb-8">
                       <Form {...form}>
-                        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-7 max-h-[60vh] overflow-y-auto pr-2 custom-scrollbar">
+                        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4 max-h-[60vh] overflow-y-auto pr-2 custom-scrollbar">
                           <FormField
                             control={form.control}
                             name="title"
                             render={({ field }) => (
                               <FormItem>
-                                <FormLabel className="block text-xs font-medium text-gray-700 tracking-widest mb-1 uppercase">Title</FormLabel>
+                                <FormLabel>Title</FormLabel>
                                 <FormControl>
-                                  <Input placeholder="Event title" {...field} disabled={isSubmitting} className="ml-[10px] mr-[10px] w-full bg-white border border-gray-200 rounded-lg px-[10px] py-2 text-gray-900 placeholder-gray-400 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-100 focus:outline-none transition" suppressHydrationWarning />
+                                  <Input placeholder="Event title" {...field} disabled={isSubmitting} suppressHydrationWarning />
                                 </FormControl>
-                                <FormMessage className="text-xs text-red-500 mt-1" />
+                                <FormMessage />
                               </FormItem>
                             )}
                           />
@@ -329,25 +330,25 @@ export default function EventsPage() {
                             name="description"
                             render={({ field }) => (
                               <FormItem>
-                                <FormLabel className="block text-xs font-medium text-gray-700 tracking-widest mb-1 uppercase">Description</FormLabel>
+                                <FormLabel>Description</FormLabel>
                                 <FormControl>
-                                  <Textarea placeholder="Event description" {...field} disabled={isSubmitting} className="ml-[10px] mr-[10px] w-full bg-white border border-gray-200 rounded-lg px-[10px] py-3 text-gray-900 placeholder-gray-400 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-100 focus:outline-none transition min-h-[100px] resize-none" suppressHydrationWarning />
+                                  <Textarea placeholder="Event description" {...field} disabled={isSubmitting} suppressHydrationWarning />
                                 </FormControl>
-                                <FormMessage className="text-xs text-red-500 mt-1" />
+                                <FormMessage />
                               </FormItem>
                             )}
                           />
-                          <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
+                          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                             <FormField
                               control={form.control}
                               name="date"
                               render={({ field }) => (
                                 <FormItem>
-                                  <FormLabel className="block text-xs font-medium text-gray-700 tracking-widest mb-1 uppercase">Date</FormLabel>
+                                  <FormLabel>Date</FormLabel>
                                   <FormControl>
-                                    <Input type="date" {...field} disabled={isSubmitting} className="ml-[10px] mr-[10px] w-full bg-white border border-gray-200 rounded-lg px-[10px] py-2 text-gray-900 placeholder-gray-400 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-100 focus:outline-none transition" suppressHydrationWarning />
+                                    <Input type="date" {...field} disabled={isSubmitting} suppressHydrationWarning />
                                   </FormControl>
-                                  <FormMessage className="text-xs text-red-500 mt-1" />
+                                  <FormMessage />
                                 </FormItem>
                               )}
                             />
@@ -356,11 +357,11 @@ export default function EventsPage() {
                               name="time"
                               render={({ field }) => (
                                 <FormItem>
-                                  <FormLabel className="block text-xs font-medium text-gray-700 tracking-widest mb-1 uppercase">Time</FormLabel>
+                                  <FormLabel>Time</FormLabel>
                                   <FormControl>
-                                    <Input type="time" {...field} disabled={isSubmitting} className="ml-[10px] mr-[10px] w-full bg-white border border-gray-200 rounded-lg px-[10px] py-2 text-gray-900 placeholder-gray-400 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-100 focus:outline-none transition" suppressHydrationWarning />
+                                    <Input type="time" {...field} disabled={isSubmitting} suppressHydrationWarning />
                                   </FormControl>
-                                  <FormMessage className="text-xs text-red-500 mt-1" />
+                                  <FormMessage />
                                 </FormItem>
                               )}
                             />
@@ -370,11 +371,11 @@ export default function EventsPage() {
                             name="venue"
                             render={({ field }) => (
                               <FormItem>
-                                <FormLabel className="block text-xs font-medium text-gray-700 tracking-widest mb-1 uppercase">Venue</FormLabel>
+                                <FormLabel>Venue</FormLabel>
                                 <FormControl>
-                                  <Input placeholder="Event location" {...field} disabled={isSubmitting} className="ml-[10px] mr-[10px] w-full bg-white border border-gray-200 rounded-lg px-[10px] py-2 text-gray-900 placeholder-gray-400 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-100 focus:outline-none transition" suppressHydrationWarning />
+                                  <Input placeholder="Event location" {...field} disabled={isSubmitting} suppressHydrationWarning />
                                 </FormControl>
-                                <FormMessage className="text-xs text-red-500 mt-1" />
+                                <FormMessage />
                               </FormItem>
                             )}
                           />
@@ -383,20 +384,20 @@ export default function EventsPage() {
                             name="status"
                             render={({ field }) => (
                               <FormItem>
-                                <FormLabel className="block text-xs font-medium text-gray-700 tracking-widest mb-1 uppercase">Status</FormLabel>
+                                <FormLabel>Status</FormLabel>
                                 <Select onValueChange={field.onChange} defaultValue={field.value} disabled={isSubmitting}>
                                   <FormControl>
-                                    <SelectTrigger className="ml-[10px] mr-[10px] w-full bg-white border border-gray-200 rounded-lg px-[10px] py-2 text-gray-900 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-100 focus:outline-none transition">
+                                    <SelectTrigger>
                                       <SelectValue placeholder="Select status" />
                                     </SelectTrigger>
                                   </FormControl>
-                                  <SelectContent className="bg-white border border-gray-100 rounded-lg shadow-lg py-2">
-                                    <SelectItem value="draft" className="py-2">Draft</SelectItem>
-                                    <SelectItem value="published" className="py-2">Published</SelectItem>
-                                    <SelectItem value="archived" className="py-2">Archived</SelectItem>
+                                  <SelectContent>
+                                    <SelectItem value="draft">Draft</SelectItem>
+                                    <SelectItem value="published">Published</SelectItem>
+                                    <SelectItem value="archived">Archived</SelectItem>
                                   </SelectContent>
                                 </Select>
-                                <FormMessage className="text-xs text-red-500 mt-1" />
+                                <FormMessage />
                               </FormItem>
                             )}
                           />
@@ -405,11 +406,11 @@ export default function EventsPage() {
                             name="applyLink"
                             render={({ field }) => (
                               <FormItem>
-                                <FormLabel className="block text-xs font-medium text-gray-700 tracking-widest mb-1 uppercase">Apply Link <span className='text-gray-400 font-normal'>(Optional)</span></FormLabel>
+                                <FormLabel>Apply Link <span className='text-gray-400 font-normal'>(Optional)</span></FormLabel>
                                 <FormControl>
-                                  <Input placeholder="https://example.com" {...field} disabled={isSubmitting} className="ml-[10px] mr-[10px] w-full bg-white border border-gray-200 rounded-lg px-[10px] py-2 text-gray-900 placeholder-gray-400 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-100 focus:outline-none transition" suppressHydrationWarning />
+                                  <Input placeholder="https://example.com" {...field} disabled={isSubmitting} suppressHydrationWarning />
                                 </FormControl>
-                                <FormMessage className="text-xs text-red-500 mt-1" />
+                                <FormMessage />
                               </FormItem>
                             )}
                           />
@@ -418,21 +419,21 @@ export default function EventsPage() {
                             name="imageUrl"
                             render={({ field }) => (
                               <FormItem>
-                                <FormLabel className="block text-xs font-medium text-gray-700 tracking-widest mb-1 uppercase">Image URL <span className='text-gray-400 font-normal'>(Optional)</span></FormLabel>
+                                <FormLabel>Image URL <span className='text-gray-400 font-normal'>(Optional)</span></FormLabel>
                                 <FormControl>
-                                  <Input placeholder="https://example.com/image.jpg" {...field} disabled={isSubmitting} className="ml-[10px] mr-[10px] w-full bg-white border border-gray-200 rounded-lg px-[10px] py-2 text-gray-900 placeholder-gray-400 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-100 focus:outline-none transition" suppressHydrationWarning />
+                                  <Input placeholder="https://example.com/image.jpg" {...field} disabled={isSubmitting} suppressHydrationWarning />
                                 </FormControl>
-                                <FormMessage className="text-xs text-red-500 mt-1" />
+                                <FormMessage />
                               </FormItem>
                             )}
                           />
-                          <DialogFooter className="mt-8 flex gap-3 justify-end">
+                          <DialogFooter className="pt-4">
                             <Button
                               type="button"
                               variant="outline"
                               onClick={() => setIsCreateDialogOpen(false)}
                               disabled={isSubmitting}
-                              className="rounded-lg px-6 py-2 font-semibold border-gray-200 bg-white hover:bg-gray-50 text-gray-500 hover:text-gray-700 shadow-none"
+                              className="rounded-lg font-semibold"
                               suppressHydrationWarning
                             >
                               Cancel
@@ -440,7 +441,7 @@ export default function EventsPage() {
                             <Button
                               type="submit"
                               disabled={isSubmitting}
-                              className="bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white rounded-lg px-6 py-2 font-semibold shadow-lg"
+                              className="bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-semibold"
                               suppressHydrationWarning
                             >
                               {isSubmitting ? (<><Loader2 className="mr-2 h-4 w-4 animate-spin" />Creating...</>) : ('Create Event')}
@@ -465,7 +466,7 @@ export default function EventsPage() {
                 <Input
                   type="text"
                   placeholder="Search events by title, venue, or date..."
-                  className="pl-14 h-12 text-base border-gray-200 focus:border-blue-400 focus:ring-blue-200 shadow rounded-xl bg-white focus:bg-white transition-all duration-300 w-full"
+                  className="pl-14 h-12 text-base"
                   value={searchQuery}
                   onChange={handleSearchChange}
                   suppressHydrationWarning
