@@ -1,10 +1,10 @@
-// src/app/actions/auth-actions.ts
+// src/getFirebaseApp()/actions/getFirebaseAuth()-actions.ts
 'use server';
 
 import { z } from 'zod';
-import { db, auth } from '@/lib/firebase';
+import { getFirebaseDb, getFirebaseAuth } from '@/lib/firebase';
 import { doc, getDoc, collection, query, where, getDocs, QuerySnapshot, DocumentData } from 'firebase/firestore';
-import { signInWithEmailAndPassword, signOut, sendPasswordResetEmail } from 'firebase/auth';
+import { signInWithEmailAndPassword, signOut, sendPasswordResetEmail } from 'firebase/getFirebaseAuth()';
 
 // --- Admin Credentials ---
 const AdminLoginFormSchema = z.object({
@@ -26,7 +26,7 @@ export async function verifyAdminCredentials(
   try {
     const validatedValues = AdminLoginFormSchema.parse(values);
 
-    const credsDocRef = doc(db, ADMIN_CREDENTIALS_PATH);
+    const credsDocRef = doc(getFirebaseDb(), ADMIN_CREDENTIALS_PATH);
     const credsDocSnap = await getDoc(credsDocRef);
 
     if (!credsDocSnap.exists()) {
@@ -122,19 +122,19 @@ export async function verifyUserCredentials(
 
     try {
       // Authenticate with Firebase Auth
-      const userCredential = await signInWithEmailAndPassword(auth, email, password);
+      const userCredential = await signInWithEmailAndPassword(getFirebaseAuth(), email, password);
       const firebaseUser = userCredential.user;
       
       // Keep user signed in - do not sign out
-      // The user context will handle the auth state
+      // The user context will handle the getFirebaseAuth() state
       
       // Get user data from users collection
-      const userDocRef = doc(db, 'users', firebaseUser.uid);
+      const userDocRef = doc(getFirebaseDb(), 'users', firebaseUser.uid);
       const userDoc = await getDoc(userDocRef);
       
       if (!userDoc.exists()) {
         // If user document doesn't exist, sign out and return error
-        await signOut(auth);
+        await signOut(getFirebaseAuth());
         return { 
           success: false, 
           message: 'User profile not found. Please contact support.' 
@@ -146,7 +146,7 @@ export async function verifyUserCredentials(
       // Check if user is active
       if (userData.status !== 'active') {
         // If user is not active, sign out and return error
-        await signOut(auth);
+        await signOut(getFirebaseAuth());
         return { 
           success: false, 
           message: 'Your account is not active. Please contact support.' 
@@ -168,11 +168,11 @@ export async function verifyUserCredentials(
       console.error('Firebase Auth error:', authError);
       
       // Handle specific Firebase Auth errors
-      if (authError.code === 'auth/user-not-found' || authError.code === 'auth/wrong-password') {
+      if (authError.code === 'getFirebaseAuth()/user-not-found' || authError.code === 'getFirebaseAuth()/wrong-password') {
         return { success: false, message: 'Invalid email or password.' };
-      } else if (authError.code === 'auth/user-disabled') {
+      } else if (authError.code === 'getFirebaseAuth()/user-disabled') {
         return { success: false, message: 'This account has been disabled.' };
-      } else if (authError.code === 'auth/too-many-requests') {
+      } else if (authError.code === 'getFirebaseAuth()/too-many-requests') {
         return { success: false, message: 'Too many failed login attempts. Please try again later.' };
       } else {
         return { success: false, message: 'Login failed. Please try again.' };
@@ -207,7 +207,7 @@ export async function resetPassword(email: string): Promise<PasswordResetRespons
     // Validate email format
     const validatedEmail = PasswordResetSchema.parse({ email });
     
-    await sendPasswordResetEmail(auth, validatedEmail.email);
+    await sendPasswordResetEmail(getFirebaseAuth(), validatedEmail.email);
     
     return {
       success: true,
@@ -218,11 +218,11 @@ export async function resetPassword(email: string): Promise<PasswordResetRespons
     
     let message = 'Failed to send password reset email. Please try again.';
     
-    if (error.code === 'auth/user-not-found') {
+    if (error.code === 'getFirebaseAuth()/user-not-found') {
       message = 'No account found with this email address.';
-    } else if (error.code === 'auth/invalid-email') {
+    } else if (error.code === 'getFirebaseAuth()/invalid-email') {
       message = 'Please enter a valid email address.';
-    } else if (error.code === 'auth/too-many-requests') {
+    } else if (error.code === 'getFirebaseAuth()/too-many-requests') {
       message = 'Too many reset attempts. Please try again later.';
     } else if (error instanceof z.ZodError) {
       message = error.errors[0]?.message || 'Please enter a valid email address.';
@@ -238,7 +238,7 @@ export async function resetPassword(email: string): Promise<PasswordResetRespons
 // User logout function
 export async function logoutUser(): Promise<{ success: boolean; message: string }> {
   try {
-    await signOut(auth);
+    await signOut(getFirebaseAuth());
     return {
       success: true,
       message: 'Logged out successfully'

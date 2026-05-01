@@ -2,6 +2,14 @@ import type { NextConfig } from 'next';
 
 const nextConfig: NextConfig = {
   /* config options here */
+  serverExternalPackages: [
+    'genkit',
+    '@genkit-ai/core',
+    '@genkit-ai/ai',
+    '@opentelemetry/sdk-node',
+    'handlebars',
+    'dotprompt'
+  ],
   typescript: {
     ignoreBuildErrors: true,
   },

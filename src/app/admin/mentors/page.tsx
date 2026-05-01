@@ -1,5 +1,5 @@
 
-// src/app/admin/mentors/page.tsx
+// src/getFirebaseApp()/admin/mentors/page.tsx
 "use client";
 
 // Complete React import to ensure proper JSX transformation
@@ -37,9 +37,9 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { useToast } from "@/hooks/use-toast";
-import { db } from '@/lib/firebase';
+import { getFirebaseDb } from '@/lib/firebase';
 import { collection, getDocs, Timestamp, orderBy, query, doc, getDoc } from 'firebase/firestore';
-import { createMentorAction, deleteMentorAction } from '@/app/actions/mentor-actions';
+import { createMentorAction, deleteMentorAction } from '@/getFirebaseApp()/actions/mentor-actions';
 import { runMigration } from '@/lib/migrate-mentors';
 import { format } from 'date-fns';
 import ImageUploadComponent from '@/components/ui/image-upload';
@@ -152,7 +152,7 @@ export default function AdminMentorsPage() {
     setIsLoading(true);
     setError(null);
     try {
-      const mentorsCollection = collection(db, "mentors");
+      const mentorsCollection = collection(getFirebaseDb(), "mentors");
       const q = query(mentorsCollection, orderBy("createdAt", "desc"));
       const querySnapshot = await getDocs(q);
       const fetchedMentors: MentorDocument[] = [];
@@ -162,7 +162,7 @@ export default function AdminMentorsPage() {
         const mentorData = mentorDoc.data();
         
         // Get profile details from subcollection
-        const profileRef = doc(db, "mentors", mentorDoc.id, "profile", "details");
+        const profileRef = doc(getFirebaseDb(), "mentors", mentorDoc.id, "profile", "details");
         const profileSnap = await getDoc(profileRef);
         
         if (profileSnap.exists()) {

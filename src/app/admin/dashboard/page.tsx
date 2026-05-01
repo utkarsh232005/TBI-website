@@ -5,10 +5,10 @@ import { useEffect, useState } from 'react';
 import { Button } from "@/components/ui/button";
 import { FileTextIcon, TrendingUp, Users, Activity, BarChart3 } from "lucide-react";
 import { AlertCircle, Loader2, ThumbsUp, ThumbsDown, KeyRound, UserCircle, CheckCircle, XCircle, Clock, Landmark, Building, RefreshCw } from "lucide-react";
-import { db } from '@/lib/firebase';
+import { getFirebaseDb } from '@/lib/firebase';
 import { collection, getDocs, orderBy, query, Timestamp } from 'firebase/firestore';
 import { useToast } from "@/hooks/use-toast";
-import { processApplicationAction } from '@/app/actions/admin-actions';
+import { processApplicationAction } from '@/getFirebaseApp()/actions/admin-actions';
 import { SubmissionsTable } from './components/SubmissionsTable';
 import { Submission } from '@/types/Submission';
 
@@ -34,7 +34,7 @@ export default function AdminDashboardPage() {
       const allSubmissions: Submission[] = [];
 
       for (const collectionName of collectionsToFetch) {
-        const submissionsCollection = collection(db, collectionName);
+        const submissionsCollection = collection(getFirebaseDb(), collectionName);
         const q = query(submissionsCollection, orderBy("submittedAt", "desc"));
         const snapshot = await getDocs(q);
         

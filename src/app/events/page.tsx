@@ -1,4 +1,4 @@
-// src/app/events/page.tsx
+// src/getFirebaseApp()/events/page.tsx
 "use client";
 
 import { useEffect, useState } from 'react';
@@ -6,7 +6,7 @@ import MainNavbar from '@/components/ui/main-navbar';
 import Footer from '@/components/ui/footer';
 import EventCard, { type Event } from '@/components/ui/event-card'; // Assuming EventCard's Event type matches
 import { motion } from 'framer-motion';
-import { db } from '@/lib/firebase';
+import { getFirebaseDb } from '@/lib/firebase';
 import { collection, getDocs, orderBy, query, Timestamp } from 'firebase/firestore';
 import { Loader2, AlertCircle, CalendarDays } from 'lucide-react';
 import { format } from 'date-fns'; // Added this import
@@ -50,7 +50,7 @@ export default function EventsPage() {
       setIsLoading(true);
       setError(null);
       try {
-        const eventsCollection = collection(db, "events");
+        const eventsCollection = collection(getFirebaseDb(), "events");
         // Order by event date (which is a string 'YYYY-MM-DD') then by creation time for events on same day
         const q = query(eventsCollection, orderBy("date", "asc"), orderBy("createdAt", "desc"));
         const querySnapshot = await getDocs(q);

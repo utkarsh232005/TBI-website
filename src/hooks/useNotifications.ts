@@ -3,7 +3,7 @@
 
 import { useState, useEffect } from 'react';
 import { collection, query, where, orderBy, onSnapshot, updateDoc, doc } from 'firebase/firestore';
-import { db } from '@/lib/firebase';
+import { getFirebaseDb } from '@/lib/firebase';
 import type { NotificationData } from '@/types/mentor-request';
 
 export function useNotifications(userId: string) {
@@ -16,7 +16,7 @@ export function useNotifications(userId: string) {
 
     // Temporary: Remove orderBy while index is building
     const q = query(
-      collection(db, 'notifications'),
+      collection(getFirebaseDb(), 'notifications'),
       where('userId', '==', userId)
     );
 
@@ -46,7 +46,7 @@ export function useNotifications(userId: string) {
 
   const markAsRead = async (notificationId: string) => {
     try {
-      await updateDoc(doc(db, 'notifications', notificationId), {
+      await updateDoc(doc(getFirebaseDb(), 'notifications', notificationId), {
         read: true
       });
     } catch (error) {
@@ -59,7 +59,7 @@ export function useNotifications(userId: string) {
       const unreadNotifications = notifications.filter(n => !n.read);
       await Promise.all(
         unreadNotifications.map(n => 
-          updateDoc(doc(db, 'notifications', (n as any).id), { read: true })
+          updateDoc(doc(getFirebaseDb(), 'notifications', (n as any).id), { read: true })
         )
       );
     } catch (error) {

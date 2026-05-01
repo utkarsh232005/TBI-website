@@ -6,7 +6,7 @@
  */
 
 import { doc, setDoc, getDoc, updateDoc, Timestamp } from 'firebase/firestore';
-import { db } from './firebase';
+import { getFirebaseDb } from '@/lib/firebase';
 import { isBase64Image, getBase64Size } from './image-upload';
 
 // Types for Base64 image metadata
@@ -40,7 +40,7 @@ export async function storeBase64Image(
     if (!isBase64Image(imageData)) {
       console.warn('Provided data is not a Base64 image, storing as URL');
       // If it's not Base64, just store the URL directly
-      const docRef = doc(db, collectionName, documentId);
+      const docRef = doc(getFirebaseDb(), collectionName, documentId);
       await updateDoc(docRef, {
         [fieldName]: imageData
       });
@@ -61,7 +61,7 @@ export async function storeBase64Image(
     };
 
     // Store in document
-    const docRef = doc(db, collectionName, documentId);
+    const docRef = doc(getFirebaseDb(), collectionName, documentId);
     await updateDoc(docRef, {
       [fieldName]: imageData,
       [`${fieldName}_metadata`]: imageMetadata
@@ -84,7 +84,7 @@ export async function retrieveBase64Image(
   fieldName: string
 ): Promise<StoredImage | null> {
   try {
-    const docRef = doc(db, collectionName, documentId);
+    const docRef = doc(getFirebaseDb(), collectionName, documentId);
     const docSnap = await getDoc(docRef);
     
     if (!docSnap.exists()) {
@@ -123,7 +123,7 @@ export async function deleteBase64Image(
   fieldName: string
 ): Promise<boolean> {
   try {
-    const docRef = doc(db, collectionName, documentId);
+    const docRef = doc(getFirebaseDb(), collectionName, documentId);
     await updateDoc(docRef, {
       [fieldName]: null,
       [`${fieldName}_metadata`]: null
@@ -138,7 +138,7 @@ export async function deleteBase64Image(
 }
 
 /**
- * Get statistics about Base64 image storage usage
+ * Get statistics about Base64 image getFirebaseStorage() usage
  * Useful for monitoring and cleanup
  */
 export async function getImageStorageStats(
@@ -150,7 +150,7 @@ export async function getImageStorageStats(
   images: Array<{ field: string; size: number; metadata: ImageMetadata }>;
 }> {
   try {
-    const docRef = doc(db, collectionName, documentId);
+    const docRef = doc(getFirebaseDb(), collectionName, documentId);
     const docSnap = await getDoc(docRef);
     
     if (!docSnap.exists()) {
@@ -188,7 +188,7 @@ export async function getImageStorageStats(
       images
     };
   } catch (error) {
-    console.error('Error getting image storage stats:', error);
+    console.error('Error getting image getFirebaseStorage() stats:', error);
     return { totalImages: 0, totalSize: 0, images: [] };
   }
 }
@@ -208,7 +208,7 @@ export async function prepareForFirebaseStorageMigration(
   try {
     const stats = await getImageStorageStats(collectionName, documentId);
     
-    const docRef = doc(db, collectionName, documentId);
+    const docRef = doc(getFirebaseDb(), collectionName, documentId);
     const docSnap = await getDoc(docRef);
     
     if (!docSnap.exists()) {
@@ -236,7 +236,7 @@ export async function prepareForFirebaseStorageMigration(
 }
 
 /**
- * Utility to check if current storage method is Base64
+ * Utility to check if current getFirebaseStorage() method is Base64
  */
 export function isUsingBase64Storage(): boolean {
   // This can be configured via environment variables later
@@ -256,7 +256,7 @@ export function getMigrationRecommendation(totalSize: number, totalImages: numbe
   if (sizeInMB > 50) {
     return {
       shouldMigrate: true,
-      reason: `Large storage usage (${sizeInMB.toFixed(2)}MB) detected. Firebase Storage recommended.`,
+      reason: `Large getFirebaseStorage() usage (${sizeInMB.toFixed(2)}MB) detected. Firebase Storage recommended.`,
       priority: 'high'
     };
   }
@@ -272,14 +272,14 @@ export function getMigrationRecommendation(totalSize: number, totalImages: numbe
   if (sizeInMB > 10) {
     return {
       shouldMigrate: true,
-      reason: `Moderate storage usage (${sizeInMB.toFixed(2)}MB). Consider Firebase Storage for better performance.`,
+      reason: `Moderate getFirebaseStorage() usage (${sizeInMB.toFixed(2)}MB). Consider Firebase Storage for better performance.`,
       priority: 'low'
     };
   }
   
   return {
     shouldMigrate: false,
-    reason: `Current usage (${totalImages} images, ${sizeInMB.toFixed(2)}MB) is within acceptable limits for Base64 storage.`,
+    reason: `Current usage (${totalImages} images, ${sizeInMB.toFixed(2)}MB) is within acceptable limits for Base64 getFirebaseStorage().`,
     priority: 'low'
   };
 }

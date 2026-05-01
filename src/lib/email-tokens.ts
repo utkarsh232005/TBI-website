@@ -1,6 +1,6 @@
 // src/lib/email-tokens.ts
 import { doc, getDoc, setDoc, deleteDoc } from 'firebase/firestore';
-import { db } from './firebase';
+import { getFirebaseDb } from '@/lib/firebase';
 import crypto from 'crypto';
 
 export interface EmailToken {
@@ -42,7 +42,7 @@ export async function createEmailToken(
     tokenData.action = action;
   }
 
-  await setDoc(doc(db, 'emailTokens', tokenId), tokenData);
+  await setDoc(doc(getFirebaseDb(), 'emailTokens', tokenId), tokenData);
   return tokenId;
 }
 
@@ -51,7 +51,7 @@ export async function verifyEmailToken(
   tokenId: string
 ): Promise<{ valid: boolean; token?: EmailToken; error?: string }> {
   try {
-    const tokenDoc = await getDoc(doc(db, 'emailTokens', tokenId));
+    const tokenDoc = await getDoc(doc(getFirebaseDb(), 'emailTokens', tokenId));
     
     if (!tokenDoc.exists()) {
       return { valid: false, error: 'Invalid token' };
@@ -66,7 +66,7 @@ export async function verifyEmailToken(
 
     // Check if token is expired
     if (now > tokenData.expiresAt) {
-      await deleteDoc(doc(db, 'emailTokens', tokenId));
+      await deleteDoc(doc(getFirebaseDb(), 'emailTokens', tokenId));
       return { valid: false, error: 'Token has expired' };
     }
 
@@ -85,7 +85,7 @@ export async function verifyEmailToken(
 // Mark token as used
 export async function markTokenAsUsed(tokenId: string): Promise<void> {
   await setDoc(
-    doc(db, 'emailTokens', tokenId),
+    doc(getFirebaseDb(), 'emailTokens', tokenId),
     { used: true },
     { merge: true }
   );

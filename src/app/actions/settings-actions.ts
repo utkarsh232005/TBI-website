@@ -1,4 +1,5 @@
 // src/app/actions/settings-actions.ts
+import 'server-only';
 'use server';
 
 import { 

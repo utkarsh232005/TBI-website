@@ -1,10 +1,10 @@
-// src/app/user/events/page.tsx
+// src/getFirebaseApp()/user/events/page.tsx
 "use client";
 
 import { useEffect, useState } from 'react';
 import EventCard, { type Event } from '@/components/ui/event-card';
 import { motion } from 'framer-motion';
-import { db } from '@/lib/firebase';
+import { getFirebaseDb } from '@/lib/firebase';
 import { collection, getDocs, orderBy, query, Timestamp } from 'firebase/firestore';
 import { Loader2, AlertCircle, CalendarDays } from 'lucide-react';
 import { format } from 'date-fns';
@@ -47,7 +47,7 @@ export default function UserEventsPage() {
       setIsLoading(true);
       setError(null);
       try {
-        const eventsCollection = collection(db, "events");
+        const eventsCollection = collection(getFirebaseDb(), "events");
         const q = query(eventsCollection, orderBy("date", "asc"), orderBy("createdAt", "desc"));
         const querySnapshot = await getDocs(q);
         const fetchedEvents: FirestoreEvent[] = [];

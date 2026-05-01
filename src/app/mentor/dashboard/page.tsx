@@ -1,4 +1,4 @@
-// src/app/mentor/dashboard/page.tsx
+// src/getFirebaseApp()/mentor/dashboard/page.tsx
 "use client";
 
 import { useState, useEffect } from 'react';
@@ -22,7 +22,7 @@ import {
 } from 'lucide-react';
 import { useToast } from "@/hooks/use-toast";
 import { collection, query, where, orderBy, onSnapshot } from 'firebase/firestore';
-import { db } from '@/lib/firebase';
+import { getFirebaseDb } from '@/lib/firebase';
 import type { MentorRequest } from '@/types/mentor-request';
 import { format } from 'date-fns';
 import Link from 'next/link';
@@ -59,7 +59,7 @@ export default function MentorDashboardPage() {
     
     // Set up real-time listener
     const q = query(
-      collection(db, 'mentorRequests'),
+      collection(getFirebaseDb(), 'mentorRequests'),
       where('mentorEmail', '==', user.email)
     );
     

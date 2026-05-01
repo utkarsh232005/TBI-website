@@ -1,4 +1,4 @@
-// src/app/mentors/page.tsx
+// src/getFirebaseApp()/mentors/page.tsx
 "use client";
 
 import { useEffect, useState } from 'react';
@@ -6,7 +6,7 @@ import MentorCard, { type Mentor as PublicMentor } from '@/components/ui/mentor-
 import MainNavbar from '@/components/ui/main-navbar';
 import Footer from '@/components/ui/footer';
 import { motion } from 'framer-motion';
-import { db } from '@/lib/firebase';
+import { getFirebaseDb } from '@/lib/firebase';
 import { collection, getDocs, orderBy, query, Timestamp } from 'firebase/firestore';
 import { Loader2, AlertCircle, Users } from 'lucide-react';
 import { AuroraText } from "@/components/magicui/aurora-text";
@@ -53,7 +53,7 @@ export default function MentorsPage() {
       setIsLoading(true);
       setError(null);
       try {
-        const mentorsCollection = collection(db, "mentors");
+        const mentorsCollection = collection(getFirebaseDb(), "mentors");
         const q = query(mentorsCollection, orderBy("createdAt", "desc"));
         const querySnapshot = await getDocs(q);
         const fetchedMentors: PublicMentor[] = []; querySnapshot.forEach((doc) => {

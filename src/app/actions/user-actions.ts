@@ -1,8 +1,8 @@
-// src/app/actions/user-actions.ts
+// src/getFirebaseApp()/actions/user-actions.ts
 'use server';
 
 import { z } from 'zod';
-import { db } from '@/lib/firebase';
+import { getFirebaseDb } from '@/lib/firebase';
 import { 
   doc, 
   getDoc, 
@@ -58,7 +58,7 @@ export async function getUserData(uid: string): Promise<UserActionResponse> {
       };
     }
 
-    const userDocRef = doc(db, 'users', uid);
+    const userDocRef = doc(getFirebaseDb(), 'users', uid);
     const userDoc = await getDoc(userDocRef);
 
     if (!userDoc.exists()) {
@@ -76,7 +76,7 @@ export async function getUserData(uid: string): Promise<UserActionResponse> {
         // We need to check both contactSubmissions and offCampusApplications
         const collectionsToSearch = ['contactSubmissions', 'offCampusApplications'];
         for (const collectionName of collectionsToSearch) {
-            const submissionDocRef = doc(db, collectionName, userData.submissionId);
+            const submissionDocRef = doc(getFirebaseDb(), collectionName, userData.submissionId);
             const submissionDoc = await getDoc(submissionDocRef);
             if (submissionDoc.exists()) {
                 submissionData = {
@@ -118,7 +118,7 @@ export async function updateUserProfile(values: UpdateUserProfileFormValues): Pr
     const validatedValues = UpdateUserProfileSchema.parse(values);
     const { uid, ...profileData } = validatedValues;
 
-    const userDocRef = doc(db, 'users', uid);
+    const userDocRef = doc(getFirebaseDb(), 'users', uid);
     const userDoc = await getDoc(userDocRef);
 
     if (!userDoc.exists()) {
@@ -167,7 +167,7 @@ export async function updateNotificationPreferences(values: UpdateNotificationPr
     const validatedValues = UpdateNotificationPreferencesSchema.parse(values);
     const { uid, emailNotifications } = validatedValues;
 
-    const userDocRef = doc(db, 'users', uid);
+    const userDocRef = doc(getFirebaseDb(), 'users', uid);
     const userDoc = await getDoc(userDocRef);
 
     if (!userDoc.exists()) {
@@ -218,7 +218,7 @@ export async function completeUserOnboarding(uid: string): Promise<UserActionRes
       };
     }
 
-    const userDocRef = doc(db, 'users', uid);
+    const userDocRef = doc(getFirebaseDb(), 'users', uid);
     const userDoc = await getDoc(userDocRef);
 
     if (!userDoc.exists()) {
@@ -261,7 +261,7 @@ export async function markPasswordChanged(uid: string): Promise<UserActionRespon
       };
     }
 
-    const userDocRef = doc(db, 'users', uid);
+    const userDocRef = doc(getFirebaseDb(), 'users', uid);
     const userDoc = await getDoc(userDocRef);
 
     if (!userDoc.exists()) {

@@ -1,8 +1,8 @@
-// src/app/actions/event-actions.ts
+// src/getFirebaseApp()/actions/event-actions.ts
 'use server';
 
 import { z } from 'zod';
-import { db } from '@/lib/firebase';
+import { getFirebaseDb } from '@/lib/firebase';
 import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
 import { revalidatePath } from 'next/cache';
 import { format } from 'date-fns';
@@ -49,7 +49,7 @@ export async function createEventAction(values: EventFormValues): Promise<Create
       updatedAt: serverTimestamp(),
     };
 
-    const docRef = await addDoc(collection(db, "events"), eventData);
+    const docRef = await addDoc(collection(getFirebaseDb(), "events"), eventData);
     
     // Revalidate paths
     revalidatePath('/admin/events');

@@ -13,26 +13,52 @@ const firebaseConfig = {
   measurementId: process.env.NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID, // Optional
 };
 
-// Initialize Firebase
-let app: FirebaseApp;
-if (!getApps().length) {
-  app = initializeApp(firebaseConfig);
-} else {
-  app = getApp();
+let app: FirebaseApp | null = null;
+
+export function getFirebaseApp() {
+  if (app) return app;
+  
+  if (!process.env.NEXT_PUBLIC_FIREBASE_API_KEY || !process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID) {
+    console.warn('Firebase environment variables missing. Returning null for app initialization.');
+    return null;
+  }
+
+  if (!getApps().length) {
+    app = initializeApp(firebaseConfig);
+  } else {
+    app = getApp();
+  }
+  return app;
 }
 
-const db: Firestore = getFirestore(app);
-const storage: FirebaseStorage = getStorage(app);
-const auth: Auth = getAuth(app);
-
-// Configure Firebase Auth to persist sessions across browser sessions
-// This will keep users logged in even after closing the browser
-if (typeof window !== 'undefined') {
-  setPersistence(auth, browserLocalPersistence).catch((error) => {
-    console.error('Failed to set Firebase Auth persistence:', error);
-  });
+let db: Firestore | null = null;
+export function getFirebaseDb() {
+  if (db) return db;
+  const a = getFirebaseApp();
+  if (!a) return null;
+  db = getFirestore(a);
+  return db;
 }
 
-// Note: uploadBytesResumable will be used for file uploads with retry logic in the form handler.
+let auth: Auth | null = null;
+export function getFirebaseAuth() {
+  if (auth) return auth;
+  const a = getFirebaseApp();
+  if (!a) return null;
+  auth = getAuth(a);
+  if (typeof window !== 'undefined') {
+    setPersistence(auth, browserLocalPersistence).catch((error) => {
+      console.error('Failed to set Firebase Auth persistence:', error);
+    });
+  }
+  return auth;
+}
 
-export { app, db, storage, auth };
+let storage: FirebaseStorage | null = null;
+export function getFirebaseStorage() {
+  if (storage) return storage;
+  const a = getFirebaseApp();
+  if (!a) return null;
+  storage = getStorage(a);
+  return storage;
+}

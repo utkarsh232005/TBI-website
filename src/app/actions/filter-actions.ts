@@ -1,4 +1,4 @@
-import { db } from '@/lib/firebase';
+import { getFirebaseDb } from '@/lib/firebase';
 import { doc, getDoc, setDoc } from 'firebase/firestore';
 import { EvaluationFilterSettings } from '@/types/FilterSettings';
 
@@ -10,7 +10,7 @@ export async function saveEvaluationFilterSettings(
   settings: EvaluationFilterSettings
 ): Promise<{ status: 'success' | 'error'; message?: string }> {
   try {
-    const settingsRef = doc(db, USERS_COLLECTION, userId, FILTER_SETTINGS_SUBCOLLECTION, 'evaluationSubmissions');
+    const settingsRef = doc(getFirebaseDb(), USERS_COLLECTION, userId, FILTER_SETTINGS_SUBCOLLECTION, 'evaluationSubmissions');
     await setDoc(settingsRef, settings, { merge: true });
     return { status: 'success' };
   } catch (error: any) {
@@ -23,7 +23,7 @@ export async function loadEvaluationFilterSettings(
   userId: string
 ): Promise<{ status: 'success' | 'error'; settings?: EvaluationFilterSettings; message?: string }> {
   try {
-    const settingsRef = doc(db, USERS_COLLECTION, userId, FILTER_SETTINGS_SUBCOLLECTION, 'evaluationSubmissions');
+    const settingsRef = doc(getFirebaseDb(), USERS_COLLECTION, userId, FILTER_SETTINGS_SUBCOLLECTION, 'evaluationSubmissions');
     const docSnap = await getDoc(settingsRef);
 
     if (docSnap.exists()) {

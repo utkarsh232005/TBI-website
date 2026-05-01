@@ -16,24 +16,24 @@ import { Button } from "@/components/ui/button";
 import { useSearchFilter } from "@/hooks/useSearchFilter";
 import { useYearFilter } from "@/hooks/useYearFilter";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { db } from '@/lib/firebase';
+import { getFirebaseDb } from '@/lib/firebase';
 import { collection, getDocs, addDoc, setDoc, doc } from 'firebase/firestore';
 import { format } from 'date-fns';
-import { getAuth, signInWithEmailAndPassword } from "firebase/auth";
+import { getAuth, signInWithEmailAndPassword } from "firebase/getFirebaseAuth()";
 
-const auth = getAuth();
+const getFirebaseAuth() = getAuth();
 
 function useFirebaseAuth() {
-  const [user, setUser] = useState<import("firebase/auth").User | null>(null);
+  const [user, setUser] = useState<import("firebase/getFirebaseAuth()").User | null>(null);
 
   useEffect(() => {
-    // Listen for auth state changes
-    const unsubscribe = auth.onAuthStateChanged((firebaseUser) => {
+    // Listen for getFirebaseAuth() state changes
+    const unsubscribe = getFirebaseAuth().onAuthStateChanged((firebaseUser) => {
       setUser(firebaseUser);
     });
 
     // Optionally, sign in automatically for testing
-    // Removed automatic sign-in to avoid auth/invalid-credential error
+    // Removed automatic sign-in to avoid getFirebaseAuth()/invalid-credential error
 
     return () => unsubscribe();
   }, []);
@@ -329,7 +329,7 @@ function getMonthlyApplicationCounts(submissions: any[]) {
 
 // Upload parsed Excel data to Firestore
 async function uploadExcelDataToFirestore(parsedData: any[]) {
-  await addDoc(collection(db, 'analysisUploads'), {
+  await addDoc(collection(getFirebaseDb(), 'analysisUploads'), {
     data: parsedData,
     uploadedAt: new Date(), // Use new Date() instead of serverTimestamp()
   });
@@ -338,7 +338,7 @@ async function uploadExcelDataToFirestore(parsedData: any[]) {
 // Helper: Fetch all campus and off-campus submissions and merge them
 async function fetchAndMergeSubmissionsToAnalysis() {
   // Fetch campus submissions
-  const campusSnapshot = await getDocs(collection(db, 'contactSubmissions'));
+  const campusSnapshot = await getDocs(collection(getFirebaseDb(), 'contactSubmissions'));
   const campusData = campusSnapshot.docs.map(doc => ({
     ...doc.data(),
     id: doc.id,
@@ -346,7 +346,7 @@ async function fetchAndMergeSubmissionsToAnalysis() {
   }));
 
   // Fetch off-campus submissions
-  const offCampusSnapshot = await getDocs(collection(db, 'offCampusApplications'));
+  const offCampusSnapshot = await getDocs(collection(getFirebaseDb(), 'offCampusApplications'));
   const offCampusData = offCampusSnapshot.docs.map(doc => ({
     ...doc.data(),
     id: doc.id,
@@ -357,7 +357,7 @@ async function fetchAndMergeSubmissionsToAnalysis() {
   const allSubmissions = [...campusData, ...offCampusData];
 
   // Upload/merge to 'analysis' collection (idempotent by submission id)
-  const analysisCol = collection(db, 'analysis');
+  const analysisCol = collection(getFirebaseDb(), 'analysis');
   for (const submission of allSubmissions) {
     await setDoc(doc(analysisCol, submission.id), submission, { merge: true });
   }
@@ -365,7 +365,7 @@ async function fetchAndMergeSubmissionsToAnalysis() {
 
 // Helper: Fetch all analysis data
 async function fetchAllAnalysisDataFromCollection() {
-  const snapshot = await getDocs(collection(db, 'analysis'));
+  const snapshot = await getDocs(collection(getFirebaseDb(), 'analysis'));
   return snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
 }
 
@@ -408,7 +408,7 @@ function getLegalStatusBadgeColors(legalStatus: string) {
 const AnalysisPage = () => {
   // All hooks at the top, before any return or conditional
   const [mounted, setMounted] = useState(false);
-  const user = useFirebaseAuth(); // Use the auth hook
+  const user = useFirebaseAuth(); // Use the getFirebaseAuth() hook
   const [excelData, setExcelData] = useState<StartupData[]>([]);
   const [chartData, setChartData] = useState<ChartData[]>([]);
   const [successData, setSuccessData] = useState<SuccessData[]>([]);
@@ -483,9 +483,9 @@ const AnalysisPage = () => {
   useEffect(() => {
     async function fetchSubmissionsForGraph() {
       setLoadingSubmissionGraph(true);
-      const campusSnapshot = await getDocs(collection(db, 'contactSubmissions'));
+      const campusSnapshot = await getDocs(collection(getFirebaseDb(), 'contactSubmissions'));
       const campusData = campusSnapshot.docs.map(doc => doc.data());
-      const offCampusSnapshot = await getDocs(collection(db, 'offCampusApplications'));
+      const offCampusSnapshot = await getDocs(collection(getFirebaseDb(), 'offCampusApplications'));
       const offCampusData = offCampusSnapshot.docs.map(doc => doc.data());
       console.log('Campus submissions:', campusData);
       console.log('Off-campus submissions:', offCampusData);
@@ -544,7 +544,7 @@ const AnalysisPage = () => {
     syncAndFetch();
   }, []);
 
-  // Early returns for loading/auth (after all hooks)
+  // Early returns for loading/getFirebaseAuth() (after all hooks)
   if (!mounted) return null;
 
   const handleDownloadTemplate = (templateType: string) => {

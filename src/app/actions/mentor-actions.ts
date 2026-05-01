@@ -1,16 +1,16 @@
-// src/app/actions/mentor-actions.ts
+// src/getFirebaseApp()/actions/mentor-actions.ts
 'use server';
 
 import { z } from 'zod';
-import { db, auth } from '@/lib/firebase';
+import { getFirebaseDb, getFirebaseAuth } from '@/lib/firebase';
 import { collection, serverTimestamp, doc, setDoc, deleteDoc } from 'firebase/firestore';
 import { revalidatePath } from 'next/cache';
-import { createUserWithEmailAndPassword } from 'firebase/auth';
+import { createUserWithEmailAndPassword } from 'firebase/getFirebaseAuth()';
 import { Resend } from 'resend';
 
 // Helper function to send emails via Resend
 // This is copied from mentor-request-actions.ts for now.
-// In a larger app, this would be in a shared lib/email.ts file.
+// In a larger getFirebaseApp(), this would be in a shared lib/email.ts file.
 async function sendEmailNotification(to: string, subject: string, body: string, htmlBody?: string): Promise<{ success: boolean; message: string; error?: string }> {
   if (!process.env.RESEND_API_KEY) {
     console.error("**********************************************************************************");
@@ -92,7 +92,7 @@ export async function createMentorAction(values: MentorFormValues): Promise<Crea
     const { name, designation, expertise, description, profilePictureUrl, linkedinUrl, email, password } = validatedValues.data;
 
     // Create Firebase Auth user for the mentor
-    const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+    const userCredential = await createUserWithEmailAndPassword(getFirebaseAuth(), email, password);
     const firebaseUser = userCredential.user;
     
     // Main mentor document with basic info only
@@ -130,8 +130,8 @@ export async function createMentorAction(values: MentorFormValues): Promise<Crea
     };
 
     // Create mentor document and profile subcollection
-    await setDoc(doc(db, "mentors", firebaseUser.uid), mentorData);
-    await setDoc(doc(db, "mentors", firebaseUser.uid, "profile", "details"), profileData);
+    await setDoc(doc(getFirebaseDb(), "mentors", firebaseUser.uid), mentorData);
+    await setDoc(doc(getFirebaseDb(), "mentors", firebaseUser.uid, "profile", "details"), profileData);
     
     // Note: No longer creating in 'users' collection - mentors are only in 'mentors' collection
     
@@ -159,7 +159,7 @@ export async function createMentorAction(values: MentorFormValues): Promise<Crea
   } catch (error: any) {
     console.error("Error in createMentorAction: ", error);
     let errorMessage = "Failed to add mentor.";
-    if (error.code === 'auth/email-already-in-use') {
+    if (error.code === 'getFirebaseAuth()/email-already-in-use') {
         errorMessage = "This email is already registered in Firebase Authentication. If you recently deleted a mentor with this email, you need to also delete the Firebase Auth user from the Firebase Console (Authentication > Users) to reuse this email.";
     } else if (error.code === 'permission-denied') {
         errorMessage = "Permission denied. Check Firestore rules for 'mentors' and 'users' collections.";
@@ -177,8 +177,8 @@ export async function deleteMentorAction(mentorId: string, deleteAuthUser: boole
     
     // Delete from mentor collection and its subcollections
     const deletionPromises = [
-      deleteDoc(doc(db, "mentors", mentorId)),
-      deleteDoc(doc(db, "mentors", mentorId, "profile", "details"))
+      deleteDoc(doc(getFirebaseDb(), "mentors", mentorId)),
+      deleteDoc(doc(getFirebaseDb(), "mentors", mentorId, "profile", "details"))
         .catch(error => {
           // If subcollection doesn't exist, that's fine
           if (error.code !== 'not-found') {
@@ -198,7 +198,7 @@ export async function deleteMentorAction(mentorId: string, deleteAuthUser: boole
         console.log(`🔐 Attempting to delete Firebase Auth user: ${mentorId}`);
         
         // Attempt to delete Firebase Auth user via API
-        const response = await fetch('/api/admin/delete-auth-user', {
+        const response = await fetch('/api/admin/delete-getFirebaseAuth()-user', {
           method: 'DELETE',
           headers: {
             'Content-Type': 'application/json',
@@ -216,11 +216,11 @@ export async function deleteMentorAction(mentorId: string, deleteAuthUser: boole
           console.warn(`⚠️ Auth deletion failed for ${mentorId}:`, result.message);
         }
       } catch (error) {
-        authUserMessage = " ⚠️ Warning: Could not connect to auth deletion API. Please delete Firebase Auth user manually from Firebase Console.";
+        authUserMessage = " ⚠️ Warning: Could not connect to getFirebaseAuth() deletion API. Please delete Firebase Auth user manually from Firebase Console.";
         console.error(`❌ Auth deletion API error for ${mentorId}:`, error);
       }
     } else {
-      authUserMessage = " ℹ️ Note: Firebase Auth account still exists. To reuse this email, delete the auth user manually from Firebase Console (Authentication > Users).";
+      authUserMessage = " ℹ️ Note: Firebase Auth account still exists. To reuse this email, delete the getFirebaseAuth() user manually from Firebase Console (Authentication > Users).";
     }
     
     revalidatePath('/admin/mentors');
