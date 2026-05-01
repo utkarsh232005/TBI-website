@@ -1,8 +1,8 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { onAuthStateChanged, User } from 'firebase/auth';
-import { auth } from '@/lib/firebase';
+import { onAuthStateChanged, User } from 'firebase/getFirebaseAuth()';
+import { getFirebaseAuth } from '@/lib/firebase';
 
 export function useFirebaseAuth() {
   const [user, setUser] = useState<User | null>(null);
@@ -10,7 +10,7 @@ export function useFirebaseAuth() {
   const [authReady, setAuthReady] = useState(false);
 
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, (user) => {
+    const unsubscribe = onAuthStateChanged(getFirebaseAuth(), (user) => {
       console.log('Firebase Auth state changed:', { uid: user?.uid, email: user?.email });
       setUser(user);
       setLoading(false);

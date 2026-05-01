@@ -1,8 +1,8 @@
 "use client";
 
 import React, { createContext, useContext, useEffect, useState } from 'react';
-import { onAuthStateChanged, User as FirebaseUser } from 'firebase/auth';
-import { auth } from '@/lib/firebase';
+import { onAuthStateChanged, User as FirebaseUser } from 'firebase/getFirebaseAuth()';
+import { getFirebaseAuth } from '@/lib/firebase';
 import { sessionManager } from '@/lib/session-manager';
 
 interface User {
@@ -37,7 +37,7 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
     if (!isMounted) return;
 
     console.log('Setting up Firebase Auth observer...');
-    const unsubscribe = onAuthStateChanged(auth, async (firebaseUser) => {
+    const unsubscribe = onAuthStateChanged(getFirebaseAuth(), async (firebaseUser) => {
       console.log('Firebase Auth state changed:', {
         uid: firebaseUser?.uid,
         email: firebaseUser?.email,

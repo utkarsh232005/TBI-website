@@ -1,4 +1,4 @@
-// src/app/mentor/profile/page.tsx
+// src/getFirebaseApp()/mentor/profile/page.tsx
 "use client";
 
 import { useEffect, useState, useRef } from "react";
@@ -6,10 +6,10 @@ import { Card, CardHeader, CardTitle, CardContent, CardDescription } from "@/com
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
-import { getAuth, onAuthStateChanged } from "firebase/auth";
+import { getAuth, onAuthStateChanged } from "firebase/getFirebaseAuth()";
 import { doc, getDoc, setDoc } from "firebase/firestore";
-import { db, storage } from "@/lib/firebase";
-import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
+import { getFirebaseDb, getFirebaseStorage } from '@/lib/firebase';
+import { ref, uploadBytes, getDownloadURL } from "firebase/getFirebaseStorage()";
 import { User, Camera, Loader2, Save, Mail, MapPin, Globe, Edit } from "lucide-react";
 
 function getInitials(name: string) {
@@ -40,8 +40,8 @@ export default function MentorProfilePage() {
 
   // Check authentication state and fetch profile
   useEffect(() => {
-    const auth = getAuth();
-    const unsubscribe = onAuthStateChanged(auth, async (currentUser) => {
+    const getFirebaseAuth() = getAuth();
+    const unsubscribe = onAuthStateChanged(getFirebaseAuth(), async (currentUser) => {
       console.log('Auth state changed:', currentUser ? 'User logged in' : 'No user');
       if (currentUser) {
         setUser(currentUser);
@@ -66,7 +66,7 @@ export default function MentorProfilePage() {
       console.log('🔍 Fetching profile for user:', user.uid);
       
       // First check if mentor exists in main collection
-      const mentorRef = doc(db, "mentors", user.uid);
+      const mentorRef = doc(getFirebaseDb(), "mentors", user.uid);
       const mentorSnap = await getDoc(mentorRef);
       
       console.log('📋 Main mentor document exists:', mentorSnap.exists());
@@ -83,7 +83,7 @@ export default function MentorProfilePage() {
       const mentorData = mentorSnap.data();
       
       // Get profile details from subcollection
-      const profileRef = doc(db, "mentors", user.uid, "profile", "details");
+      const profileRef = doc(getFirebaseDb(), "mentors", user.uid, "profile", "details");
       const profileSnap = await getDoc(profileRef);
       
       console.log('📂 Profile subcollection exists:', profileSnap.exists());
@@ -166,7 +166,7 @@ export default function MentorProfilePage() {
         }
       }
       
-      const docRef = doc(db, "mentors", user.uid, "profile", "details");
+      const docRef = doc(getFirebaseDb(), "mentors", user.uid, "profile", "details");
       const data = {
         // Personal Information
         name: profile.fullName,

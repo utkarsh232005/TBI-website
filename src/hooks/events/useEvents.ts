@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import { collection, query, orderBy, getDocs, addDoc, doc, deleteDoc, updateDoc, Timestamp, where } from 'firebase/firestore';
-import { db } from '@/lib/firebase';
+import { getFirebaseDb } from '@/lib/firebase';
 import { EventDocument, EventStatus } from '@/types/events';
 import { useToast } from '@/components/ui/use-toast';
 
@@ -16,7 +16,7 @@ export const useEvents = () => {
       setIsLoading(true);
       setError(null);
       
-      const eventsRef = collection(db, 'events');
+      const eventsRef = collection(getFirebaseDb(), 'events');
       const q = query(eventsRef, orderBy('date', 'desc'));
       const querySnapshot = await getDocs(q);
       
@@ -48,7 +48,7 @@ export const useEvents = () => {
         updatedAt: Timestamp.now(),
       };
 
-      const docRef = await addDoc(collection(db, 'events'), eventData);
+      const docRef = await addDoc(collection(getFirebaseDb(), 'events'), eventData);
       
       toast({
         title: 'Success',
@@ -71,7 +71,7 @@ export const useEvents = () => {
   // Update an existing event
   const updateEvent = async (id: string, data: Partial<EventDocument>) => {
     try {
-      await updateDoc(doc(db, 'events', id), {
+      await updateDoc(doc(getFirebaseDb(), 'events', id), {
         ...data,
         updatedAt: Timestamp.now(),
       });
@@ -96,7 +96,7 @@ export const useEvents = () => {
   // Delete an event
   const deleteEvent = async (id: string) => {
     try {
-      await deleteDoc(doc(db, 'events', id));
+      await deleteDoc(doc(getFirebaseDb(), 'events', id));
       
       toast({
         title: 'Success',

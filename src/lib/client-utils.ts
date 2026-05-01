@@ -1,6 +1,6 @@
 // Client-side utility functions that need access to browser APIs like localStorage
-import { auth } from './firebase';
-import { updatePassword, reauthenticateWithCredential, EmailAuthProvider } from 'firebase/auth';
+import { getFirebaseAuth } from '@/lib/firebase';
+import { updatePassword, reauthenticateWithCredential, EmailAuthProvider } from 'firebase/getFirebaseAuth()';
 
 // Utility function to store current user data after successful login
 export function setCurrentUser(userData: {
@@ -51,10 +51,10 @@ export async function updateUserPassword(newPassword: string, currentPassword?: 
   try {
     console.log('updateUserPassword called with:', { hasCurrentPassword: !!currentPassword, newPasswordLength: newPassword.length });
     
-    // Wait a bit to ensure auth state is loaded
+    // Wait a bit to ensure getFirebaseAuth() state is loaded
     await new Promise(resolve => setTimeout(resolve, 100));
     
-    const user = auth.currentUser;
+    const user = getFirebaseAuth().currentUser;
     console.log('Current user:', { uid: user?.uid, email: user?.email, isAnonymous: user?.isAnonymous });
     
     if (!user) {
@@ -96,12 +96,12 @@ export async function updateUserPassword(newPassword: string, currentPassword?: 
     console.error('Error updating password:', error);
     
     // Handle specific Firebase Auth errors
-    if (error.code === 'auth/weak-password') {
+    if (error.code === 'getFirebaseAuth()/weak-password') {
       return {
         success: false,
         message: 'Password is too weak. Please choose a stronger password.',
       };
-    } else if (error.code === 'auth/requires-recent-login') {
+    } else if (error.code === 'getFirebaseAuth()/requires-recent-login') {
       return {
         success: false,
         message: 'Please log out and log back in before changing your password.',

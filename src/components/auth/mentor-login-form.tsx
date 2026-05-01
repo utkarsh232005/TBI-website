@@ -10,8 +10,8 @@ import { useToast } from "@/hooks/use-toast";
 import { useRouter } from "next/navigation";
 import { LogIn, Loader2, UserCheck } from "lucide-react";
 import { useState } from "react";
-import { signInWithEmailAndPassword } from "firebase/auth";
-import { auth, db } from "@/lib/firebase";
+import { signInWithEmailAndPassword } from "firebase/getFirebaseAuth()";
+import { getFirebaseAuth, getFirebaseDb } from '@/lib/firebase';
 import { doc, getDoc } from "firebase/firestore";
 import { setCurrentUser } from "@/lib/client-utils";
 import { cn } from "@/lib/utils";
@@ -54,15 +54,15 @@ export default function MentorLoginForm({ onForgotPassword }: { onForgotPassword
   async function onSubmit(values: FormValues) {
     setIsLoading(true);
     try {
-      const userCredential = await signInWithEmailAndPassword(auth, values.email, values.password);
+      const userCredential = await signInWithEmailAndPassword(getFirebaseAuth(), values.email, values.password);
       const firebaseUser = userCredential.user;
 
       // Check if the user exists in the 'mentors' collection
-      const mentorDocRef = doc(db, 'mentors', firebaseUser.uid);
+      const mentorDocRef = doc(getFirebaseDb(), 'mentors', firebaseUser.uid);
       const mentorDoc = await getDoc(mentorDocRef);
 
       if (!mentorDoc.exists()) {
-        await auth.signOut(); // Sign out if not a mentor
+        await getFirebaseAuth().signOut(); // Sign out if not a mentor
         toast({
           title: "Access Denied",
           description: "This account does not have mentor privileges. Please contact an admin to set up your mentor profile.",
@@ -90,10 +90,10 @@ export default function MentorLoginForm({ onForgotPassword }: { onForgotPassword
       let errorMessage = "An unexpected error occurred. Please try again.";
       let toastVariant: 'warning' | 'destructive' = "destructive";
 
-      if (error.code === 'auth/user-not-found' || error.code === 'auth/wrong-password' || error.code === 'auth/invalid-credential') {
+      if (error.code === 'getFirebaseAuth()/user-not-found' || error.code === 'getFirebaseAuth()/wrong-password' || error.code === 'getFirebaseAuth()/invalid-credential') {
         errorMessage = "Invalid email or password. Please check your credentials and try again.";
         toastVariant = "warning";
-      } else if (error.code === 'auth/user-disabled') {
+      } else if (error.code === 'getFirebaseAuth()/user-disabled') {
         errorMessage = "This account has been disabled. Please contact support.";
       }
       toast({

@@ -1,3 +1,4 @@
+import 'server-only';
 
 'use server';
 /**
@@ -11,9 +12,9 @@
 
 import {ai} from '@/ai/genkit';
 import {z} from 'genkit';
-import { db, auth } from '@/lib/firebase';
+import { getFirebaseDb, getFirebaseAuth } from '@/lib/firebase';
 import { doc, updateDoc, serverTimestamp, getDoc, setDoc, collection, addDoc } from 'firebase/firestore';
-import { createUserWithEmailAndPassword, signOut } from 'firebase/auth';
+import { createUserWithEmailAndPassword, signOut } from 'firebase/getFirebaseAuth()';
 import { Resend } from 'resend';
 import { Submission } from '@/types/Submission';
 
@@ -104,7 +105,7 @@ const processApplicationFlow = ai.defineFlow(
     const { submissionId, action, applicantName, applicantEmail, campusStatus } = input;
     
     const collectionName = campusStatus === 'off-campus' ? 'offCampusApplications' : 'contactSubmissions';
-    const submissionRef = doc(db, collectionName, submissionId);
+    const submissionRef = doc(getFirebaseDb(), collectionName, submissionId);
 
     try {
       const submissionSnap = await getDoc(submissionRef);
@@ -128,9 +129,9 @@ const processApplicationFlow = ai.defineFlow(
         temporaryPassword = generateRandomString(10);
         
         try {
-          const userCredential = await createUserWithEmailAndPassword(auth, applicantEmail, temporaryPassword);
+          const userCredential = await createUserWithEmailAndPassword(getFirebaseAuth(), applicantEmail, temporaryPassword);
           const firebaseUser = userCredential.user;
-          await signOut(auth);
+          await signOut(getFirebaseAuth());
           
           const userDoc = {
             email: applicantEmail,
@@ -151,7 +152,7 @@ const processApplicationFlow = ai.defineFlow(
             updatedAt: serverTimestamp(),
           };
           
-          await setDoc(doc(db, 'users', firebaseUser.uid), userDoc);
+          await setDoc(doc(getFirebaseDb(), 'users', firebaseUser.uid), userDoc);
           
           updateData.status = 'accepted';
           updateData.firebaseUid = firebaseUser.uid;
@@ -202,3 +203,4 @@ const processApplicationFlow = ai.defineFlow(
 export async function processApplication(input: ProcessApplicationInput): Promise<ProcessApplicationOutput> {
   return processApplicationFlow(input);
 }
+

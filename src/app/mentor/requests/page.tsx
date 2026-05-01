@@ -1,4 +1,4 @@
-// src/app/mentor/requests/page.tsx
+// src/getFirebaseApp()/mentor/requests/page.tsx
 "use client";
 
 import * as React from "react";
@@ -24,7 +24,7 @@ import {
 } from 'lucide-react';
 import { useToast } from "@/hooks/use-toast";
 import { collection, query, where, orderBy, onSnapshot, doc, getDoc, getDocs } from 'firebase/firestore';
-import { db } from '@/lib/firebase';
+import { getFirebaseDb } from '@/lib/firebase';
 import type { MentorRequest } from '@/types/mentor-request';
 import { format } from 'date-fns';
 import { useUser } from '@/contexts/user-context';
@@ -61,7 +61,7 @@ export default function MentorRequestsPage() {
     try {
       // Query users collection by email
       const usersQuery = query(
-        collection(db, 'users'),
+        collection(getFirebaseDb(), 'users'),
         where('email', '==', userEmail)
       );
       
@@ -94,7 +94,7 @@ export default function MentorRequestsPage() {
     
     // Set up real-time listener
     const q = query(
-      collection(db, 'mentorRequests'),
+      collection(getFirebaseDb(), 'mentorRequests'),
       where('mentorEmail', '==', user.email)
     );
     

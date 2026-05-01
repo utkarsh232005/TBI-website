@@ -1,3 +1,4 @@
+import 'server-only';
 // src/ai/flows/admin-settings-flow.ts
 'use server';
 /**
@@ -10,7 +11,7 @@
 
 import { ai } from '@/ai/genkit'; // Assuming genkit is initialized in @/ai/genkit
 import { z } from 'genkit'; // Updated Zod import
-import { db } from '@/lib/firebase';
+import { getFirebaseDb } from '@/lib/firebase';
 import { doc, updateDoc, serverTimestamp, setDoc } from 'firebase/firestore';
 
 const ADMIN_CREDENTIALS_PATH = 'admin_config/main_credentials';
@@ -39,11 +40,11 @@ const updateAdminCredentialsFlow = ai.defineFlow(
   },
   async (input) => {
     const { newEmail, newPassword } = input;
-    const credentialsDocRef = doc(db, ADMIN_CREDENTIALS_PATH);
+    const credentialsDocRef = doc(getFirebaseDb(), ADMIN_CREDENTIALS_PATH);
 
     try {
       // WARNING: Storing password in plaintext. Highly insecure for production.
-      // Passwords should be hashed before storage.
+      // Passwords should be hashed before getFirebaseStorage().
       await setDoc(credentialsDocRef, { // Use setDoc with merge:true or updateDoc carefully
         email: newEmail,
         password: newPassword, // Storing plaintext password
@@ -70,3 +71,4 @@ export async function performFlowUpdateAdminCredentials(
 ): Promise<UpdateAdminCredentialsOutput> {
   return updateAdminCredentialsFlow(input);
 }
+

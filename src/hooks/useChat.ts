@@ -1,6 +1,6 @@
 import { useEffect, useState, useCallback } from 'react';
 import { collection, query, orderBy, onSnapshot, addDoc, serverTimestamp } from 'firebase/firestore';
-import { db } from '@/lib/firebase';
+import { getFirebaseDb } from '@/lib/firebase';
 import { useFirebaseAuth } from './useFirebaseAuth';
 
 export interface ChatMessage {
@@ -17,7 +17,7 @@ export function useChat(chatId: string) {
 
   useEffect(() => {
     if (!chatId) return;
-    const q = query(collection(db, 'chats', chatId, 'messages'), orderBy('timestamp'));
+    const q = query(collection(getFirebaseDb(), 'chats', chatId, 'messages'), orderBy('timestamp'));
     const unsubscribe = onSnapshot(q, (snapshot) => {
       setMessages(snapshot.docs.map(doc => ({ ...doc.data(), id: doc.id }) as ChatMessage));
       setLoading(false);
@@ -28,7 +28,7 @@ export function useChat(chatId: string) {
   const sendMessage = useCallback(
     async (text: string, senderType: 'mentor' | 'user') => {
       if (!user || !chatId || !text.trim()) return;
-      await addDoc(collection(db, 'chats', chatId, 'messages'), {
+      await addDoc(collection(getFirebaseDb(), 'chats', chatId, 'messages'), {
         senderId: user.uid,
         senderType,
         text,

@@ -20,13 +20,13 @@ export async function DELETE(request: NextRequest) {
     // You should verify that the requesting user is an admin
     
     const result = await deleteFirebaseAuthUser(uid);
-    
+
     return NextResponse.json(result, {
-      status: result.success ? 200 : 500
+      status: result.success ? 200 : result.status ?? 500,
     });
     
   } catch (error: any) {
-    console.error('Error in delete auth user API:', error);
+    console.error('Error in delete getFirebaseAuth() user API:', error);
     return NextResponse.json(
       { success: false, message: `Server error: ${error.message}` },
       { status: 500 }

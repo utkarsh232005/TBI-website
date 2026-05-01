@@ -1,4 +1,4 @@
-// src/app/admin/startups/page.tsx
+// src/getFirebaseApp()/admin/startups/page.tsx
 "use client";
 
 import { useState, useEffect, useCallback } from 'react';
@@ -46,9 +46,9 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { useToast } from "@/hooks/use-toast";
 import { uploadImage } from "@/lib/image-upload";
-import { db } from '@/lib/firebase';
+import { getFirebaseDb } from '@/lib/firebase';
 import { collection, getDocs, Timestamp, orderBy, query, doc, deleteDoc } from 'firebase/firestore';
-import { createStartupAction, updateStartupAction, deleteStartupAction, importStartupsFromTable } from '@/app/actions/startup-actions';
+import { createStartupAction, updateStartupAction, deleteStartupAction, importStartupsFromTable } from '@/getFirebaseApp()/actions/startup-actions';
 import Image from 'next/image';
 import ImageUploadComponent from '@/components/ui/image-upload';
 
@@ -132,7 +132,7 @@ export default function AdminStartupsPage() {
     setIsLoading(true);
     setError(null);
     try {
-      const startupsCollection = collection(db, "startups");
+      const startupsCollection = collection(getFirebaseDb(), "startups");
       const q = query(startupsCollection, orderBy("createdAt", "desc"));
       const querySnapshot = await getDocs(q);
       const fetchedStartups: StartupDocument[] = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as StartupDocument));
@@ -310,7 +310,7 @@ export default function AdminStartupsPage() {
 
   const handleImportStartups = async () => {
     setIsImporting(true);
-    // This is a predefined list for now. In a real app, this would come from a file upload or API.
+    // This is a predefined list for now. In a real getFirebaseApp(), this would come from a file upload or API.
     const startupDataToImport = [
       { "Startup Name": "Ira Industries", "Founder Details": "Akshay Shirpurkar (BE Civil 18)", "Incubation Stage": "Revenue Generation", "Legal Registration Type": "MSME SSI", "Funding Support": "₹5,69,723", "Recognition": "DPIIT Recognized", "Business Category & Industry": "Manufacturing", "Contact Information": "akshay.2995@gmail.com" },
       { "Startup Name": "The Imperial Lubricants", "Founder Details": "Apurv Sanjay Dey (B.E. Electronics-2020)", "Incubation Stage": "Revenue Generation", "Legal Registration Type": "MSME SSI", "Funding Support": "₹5,12,997", "Recognition": "DPIIT Recognized", "Business Category & Industry": "Eco-friendly Lubricants", "Contact Information": "apurvdey4@gmail.com" },

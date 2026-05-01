@@ -10,9 +10,9 @@ import { useToast } from "@/hooks/use-toast";
 import { useRouter } from "next/navigation";
 import { LogIn, Loader2, Users } from "lucide-react";
 import { useState } from "react";
-import { signInWithEmailAndPassword } from "firebase/auth";
-import { auth } from "@/lib/firebase";
-import { getUserData } from "@/app/actions/user-actions";
+import { signInWithEmailAndPassword } from "firebase/getFirebaseAuth()";
+import { getFirebaseAuth } from '@/lib/firebase';
+import { getUserData } from "@/getFirebaseApp()/actions/user-actions";
 import { setCurrentUser } from "@/lib/client-utils";
 import { cn } from "@/lib/utils";
 import { motion } from "framer-motion";
@@ -57,7 +57,7 @@ export default function UserLoginForm({ onForgotPassword }: { onForgotPassword?:
       console.log('Attempting login with:', { email: values.email });
 
       // Authenticate with Firebase Auth (client-side)
-      const userCredential = await signInWithEmailAndPassword(auth, values.email, values.password);
+      const userCredential = await signInWithEmailAndPassword(getFirebaseAuth(), values.email, values.password);
       const firebaseUser = userCredential.user;
 
       console.log('Firebase Auth successful:', { uid: firebaseUser.uid, email: firebaseUser.email });
@@ -67,7 +67,7 @@ export default function UserLoginForm({ onForgotPassword }: { onForgotPassword?:
 
       if (!userDataResult.success || !userDataResult.data) {
         // If user document doesn't exist, sign out and show error
-        await auth.signOut();
+        await getFirebaseAuth().signOut();
         toast({
           title: "Login Failed",
           description: "User profile not found. Please contact support.",
@@ -81,7 +81,7 @@ export default function UserLoginForm({ onForgotPassword }: { onForgotPassword?:
       // Check if user is active
       if (userData.status !== 'active') {
         // If user is not active, sign out and show error
-        await auth.signOut();
+        await getFirebaseAuth().signOut();
         toast({
           title: "Login Failed",
           description: "Your account is not active. Please contact support.",
@@ -114,12 +114,12 @@ export default function UserLoginForm({ onForgotPassword }: { onForgotPassword?:
       let errorMessage = "An unexpected error occurred. Please try again.";
       let toastVariant: 'warning' | 'destructive' = "destructive";
 
-      if (error.code === 'auth/user-not-found' || error.code === 'auth/wrong-password' || error.code === 'auth/invalid-credential') {
+      if (error.code === 'getFirebaseAuth()/user-not-found' || error.code === 'getFirebaseAuth()/wrong-password' || error.code === 'getFirebaseAuth()/invalid-credential') {
         errorMessage = "Invalid email or password. Please check your credentials and try again.";
         toastVariant = "warning";
-      } else if (error.code === 'auth/user-disabled') {
+      } else if (error.code === 'getFirebaseAuth()/user-disabled') {
         errorMessage = "This account has been disabled. Please contact support.";
-      } else if (error.code === 'auth/too-many-requests') {
+      } else if (error.code === 'getFirebaseAuth()/too-many-requests') {
         errorMessage = "Too many failed login attempts. Please try again later.";
       } else if (error.message) {
         errorMessage = error.message;

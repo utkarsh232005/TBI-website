@@ -3,7 +3,7 @@
 import { Rocket, Loader2, AlertCircle, Building2, ExternalLink, Users, TrendingUp, Award } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { useEffect, useState } from 'react';
-import { db } from '@/lib/firebase';
+import { getFirebaseDb } from '@/lib/firebase';
 import { collection, query, orderBy, getDocs, Timestamp } from 'firebase/firestore';
 import { processImageUrl } from '@/lib/utils';
 import StartupModal from '@/components/ui/startup-modal';
@@ -133,7 +133,7 @@ export default function FeaturedStartupsSection() {
         setError(null);
 
         const startupsQuery = query(
-          collection(db, 'startups'),
+          collection(getFirebaseDb(), 'startups'),
           orderBy('createdAt', 'desc')
         );
 

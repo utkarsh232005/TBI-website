@@ -1,11 +1,11 @@
-// src/app/user/mentors/page.tsx
+// src/getFirebaseApp()/user/mentors/page.tsx
 "use client";
 
 import { useEffect, useState } from 'react';
 import MentorCard, { type Mentor as PublicMentor } from '@/components/ui/mentor-card';
 import MentorRequestDialog from '@/components/ui/mentor-request-dialog';
 import { motion } from 'framer-motion';
-import { db } from '@/lib/firebase';
+import { getFirebaseDb } from '@/lib/firebase';
 import { collection, getDocs, orderBy, query, Timestamp } from 'firebase/firestore';
 import { Loader2, AlertCircle, Users, Lock } from 'lucide-react';
 import { processImageUrl } from "@/lib/utils";
@@ -67,7 +67,7 @@ export default function UserMentorsPage() {
       setIsLoading(true);
       setError(null);
       try {
-        const mentorsCollection = collection(db, "mentors");
+        const mentorsCollection = collection(getFirebaseDb(), "mentors");
         const q = query(mentorsCollection, orderBy("createdAt", "desc")); // Assuming createdAt exists
         const querySnapshot = await getDocs(q);
         const fetchedMentors: PublicMentor[] = [];

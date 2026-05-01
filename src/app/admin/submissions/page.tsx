@@ -4,10 +4,10 @@
 import { useEffect, useState, Suspense } from 'react';
 import { Button } from "@/components/ui/button";
 import { FileTextIcon, Loader2, AlertCircle, RefreshCw, UploadCloud, Building, Landmark } from "lucide-react";
-import { db } from '@/lib/firebase';
+import { getFirebaseDb } from '@/lib/firebase';
 import { collection, getDocs, orderBy, query, Timestamp } from 'firebase/firestore';
 import { useToast } from "@/hooks/use-toast";
-import { processApplicationAction, importOffCampusSubmissionsFromSheet } from '@/app/actions/admin-actions';
+import { processApplicationAction, importOffCampusSubmissionsFromSheet } from '@/getFirebaseApp()/actions/admin-actions';
 import { OffCampusSubmissionCard } from './components/OffCampusSubmissionCard';
 import { Submission } from '@/types/Submission';
 import { useSearchParams } from 'next/navigation';
@@ -46,8 +46,8 @@ function AdminSubmissionsContent() {
     setIsLoading(true);
     setError(null);
     try {
-      const onCampusQuery = query(collection(db, "contactSubmissions"), orderBy("submittedAt", "desc"));
-      const offCampusQuery = query(collection(db, "offCampusApplications"), orderBy("submittedAt", "desc"));
+      const onCampusQuery = query(collection(getFirebaseDb(), "contactSubmissions"), orderBy("submittedAt", "desc"));
+      const offCampusQuery = query(collection(getFirebaseDb(), "offCampusApplications"), orderBy("submittedAt", "desc"));
 
       const [onCampusSnapshot, offCampusSnapshot] = await Promise.all([
         getDocs(onCampusQuery),

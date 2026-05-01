@@ -1,6 +1,6 @@
 
 import { NextRequest, NextResponse } from 'next/server';
-import { db } from '@/lib/firebase';
+import { getFirebaseDb } from '@/lib/firebase';
 import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
 import { CampusStatus } from '@/types/Submission';
 import { DOMAIN_OPTIONS, SECTOR_OPTIONS } from '@/lib/validation/dropdown-constants';
@@ -55,7 +55,7 @@ export async function POST(request: NextRequest) {
       status: 'pending' as const,
     };
 
-    const docRef = await addDoc(collection(db, collectionName), submission);
+    const docRef = await addDoc(collection(getFirebaseDb(), collectionName), submission);
     console.log(`Document added to ${collectionName} with ID:`, docRef.id);
 
     return NextResponse.json({ message: 'Application submitted successfully', id: docRef.id }, { status: 201 });

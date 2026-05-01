@@ -1,8 +1,8 @@
 // Session management utilities for Firebase Auth
 // This helps maintain longer user sessions and handle token refresh
 
-import { auth } from '@/lib/firebase';
-import { User as FirebaseUser, onIdTokenChanged, getIdToken } from 'firebase/auth';
+import { getFirebaseAuth } from '@/lib/firebase';
+import { User as FirebaseUser, onIdTokenChanged, getIdToken } from 'firebase/getFirebaseAuth()';
 
 export class SessionManager {
   private static instance: SessionManager;
@@ -28,8 +28,8 @@ export class SessionManager {
    * Setup automatic token refresh to prevent session expiry
    */
   private setupTokenRefresh() {
-    // Listen for auth state changes and setup token refresh
-    onIdTokenChanged(auth, (user: FirebaseUser | null) => {
+    // Listen for getFirebaseAuth() state changes and setup token refresh
+    onIdTokenChanged(getFirebaseAuth(), (user: FirebaseUser | null) => {
       if (user) {
         this.startTokenRefresh(user);
       } else {
@@ -128,7 +128,7 @@ export class SessionManager {
    * Force refresh the current user's token
    */
   public async forceTokenRefresh(): Promise<void> {
-    const user = auth.currentUser;
+    const user = getFirebaseAuth().currentUser;
     if (user) {
       try {
         await getIdToken(user, true);
@@ -150,7 +150,7 @@ export class SessionManager {
    * Check if user session is still valid
    */
   public isSessionValid(): boolean {
-    const user = auth.currentUser;
+    const user = getFirebaseAuth().currentUser;
     const timeSinceActivity = this.getTimeSinceLastActivity();
     const MAX_SESSION_TIME = 24 * 60 * 60 * 1000; // 24 hours
 

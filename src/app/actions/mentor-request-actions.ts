@@ -1,8 +1,8 @@
-// src/app/actions/mentor-request-actions.ts
+// src/getFirebaseApp()/actions/mentor-request-actions.ts
 'use server';
 
 import { z } from 'zod';
-import { db } from '@/lib/firebase';
+import { getFirebaseDb } from '@/lib/firebase';
 import { 
   collection, 
   addDoc, 
@@ -99,7 +99,7 @@ async function sendEmailNotification(to: string, subject: string, body: string, 
 // Helper function to create notifications
 async function createNotification(notificationData: Omit<NotificationData, 'createdAt'>): Promise<void> {
   try {
-    await addDoc(collection(db, 'notifications'), {
+    await addDoc(collection(getFirebaseDb(), 'notifications'), {
       ...notificationData,
       createdAt: serverTimestamp(),
     });
@@ -123,7 +123,7 @@ async function getUserProfileDetails(userId: string): Promise<{
 } | null> {
   try {
     // Try to get from users collection first
-    const userDoc = await getDoc(doc(db, 'users', userId));
+    const userDoc = await getDoc(doc(getFirebaseDb(), 'users', userId));
     if (userDoc.exists()) {
       const userData = userDoc.data();
       return {
@@ -142,7 +142,7 @@ async function getUserProfileDetails(userId: string): Promise<{
     
     // If not found in users collection, try submissions (onboarding data)
     const submissionsQuery = query(
-      collection(db, 'submissions'),
+      collection(getFirebaseDb(), 'submissions'),
       where('uid', '==', userId)
     );
     const submissionsSnapshot = await getDocs(submissionsQuery);
@@ -190,7 +190,7 @@ export async function submitMentorRequest(
     console.log('Form data validated successfully');
 
     // Get mentor details
-    const mentorDoc = await getDoc(doc(db, 'mentors', formData.mentorId));
+    const mentorDoc = await getDoc(doc(getFirebaseDb(), 'mentors', formData.mentorId));
     if (!mentorDoc.exists()) {
       console.error('Mentor not found:', formData.mentorId);
       return { success: false, message: "Mentor not found" };
@@ -201,7 +201,7 @@ export async function submitMentorRequest(
 
     // Check if user already has a pending request for this mentor
     const existingRequestQuery = query(
-      collection(db, 'mentorRequests'),
+      collection(getFirebaseDb(), 'mentorRequests'),
       where('userId', '==', userId),
       where('mentorId', '==', formData.mentorId),
       where('status', 'in', ['pending', 'admin_approved'])
@@ -230,7 +230,7 @@ export async function submitMentorRequest(
     };
 
     console.log('About to add document to Firestore:', requestData);
-    const docRef = await addDoc(collection(db, 'mentorRequests'), requestData);
+    const docRef = await addDoc(collection(getFirebaseDb(), 'mentorRequests'), requestData);
     console.log('Document added successfully with ID:', docRef.id);
 
     revalidatePath('/admin/mentor-requests');
@@ -260,7 +260,7 @@ export async function processAdminMentorRequest(
     }
 
     // Get the request
-    const requestDoc = await getDoc(doc(db, 'mentorRequests', action.requestId));
+    const requestDoc = await getDoc(doc(getFirebaseDb(), 'mentorRequests', action.requestId));
     if (!requestDoc.exists()) {
       return { success: false, message: "Request not found" };
     }
@@ -274,7 +274,7 @@ export async function processAdminMentorRequest(
     const newStatus = action.action === 'approve' ? 'admin_approved' : 'admin_rejected';
 
     // Update request status
-    await updateDoc(doc(db, 'mentorRequests', action.requestId), {
+    await updateDoc(doc(getFirebaseDb(), 'mentorRequests', action.requestId), {
       status: newStatus,
       adminNotes: action.notes || '',
       adminProcessedAt: serverTimestamp(),
@@ -355,7 +355,7 @@ export async function processMentorDecision(
       return { success: false, message: "Invalid action data" };
     }
 
-    const requestDoc = await getDoc(doc(db, 'mentorRequests', action.requestId));
+    const requestDoc = await getDoc(doc(getFirebaseDb(), 'mentorRequests', action.requestId));
     if (!requestDoc.exists()) {
       return { success: false, message: "Request not found" };
     }
@@ -372,7 +372,7 @@ export async function processMentorDecision(
 
     const newStatus = action.action === 'approve' ? 'mentor_approved' : 'mentor_rejected';
 
-    await updateDoc(doc(db, 'mentorRequests', action.requestId), {
+    await updateDoc(doc(getFirebaseDb(), 'mentorRequests', action.requestId), {
       status: newStatus,
       mentorNotes: action.notes || '',
       mentorProcessedAt: serverTimestamp(),
@@ -407,7 +407,7 @@ export async function processMentorDecision(
 export async function getAdminMentorRequests(): Promise<MentorRequest[]> {
   try {
     const q = query(
-      collection(db, 'mentorRequests'),
+      collection(getFirebaseDb(), 'mentorRequests'),
       orderBy('createdAt', 'desc')
     );
     
@@ -451,7 +451,7 @@ export async function getMentorRequestForMentor(
   mentorEmail: string
 ): Promise<{ success: boolean; request?: MentorRequest; userDetails?: any; error?: string }> {
   try {
-    const requestDoc = await getDoc(doc(db, 'mentorRequests', requestId));
+    const requestDoc = await getDoc(doc(getFirebaseDb(), 'mentorRequests', requestId));
     
     if (!requestDoc.exists()) {
       return { success: false, error: "Request not found." };
@@ -492,7 +492,7 @@ export async function getMentorRequestForMentor(
 export async function getUserMentorRequests(userId: string): Promise<MentorRequest[]> {
   try {
     const q = query(
-      collection(db, 'mentorRequests'),
+      collection(getFirebaseDb(), 'mentorRequests'),
       where('userId', '==', userId),
       orderBy('createdAt', 'desc')
     );
@@ -535,7 +535,7 @@ export async function getUserMentorRequests(userId: string): Promise<MentorReque
 export async function getApprovedMentees(mentorEmail: string): Promise<{ success: boolean; mentees?: MentorRequest[]; error?: string }> {
   try {
     const q = query(
-      collection(db, 'mentorRequests'),
+      collection(getFirebaseDb(), 'mentorRequests'),
       where('mentorEmail', '==', mentorEmail),
       where('status', '==', 'mentor_approved'),
       orderBy('mentorProcessedAt', 'desc')
@@ -575,7 +575,7 @@ export async function getMenteeProfile(menteeUserId: string, mentorEmail: string
   try {
     // Security Check: Verify there's an approved mentorship relationship
     const q = query(
-      collection(db, 'mentorRequests'),
+      collection(getFirebaseDb(), 'mentorRequests'),
       where('userId', '==', menteeUserId),
       where('mentorEmail', '==', mentorEmail),
       where('status', '==', 'mentor_approved')

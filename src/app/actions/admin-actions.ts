@@ -1,4 +1,5 @@
 
+import 'server-only';
 'use server';
 
 import { 
@@ -8,9 +9,9 @@ import {
 } from '@/ai/flows/process-application-flow';
 import { revalidatePath } from 'next/cache';
 import { google } from 'googleapis';
-import { JWT } from 'google-auth-library';
+import { JWT } from 'google-getFirebaseAuth()-library';
 import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
-import { db } from '@/lib/firebase';
+import { getFirebaseDb } from '@/lib/firebase';
 import type { Submission } from '@/types/Submission';
 
 export async function processApplicationAction(
@@ -59,14 +60,14 @@ export async function importOffCampusSubmissionsFromSheet(): Promise<ImportSubmi
     const jwtClient = new JWT({
       email: credentials.client_email,
       key: credentials.private_key,
-      scopes: ['https://www.googleapis.com/auth/spreadsheets.readonly'],
+      scopes: ['https://www.googleapis.com/getFirebaseAuth()/spreadsheets.readonly'],
     });
 
     await jwtClient.authorize();
 
     const sheets = google.sheets({
       version: 'v4',
-      auth: jwtClient,
+      getFirebaseAuth(): jwtClient,
     });
 
     const spreadsheetId = '1wPgY5n0Ytj0GjnTIWqktGbnG3OEEK20QLRxihxj8DuI';
@@ -119,7 +120,7 @@ export async function importOffCampusSubmissionsFromSheet(): Promise<ImportSubmi
           throw new Error('Could not determine email for row.');
         }
         
-        await addDoc(collection(db, "offCampusApplications"), submissionData);
+        await addDoc(collection(getFirebaseDb(), "offCampusApplications"), submissionData);
         importedCount++;
       } catch (rowError: any) {
         console.error(`Error processing row ${i + 2}:`, row, rowError);

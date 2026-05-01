@@ -6,7 +6,7 @@ import { useRouter } from 'next/navigation';
 import styles from './events.module.css';
 
 // Firebase
-import { db } from '@/lib/firebase';
+import { getFirebaseDb } from '@/lib/firebase';
 import { 
   collection, 
   query, 
@@ -180,7 +180,7 @@ export default function EventsPage() {
       setLoading(true);
       setError(null);
       
-      const eventsCollection = collection(db, 'events');
+      const eventsCollection = collection(getFirebaseDb(), 'events');
       const q = query(eventsCollection, orderBy('createdAt', 'desc'));
       const querySnapshot = await getDocs(q);
       
@@ -233,7 +233,7 @@ export default function EventsPage() {
         updatedAt: Timestamp.now()
       };
       
-      const eventsCollection = collection(db, 'events');
+      const eventsCollection = collection(getFirebaseDb(), 'events');
       await addDoc(eventsCollection, eventData);
       
       
@@ -259,7 +259,7 @@ export default function EventsPage() {
     }
     
     try {
-      await deleteDoc(doc(db, 'events', id));
+      await deleteDoc(doc(getFirebaseDb(), 'events', id));
       
       fetchEvents();
     } catch (error) {

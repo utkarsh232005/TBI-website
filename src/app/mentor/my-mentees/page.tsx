@@ -1,9 +1,9 @@
-// src/app/mentor/my-mentees/page.tsx
+// src/getFirebaseApp()/mentor/my-mentees/page.tsx
 "use client";
 
 import { useState, useEffect } from 'react';
 import { useUser } from '@/contexts/user-context';
-import { getApprovedMentees } from '@/app/actions/mentor-request-actions';
+import { getApprovedMentees } from '@/getFirebaseApp()/actions/mentor-request-actions';
 import type { MentorRequest } from '@/types/mentor-request';
 import { Card, CardHeader, CardTitle, CardContent, CardDescription, CardFooter } from "@/components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -26,7 +26,7 @@ import {
 } from "lucide-react";
 import Link from 'next/link';
 import { collection, query, where, getDocs } from 'firebase/firestore';
-import { db } from '@/lib/firebase';
+import { getFirebaseDb } from '@/lib/firebase';
 
 // Extended type to include actual user details
 type MentorRequestWithUserDetails = MentorRequest & {
@@ -50,7 +50,7 @@ export default function MyMenteesPage() {
     try {
       // Query users collection by email
       const usersQuery = query(
-        collection(db, 'users'),
+        collection(getFirebaseDb(), 'users'),
         where('email', '==', userEmail)
       );
       

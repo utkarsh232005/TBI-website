@@ -2,7 +2,7 @@
 // Run this script to migrate existing mentors to the new format
 
 import { collection, getDocs, doc, setDoc, getDoc } from 'firebase/firestore';
-import { db } from '@/lib/firebase'; // Use existing Firebase instance
+import { getFirebaseDb } from '@/lib/firebase'; // Use existing Firebase instance
 
 interface MigrationResult {
   success: boolean;
@@ -15,7 +15,7 @@ export async function migrateMentorsToSubcollections(): Promise<MigrationResult>
   console.log('Starting migration of mentors to subcollection structure...');
   
   try {
-    const mentorsCollection = collection(db, "mentors");
+    const mentorsCollection = collection(getFirebaseDb(), "mentors");
     const querySnapshot = await getDocs(mentorsCollection);
     
     let migratedCount = 0;
@@ -26,7 +26,7 @@ export async function migrateMentorsToSubcollections(): Promise<MigrationResult>
       const mentorId = mentorDoc.id;
       
       // Check if profile subcollection already exists
-      const profileRef = doc(db, "mentors", mentorId, "profile", "details");
+      const profileRef = doc(getFirebaseDb(), "mentors", mentorId, "profile", "details");
       const profileSnap = await getDoc(profileRef);
       
       if (profileSnap.exists()) {
@@ -70,7 +70,7 @@ export async function migrateMentorsToSubcollections(): Promise<MigrationResult>
       };
       
       // Save both documents
-      await setDoc(doc(db, "mentors", mentorId), newMentorData, { merge: true });
+      await setDoc(doc(getFirebaseDb(), "mentors", mentorId), newMentorData, { merge: true });
       await setDoc(profileRef, profileData);
       
       console.log(`Migrated ${mentorData.name} successfully`);

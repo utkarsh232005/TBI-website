@@ -1,8 +1,8 @@
-// src/app/actions/startup-actions.ts
+// src/getFirebaseApp()/actions/startup-actions.ts
 'use server';
 
 import { z } from 'zod';
-import { db } from '@/lib/firebase';
+import { getFirebaseDb } from '@/lib/firebase';
 import { collection, addDoc, doc, updateDoc, deleteDoc, serverTimestamp } from 'firebase/firestore';
 import { revalidatePath } from 'next/cache';
 
@@ -79,7 +79,7 @@ export async function createStartupAction(values: StartupFormValues): Promise<Cr
       updatedAt: serverTimestamp(),
     };
 
-    const docRef = await addDoc(collection(db, "startups"), startupData);
+    const docRef = await addDoc(collection(getFirebaseDb(), "startups"), startupData);
     
     revalidatePath('/admin/startups');
     revalidatePath('/'); 
@@ -106,7 +106,7 @@ export async function updateStartupAction(startupId: string, values: StartupForm
       console.error("Server-side validation failed for startup update:", validatedValues.error.flatten().fieldErrors);
       return { success: false, message: "Invalid input data for startup update. " + JSON.stringify(validatedValues.error.flatten().fieldErrors) };
     }    const { name, logoUrl, logoFile, description, websiteUrl, funnelSource, session, monthYearOfIncubation, status, legalStatus, rknecEmailId, emailId, mobileNumber } = validatedValues.data;
-    const startupDocRef = doc(db, "startups", startupId);
+    const startupDocRef = doc(getFirebaseDb(), "startups", startupId);
     
     // Determine logo URL - needs careful handling to preserve existing if not changed
     // If logoFile is provided, it takes precedence.
@@ -161,7 +161,7 @@ export async function updateStartupAction(startupId: string, values: StartupForm
 // --- Delete Startup Action ---
 export async function deleteStartupAction(startupId: string): Promise<DeleteStartupResponse> {
   try {
-    const startupDocRef = doc(db, "startups", startupId);
+    const startupDocRef = doc(getFirebaseDb(), "startups", startupId);
     await deleteDoc(startupDocRef);
 
     revalidatePath('/admin/startups');
@@ -250,13 +250,13 @@ export async function importStartupsFromTable(data: StartupRowData[]): Promise<I
         updatedAt: serverTimestamp(),
       };
       
-      // Remove logoFile if present, as it's not for DB storage
+      // Remove logoFile if present, as it's not for DB getFirebaseStorage()
       if ('logoFile' in dataToSave) {
         delete (dataToSave as any).logoFile;
       }
 
 
-      await addDoc(collection(db, "startups"), dataToSave);
+      await addDoc(collection(getFirebaseDb(), "startups"), dataToSave);
       importedCount++;
     } catch (rowError: any) {
       console.error("Error processing startup row:", row, rowError);

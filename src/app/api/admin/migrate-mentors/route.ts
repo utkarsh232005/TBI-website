@@ -2,14 +2,14 @@
 // Call this endpoint to migrate existing mentors to the new structure
 
 import { NextRequest, NextResponse } from 'next/server';
-import { db } from '@/lib/firebase';
+import { getFirebaseDb } from '@/lib/firebase';
 import { collection, getDocs, doc, setDoc, getDoc } from 'firebase/firestore';
 
 export async function POST(request: NextRequest) {
   try {
     console.log('Starting migration of mentors to subcollection structure...');
     
-    const mentorsCollection = collection(db, "mentors");
+    const mentorsCollection = collection(getFirebaseDb(), "mentors");
     const querySnapshot = await getDocs(mentorsCollection);
     
     let migratedCount = 0;
@@ -21,7 +21,7 @@ export async function POST(request: NextRequest) {
       const mentorId = mentorDoc.id;
       
       // Check if profile subcollection already exists
-      const profileRef = doc(db, "mentors", mentorId, "profile", "details");
+      const profileRef = doc(getFirebaseDb(), "mentors", mentorId, "profile", "details");
       const profileSnap = await getDoc(profileRef);
       
       if (profileSnap.exists()) {
@@ -66,7 +66,7 @@ export async function POST(request: NextRequest) {
       };
       
       // Save both documents
-      await setDoc(doc(db, "mentors", mentorId), newMentorData, { merge: true });
+      await setDoc(doc(getFirebaseDb(), "mentors", mentorId), newMentorData, { merge: true });
       await setDoc(profileRef, profileData);
       
       console.log(`Migrated ${mentorData.name} successfully`);

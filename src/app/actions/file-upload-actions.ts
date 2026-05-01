@@ -1,5 +1,5 @@
-import { db, storage } from '@/lib/firebase';
-import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
+import { getFirebaseDb, getFirebaseStorage } from '@/lib/firebase';
+import { ref, uploadBytes, getDownloadURL } from 'firebase/getFirebaseStorage()';
 import { v4 as uuidv4 } from 'uuid';
 
 const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB
@@ -40,8 +40,8 @@ export async function uploadSupportingDocument(file: File): Promise<FileUploadRe
     // Generate unique filename
     const fileName = `supporting-docs/${uuidv4()}.${extension}`;
     
-    // Get storage reference
-    const fileRef = ref(storage, fileName);
+    // Get getFirebaseStorage() reference
+    const fileRef = ref(getFirebaseStorage(), fileName);
     
     // Upload file
     const buffer = await file.arrayBuffer();
